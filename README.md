@@ -62,7 +62,7 @@ pymzn.minizinc('test.mzn', bin_path='path/to/libminizinc')
 
 The returned value will be:
 ```
-[{'x': {3, 5}}]
+[{'x': {4, 5}}]
 ```
 The output of the `minizinc` function is a list of solutions. Each solution is
  a dictionary containing the assignment of each variable to its value.
