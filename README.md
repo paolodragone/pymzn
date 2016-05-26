@@ -99,6 +99,3 @@ Maintainers
 -----------
 
 [Paolo Dragone](http://paolodragone.com), University of Trento
-
-Please send bugs, comments and suggestions to the email you find in the
-website.
