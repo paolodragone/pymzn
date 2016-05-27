@@ -13,7 +13,7 @@ long_description = read('README.rst')
 
 setup(
     name='pymzn',
-    version='0.9',
+    version='0.9.1',
     url='https://github.com/paolodragone/PyMzn',
     license='MIT',
     author='Paolo Dragone',
