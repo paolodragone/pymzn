@@ -12,6 +12,8 @@ from io import IOBase
 # For now support only numerical values and numeric arrays and sets
 
 # integer patter
+from pymzn.dzn import dzn
+
 int_p = re.compile('^[+\-]?\d+$')
 
 # float pattern
@@ -251,14 +253,16 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_std,
     return solns
 
 
-def mzn2fzn(mzn_file, dzn_files=None, output_base=None, mzn_globals=None,
-            mzn2fzn_cmd='mzn2fzn'):
+def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
+            mzn_globals=None, mzn2fzn_cmd='mzn2fzn'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libmzn to produce a fzn file from a mzn one (and possibly
     an ozn file as well).
 
     :param str mzn_file: The path to a mzn file containing the MiniZinc model
+    :param dict data: Dictionary of variables to use as data for the solving
+                      of the minizinc problem
     :param [str] dzn_files: A list of paths to dzn files to attach to the
                             mzn2fzn execution; by default no data file is
                             attached
@@ -281,6 +285,9 @@ def mzn2fzn(mzn_file, dzn_files=None, output_base=None, mzn_globals=None,
         args += ['--output-base', output_base]
     if mzn_globals:
         args += ['-G', mzn_globals]
+    if data:
+        data = ' '.join(dzn(data))
+        args += ['-D', data]
     dzn_files = dzn_files or []
     args += [mzn_file] + dzn_files
     cmd = ' '.join(args)
@@ -391,9 +398,9 @@ def minizinc(mzn_file, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
                          the libminizinc utilities
     :param func fzn_cmd: The function to call for the solver; defaults to the
                          function fzn_gecode
-    :param [str] fzn_flags: A dictionary containing the additional flags to
-                            pass to the fzn_cmd; default is None, meaning no
-                            additional attribute
+    :param fzn_flags: A dictionary containing the additional flags to
+                      pass to the fzn_cmd; default is None, meaning no
+                      additional attribute
     :param kwargs: Any additional keyword argument is passed to the mzn2fzn
                    and solns2out utilities as options
     :return: Returns the solutions as returned by the solns2out utility

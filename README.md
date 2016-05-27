@@ -42,18 +42,23 @@ is a simple 0-1 knapsack problem encoded in MiniZinc:
 int: n = 5;
 set of int: OBJ = 1..n;
 int: capacity = 20;
-array[OBJ] of int: profit = [10, 3, 4, 9, 8];
-array[OBJ] of int: size = [14, 4, 6, 10, 9];
+array[OBJ] of int: profit = [10, 3, 9, 4, 8];
+array[OBJ] of int: size = [14, 4, 10, 6, 9];
+
 var set of OBJ: x;
 constraint sum(i in x)(size[i]) <= capacity;
+
 solve maximize sum(i in x)(profit[i]);
 ```
 
-Then you can run minizinc through pymzn like this:
+Assuming you installed Gecode (the default solver supported by this library),
+you can run minizinc through pymzn like this:
 ```
 import pymzn
 pymzn.minizinc('test.mzn')
 ```
+If you want to use a different solver, please read the following section.
+
 If you didn't put the binaries of libminizinc into the PATH environment
 variable, you need to specify this path using the `bin_path` argument:
 ```
@@ -62,7 +67,7 @@ pymzn.minizinc('test.mzn', bin_path='path/to/libminizinc')
 
 The returned value will be:
 ```
-[{'x': {4, 5}}]
+[{'x': {3, 5}}]
 ```
 The output of the `minizinc` function is a list of solutions. Each solution is
  a dictionary containing the assignment of each variable to its value.
@@ -86,6 +91,44 @@ The behaviour of the `minizinc` function can be adjusted by passing keywords
  almost one-to-one match with command line arguments of the libminizinc
  utilities.
 
+For instance, you can pass data to the `minizinc` function in the form of a
+dictionary of python objects, which are then converted in the right dzn
+format and feed to the mzn2fzn utility (more information about this in the
+following section).
+```
+pymzn.minizinc('test.mzn', data={'n': 10})
+```
+Otherwise you can provide dzn files containing the data:
+```
+pymzn.minizinc('test.mzn', dzn_files=['data1.dzn', 'data2.dzn'])
+```
+Or you can use both.
+
+Solvers
+-------
+If you want to use a different solver other than Gecode, you first need to
+make sure that it supports the MiniZinc interface.
+To solve your model through PyMzn you need to provide a proxy function to
+handle the command line interface of the solver, this is an example:
+```
+import pymzn
+
+def solve(fzn_file, arg1=def_val1, arg2=def_val2):
+    solver = 'path/to/solver'
+    args = [solver, '-arg1', str(arg1), '-arg2', str(arg2), fzn_file]
+    cmd = ' '.join(args)
+    ret, out, err = pymzn.run(cmd)
+
+    if ret != 0:
+        raise Exception('Something went wrong:\n{}'.format(err))
+
+    return out
+```
+Then you can run the `minizinc` function like this:
+```
+pymzn.minizinc('test.mzn', fzn_cmd=solve, fzn_flags={'arg1':val1, 'arg2':val2})
+```
+
 Parsing
 -------
 The output stream of the solver is parsed by the `solns2out` function. To
@@ -94,6 +137,28 @@ parse the output one needs a specialized function. The default one is the
 `solns2out` function then the raw output of the solver is used as output
 solution stream. If a custom output statement is used in the minizinc model,
  then an appropriate parsing function must be provided as well.
+
+Dzn data files
+--------------
+The PyMzn library also provides a set of methods to convert python objects
+into dzn format.
+```
+pymzn.dzn({'x': 2, 'y': {4, 6, 8}, 'z': [4.5, 1.3, 5.7]})
+```
+The `dzn` function gets a dictionary of python objects as input and returns
+a list of variable declaration statements in dzn format. Optionally, you can
+ pass the path to a dzn file where to write the statements.
+```
+pymzn.dzn(data, fout='path/to/dzn')
+```
+The supported types of python objects are:
+* String (str)
+* Integer (int)
+* Float (float)
+* Set (set of str, int of float)
+* Array (list of str, int, float or set)
+* Matrix (list of lists of str, int, float or set) \[the inner lists must
+have the same length\]
 
 Maintainers
 -----------
