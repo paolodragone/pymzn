@@ -52,7 +52,7 @@ def dzn(objs, fout=None):
         return False
 
     vals = []
-    for key, val in objs:
+    for key, val in objs.items():
         if is_value(val):
             vals.append(dzn_var(key, val))
         elif is_set(val):
