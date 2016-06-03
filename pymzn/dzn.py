@@ -3,7 +3,7 @@
 
 
 def dzn_var(name, val):
-    return '{} = {};\n'.format(name, val)
+    return '{} = {};'.format(name, val)
 
 
 def dzn_set(vals, sep=', '):
@@ -14,8 +14,8 @@ def dzn_array(array, sep=', '):
     return '[{}]'.format(sep.join(map(str, array)))
 
 
-def dzn_matrix(matrix):
-    rows = '\n'.join(['|' + ', '.join(map(str, row)) for row in matrix])
+def dzn_matrix(matrix, sep='\n'):
+    rows = sep.join(['|' + ', '.join(map(str, row)) for row in matrix])
     return '[{}|]'.format(rows)
 
 
@@ -77,6 +77,6 @@ def dzn(objs, fout=None):
     if fout:
         with open(fout, 'w') as f:
             for val in vals:
-                f.write(val)
+                f.write(val + '\n')
 
     return vals

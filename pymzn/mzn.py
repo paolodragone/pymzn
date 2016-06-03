@@ -285,8 +285,8 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
         args += ['--output-base', output_base]
     if mzn_globals:
         args += ['-G', mzn_globals]
-    if data:
-        data = ' '.join(dzn(data))
+    if data is not None:
+        data = '"' + ' '.join(dzn(data)) + '"'
         args += ['-D', data]
     dzn_files = dzn_files or []
     args += [mzn_file] + dzn_files
