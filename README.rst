@@ -87,7 +87,7 @@ the Parsing section)
 
 The ``pymzn`` module also provide the convenience function
 ``dict2array`` to convert the dict-based representation output by the
-``parse_std`` function into an array-based representation more suitable
+``parse_dzn`` function into an array-based representation more suitable
 to represent vectors and matrices of numbers.
 
 The behaviour of the ``minizinc`` function can be adjusted by passing
@@ -146,7 +146,7 @@ Parsing
 
 The output stream of the solver is parsed by the ``solns2out`` function.
 To parse the output one needs a specialized function. The default one is
-the ``parse_std`` function. If no parsing function (``parse=None``) is
+the ``parse_dzn`` function. If no parsing function (``parse=None``) is
 passed to the ``solns2out`` function then the raw output of the solver
 is used as output solution stream. If a custom output statement is used
 in the minizinc model, then an appropriate parsing function must be

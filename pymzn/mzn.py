@@ -41,7 +41,7 @@ var_p = re.compile(('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>[\w \.,+\-\\\/\*^|\('
 
 def dict2array(d):
     """
-    Transform an indexed dictionary (such as those returned by the parse_std
+    Transform an indexed dictionary (such as those returned by the parse_dzn
     function when parsing arrays) into an multi-dimensional array.
 
     :param dict d: The indexed dictionary to convert
@@ -125,7 +125,7 @@ def _parse_val(val):
     return None
 
 
-def parse_std(lines):
+def parse_dzn(lines):
     """
     Parse the one solution from the output stream of the solns2out utility.
 
@@ -164,7 +164,7 @@ def parse_std(lines):
     return parsed_vars
 
 
-def solns2out(solns_input, ozn_file, output_file=None, parse=parse_std,
+def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
               solns2out_cmd='solns2out', soln_sep='----------',
               search_complete_msg='==========',
               unknown_msg='=====UNKNOWN=====',
@@ -181,7 +181,7 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_std,
                             by this function and not saved on a file
     :param func parse: The function that parses the output of the solns2out
                        utility, if None a list of unparsed solution strings is
-                       returned; by default the function parse_std is used,
+                       returned; by default the function parse_dzn is used,
                        which can be used only if no output statement is used in
                        the MiniZinc model
     :param str solns2out_cmd: The command to call to execute the solns2out
@@ -204,15 +204,11 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_std,
              is returned
     :rtype: list
     """
-    args = [solns2out_cmd]
+    args = []
     if output_file:
-        args += ['-o', output_file]
+        args.append(('-o', output_file))
     args.append(ozn_file)
-    cmd = ' '.join(args)
-    ret, out, err = run(cmd, cmd_in=solns_input)
-
-    if ret != 0:
-        raise MiniZincError(cmd, err)
+    out = run(solns2out_cmd, args, cmd_in=solns_input)
 
     if output_file:
         f = open(output_file)
@@ -280,21 +276,18 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
     :rtype: (str, str)
     """
 
-    args = [mzn2fzn_cmd]
+    args = []
     if output_base:
-        args += ['--output-base', output_base]
+        args.append(('--output-base', output_base))
     if mzn_globals:
-        args += ['-G', mzn_globals]
+        args.append(('-G', mzn_globals))
     if data is not None:
         data = '"' + ' '.join(dzn(data)) + '"'
-        args += ['-D', data]
+        args.append(('-D', data))
     dzn_files = dzn_files or []
     args += [mzn_file] + dzn_files
-    cmd = ' '.join(args)
-    ret, out, err = run(cmd)
 
-    if ret != 0:
-        raise MiniZincError(cmd, err)
+    run(mzn2fzn_cmd, args)
 
     base = output_base or mzn_file[:-4]
     out_files = []
@@ -351,29 +344,26 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
              as a string using `out.decode('ascii')`
     :rtype: str
     """
-    args = [fzn_gecode_cmd]
+    args = []
     if output_file:
-        args += ['-o', output_file]
+        args.append(('-o', output_file))
     if n_solns >= 0:
-        args += ['-n', str(n_solns)]
+        args.append(('-n', n_solns))
     if parallel != 1:
-        args += ['-p', str(parallel)]
+        args.append(('-p', parallel))
     if time > 0:
-        args += ['-time', str(time)]
+        args.append(('-time', time))
     if seed != 0:
-        args += ['-r', str(seed)]
+        args.append(('-r', seed))
     if restart:
-        args += ['-restart', restart]
+        args.append(('-restart', restart))
     if restart_base:
-        args += ['-restart-base', str(restart_base)]
+        args.append(('-restart-base', restart_base))
     if restart_scale:
-        args += ['-restart-scale', str(restart_scale)]
+        args.append(('-restart-scale', restart_scale))
     args.append(fzn_file)
-    cmd = ' '.join(args)
-    ret, out, err = run(cmd)
 
-    if ret != 0:
-        raise MiniZincError(cmd, err)
+    out = run(fzn_gecode_cmd, args)
 
     if output_file:
         with open(output_file, 'rb') as f:
@@ -467,8 +457,8 @@ class MiniZincError(RuntimeError):
         """
         self.cmd = cmd
         self.err_msg = err_msg.decode('utf-8')
-        self.msg = 'An error occurred while executing the command: ' \
-                   '{}\n{}'.format(self.cmd, self.err_msg)
+        self.msg = ('An error occurred while executing the command: '
+                    '{}\n{}').format(self.cmd, self.err_msg)
         super().__init__(self.msg)
 
 
@@ -489,15 +479,37 @@ class MiniZincParsingError(RuntimeError):
         super().__init__(self.msg)
 
 
-def run(cmd, cmd_in=None):
+def run(cmd, args=None, cmd_in=None) -> bytes:
     """
     Executes a shell command and waits for the result.
 
-    :param cmd: The command to be executed (including arguments)
+    :param str cmd: The command to be executed (including its path if not in
+                    the working directory or in PATH environment variable)
+    :param list args: A list containing the arguments to pass to the
+                      command. The list may contain positional arguments that
+                      can be strings, integers or floats,
+                      or key-value pairs (tuple or list)
     :param cmd_in: Input stream to pass to the command
     :return: (ret, out, err) where ret is the return code, out is the output
              stream and err is the error stream of the command
+    :rtype: tuple
     """
+    cmd = [cmd]
+    if args is not None:
+        for arg in args:
+            if isinstance(arg, str):
+                cmd.append(arg)
+            elif isinstance(arg, [int, float]):
+                cmd.append(str(arg))
+            elif isinstance(arg, [tuple, list]) and len(arg) == 2:
+                k, v = arg
+                cmd.append(k)
+                if isinstance(v, [str, int, float]):
+                    cmd.append(str(v))
+            else:
+                raise RuntimeError('Argument not valid: {}'.format(arg))
+    cmd = ' '.join(cmd)
+
     pipe = subprocess.Popen(cmd, shell=True,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
@@ -505,7 +517,11 @@ def run(cmd, cmd_in=None):
                             preexec_fn=os.setsid)
     out, err = pipe.communicate(input=cmd_in)
     ret = pipe.wait()
-    return ret, out, err
+
+    if ret != 0:
+        raise MiniZincError(cmd, err)
+
+    return out
 
 
 def _get_defaults(f):

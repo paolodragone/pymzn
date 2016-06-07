@@ -7,9 +7,15 @@ def dzn_var(name, val):
 
 
 def dzn_set(vals, sep=', '):
+    if all([isinstance(v, int) for v in vals]):
+        min_val = min(vals)
+        max_val = max(vals)
+        if all([v in vals for v in range(min_val, max_val + 1)]):
+            return '{}..{}'.format(min_val, max_val)
     return '{{ {} }}'.format(sep.join(map(str, vals)))
 
 
+# TODO: pass from this conversion to the arrayNd one
 def dzn_array(array, sep=', '):
     return '[{}]'.format(sep.join(map(str, array)))
 
