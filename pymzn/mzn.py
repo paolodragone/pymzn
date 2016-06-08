@@ -329,12 +329,12 @@ def run(cmd, args=None, cmd_in=None) -> bytes:
         for arg in args:
             if isinstance(arg, str):
                 cmd.append(arg)
-            elif isinstance(arg, [int, float]):
+            elif isinstance(arg, (int, float)):
                 cmd.append(str(arg))
-            elif isinstance(arg, [tuple, list]) and len(arg) == 2:
+            elif isinstance(arg, (tuple, list)) and len(arg) == 2:
                 k, v = arg
                 cmd.append(k)
-                if isinstance(v, [str, int, float]):
+                if isinstance(v, (str, int, float)):
                     cmd.append(str(v))
             else:
                 raise RuntimeError('Argument not valid: {}'.format(arg))

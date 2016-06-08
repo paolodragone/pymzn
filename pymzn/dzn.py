@@ -64,7 +64,7 @@ def _dict_index_set(obj):
 
 def _is_contiguous(obj):
     if all(map(_is_int, obj)):
-        min_val, max_val = _dict_index_set(obj)
+        min_val, max_val = min(obj), max(obj)
         return all([v in obj for v in range(min_val, max_val + 1)])
     return False
 
@@ -114,8 +114,9 @@ def _dzn_array_nd(arr):
         raise MiniZincParsingError(arr)
     flat_arr = _flatten_array(arr, dim)
     dzn_arr = 'array{}d({}, {})'
-    return dzn_arr.format(dim, ', '.join(map(_dzn_set, idx_set)),
-                          '[' + ', '.join(map(str, flat_arr)) + ']')
+    idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
+    arr_str = '[' + ', '.join(map(str, flat_arr)) + ']'
+    return dzn_arr.format(dim, idx_set_str, arr_str)
 
 
 def dzn(objs, fout=None):
