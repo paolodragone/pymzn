@@ -164,13 +164,13 @@ Data (dzn files)
 The PyMzn library also provides a set of methods to convert python objects
 into dzn format.
 ```
-pymzn.dzn({'a': 2, 'b': {4, 6}, 'c': {1, 2, 3}, 'd': [4.5, 1.3], 'e': [[1, 2], [3, 4], [5, 6]]})
+pymzn.dzn({'a': 2, 'b': {4, 6}, 'c': {1, 2, 3}, 'd': {3: 4.5, 4: 1.3}, 'e': [[1, 2], [3, 4], [5, 6]]})
 ```
 The `dzn` function gets a dictionary of python objects as input and returns
 a list of variable declaration statements in dzn format.
 For instance, the output of the previous example would be:
 ```
-['a = 2;', 'b = {4, 6}', 'c = 1..3', 'd = [4.5, 1.3]', 'e = [| 1, 2 | 3, 4 | 5, 6 |]']
+['a = 2;', 'b = {4, 6};', 'c = 1..3;', 'd = array1d(3..4, [4.5, 1.3]);', 'e = array2d(1..3, 1..2, [1, 2, 3, 4, 5, 6];']
 ```
 
 Optionally, you can pass the path to a dzn file where to write the statements.
@@ -182,9 +182,14 @@ The supported types of python objects are:
 * Integer (int)
 * Float (float)
 * Set (set of str, int of float)
-* Array (list of str, int, float or set)
-* Matrix (list of lists of str, int, float or set; the inner lists must
-have the same length)
+* Multi-dimensional arrays:
+  * list of str, int, float or set; lists are converted into dzn arrays
+  with index-set 1..len(list);
+  * dict with int keys of str, int, float or set; dicts are converted into dzn
+  arrays with index-set equal to the key-set of the dict, provided that it is a
+  contiguous set;
+  * nested combinations of the previous two, provided that the children of
+  every node have the same index-set. The maximum depth is 6.
 
 Maintainers
 -----------

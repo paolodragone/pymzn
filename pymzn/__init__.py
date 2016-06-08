@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Wrapper module for the MiniZinc tool pipeline."""
+__version__ = '0.9.3'
 
-from .mzn import dict2array, fzn_gecode, minizinc, mzn2fzn, solns2out, \
-    parse_dzn, MiniZincError, MiniZincParsingError, run
-
-from .dzn import dzn_var, dzn_set, dzn_array, dzn_matrix, dzn
+from .mzn import fzn_gecode, minizinc, mzn2fzn, solns2out, MiniZincError, run
+from .dzn import dzn, parse_dzn, dict2array, MiniZincParsingError

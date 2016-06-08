@@ -4,164 +4,11 @@
 import contextlib
 import inspect
 import os.path
-import re
 import subprocess
 
 from io import IOBase
 
-# For now support only numerical values and numeric arrays and sets
-
-# integer patter
-from pymzn.dzn import dzn
-
-int_p = re.compile('^[+\-]?\d+$')
-
-# float pattern
-float_p = re.compile('^[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?$')
-
-# continuous integer set pattern
-cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
-
-# integer set pattern
-int_set_p = re.compile('^(\{(?P<vals>[\d ,+\-]*)\})$')
-
-# matches any of the previous
-val_p = re.compile(('(?:\{(?:[\d ,+\-]+)\}|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)|['
-                    '+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?|[+\-]?\d+)'))
-
-# multi-dimensional array pattern
-array_p = re.compile(('^(?:array(?P<dim>\d)d\s*\((?P<indices>(?:\s*['
-                      '\d\.+\-]+(\s*,\s*)?)+)\s*,\s*)?\[(?P<vals>[\w \.,'
-                      '+\-\\\/\*^|\(\)\{\}]+)\]\)?$'))
-
-# variable pattern
-var_p = re.compile(('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>[\w \.,+\-\\\/\*^|\('
-                    '\)\[\]\{\}]+);?$'))
-
-
-def dict2array(d):
-    """
-    Transform an indexed dictionary (such as those returned by the parse_dzn
-    function when parsing arrays) into an multi-dimensional array.
-
-    :param dict d: The indexed dictionary to convert
-    :return: A multi-dimensional array
-    :rtype: list
-    """
-    arr = []
-    index_set = sorted(d.keys())
-    for i in range(len(index_set)):
-        idx = index_set[i]
-        v = d[idx]
-        if isinstance(v, dict):
-            v = dict2array(v)
-        arr.append(v)
-    return arr
-
-
-def _parse_array(indices, vals):
-    # Recursive parsing of multi-dimensional arrays returned by the solns2out
-    # utility of the type: array2d(2..4, 1..3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
-    index_set = indices[0]
-    if len(indices) == 1:
-        arr = {i: _parse_val(vals.pop(0)) for i in index_set}
-    else:
-        arr = {i: _parse_array(indices[1:], vals) for i in index_set}
-    return arr
-
-
-def _parse_indices(st):
-    # Parse indices inside multi-dimensional arrays
-    ss = st.strip().split(',')
-    indices = []
-    for s in ss:
-        s = s.strip()
-        cont_int_set_m = cont_int_set_p.match(s)
-        if cont_int_set_m:
-            v1 = int(cont_int_set_m.group(1))
-            v2 = int(cont_int_set_m.group(2))
-            indices.append(range(v1, v2 + 1))
-        else:
-            raise MiniZincParsingError(s)
-    return indices
-
-
-def _parse_set(vals):
-    # Parse sets of integers of the type: {41, 2, 53, 12, 8}
-    p_s = set()
-    for val in vals:
-        p_val = val.strip()
-        if int_p.match(p_val):
-            p_val = int(p_val)
-            p_s.add(p_val)
-        else:
-            raise MiniZincParsingError(p_val)
-    return p_s
-
-
-def _parse_val(val):
-    # integer value
-    if int_p.match(val):
-        return int(val)
-
-    # float value
-    if float_p.match(val):
-        return float(val)
-
-    # continuous integer set
-    cont_int_set_m = cont_int_set_p.match(val)
-    if cont_int_set_m:
-        v1 = int(cont_int_set_m.group(1))
-        v2 = int(cont_int_set_m.group(2))
-        return set(range(v1, v2 + 1))
-
-    # integer set
-    set_m = int_set_p.match(val)
-    if set_m:
-        vals = set_m.group('vals')
-        if vals:
-            return _parse_set(vals.split(','))
-        return set()
-    return None
-
-
-def parse_dzn(lines):
-    """
-    Parse the one solution from the output stream of the solns2out utility.
-
-    :param [str] lines: The stream of lines from a given solution
-    :return: A dictionary containing the variable assignments parsed from
-             the input stream
-    :rtype: dict
-    """
-    parsed_vars = {}
-    for l in lines:
-        l = l.strip()
-        var_m = var_p.match(l)
-        if var_m:
-            var = var_m.group('var')
-            val = var_m.group('val')
-            p_val = _parse_val(val)
-            if p_val is not None:
-                parsed_vars[var] = p_val
-                continue
-
-            array_m = array_p.match(val)
-            if array_m:
-                vals = array_m.group('vals')
-                vals = val_p.findall(vals)
-                dim = array_m.group('dim')
-                if dim:  # explicit dimensions
-                    dim = int(dim)
-                    indices = _parse_indices(array_m.group('indices'))
-                    assert len(indices) == dim
-                    p_val = _parse_array(indices, vals)
-                else:  # assuming 1d array based on 0
-                    p_val = _parse_array([range(len(vals))], vals)
-                parsed_vars[var] = p_val
-                continue
-        raise MiniZincParsingError(l)
-    return parsed_vars
+from pymzn.dzn import dzn, parse_dzn
 
 
 def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
@@ -459,23 +306,6 @@ class MiniZincError(RuntimeError):
         self.err_msg = err_msg.decode('utf-8')
         self.msg = ('An error occurred while executing the command: '
                     '{}\n{}').format(self.cmd, self.err_msg)
-        super().__init__(self.msg)
-
-
-class MiniZincParsingError(RuntimeError):
-    """
-        Exception for errors encountered while parsing the output of the
-        FlatZinc solution output stream.
-    """
-
-    def __init__(self, val):
-        """
-        Instantiate a new MiniZincParsingError.
-        :param val: The value that was impossible to parse
-        """
-        self.val = val
-        self.msg = 'Unsupported variable parsing for value: {}'.format(
-                self.val)
         super().__init__(self.msg)
 
 

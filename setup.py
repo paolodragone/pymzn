@@ -1,3 +1,4 @@
+import pymzn
 from setuptools import setup, find_packages
 
 import codecs
@@ -13,7 +14,7 @@ long_description = read('README.rst')
 
 setup(
     name='pymzn',
-    version='0.9.2',
+    version=pymzn.__version__,
     url='https://github.com/paolodragone/PyMzn',
     license='MIT',
     author='Paolo Dragone',
