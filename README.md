@@ -208,6 +208,19 @@ Troubleshooting
   source ~/.bashrc
   ```
 
+* Minizinc raises the following error when trying to include the gecode library
+  with the `-G gecode` option:
+  ```
+  Cannot access include directory /usr/local/bin/../share/minizinc/gecode/
+  ```
+  To solve this problem you need to copy (or create links of) the files in the
+  directory `/usr/local/share/gecode/mznlib` into the directory `/usr/local/share/minizinc/gecode`.
+  ```
+  cd /usr/local/share
+  sudo mkdir minizinc/gecode
+  sudo cp gecode/mznlib/* minizinc/gecode/
+  ```
+
 Maintainers
 -----------
 
