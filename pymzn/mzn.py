@@ -89,10 +89,8 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     if isinstance(f, IOBase):
         f.close()
 
-    if unkn:
-        return unknown_msg
-    if unsat:
-        return unsat_msg
+    if unkn or unsat:
+        return False
     return solns
 
 

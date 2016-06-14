@@ -29,7 +29,7 @@ the source code from the git repository or install it via Pip:
 
 ::
 
-        pip3 install pymzn
+    pip3 install pymzn
 
 Quick Start
 -----------
@@ -197,6 +197,18 @@ index-set equal to the key-set of the dict, provided that it is a
 contiguous set; \* nested combinations of the previous two, provided
 that the children of every node have the same index-set. The maximum
 depth is 6.
+
+Troubleshooting
+---------------
+
+-  Gecode raises the following error at the first execution after the
+   installation:
+   ``fzn-gecode: error while loading shared libraries: libgecodeflatzinc.so.41: cannot open shared object file: No such file or directory``
+   To solve this problem you need to set the environment variable
+   ``LD_LIBRARY_PATH`` before running your Python script:
+   ``export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/`` or put
+   the script into your ``~/.bashrc`` file and then run:
+   ``source ~/.bashrc``
 
 Maintainers
 -----------
