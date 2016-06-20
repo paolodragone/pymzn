@@ -70,15 +70,19 @@ def _is_contiguous(obj):
 
 
 def _index_set(obj):
-    if _is_list(obj) and len(obj) > 0:
+    if _is_list(obj):
+        if len(obj) == 0:
+            return []
         if all(map(_is_elem, obj)):
             return _list_index_set(obj),
         elif all(map(_is_array_type, obj)):
             idx_sets = list(map(_index_set, obj))
             if idx_sets[1:] == idx_sets[:-1]:
                 return (_list_index_set(obj),) + idx_sets[0]
-    elif _is_dict(obj) and len(obj) > 0 and _is_contiguous(obj.keys()):
-        if all(map(_is_elem, obj.values())):
+    elif _is_dict(obj):
+        if len(obj) == 0:
+            return []
+        if _is_contiguous(obj.keys()) and all(map(_is_elem, obj.values())):
             return _dict_index_set(obj),
         elif all(map(_is_array_type, obj.values())):
             idx_sets = list(map(_index_set, obj.values()))
@@ -109,12 +113,15 @@ def _dzn_set(vals):
 
 def _dzn_array_nd(arr):
     idx_set = _index_set(arr)
-    dim = len(idx_set)
+    dim = max([len(idx_set), 1])
     if dim > 6:  # max 6-dimensional array in dzn language
         raise MiniZincParsingError(arr)
     flat_arr = _flatten_array(arr, dim)
     dzn_arr = 'array{}d({}, {})'
-    idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
+    if len(idx_set) > 0:
+        idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
+    else:
+        idx_set_str = '{}'
     arr_str = '[' + ', '.join(map(str, flat_arr)) + ']'
     return dzn_arr.format(dim, idx_set_str, arr_str)
 

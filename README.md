@@ -20,9 +20,9 @@ environment variable.
 
 To use MiniZinc one also needs (at least) one compatible CSP solver installed.
 The default one assumed by this library is Gecode 4.4.0, which you can
-download from this page:
+download from:
 <br/>
-http://www.gecode.org/download.html
+http://www.gecode.org/download/gecode-4.4.0.tar.gz
 <br/>
 In principle you can use any solver you like, provided it is compatible 
 with MiniZinc. If you use a solver that is not Gecode, please read carefully
