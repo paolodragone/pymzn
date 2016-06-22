@@ -76,7 +76,7 @@ def _is_contiguous(obj):
 def _index_set(obj):
     if _is_list(obj):
         if len(obj) == 0:
-            return []
+            return ()
         if all(map(_is_elem, obj)):
             return _list_index_set(obj),
         elif all(map(_is_array_type, obj)):
@@ -86,14 +86,15 @@ def _index_set(obj):
                 return (_list_index_set(obj),) + idx_sets[0]
     elif _is_dict(obj):
         if len(obj) == 0:
-            return []
-        if _is_contiguous(obj.keys()) and all(map(_is_elem, obj.values())):
-            return _dict_index_set(obj),
-        elif all(map(_is_array_type, obj.values())):
-            idx_sets = list(map(_index_set, obj.values()))
-            # all children index-sets must be identical
-            if idx_sets[1:] == idx_sets[:-1]:
-                return (_dict_index_set(obj),) + idx_sets[0]
+            return ()
+        if _is_contiguous(obj.keys()):
+            if all(map(_is_elem, obj.values())):
+                return _dict_index_set(obj),
+            elif all(map(_is_array_type, obj.values())):
+                idx_sets = list(map(_index_set, obj.values()))
+                # all children index-sets must be identical
+                if idx_sets[1:] == idx_sets[:-1]:
+                    return (_dict_index_set(obj),) + idx_sets[0]
     raise RuntimeError('The object is not a proper array: '
                        '{} [{}]'.format(obj, type(obj)))
 
@@ -102,7 +103,13 @@ def _flatten_array(arr, lvl):
     if lvl == 1:
         return arr
     flat_arr = []
-    for sub_arr in arr:
+
+    if _is_dict(arr):
+        arr_it = arr.values()
+    else:
+        arr_it = arr
+
+    for sub_arr in arr_it:
         flat_arr += _flatten_array(sub_arr, lvl - 1)
     return flat_arr
 
@@ -123,7 +130,13 @@ def _dzn_array_nd(arr):
     dim = max([len(idx_set), 1])
     if dim > 6:  # max 6-dimensional array in dzn language
         raise MiniZincParsingError(arr)
-    flat_arr = _flatten_array(arr, dim)
+
+    if _is_dict(arr):
+        arr_it = arr.values()
+    else:
+        arr_it = arr
+    flat_arr = _flatten_array(arr_it, dim)
+
     dzn_arr = 'array{}d({}, {})'
     if len(idx_set) > 0:
         idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
@@ -229,10 +242,11 @@ def dict2array(d):
     :rtype: list
     """
     arr = []
-    idx_set = _dict_index_set(d)
+    min_val, max_val = _dict_index_set(d)
+    idx_set = range(min_val, max_val + 1)
     for idx in idx_set:
         v = d[idx]
-        if isinstance(v, dict):
+        if _is_dict(v):
             v = dict2array(v)
         arr.append(v)
     return arr
