@@ -1,10 +1,19 @@
-import os
 import subprocess
-
-# TODO: Document everything
 
 
 def command(path, args):
+    """
+    Returns the command string from the path to the binary with the provided
+    arguments.
+
+    :param string path: The path to the binary file to be executed. If the
+                        binary is in the PATH, then only the name is needed
+    :param list args: A list of arguments to pass to the command. Supported
+                      types of arguments are str, int, float and key-value
+                      tuples
+    :return: The string command
+    :rtype: str
+    """
     cmd = [path]
     for arg in args:
         if isinstance(arg, str):
@@ -26,25 +35,32 @@ def run(cmd, cmd_in=None) -> bytes:
     """
     Executes a shell command and waits for the result.
 
-    :param str cmd:
+    :param str cmd: The command string to be executed, as returned from the
+                    command function.
     :param cmd_in: Input stream to pass to the command
     :return: The output stream of the command
     """
 
-    pipe = subprocess.Popen(cmd, shell=True, preexec_fn=os.setsid,
+    pipe = subprocess.Popen(cmd, shell=True,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+                            stderr=subprocess.PIPE,
+                            # Still not sure if needed, without it kills the
+                            #  subprocess after killing the parent,
+                            # but I can't kill it from inside the program
+                            # (which I don't need anymore though)
+                            # preexec_fn=os.setsid
+                            )
     out, err = pipe.communicate(input=cmd_in)
     ret = pipe.wait()
 
     if ret != 0:
-        raise CommandRuntimeError(cmd, ret, out, err)
+        raise BinaryRuntimeError(cmd, ret, out, err)
 
     return out
 
 
-class CommandRuntimeError(RuntimeError):
+class BinaryRuntimeError(RuntimeError):
     """
         Exception for errors returned while executing a command.
     """

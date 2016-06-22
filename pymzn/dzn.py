@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Utilities to convert Python objects into dzn format and back."""
+
 import re
+from numbers import Number, Integral
+from collections import Sized, Iterable, Set, Mapping
 
 
 class MiniZincSerializationError(RuntimeError):
@@ -17,23 +20,23 @@ class MiniZincSerializationError(RuntimeError):
         """
         self.key = key
         self.val = val
-        self.msg = 'Unsupported serialization for variable {} with value:\n{}'
-        super().__init__(self.msg.format(self.key, self.val))
-
+        self.msg = ('Unsupported serialization for variable {} with value:\n'
+                    '{} [{}]')
+        super().__init__(self.msg.format(self.key, self.val, type(self.val)))
 
 """ PYTHON TO DZN """
 
 
 def _is_int(obj):
-    return isinstance(obj, int)
+    return isinstance(obj, Integral)
 
 
 def _is_value(obj):
-    return isinstance(obj, (str, int, float))
+    return isinstance(obj, (str, Number))
 
 
 def _is_set(obj):
-    return isinstance(obj, set) and all(map(_is_value, obj))
+    return isinstance(obj, Set) and all(map(_is_value, obj))
 
 
 def _is_elem(obj):
@@ -41,15 +44,16 @@ def _is_elem(obj):
 
 
 def _is_list(obj):
-    return isinstance(obj, list)
+    return (isinstance(obj, Sized) and isinstance(obj, Iterable) and
+            not isinstance(obj, (Set, Mapping)))
 
 
 def _is_dict(obj):
-    return isinstance(obj, dict)
+    return isinstance(obj, Mapping)
 
 
 def _is_array_type(obj):
-    return isinstance(obj, (list, dict))
+    return _is_list(obj) or _is_dict(obj)
 
 
 def _list_index_set(obj):
@@ -77,6 +81,7 @@ def _index_set(obj):
             return _list_index_set(obj),
         elif all(map(_is_array_type, obj)):
             idx_sets = list(map(_index_set, obj))
+            # all children index-sets must be identical
             if idx_sets[1:] == idx_sets[:-1]:
                 return (_list_index_set(obj),) + idx_sets[0]
     elif _is_dict(obj):
@@ -86,9 +91,11 @@ def _index_set(obj):
             return _dict_index_set(obj),
         elif all(map(_is_array_type, obj.values())):
             idx_sets = list(map(_index_set, obj.values()))
+            # all children index-sets must be identical
             if idx_sets[1:] == idx_sets[:-1]:
                 return (_dict_index_set(obj),) + idx_sets[0]
-    raise RuntimeError('The object is not a proper array: {}'.format(obj))
+    raise RuntimeError('The object is not a proper array: '
+                       '{} [{}]'.format(obj, type(obj)))
 
 
 def _flatten_array(arr, lvl):
@@ -106,7 +113,7 @@ def _dzn_var(name, val):
 
 def _dzn_set(vals):
     if _is_contiguous(vals):
-        min_val, max_val = _dict_index_set(vals)
+        min_val, max_val = min(vals), max(vals)
         return '{}..{}'.format(min_val, max_val)  # contiguous set
     return '{{ {} }}'.format(', '.join(map(str, vals)))
 
@@ -180,8 +187,8 @@ class MiniZincParsingError(RuntimeError):
         :param val: The value that was impossible to parse
         """
         self.val = val
-        self.msg = 'Unsupported parsing for value: {}'.format(self.val)
-        super().__init__(self.msg)
+        self.msg = 'Unsupported parsing for value: {} [{}]'
+        super().__init__(self.msg.format(self.val, type(self.val)))
 
 
 # For now support only numerical values and numeric arrays and sets

@@ -6,7 +6,7 @@ import inspect
 import os.path
 from io import IOBase
 
-from pymzn.binary import command, run, CommandRuntimeError
+from pymzn.binary import command, run, BinaryRuntimeError
 from pymzn.dzn import dzn, parse_dzn
 
 soln_sep_default = '----------'
@@ -224,7 +224,7 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     cmd = command(fzn_gecode_cmd, args)
     try:
         out = run(cmd)
-    except CommandRuntimeError as cmd_err:
+    except BinaryRuntimeError as cmd_err:
         if (suppress_segfault and
                 cmd_err.err_msg.startswith('Segmentation fault') and
                 len(cmd_err.out) > 0):
@@ -322,14 +322,27 @@ def _sub_dict(d, keys):
 
 
 class MiniZincUnsatisfiableError(RuntimeError):
+    """
+    Error raised when a minizinc problem is unsatisfiable.
+    """
+
     def __init__(self, cmd):
+        """
+        :param cmd: The command executed on the unsatisfiable problem
+        """
         self.cmd = cmd
         self.msg = 'The problem is unsatisfiable.\n{}'.format(self.cmd)
         super().__init__(self.msg)
 
 
 class MiniZincUnknownError(RuntimeError):
+    """
+    Error raised when minizinc returns no solution (unknown).
+    """
     def __init__(self, cmd):
+        """
+        :param cmd: The command executed on the problem with unknown solution
+        """
         self.cmd = cmd
         self.msg = 'The solution of the problem is unknown.\n' \
                    '{}'.format(self.cmd)
