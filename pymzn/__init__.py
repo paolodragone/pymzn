@@ -3,5 +3,7 @@
 __version__ = '0.9.6'
 
 import pymzn.binary
-from .mzn import fzn_gecode, minizinc, mzn2fzn, solns2out
-from .dzn import dzn, parse_dzn, dict2array, MiniZincParsingError
+from .mzn import minizinc, mzn2fzn, solns2out, fzn_gecode, \
+    MiniZincRuntimeError, MiniZincUnknownError, MiniZincUnsatisfiableError
+from .dzn import dzn, parse_dzn, dict2list, \
+    MiniZincParsingError, MiniZincSerializationError

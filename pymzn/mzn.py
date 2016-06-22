@@ -6,7 +6,7 @@ import inspect
 import os.path
 from io import IOBase
 
-from pymzn.binary import command, run, BinaryRuntimeError
+from pymzn.binary import run, command, BinaryRuntimeError
 from pymzn.dzn import dzn, parse_dzn
 
 soln_sep_default = '----------'
@@ -344,8 +344,8 @@ class MiniZincUnknownError(RuntimeError):
         :param cmd: The command executed on the problem with unknown solution
         """
         self.cmd = cmd
-        self.msg = 'The solution of the problem is unknown.\n' \
-                   '{}'.format(self.cmd)
+        self.msg = ('The solution of the problem is unknown.\n'
+                    '{}').format(self.cmd)
         super().__init__(self.msg)
 
 

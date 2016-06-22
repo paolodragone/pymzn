@@ -77,6 +77,6 @@ class BinaryRuntimeError(RuntimeError):
         self.out = out
         self.err = err
         self.err_msg = err.decode('utf-8')
-        msg = 'An error occurred while executing the command: {}\n{}'
-        msg = msg.format(self.cmd, self.err_msg)
-        super().__init__(msg)
+        self.msg = ('An error occurred while executing the command: '
+                    '{}\n{}').format(self.cmd, self.err_msg)
+        super().__init__(self.msg)

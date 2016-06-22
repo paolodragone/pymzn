@@ -21,8 +21,8 @@ class MiniZincSerializationError(RuntimeError):
         self.key = key
         self.val = val
         self.msg = ('Unsupported serialization for variable {} with value:\n'
-                    '{} [{}]')
-        super().__init__(self.msg.format(self.key, self.val, type(self.val)))
+                    '{} [{}]').format(self.key, self.val, type(self.val))
+        super().__init__(self.msg)
 
 """ PYTHON TO DZN """
 
@@ -200,8 +200,9 @@ class MiniZincParsingError(RuntimeError):
         :param val: The value that was impossible to parse
         """
         self.val = val
-        self.msg = 'Unsupported parsing for value: {} [{}]'
-        super().__init__(self.msg.format(self.val, type(self.val)))
+        self.msg = ('Unsupported parsing for value: '
+                    '{} [{}]').format(self.val, type(self.val))
+        super().__init__(self.msg)
 
 
 # For now support only numerical values and numeric arrays and sets
@@ -232,7 +233,7 @@ _var_p = re.compile(('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>[\w \.,+\-\\\/\*^|\('
                      '\)\[\]\{\}]+);?$'))
 
 
-def dict2array(d):
+def dict2list(d):
     """
     Transform an indexed dictionary (such as those returned by the parse_dzn
     function when parsing arrays) into an multi-dimensional array.
@@ -247,7 +248,7 @@ def dict2array(d):
     for idx in idx_set:
         v = d[idx]
         if _is_dict(v):
-            v = dict2array(v)
+            v = dict2list(v)
         arr.append(v)
     return arr
 
