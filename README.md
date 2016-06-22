@@ -1,4 +1,4 @@
-PyMzn
+[PyMzn](https://github.com/paolodragone/PyMzn)
 =====
 
 PyMzn is a Python 3 wrapper for the MiniZinc tool pipeline. <br/>
@@ -17,6 +17,10 @@ Instructions on how to compile libminizinc are provided in the package itself.
 It is not necessary but strongly recommended to insert the path to the
 directory containing the binaries of the libminizinc tools into the PATH
 environment variable.
+
+There is also a `minizinc` package available through `apt-get`, but it is an
+older version and PyMzn has not been tested with it, so we recommend you to
+compile libminizinc from sources.
 
 To use MiniZinc one also needs (at least) one compatible CSP solver installed.
 The default one assumed by this library is Gecode 4.4.0, which you can
@@ -117,6 +121,14 @@ pymzn.minizinc('test.mzn', dzn_files=['data1.dzn', 'data2.dzn'])
 ```
 Or you can use both.
 
+For more details on how to use each functions, please refer to the
+documentation. To compile the documentation, first make sure you installed Sphinx for
+Python 3, and then execute the make file inside the `docs` directory:
+```
+make html
+```
+The documentation will then be compiled in the `docs/_build/html` folder.
+
 Solvers
 -------
 If you want to use a different solver other than Gecode, you first need to
@@ -128,9 +140,10 @@ this is an example of such function:
 import pymzn
 
 def fzn_solver(fzn_file, arg1=def_val1, arg2=def_val2):
-    solver_cmd = 'path/to/solver'
+    solver_path = 'path/to/solver'  # Only the name if it's in the PATH
     args = [('-arg1', arg1), ('-arg2', arg2), fzn_file]
-    return pymzn.run(solver_cmd, args)
+    solver_cmd = pymzn.binary.command(solver_path, args)
+    return pymzn.binary.run(solver_cmd, args)
 ```
 Then you can run the `minizinc` function like this:
 ```
@@ -219,6 +232,14 @@ Troubleshooting
   cd /usr/local/share
   sudo mkdir minizinc/gecode
   sudo cp gecode/mznlib/* minizinc/gecode/
+  ```
+
+* The function `pymzn.dzn` arises a `RecursionError` when given a `numpy.mat`
+  object as input. This problem arises because the iteration with `numpy.mat`
+  behaves differently than `numpy.ndarray` or built-in `list`. The simplest
+  solution is to convert the `numpy.mat` into a `numpy.ndarray`:
+  ```
+  matrix_array = np.asarray(matrix)
   ```
 
 Maintainers

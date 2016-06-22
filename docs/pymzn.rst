@@ -26,3 +26,11 @@ pymzn.mzn module
     :show-inheritance:
 
 
+pymzn.binary module
+-------------------
+
+.. automodule:: pymzn.binary
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

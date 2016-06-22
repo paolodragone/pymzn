@@ -110,7 +110,8 @@ def _flatten_array(arr, lvl):
         arr_it = arr
 
     for sub_arr in arr_it:
-        flat_arr += _flatten_array(sub_arr, lvl - 1)
+        for item in _flatten_array(sub_arr, lvl - 1):
+            flat_arr.append(item)
     return flat_arr
 
 
