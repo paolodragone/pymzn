@@ -3,5 +3,5 @@
 __version__ = '0.9.7'
 
 from .mzn import minizinc, mzn2fzn, solns2out, fzn_gecode, \
-    MiniZincRuntimeError, MiniZincUnknownError, MiniZincUnsatisfiableError
+    MiniZincUnknownError, MiniZincUnsatisfiableError
 from .dzn import dzn, parse_dzn, dict2list

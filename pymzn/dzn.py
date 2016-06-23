@@ -188,13 +188,15 @@ _cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
 _int_set_p = re.compile('^(\{(?P<vals>[\d ,+\-]*)\})$')
 
 # matches any of the previous
-_val_p = re.compile(('(?:\{(?:[\d ,+\-]+)\}|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)|['
-                     '+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?|[+\-]?\d+)'))
+_val_p = re.compile(('(?:true|false|\{(?:[\d ,+\-]+)\}'
+                     '|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)'
+                     '|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?'
+                     '|[+\-]?\d+)'))
 
 # multi-dimensional array pattern
-_array_p = re.compile(('^(?:array(?P<dim>\d)d\s*\((?P<indices>(?:\s*['
-                       '\d\.+\-]+(\s*,\s*)?)+)\s*,\s*)?\[(?P<vals>[\w \.,'
-                       '+\-\\\/\*^|\(\)\{\}]+)\]\)?$'))
+_array_p = re.compile(('^(?:array(?P<dim>\d)d\s*'
+                       '\((?P<indices>(?:\s*[\d\.+\-]+(\s*,\s*)?)+)\s*,\s*)?'
+                       '\[(?P<vals>[\w \.,+\-\\\/\*^|\(\)\{\}]+)\]\)?$'))
 
 # variable pattern
 _var_p = re.compile(('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>[\w \.,+\-\\\/\*^|\('
@@ -301,7 +303,7 @@ def parse_dzn(lines):
     parsed_vars = {}
     for l in lines:
         l = l.strip()
-        log.debug('Parsing: %s', l)
+        log.debug('Parsing line: %s', l)
         var_m = _var_p.match(l)
         if var_m:
             var = var_m.group('var')
@@ -311,6 +313,7 @@ def parse_dzn(lines):
                 parsed_vars[var] = p_val
                 continue
 
+            log.debug('Parsing array: %s', val)
             array_m = _array_p.match(val)
             if array_m:
                 vals = array_m.group('vals')
@@ -318,10 +321,14 @@ def parse_dzn(lines):
                 dim = array_m.group('dim')
                 if dim:  # explicit dimensions
                     dim = int(dim)
-                    indices = _parse_indices(array_m.group('indices'))
+                    indices = array_m.group('indices')
+                    log.debug('Parsing indices: %s', indices)
+                    indices = _parse_indices(indices)
                     assert len(indices) == dim
+                    log.debug('Parsing values: %s', vals)
                     p_val = _parse_array(indices, vals)
                 else:  # assuming 1d array based on 0
+                    log.debug('Parsing values: %s', vals)
                     p_val = _parse_array([range(len(vals))], vals)
                 parsed_vars[var] = p_val
                 continue
