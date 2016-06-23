@@ -3,6 +3,7 @@
 
 import contextlib
 import inspect
+import logging
 import os.path
 from io import IOBase
 
@@ -54,13 +55,20 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
              is returned
     :rtype: list
     """
+    log = logging.getLogger(__name__)
     args = []
     if output_file:
         args.append(('-o', output_file))
     args.append(ozn_file)
 
+    log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
     cmd = command(solns2out_cmd, args)
-    out = run(cmd, cmd_in=solns_input)
+
+    try:
+        out = run(cmd, cmd_in=solns_input)
+    except BinaryRuntimeError:
+        log.exception()
+        raise
 
     if output_file:
         f = open(output_file)
@@ -124,11 +132,10 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
     :param str mzn2fzn_cmd: The command to call to execute the mzn2fzn utility;
                             defaults to 'mzn2fzn', assuming the utility is the
                             PATH
-    :return: The command line output from the execution of the mzn2fzn
-             utility; the fzn and ozn files are created as a side effect
+    :return: The paths to the fzn and ozn files created by the function
     :rtype: (str, str)
     """
-
+    log = logging.getLogger(__name__)
     args = []
     if output_base:
         args.append(('--output-base', output_base))
@@ -140,8 +147,14 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
     dzn_files = dzn_files or []
     args += [mzn_file] + dzn_files
 
+    log.debug('Calling %s with arguments: %s', mzn2fzn_cmd, args)
     cmd = command(mzn2fzn_cmd, args)
-    run(cmd)
+
+    try:
+        run(cmd)
+    except BinaryRuntimeError:
+        log.exception()
+        raise
 
     base = output_base or mzn_file[:-4]
     out_files = []
@@ -202,6 +215,7 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
              as a string using `out.decode('ascii')`
     :rtype: str
     """
+    log = logging.getLogger(__name__)
     args = []
     if output_file:
         args.append(('-o', output_file))
@@ -221,16 +235,22 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
         args.append(('-restart-scale', restart_scale))
     args.append(fzn_file)
 
+    log.debug('Calling %s with arguments: %s', fzn_gecode_cmd, args)
     cmd = command(fzn_gecode_cmd, args)
     try:
         out = run(cmd)
-    except BinaryRuntimeError as cmd_err:
+    except BinaryRuntimeError as bin_err:
         if (suppress_segfault and
-                cmd_err.err_msg.startswith('Segmentation fault') and
-                len(cmd_err.out) > 0):
-            return cmd_err.out
+                bin_err.err_msg.startswith('Segmentation fault') and
+                len(bin_err.out) > 0):
+            log.warning('Gecode returned error code {} (segmentation fault) '
+                        'but a solution was found and returned '
+                        '(suppress_segfault=True).'.format(bin_err.ret))
+            return bin_err.out
         else:
-            raise cmd_err
+            log.exception('Gecode returned error code {} '
+                          '(segmentation fault).'.format(bin_err.ret))
+            raise bin_err
 
     if output_file:
         with open(output_file, 'rb') as f:
@@ -331,8 +351,8 @@ class MiniZincUnsatisfiableError(RuntimeError):
         :param cmd: The command executed on the unsatisfiable problem
         """
         self.cmd = cmd
-        self.msg = 'The problem is unsatisfiable.\n{}'.format(self.cmd)
-        super().__init__(self.msg)
+        msg = 'The problem is unsatisfiable.\n{}'
+        super().__init__(msg.format(self.cmd))
 
 
 class MiniZincUnknownError(RuntimeError):
@@ -344,26 +364,5 @@ class MiniZincUnknownError(RuntimeError):
         :param cmd: The command executed on the problem with unknown solution
         """
         self.cmd = cmd
-        self.msg = ('The solution of the problem is unknown.\n'
-                    '{}').format(self.cmd)
-        super().__init__(self.msg)
-
-
-class MiniZincRuntimeError(RuntimeError):
-    """
-        Exception for errors returned while executing one of the MiniZinc
-        utilities.
-    """
-
-    def __init__(self, cmd, err_msg, out=None):
-        """
-        Instantiate a new MiniZincError.
-        :param cmd: The command that generated the error
-        :param err_msg: The error message returned by the execution of cmd
-        """
-        self.cmd = cmd
-        self.out = out
-        self.err_msg = err_msg.decode('utf-8')
-        self.msg = ('An error occurred while executing the command: '
-                    '{}\n{}').format(self.cmd, self.err_msg)
-        super().__init__(self.msg)
+        msg = 'The solution of the problem is unknown.\n{}'
+        super().__init__(msg.format(self.cmd))

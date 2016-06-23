@@ -1,28 +1,11 @@
 # -*- coding: utf-8 -*-
 """Utilities to convert Python objects into dzn format and back."""
 
+import logging
 import re
 from numbers import Number, Integral
 from collections import Sized, Iterable, Set, Mapping
 
-
-class MiniZincSerializationError(RuntimeError):
-    """
-        Exception for errors encountered while serializing some Python object
-        into dzn format.
-    """
-
-    def __init__(self, key, val):
-        """
-        Instantiate a new MiniZincSerializationError.
-        :param key: The name of the variable that was impossible to serialize
-        :param val: The value that was impossible to serialize
-        """
-        self.key = key
-        self.val = val
-        self.msg = ('Unsupported serialization for variable {} with value:\n'
-                    '{} [{}]').format(self.key, self.val, type(self.val))
-        super().__init__(self.msg)
 
 """ PYTHON TO DZN """
 
@@ -95,8 +78,8 @@ def _index_set(obj):
                 # all children index-sets must be identical
                 if idx_sets[1:] == idx_sets[:-1]:
                     return (_dict_index_set(obj),) + idx_sets[0]
-    raise RuntimeError('The object is not a proper array: '
-                       '{} [{}]'.format(obj, type(obj)))
+    raise ValueError('The input object is not a proper array: '
+                     '{}'.format(repr(obj)), obj)
 
 
 def _flatten_array(arr, lvl):
@@ -130,7 +113,8 @@ def _dzn_array_nd(arr):
     idx_set = _index_set(arr)
     dim = max([len(idx_set), 1])
     if dim > 6:  # max 6-dimensional array in dzn language
-        raise MiniZincParsingError(arr)
+        raise ValueError('The input array has {} dimensions. Minizinc supports'
+                         ' arrays of up to 6 dimensions.'.format(dim), arr)
 
     if _is_dict(arr):
         arr_it = arr.values()
@@ -176,7 +160,8 @@ def dzn(objs, fout=None):
             arr = _dzn_array_nd(val)
             vals.append(_dzn_var(key, arr))
         else:
-            raise MiniZincSerializationError(key, val)
+            raise TypeError('Unsupported parsing for value with key \'{}\': '
+                            '{}'.format(key, repr(val)), val)
 
     if fout:
         with open(fout, 'w') as f:
@@ -187,24 +172,6 @@ def dzn(objs, fout=None):
 
 
 """ DZN TO PYTHON """
-
-
-class MiniZincParsingError(RuntimeError):
-    """
-        Exception for errors encountered while parsing the output of the
-        FlatZinc solution output stream.
-    """
-
-    def __init__(self, val):
-        """
-        Instantiate a new MiniZincParsingError.
-        :param val: The value that was impossible to parse
-        """
-        self.val = val
-        self.msg = ('Unsupported parsing for value: '
-                    '{} [{}]').format(self.val, type(self.val))
-        super().__init__(self.msg)
-
 
 # For now support only numerical values and numeric arrays and sets
 
@@ -277,7 +244,7 @@ def _parse_indices(st):
             v2 = int(cont_int_set_m.group(2))
             indices.append(range(v1, v2 + 1))
         else:
-            raise MiniZincParsingError(s)
+            raise ValueError('Index \'{}\' is not well formatted.'.format(s))
     return indices
 
 
@@ -290,7 +257,8 @@ def _parse_set(vals):
             p_val = int(p_val)
             p_s.add(p_val)
         else:
-            raise MiniZincParsingError(p_val)
+            raise ValueError('A value of the input set is not an integer: '
+                             '{}'.format(repr(p_val)), p_val)
     return p_s
 
 
@@ -329,9 +297,11 @@ def parse_dzn(lines):
              the input stream
     :rtype: dict
     """
+    log = logging.getLogger()
     parsed_vars = {}
     for l in lines:
         l = l.strip()
+        log.debug('Parsing: %s', l)
         var_m = _var_p.match(l)
         if var_m:
             var = var_m.group('var')
@@ -355,5 +325,5 @@ def parse_dzn(lines):
                     p_val = _parse_array([range(len(vals))], vals)
                 parsed_vars[var] = p_val
                 continue
-        raise MiniZincParsingError(l)
+        raise ValueError('Unsupported parsing for line:\n{}'.format(l), l)
     return parsed_vars

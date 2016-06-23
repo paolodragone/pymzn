@@ -1,4 +1,7 @@
+import logging
 import subprocess
+import numbers
+import collections.abc
 
 
 def command(path, args):
@@ -18,16 +21,17 @@ def command(path, args):
     for arg in args:
         if isinstance(arg, str):
             cmd.append(arg)
-        elif isinstance(arg, (int, float)):
+        elif isinstance(arg, numbers.Number):
             cmd.append(str(arg))
-        elif isinstance(arg, (tuple, list)) and len(arg) == 2:
+        elif isinstance(arg, collections.abc.Iterable) and len(arg) == 2:
             k, v = arg
-            cmd.append(k)
-            if isinstance(v, (str, int, float)):
+            if isinstance(k, str) and isinstance(v, (str, numbers.Number)):
+                cmd.append(str(k))
                 cmd.append(str(v))
+            else:
+                raise ValueError('Invalid argument: {}'.format(arg), arg)
         else:
-            msg = 'Argument type not supported: {} [{}]'
-            raise RuntimeError(msg.format(arg, type(arg)))
+            raise TypeError('Invalid argument: {}'.format(arg), arg)
     return ' '.join(cmd)
 
 
@@ -40,7 +44,8 @@ def run(cmd, cmd_in=None) -> bytes:
     :param cmd_in: Input stream to pass to the command
     :return: The output stream of the command
     """
-
+    log = logging.getLogger(__name__)
+    log.debug('Executing command: %s', cmd, extra={'cmd_in': cmd_in})
     pipe = subprocess.Popen(cmd, shell=True,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
@@ -77,6 +82,5 @@ class BinaryRuntimeError(RuntimeError):
         self.out = out
         self.err = err
         self.err_msg = err.decode('utf-8')
-        self.msg = ('An error occurred while executing the command: '
-                    '{}\n{}').format(self.cmd, self.err_msg)
-        super().__init__(self.msg)
+        msg = 'An error occurred while executing the command: {}\n{}'
+        super().__init__(msg.format(self.cmd, self.err_msg))
