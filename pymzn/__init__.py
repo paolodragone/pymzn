@@ -11,19 +11,14 @@ __version__ = '0.9.7'
 debug_handler = None
 
 
-def turn_on_debug():
+def verbose(verb):
     log = logging.getLogger(__name__)
     global debug_handler
-    if debug_handler is None:
+    if verb and debug_handler is None:
         debug_handler = logging.StreamHandler()
         log.addHandler(debug_handler)
         log.setLevel(logging.DEBUG)
-
-
-def turn_off_debug():
-    log = logging.getLogger(__name__)
-    global debug_handler
-    if debug_handler is not None:
+    elif not verb and debug_handler is not None:
         log.removeHandler(debug_handler)
         debug_handler = None
         log.setLevel(logging.WARNING)
