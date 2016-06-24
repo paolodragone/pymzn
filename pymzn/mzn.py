@@ -72,7 +72,7 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     try:
         out = run(cmd, cmd_in=solns_input)
     except BinaryRuntimeError:
-        log.exception()
+        log.exception('')
         raise
 
     if output_file:
@@ -166,7 +166,7 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
     try:
         run(cmd)
     except BinaryRuntimeError:
-        log.exception()
+        log.exception('')
         raise
 
     base = output_base or mzn_file[:-4]
