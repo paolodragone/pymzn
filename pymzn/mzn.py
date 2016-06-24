@@ -123,14 +123,14 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     return solns
 
 
-def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
+def mzn2fzn(mzn, keep=False, data=None, dzn_files=None, output_base=None,
             mzn_globals='gecode', mzn2fzn_cmd='mzn2fzn'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libmzn to produce a fzn file from a mzn one (and possibly
     an ozn file as well).
 
-    :param str mzn_file: The path to a mzn file containing the MiniZinc model
+    :param str mzn: The path to a mzn file containing the MiniZinc model
     :param dict data: Dictionary of variables to use as data for the solving
                       of the minizinc problem
     :param [str] dzn_files: A list of paths to dzn files to attach to the
@@ -150,7 +150,29 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
     """
     log = logging.getLogger(__name__)
     args = []
+
+    if not mzn:
+        raise ValueError('MiniZinc model not specified.')
+
+    if isinstance(mzn, str) and mzn.endswith('.mzn'):
+        mzn_file = mzn
+    elif isinstance(mzn, (str, IOBase)):
+        if not keep:
+            d = tempfile.TemporaryDirectory()
+            output_base = os.path.join(d.name, 'mznout')
+        elif not output_base:
+            output_base = 'mznout'
+        mzn_file = output_base + '.mzn'
+        with open(mzn_file, 'w') as f:
+            f.write(mzn)
+    else:
+        raise TypeError('The specified MiniZinc model is not valid.')
+
     if output_base:
+        args.append(('--output-base', output_base))
+    elif not keep:
+        d = tempfile.TemporaryDirectory()
+        output_base = os.path.join(d.name, mzn_file[:-4])
         args.append(('--output-base', output_base))
     if mzn_globals:
         args.append(('-G', mzn_globals))
@@ -158,7 +180,7 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
         data = '"' + ' '.join(dzn(data)) + '"'
         args.append(('-D', data))
     dzn_files = dzn_files or []
-    args += [mzn_file] + dzn_files
+    args += [mzn] + dzn_files
 
     log.debug('Calling %s with arguments: %s', mzn2fzn_cmd, args)
     cmd = command(mzn2fzn_cmd, args)
@@ -169,7 +191,7 @@ def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
         log.exception()
         raise
 
-    base = output_base or mzn_file[:-4]
+    base = output_base or mzn[:-4]
     out_files = []
 
     fzn = '.'.join([base, 'fzn'])
@@ -316,7 +338,7 @@ def minizinc(mzn, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
         if mzn.endswith('.mzn'):
             mzn_file = mzn
         else:
-            tempfile.NamedTemporaryFile()
+            tempfile.NamedTemporaryFile(suffix='.mzn')
     # elif isinstance(mzn, )
 
     # TODO: Default behaviour should be that it solves the problem without leaving any file behind, possibly without creating any files at all
