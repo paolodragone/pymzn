@@ -5,15 +5,20 @@ import contextlib
 import inspect
 import logging
 import os.path
+import tempfile
 from io import IOBase
 
 from pymzn.binary import run, command, BinaryRuntimeError
 from pymzn.dzn import dzn, parse_dzn
 
+
 soln_sep_default = '----------'
 search_complete_msg_default = '=========='
 unsat_msg_default = '=====UNSATISFIABLE====='
 unkn_msg_default = '=====UNKNOWN====='
+
+# TODO: UNBOUNDED
+# TODO: mzn2doc
 
 
 def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
@@ -84,9 +89,13 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
         l = l.strip()
         if l == soln_sep:
             if parse:
-                solns.append(parse(curr_out))
+                sol = parse(curr_out)
+                solns.append(sol)
+                log.debug('Solution found: %s', sol)
             else:
-                solns.append('\n'.join(curr_out))
+                sol = '\n'.join(curr_out)
+                solns.append(sol)
+                log.debug('Solution found: %s', sol)
             curr_out = []
         elif l == search_complete_msg:
             break
@@ -106,6 +115,10 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
         raise MiniZincUnknownError(cmd)
     if unsat:
         raise MiniZincUnsatisfiableError(cmd)
+
+    if len(solns) == 0:
+        log.warning('A solution was found but none was returned by the '
+                    'solver or the parser.')
 
     return solns
 
@@ -237,6 +250,7 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
 
     log.debug('Calling %s with arguments: %s', fzn_gecode_cmd, args)
     cmd = command(fzn_gecode_cmd, args)
+
     try:
         out = run(cmd)
     except BinaryRuntimeError as bin_err:
@@ -261,10 +275,10 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     return solns
 
 
-def minizinc(mzn_file, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
+def minizinc(mzn, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
              fzn_flags=None, **kwargs):
     """
-    Workflow to solve a constrained problem encoded in MiniZinc.
+    Workflow to solve a constrained optimization problem encoded with MiniZinc.
     It first calls mzn2fzn to get the fzn and ozn files, then calls the
     solver using the specified fzn_cmd, passing the fzn_flags,
     then it calls the solns2out utility on the output of the solver.
@@ -284,7 +298,6 @@ def minizinc(mzn_file, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
     :return: Returns the solutions as returned by the solns2out utility
     :rtype: [str] or [dict]
     """
-
     mzn2fzn_defaults = _get_defaults(mzn2fzn)
     mzn2fzn_kwargs = set(mzn2fzn_defaults.keys())
     mzn2fzn_args = _sub_dict(kwargs, mzn2fzn_kwargs)
@@ -295,6 +308,19 @@ def minizinc(mzn_file, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
     if bin_path:
         mzn2fzn_path = os.path.join(bin_path, mzn2fzn_cmd)
         mzn2fzn_args['mzn2fzn_cmd'] = mzn2fzn_path
+
+    # TODO: enter either a filename, or a string/stream containing the model
+
+    if isinstance(mzn, str):
+        mzn = mzn.strip()
+        if mzn.endswith('.mzn'):
+            mzn_file = mzn
+        else:
+            tempfile.NamedTemporaryFile()
+    # elif isinstance(mzn, )
+
+    # TODO: Default behaviour should be that it solves the problem without leaving any file behind, possibly without creating any files at all
+    # TODO: Need to ensure isolation between each instance of the problem, even if the same mzn and fzn files are used
 
     # Execute mzn2fzn
     fzn, ozn = mzn2fzn(mzn_file, **mzn2fzn_args)

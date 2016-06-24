@@ -175,6 +175,9 @@ def dzn(objs, fout=None):
 
 # For now support only numerical values and numeric arrays and sets
 
+# boolean pattern
+_bool_p = re.compile('(?:true|false)')
+
 # integer pattern
 _int_p = re.compile('^[+\-]?\d+$')
 
@@ -265,6 +268,10 @@ def _parse_set(vals):
 
 
 def _parse_val(val):
+    # boolean value
+    if _bool_p.match(val):
+        return bool(val)
+
     # integer value
     if _int_p.match(val):
         return int(val)
@@ -299,7 +306,7 @@ def parse_dzn(lines):
              the input stream
     :rtype: dict
     """
-    log = logging.getLogger()
+    log = logging.getLogger(__name__)
     parsed_vars = {}
     for l in lines:
         l = l.strip()
@@ -311,6 +318,7 @@ def parse_dzn(lines):
             p_val = _parse_val(val)
             if p_val is not None:
                 parsed_vars[var] = p_val
+                log.debug('Parsed value: %s', p_val)
                 continue
 
             log.debug('Parsing array: %s', val)
@@ -331,6 +339,7 @@ def parse_dzn(lines):
                     log.debug('Parsing values: %s', vals)
                     p_val = _parse_array([range(len(vals))], vals)
                 parsed_vars[var] = p_val
+                log.debug('Parsed array: %s', p_val)
                 continue
         raise ValueError('Unsupported parsing for line:\n{}'.format(l), l)
     return parsed_vars
