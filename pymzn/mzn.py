@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 """Wrapper module for the MiniZinc tool pipeline."""
-
 import contextlib
 import inspect
 import logging
 import os.path
+import shutil
 import tempfile
 from io import IOBase
 
 from pymzn.binary import run, command, BinaryRuntimeError
 from pymzn.dzn import dzn, parse_dzn
 
-
 soln_sep_default = '----------'
 search_complete_msg_default = '=========='
 unsat_msg_default = '=====UNSATISFIABLE====='
 unkn_msg_default = '=====UNKNOWN====='
 
+
 # TODO: UNBOUNDED
 # TODO: mzn2doc
+# TODO: check all the documentation
+# TODO: model class that can be modified by attaching constraints
 
 
 def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
@@ -123,7 +125,7 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     return solns
 
 
-def mzn2fzn(mzn, keep=False, data=None, dzn_files=None, output_base=None,
+def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
             mzn_globals='gecode', mzn2fzn_cmd='mzn2fzn'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
@@ -131,6 +133,15 @@ def mzn2fzn(mzn, keep=False, data=None, dzn_files=None, output_base=None,
     an ozn file as well).
 
     :param str mzn: The path to a mzn file containing the MiniZinc model
+    :param bool keep: Whether to keep the generated fzn and ozn files or not;
+                      not keeping the files actually means creating a temporary
+                      directory to store the generated files, which will then
+                      be cleaned up by the OS. Default is False. Running
+                      minizinc with keep=False automatically ensures isolation
+                      of the instances of your solver. If you specify keep=True
+                       you need to take care of the isolation yourself by
+                       specifying a proper output_base for each instance of
+                       the solver.
     :param dict data: Dictionary of variables to use as data for the solving
                       of the minizinc problem
     :param [str] dzn_files: A list of paths to dzn files to attach to the
@@ -145,42 +156,63 @@ def mzn2fzn(mzn, keep=False, data=None, dzn_files=None, output_base=None,
     :param str mzn2fzn_cmd: The command to call to execute the mzn2fzn utility;
                             defaults to 'mzn2fzn', assuming the utility is the
                             PATH
-    :return: The paths to the fzn and ozn files created by the function
-    :rtype: (str, str)
+    :return: The paths to the mzn, fzn and ozn files created by the function
+    :rtype: (str, str, str)
     """
     log = logging.getLogger(__name__)
-    args = []
 
     if not mzn:
         raise ValueError('MiniZinc model not specified.')
 
-    if isinstance(mzn, str) and mzn.endswith('.mzn'):
+    if _is_mzn_file(mzn):
         mzn_file = mzn
+        log.debug('Mzn file provided: %s', mzn_file)
     elif isinstance(mzn, (str, IOBase)):
-        if not keep:
-            d = tempfile.TemporaryDirectory()
-            output_base = os.path.join(d.name, 'mznout')
-        elif not output_base:
-            output_base = 'mznout'
-        mzn_file = output_base + '.mzn'
-        with open(mzn_file, 'w') as f:
-            f.write(mzn)
+        if output_base:
+            mzn_file_name = output_base + '.mzn'
+            mzn_file = open(mzn_file_name, 'w+')
+            output_base = None
+        elif keep:
+            mzn_file_name = 'mznout.mzn'
+            mzn_file = open(mzn_file_name, 'w+')
+        else:
+            mzn_file = tempfile.NamedTemporaryFile(suffix='.mzn', mode='w+',
+                                                   delete=False)
+            mzn_file_name = mzn_file.name
+        log.debug('Writing provided content to: %s', mzn_file_name)
+        mzn_file.write(mzn)
+        mzn_file.close()
+        mzn_file = mzn_file_name
     else:
         raise TypeError('The specified MiniZinc model is not valid.')
 
+    args = []
+
     if output_base:
         args.append(('--output-base', output_base))
-    elif not keep:
-        d = tempfile.TemporaryDirectory()
-        output_base = os.path.join(d.name, mzn_file[:-4])
+    elif _is_mzn_file(mzn) and not keep:
+        tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=mzn_file[:-4] + '_',
+                                                   suffix='.mzn', mode='w+',
+                                                   delete=False)
+        log.debug('Copying %s to %s (keep=False)', mzn_file, tmp_mzn_file.name)
+        with open(mzn_file) as f:
+            shutil.copyfileobj(f, tmp_mzn_file)
+            tmp_mzn_file.file.flush()
+        mzn_file = tmp_mzn_file.name
+        output_base = mzn_file[:-4]
         args.append(('--output-base', output_base))
+
     if mzn_globals:
         args.append(('-G', mzn_globals))
+
     if data is not None:
         data = '"' + ' '.join(dzn(data)) + '"'
         args.append(('-D', data))
+
     dzn_files = dzn_files or []
-    args += [mzn] + dzn_files
+    args += [mzn_file] + dzn_files
+
+    assert os.path.isfile(mzn_file), 'Input mzn file does not exists.'
 
     log.debug('Calling %s with arguments: %s', mzn2fzn_cmd, args)
     cmd = command(mzn2fzn_cmd, args)
@@ -191,18 +223,18 @@ def mzn2fzn(mzn, keep=False, data=None, dzn_files=None, output_base=None,
         log.exception('')
         raise
 
-    base = output_base or mzn[:-4]
-    out_files = []
+    base = output_base or mzn_file[:-4]
+    out_files = [mzn_file]
 
-    fzn = '.'.join([base, 'fzn'])
-    if os.path.isfile(fzn):
-        out_files.append(fzn)
+    fzn_file = '.'.join([base, 'fzn'])
+    if os.path.isfile(fzn_file):
+        out_files.append(fzn_file)
     else:
         out_files.append(None)
 
-    ozn = '.'.join([base, 'ozn'])
-    if os.path.isfile(ozn):
-        out_files.append(ozn)
+    ozn_file = '.'.join([base, 'ozn'])
+    if os.path.isfile(ozn_file):
+        out_files.append(ozn_file)
     else:
         out_files.append(None)
 
@@ -270,6 +302,8 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
         args.append(('-restart-scale', restart_scale))
     args.append(fzn_file)
 
+    assert os.path.isfile(fzn_file), 'Input fzn file does not exists.'
+
     log.debug('Calling %s with arguments: %s', fzn_gecode_cmd, args)
     cmd = command(fzn_gecode_cmd, args)
 
@@ -297,17 +331,25 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     return solns
 
 
-def minizinc(mzn, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
-             fzn_flags=None, **kwargs):
+def minizinc(mzn, keep=False, bin_path=None, output_base=None,
+             fzn_cmd=fzn_gecode, fzn_flags=None, **kwargs):
     """
     Workflow to solve a constrained optimization problem encoded with MiniZinc.
     It first calls mzn2fzn to get the fzn and ozn files, then calls the
     solver using the specified fzn_cmd, passing the fzn_flags,
     then it calls the solns2out utility on the output of the solver.
 
-    :param str mzn_file: The mzn file specifying the problem to be solved
+    :param output_base:
+    :param str mzn: The mzn file specifying the problem to be solved
     :param bool keep: Whether to keep the generated fzn and ozn files or not;
-                      default is False
+                      not keeping the files actually means creating a temporary
+                      directory to store the generated files, which will then
+                      be cleaned up by the OS. Default is False. Running
+                      minizinc with keep=False automatically ensures isolation
+                      of the instances of your solver. If you specify keep=True
+                       you need to take care of the isolation yourself by
+                       specifying a proper output_base for each instance of
+                       the solver.
     :param str bin_path: The path to the directory containing the binaries of
                          the libminizinc utilities
     :param func fzn_cmd: The function to call for the solver; defaults to the
@@ -320,6 +362,8 @@ def minizinc(mzn, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
     :return: Returns the solutions as returned by the solns2out utility
     :rtype: [str] or [dict]
     """
+    log = logging.getLogger(__name__)
+
     mzn2fzn_defaults = _get_defaults(mzn2fzn)
     mzn2fzn_kwargs = set(mzn2fzn_defaults.keys())
     mzn2fzn_args = _sub_dict(kwargs, mzn2fzn_kwargs)
@@ -331,29 +375,19 @@ def minizinc(mzn, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
         mzn2fzn_path = os.path.join(bin_path, mzn2fzn_cmd)
         mzn2fzn_args['mzn2fzn_cmd'] = mzn2fzn_path
 
-    # TODO: enter either a filename, or a string/stream containing the model
-
-    if isinstance(mzn, str):
-        mzn = mzn.strip()
-        if mzn.endswith('.mzn'):
-            mzn_file = mzn
-        else:
-            tempfile.NamedTemporaryFile(suffix='.mzn')
-    # elif isinstance(mzn, )
-
-    # TODO: Default behaviour should be that it solves the problem without leaving any file behind, possibly without creating any files at all
-    # TODO: Need to ensure isolation between each instance of the problem, even if the same mzn and fzn files are used
+    mzn2fzn_args['keep'] = keep
+    mzn2fzn_args['output_base'] = output_base
 
     # Execute mzn2fzn
-    fzn, ozn = mzn2fzn(mzn_file, **mzn2fzn_args)
+    mzn_file, fzn_file, ozn_file = mzn2fzn(mzn, **mzn2fzn_args)
 
     if not fzn_flags:
         fzn_flags = {}
 
     # Execute fzn_cmd
-    solns = fzn_cmd(fzn, **fzn_flags)
+    solns = fzn_cmd(fzn_file, **fzn_flags)
 
-    if ozn:
+    if ozn_file:
         solns2out_defaults = _get_defaults(solns2out)
         solns2out_kwargs = set(solns2out_defaults.keys())
         solns2out_args = _sub_dict(kwargs, solns2out_kwargs)
@@ -366,17 +400,26 @@ def minizinc(mzn, keep=False, bin_path=None, fzn_cmd=fzn_gecode,
             solns2out_args['solns2out_cmd'] = solns2out_path
 
         # Execute solns2out
-        out = solns2out(solns, ozn, **solns2out_args)
+        out = solns2out(solns, ozn_file, **solns2out_args)
     else:
         # Return the raw solution strings if no ozn file produced
         out = solns
 
     if not keep:
         with contextlib.suppress(FileNotFoundError):
-            os.remove(fzn)
-            os.remove(ozn)
-
+            os.remove(fzn_file)
+            os.remove(ozn_file)
+            if not (_is_mzn_file(mzn) or output_base):
+                os.remove(mzn_file)
+                log.debug('Deleting files: %s %s %s',
+                          mzn_file, fzn_file, ozn_file)
+            else:
+                log.debug('Deleting files: %s %s', fzn_file, ozn_file)
     return out
+
+
+def _is_mzn_file(mzn):
+    return isinstance(mzn, str) and mzn.endswith('.mzn')
 
 
 def _get_defaults(f):
@@ -407,6 +450,7 @@ class MiniZincUnknownError(RuntimeError):
     """
     Error raised when minizinc returns no solution (unknown).
     """
+
     def __init__(self, cmd):
         """
         :param cmd: The command executed on the problem with unknown solution
