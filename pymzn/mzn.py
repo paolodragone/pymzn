@@ -124,7 +124,7 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
 
 
 def mzn2fzn(mzn_file, data=None, dzn_files=None, output_base=None,
-            mzn_globals=None, mzn2fzn_cmd='mzn2fzn'):
+            mzn_globals='gecode', mzn2fzn_cmd='mzn2fzn'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libmzn to produce a fzn file from a mzn one (and possibly
