@@ -19,19 +19,20 @@ unbnd_msg_default = '=====UNBOUNDED====='
 
 
 # TODO: mzn2doc
+# TODO: optimatsat
 # TODO: check all the documentation
-# TODO: model class that can be modified by attaching constraints
 
 
 def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
               solns2out_cmd='solns2out', soln_sep=soln_sep_default,
               search_complete_msg=search_complete_msg_default,
               unkn_msg=unkn_msg_default, unsat_msg=unsat_msg_default,
-              unbnd_msg=unbnd_msg_default):
+              unbnd_msg=unbnd_msg_default, parse_solns=False):
     """
     Wraps the MiniZinc utility solns2out, executes it on the input solution
     stream, then parses and returns the output.
 
+    :param parse_solns:
     :param file-like solns_input: The solution stream as output by the solver
     :param str ozn_file: The .ozn file path produced by the mzn2fzn utility
     :param str output_file: The file path where to write the output of
@@ -67,19 +68,23 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     :rtype: list
     """
     log = logging.getLogger(__name__)
-    args = []
-    if output_file:
-        args.append(('-o', output_file))
-    args.append(ozn_file)
 
-    log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
-    cmd = command(solns2out_cmd, args)
+    if parse_solns:
+        out = solns_input
+    else:
+        args = []
+        if output_file:
+            args.append(('-o', output_file))
+        args.append(ozn_file)
 
-    try:
-        out = run(cmd, cmd_in=solns_input)
-    except BinaryRuntimeError:
-        log.exception('')
-        raise
+        log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
+        cmd = command(solns2out_cmd, args)
+
+        try:
+            out = run(cmd, cmd_in=solns_input)
+        except BinaryRuntimeError:
+            log.exception('')
+            raise
 
     if output_file:
         f = open(output_file)
@@ -122,11 +127,11 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
         f.close()
 
     if unkn:
-        raise MiniZincUnknownError(cmd)
+        raise MiniZincUnknownError()
     if unsat:
-        raise MiniZincUnsatisfiableError(cmd)
+        raise MiniZincUnsatisfiableError()
     if unbnd:
-        raise MiniZincUnboundedError(cmd)
+        raise MiniZincUnboundedError()
 
     if len(solns) == 0:
         log.warning('A solution was found but none was returned by the '
@@ -178,7 +183,10 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
     if _is_mzn_file(mzn):
         mzn_file = mzn
         log.debug('Mzn file provided: %s', mzn_file)
-    elif isinstance(mzn, (str, IOBase)):
+    elif isinstance(mzn, (str, IOBase)) or isinstance(mzn, MiniZincModel):
+        if isinstance(mzn, MiniZincModel):
+            mzn = mzn.compile()
+
         if output_base:
             mzn_file_name = output_base + '.mzn'
             mzn_file = open(mzn_file_name, 'w+')
@@ -322,14 +330,17 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     try:
         out = run(cmd)
     except BinaryRuntimeError as bin_err:
-        if (suppress_segfault and
-                bin_err.err_msg.startswith('Segmentation fault') and
-                    len(bin_err.out) > 0):
-            log.warning('Gecode returned error code {} (segmentation fault) '
-                        'but a solution was found and returned '
-                        '(suppress_segfault=True).'.format(bin_err.ret))
-            return bin_err.out
-        else:
+        out = None
+        err_msg = bin_err.err_msg
+        if suppress_segfault and err_msg.startswith('Segmentation fault'):
+            if not output_file and len(bin_err.out) > 0:
+                log.warning('Gecode returned error code {} (segmentation '
+                            'fault) but a solution was found and returned '
+                            '(suppress_segfault=True).'.format(bin_err.ret))
+                out = bin_err.out
+            elif output_file:
+                out = True
+        if not out:
             log.exception('Gecode returned error code {} '
                           '(segmentation fault).'.format(bin_err.ret))
             raise bin_err
@@ -343,14 +354,15 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     return solns
 
 
-def minizinc(mzn, keep=False, bin_path=None, output_base=None,
-             fzn_cmd=fzn_gecode, fzn_flags=None, **kwargs):
+def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
+             output_base=None, keep=False, warn_on_unsolved=False, **kwargs):
     """
     Workflow to solve a constrained optimization problem encoded with MiniZinc.
     It first calls mzn2fzn to get the fzn and ozn files, then calls the
     solver using the specified fzn_cmd, passing the fzn_flags,
     then it calls the solns2out utility on the output of the solver.
 
+    :param warn_on_unsolved:
     :param output_base:
     :param str mzn: The mzn file specifying the problem to be solved
     :param bool keep: Whether to keep the generated fzn and ozn files or not;
@@ -396,38 +408,102 @@ def minizinc(mzn, keep=False, bin_path=None, output_base=None,
     if not fzn_flags:
         fzn_flags = {}
 
-    # Execute fzn_cmd
-    solns = fzn_cmd(fzn_file, **fzn_flags)
+    try:
+        # Execute fzn_cmd
+        solns = fzn_cmd(fzn_file, **fzn_flags)
 
-    if ozn_file:
-        solns2out_defaults = _get_defaults(solns2out)
-        solns2out_kwargs = set(solns2out_defaults.keys())
-        solns2out_args = _sub_dict(kwargs, solns2out_kwargs)
-        solns2out_def_cmd = solns2out_defaults['solns2out_cmd']
-        solns2out_cmd = solns2out_args.get('solns2out_cmd', solns2out_def_cmd)
+        if ozn_file:
+            solns2out_defaults = _get_defaults(solns2out)
+            solns2out_kwargs = set(solns2out_defaults.keys())
+            solns2out_args = _sub_dict(kwargs, solns2out_kwargs)
+            solns2out_def_cmd = solns2out_defaults['solns2out_cmd']
+            solns2out_cmd = solns2out_args.get('solns2out_cmd',
+                                               solns2out_def_cmd)
 
-        # Adjust the path if bin_path is provided
-        if bin_path:
-            solns2out_path = os.path.join(bin_path, solns2out_cmd)
-            solns2out_args['solns2out_cmd'] = solns2out_path
+            # Adjust the path if bin_path is provided
+            if bin_path:
+                solns2out_path = os.path.join(bin_path, solns2out_cmd)
+                solns2out_args['solns2out_cmd'] = solns2out_path
 
-        # Execute solns2out
-        out = solns2out(solns, ozn_file, **solns2out_args)
-    else:
-        # Return the raw solution strings if no ozn file produced
-        out = solns
-
-    if not keep:
-        with contextlib.suppress(FileNotFoundError):
-            os.remove(fzn_file)
-            os.remove(ozn_file)
-            if not (_is_mzn_file(mzn) or output_base):
-                os.remove(mzn_file)
-                log.debug('Deleting files: %s %s %s',
-                          mzn_file, fzn_file, ozn_file)
-            else:
-                log.debug('Deleting files: %s %s', fzn_file, ozn_file)
+            # Execute solns2out
+            out = solns2out(solns, ozn_file, **solns2out_args)
+        else:
+            # Return the raw solution strings if no ozn file produced
+            out = solns
+    except (MiniZincUnsatisfiableError,
+            MiniZincUnknownError,
+            MiniZincUnboundedError) as err:
+        if warn_on_unsolved:
+            log.warning('No solution found. {}'.format(err.message))
+            out = None
+        else:
+            log.exception('')
+            raise
+    finally:
+        if not keep:
+            with contextlib.suppress(FileNotFoundError):
+                os.remove(fzn_file)
+                os.remove(ozn_file)
+                if not (_is_mzn_file(mzn) or output_base):
+                    os.remove(mzn_file)
+                    log.debug('Deleting files: %s %s %s',
+                              mzn_file, fzn_file, ozn_file)
+                else:
+                    log.debug('Deleting files: %s %s', fzn_file, ozn_file)
     return out
+
+
+class MiniZincModel(object):
+
+    def __init__(self, file_mzn=None):
+        self.file_mzn = file_mzn
+        self.vars = {}
+        self.constraints = []
+        self.solve = None
+        self.output = None
+
+    def add_constraint(self, c):
+        self.constraints.append(c)
+
+    def solve_statement(self, solve):
+        self.solve = solve
+
+    def output_statement(self, output):
+        self.output = output
+
+    def add_variable(self, vartype, var, val=None):
+        self.vars[var] = (vartype, val)
+
+    def compile(self, output_file=None):
+        model = []
+
+        if self.file_mzn and os.path.exists(self.file_mzn):
+            with open(self.file_mzn) as f:
+                model = f.readlines()
+
+        model.append('\n%% GENERATED BY PYMZN %%\n')
+
+        for var, (vartype, val) in self.vars.items():
+            if val is not None:
+                model.append('{}: {} = {};'.format(vartype, var, val))
+            else:
+                model.append('{}: {};'.format(vartype, var))
+
+        for constr in self.constraints:
+            model.append('constraint {};'.format(constr))
+
+        if self.solve is not None:
+            model.append('solve {};'.format(self.solve))
+
+        if self.output is not None:
+            model.append('output {};'.format(self.output))
+
+        model = '\n'.join(model)
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write(model)
+
+        return model
 
 
 def _is_mzn_file(mzn):
@@ -449,13 +525,8 @@ class MiniZincUnsatisfiableError(RuntimeError):
     Error raised when a minizinc problem is unsatisfiable.
     """
 
-    def __init__(self, cmd):
-        """
-        :param cmd: The command executed on the unsatisfiable problem
-        """
-        self.cmd = cmd
-        msg = 'The problem is unsatisfiable.\n{}'
-        super().__init__(msg.format(self.cmd))
+    def __init__(self):
+        super().__init__('The problem is unsatisfiable.')
 
 
 class MiniZincUnknownError(RuntimeError):
@@ -463,24 +534,14 @@ class MiniZincUnknownError(RuntimeError):
     Error raised when minizinc returns no solution (unknown).
     """
 
-    def __init__(self, cmd):
-        """
-        :param cmd: The command executed on the problem with unknown solution
-        """
-        self.cmd = cmd
-        msg = 'The solution of the problem is unknown.\n{}'
-        super().__init__(msg.format(self.cmd))
+    def __init__(self):
+        super().__init__('The solution of the problem is unknown.')
 
 
 class MiniZincUnboundedError(RuntimeError):
     """
-    Error raised when a minizinc is unbounded.
+    Error raised when a minizinc problem is unbounded.
     """
 
-    def __init__(self, cmd):
-        """
-        :param cmd: The command executed on the unbounded problem
-        """
-        self.cmd = cmd
-        msg = 'The problem is unbounded.\n{}'
-        super().__init__(msg.format(self.cmd))
+    def __init__(self):
+        super().__init__('The problem is unbounded.')
