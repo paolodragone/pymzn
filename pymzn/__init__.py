@@ -2,11 +2,11 @@
 """Wrapper module for the MiniZinc tool pipeline."""
 import logging
 
-from .mzn import minizinc, mzn2fzn, solns2out, fzn_gecode, \
-    MiniZincUnknownError, MiniZincUnsatisfiableError
+from .mzn import minizinc, mzn2fzn, solns2out, fzn_gecode, MiniZincModel, \
+    MiniZincUnknownError, MiniZincUnsatisfiableError, MiniZincUnboundedError
 from .dzn import dzn, parse_dzn, dict2list
 
-__version__ = '0.9.7'
+__version__ = '0.9.8'
 
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)
