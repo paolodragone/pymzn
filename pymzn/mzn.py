@@ -15,9 +15,9 @@ soln_sep_default = '----------'
 search_complete_msg_default = '=========='
 unsat_msg_default = '=====UNSATISFIABLE====='
 unkn_msg_default = '=====UNKNOWN====='
+unbnd_msg_default = '=====UNBOUNDED====='
 
 
-# TODO: UNBOUNDED
 # TODO: mzn2doc
 # TODO: check all the documentation
 # TODO: model class that can be modified by attaching constraints
@@ -26,7 +26,8 @@ unkn_msg_default = '=====UNKNOWN====='
 def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
               solns2out_cmd='solns2out', soln_sep=soln_sep_default,
               search_complete_msg=search_complete_msg_default,
-              unkn_msg=unkn_msg_default, unsat_msg=unsat_msg_default):
+              unkn_msg=unkn_msg_default, unsat_msg=unsat_msg_default,
+              unbnd_msg=unbnd_msg_default):
     """
     Wraps the MiniZinc utility solns2out, executes it on the input solution
     stream, then parses and returns the output.
@@ -51,9 +52,12 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
                                     solver output stream; defaults to the
                                     default value for solns2out
     :param str unkn_msg: The line message for unknown solution in the solver
-                            output stream; defaults to the default value for
-                            solns2out
+                         output stream; defaults to the default value for
+                         solns2out
     :param str unsat_msg: The line message for unsatisfiable problem in the
+                          solver output stream; defaults to the default
+                          value for solns2out
+    :param str unbnd_msg: The line message for unbounded problem in the
                           solver output stream; defaults to the default
                           value for solns2out
     :return: A list of solutions output by the solns2out utility; if a
@@ -86,6 +90,7 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     curr_out = []
     unsat = False
     unkn = False
+    unbnd = False
 
     for l in f:
         l = l.strip()
@@ -107,6 +112,9 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
         elif l == unsat_msg:
             unsat = True
             break
+        elif l == unbnd_msg:
+            unbnd = True
+            break
         else:
             curr_out.append(l)
 
@@ -117,6 +125,8 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
         raise MiniZincUnknownError(cmd)
     if unsat:
         raise MiniZincUnsatisfiableError(cmd)
+    if unbnd:
+        raise MiniZincUnboundedError(cmd)
 
     if len(solns) == 0:
         log.warning('A solution was found but none was returned by the '
@@ -151,8 +161,9 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
                             are then attached automatically); by default the
                             mzn_file name is used
     :param str mzn_globals: The path to the directory to search for globals
-                            included files; by default the standard global
-                            library is used
+                            included files; by default the 'gecode' global
+                            library is used, since this library assumes Gecode
+                            as default solver
     :param str mzn2fzn_cmd: The command to call to execute the mzn2fzn utility;
                             defaults to 'mzn2fzn', assuming the utility is the
                             PATH
@@ -191,7 +202,8 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
     if output_base:
         args.append(('--output-base', output_base))
     elif _is_mzn_file(mzn) and not keep:
-        tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=mzn_file[:-4] + '_',
+        prex_mzn = os.path.basename(mzn)[:-4] + '_'
+        tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=prex_mzn,
                                                    suffix='.mzn', mode='w+',
                                                    delete=False)
         log.debug('Copying %s to %s (keep=False)', mzn_file, tmp_mzn_file.name)
@@ -312,7 +324,7 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     except BinaryRuntimeError as bin_err:
         if (suppress_segfault and
                 bin_err.err_msg.startswith('Segmentation fault') and
-                len(bin_err.out) > 0):
+                    len(bin_err.out) > 0):
             log.warning('Gecode returned error code {} (segmentation fault) '
                         'but a solution was found and returned '
                         '(suppress_segfault=True).'.format(bin_err.ret))
@@ -457,4 +469,18 @@ class MiniZincUnknownError(RuntimeError):
         """
         self.cmd = cmd
         msg = 'The solution of the problem is unknown.\n{}'
+        super().__init__(msg.format(self.cmd))
+
+
+class MiniZincUnboundedError(RuntimeError):
+    """
+    Error raised when a minizinc is unbounded.
+    """
+
+    def __init__(self, cmd):
+        """
+        :param cmd: The command executed on the unbounded problem
+        """
+        self.cmd = cmd
+        msg = 'The problem is unbounded.\n{}'
         super().__init__(msg.format(self.cmd))
