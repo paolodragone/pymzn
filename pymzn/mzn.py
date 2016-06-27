@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Wrapper module for the MiniZinc tool pipeline."""
-import contextlib
 import inspect
 import logging
 import os.path
@@ -408,6 +407,7 @@ def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
     if not fzn_flags:
         fzn_flags = {}
 
+    out = None
     try:
         # Execute fzn_cmd
         solns = fzn_cmd(fzn_file, **fzn_flags)
@@ -441,7 +441,7 @@ def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
             raise
     finally:
         if not keep:
-            with contextlib.suppress(FileNotFoundError):
+            try:
                 os.remove(fzn_file)
                 os.remove(ozn_file)
                 if not (_is_mzn_file(mzn) or output_base):
@@ -450,6 +450,8 @@ def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
                               mzn_file, fzn_file, ozn_file)
                 else:
                     log.debug('Deleting files: %s %s', fzn_file, ozn_file)
+            except IOError:
+                pass
     return out
 
 
@@ -511,7 +513,7 @@ def _is_mzn_file(mzn):
 
 
 def _get_defaults(f):
-    spec = inspect.getfullargspec(f)
+    spec = inspect.getargspec(f)
     return dict(zip(reversed(spec.args), reversed(spec.defaults)))
 
 
@@ -526,7 +528,8 @@ class MiniZincUnsatisfiableError(RuntimeError):
     """
 
     def __init__(self):
-        super().__init__('The problem is unsatisfiable.')
+        super(MiniZincUnsatisfiableError, self).\
+            __init__('The problem is unsatisfiable.')
 
 
 class MiniZincUnknownError(RuntimeError):
@@ -535,7 +538,8 @@ class MiniZincUnknownError(RuntimeError):
     """
 
     def __init__(self):
-        super().__init__('The solution of the problem is unknown.')
+        super(MiniZincUnknownError, self).\
+            __init__('The solution of the problem is unknown.')
 
 
 class MiniZincUnboundedError(RuntimeError):
@@ -544,4 +548,5 @@ class MiniZincUnboundedError(RuntimeError):
     """
 
     def __init__(self):
-        super().__init__('The problem is unbounded.')
+        super(MiniZincUnboundedError, self).\
+            __init__('The problem is unbounded.')

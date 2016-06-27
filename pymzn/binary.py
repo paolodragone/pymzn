@@ -1,7 +1,7 @@
 import logging
 import subprocess
 import numbers
-import collections.abc
+import collections
 
 
 def command(path, args):
@@ -23,7 +23,7 @@ def command(path, args):
             cmd.append(arg)
         elif isinstance(arg, numbers.Number):
             cmd.append(str(arg))
-        elif isinstance(arg, collections.abc.Iterable) and len(arg) == 2:
+        elif isinstance(arg, collections.Iterable) and len(arg) == 2:
             k, v = arg
             if isinstance(k, str) and isinstance(v, (str, numbers.Number)):
                 cmd.append(str(k))
@@ -35,7 +35,7 @@ def command(path, args):
     return ' '.join(cmd)
 
 
-def run(cmd, cmd_in=None) -> bytes:
+def run(cmd, cmd_in=None):
     """
     Executes a shell command and waits for the result.
 
@@ -83,4 +83,5 @@ class BinaryRuntimeError(RuntimeError):
         self.err = err
         self.err_msg = err.decode('utf-8')
         msg = 'An error occurred while executing the command: {}\n{}'
-        super().__init__(msg.format(self.cmd, self.err_msg))
+        super(BinaryRuntimeError, self).\
+            __init__(msg.format(self.cmd, self.err_msg))
