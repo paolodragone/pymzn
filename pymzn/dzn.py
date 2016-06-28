@@ -15,7 +15,7 @@ def _is_int(obj):
 
 
 def _is_value(obj):
-    return isinstance(obj, (str, Number))
+    return isinstance(obj, (bool, str, Number))
 
 
 def _is_set(obj):
@@ -99,6 +99,8 @@ def _flatten_array(arr, lvl):
 
 
 def _dzn_var(name, val):
+    if isinstance(val, bool):
+        val = 'true' if val else 'false'
     return '{} = {};'.format(name, val)
 
 
