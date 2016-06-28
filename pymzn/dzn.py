@@ -15,7 +15,7 @@ def _is_int(obj):
 
 
 def _is_value(obj):
-    return isinstance(obj, (str, Number))
+    return isinstance(obj, (bool, str, Number))
 
 
 def _is_set(obj):
@@ -98,15 +98,21 @@ def _flatten_array(arr, lvl):
     return flat_arr
 
 
+def _dzn_val(val):
+    if isinstance(val, bool):
+        return 'true' if val else 'false'
+    return str(val)
+
+
 def _dzn_var(name, val):
-    return '{} = {};'.format(name, val)
+    return '{} = {};'.format(name, _dzn_val(val))
 
 
 def _dzn_set(vals):
     if _is_contiguous(vals):
         min_val, max_val = min(vals), max(vals)
         return '{}..{}'.format(min_val, max_val)  # contiguous set
-    return '{{ {} }}'.format(', '.join(map(str, vals)))
+    return '{{ {} }}'.format(', '.join(map(_dzn_val, vals)))
 
 
 def _dzn_array_nd(arr):
@@ -127,7 +133,7 @@ def _dzn_array_nd(arr):
         idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
     else:
         idx_set_str = '{}'
-    arr_str = '[' + ', '.join(map(str, flat_arr)) + ']'
+    arr_str = '[{}]'.format(', '.join(map(_dzn_val, flat_arr)))
     return dzn_arr.format(dim, idx_set_str, arr_str)
 
 
@@ -270,7 +276,7 @@ def _parse_set(vals):
 def _parse_val(val):
     # boolean value
     if _bool_p.match(val):
-        return bool(val)
+        return {'true': True, 'false': False}[val]
 
     # integer value
     if _int_p.match(val):
