@@ -23,11 +23,11 @@ unbnd_msg_default = '=====UNBOUNDED====='
 # TODO: check all the documentation
 
 
-def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
+def solns2out(solns_input, ozn_file=None, parse=parse_dzn,
               solns2out_cmd='solns2out', soln_sep=soln_sep_default,
-              search_complete_msg=search_complete_msg_default,
-              unkn_msg=unkn_msg_default, unsat_msg=unsat_msg_default,
-              unbnd_msg=unbnd_msg_default, parse_solns=False):
+              unbnd_msg=unbnd_msg_default, unkn_msg=unkn_msg_default,
+              unsat_msg=unsat_msg_default,
+              search_complete_msg=search_complete_msg_default):
     """
     Wraps the MiniZinc utility solns2out, executes it on the input solution
     stream, then parses and returns the output.
@@ -69,13 +69,8 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     """
     log = logging.getLogger(__name__)
 
-    if parse_solns:
-        out = solns_input
-    else:
-        args = []
-        if output_file:
-            args.append(('-o', output_file))
-        args.append(ozn_file)
+    if ozn_file:
+        args = [ozn_file]
 
         log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
         cmd = command(solns2out_cmd, args)
@@ -85,11 +80,10 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
         except BinaryRuntimeError:
             log.exception('')
             raise
-
-    if output_file:
-        f = open(output_file)
     else:
-        f = out.decode('ascii').split('\n')
+        out = solns_input
+
+    lines = out.decode('ascii').split('\n')
 
     solns = []
     curr_out = []
@@ -97,9 +91,9 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
     unkn = False
     unbnd = False
 
-    for l in f:
-        l = l.strip()
-        if l == soln_sep:
+    for line in lines:
+        line = line.strip()
+        if line == soln_sep:
             if parse:
                 sol = parse(curr_out)
                 solns.append(sol)
@@ -109,22 +103,19 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
                 solns.append(sol)
                 log.debug('Solution found: %s', sol)
             curr_out = []
-        elif l == search_complete_msg:
+        elif line == search_complete_msg:
             break
-        elif l == unkn_msg:
+        elif line == unkn_msg:
             unkn = True
             break
-        elif l == unsat_msg:
+        elif line == unsat_msg:
             unsat = True
             break
-        elif l == unbnd_msg:
+        elif line == unbnd_msg:
             unbnd = True
             break
         else:
-            curr_out.append(l)
-
-    if isinstance(f, IOBase):
-        f.close()
+            curr_out.append(line)
 
     if unkn:
         raise MiniZincUnknownError()
@@ -141,7 +132,7 @@ def solns2out(solns_input, ozn_file, output_file=None, parse=parse_dzn,
 
 
 def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
-            mzn_globals='gecode', mzn2fzn_cmd='mzn2fzn'):
+            no_ozn=False, mzn_globals='gecode', mzn2fzn_cmd='mzn2fzn'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libmzn to produce a fzn file from a mzn one (and possibly
@@ -180,50 +171,64 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
     if not mzn:
         raise ValueError('MiniZinc model not specified.')
 
-    if _is_mzn_file(mzn):
-        mzn_file = mzn
-        log.debug('Mzn file provided: %s', mzn_file)
-    elif isinstance(mzn, (str, IOBase)) or isinstance(mzn, MiniZincModel):
-        if isinstance(mzn, MiniZincModel):
-            mzn = mzn.compile()
+    args = []
+    mzn_file = None
 
-        if output_base:
-            mzn_file_name = output_base + '.mzn'
-            mzn_file = open(mzn_file_name, 'w+')
-            output_base = None
-        elif keep:
-            mzn_file_name = 'mznout.mzn'
-            mzn_file = open(mzn_file_name, 'w+')
-        else:
-            mzn_file = tempfile.NamedTemporaryFile(suffix='.mzn', mode='w+',
-                                                   delete=False)
-            mzn_file_name = mzn_file.name
-        log.debug('Writing provided content to: %s', mzn_file_name)
-        mzn_file.write(mzn)
-        mzn_file.close()
-        mzn_file = mzn_file_name
+    if isinstance(mzn, MiniZincModel):
+        mzn = mzn.compile()
+
+    if keep:
+        if _is_mzn_file(mzn):
+            mzn_file = mzn
+            log.debug('Mzn file provided: %s', mzn_file)
+        elif isinstance(mzn, (str, IOBase)):
+            if output_base:
+                mzn_file_name = output_base + '.mzn'
+                mzn_file = open(mzn_file_name, 'w+')
+                output_base = None
+            else:
+                mzn_file_name = 'mznout.mzn'
+                mzn_file = open(mzn_file_name, 'w+')
+            log.debug('Writing provided content to: %s', mzn_file_name)
+            mzn_file.write(mzn)
+            mzn_file.close()
+            mzn_file = mzn_file_name
     else:
+        if _is_mzn_file(mzn):
+            mzn_file = mzn
+            prex_mzn = os.path.basename(mzn_file)[:-4] + '_'
+            tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=prex_mzn,
+                                                       suffix='.mzn', dir='.',
+                                                       mode='w+', delete=False)
+            log.debug('Copying %s to %s (keep=False)', mzn_file,
+                      tmp_mzn_file.name)
+            with open(mzn_file) as f:
+                shutil.copyfileobj(f, tmp_mzn_file)
+                tmp_mzn_file.file.flush()
+            mzn_file = tmp_mzn_file.name
+        elif isinstance(mzn, (str, IOBase)):
+            tmp_mzn_file = tempfile.NamedTemporaryFile(prefix='mznout',
+                                                       suffix='.mzn', dir='.',
+                                                       mode='w+', delete=False)
+            mzn_file_name = tmp_mzn_file.name
+            log.debug('Writing provided content to: %s', mzn_file_name)
+            tmp_mzn_file.write(mzn)
+            tmp_mzn_file.close()
+            mzn_file = mzn_file_name
+        output_base = mzn_file[:-4]
+        args.append(('--output-base', output_base))
+
+    if not mzn_file:
         raise TypeError('The specified MiniZinc model is not valid.')
 
-    args = []
-
     if output_base:
-        args.append(('--output-base', output_base))
-    elif _is_mzn_file(mzn) and not keep:
-        prex_mzn = os.path.basename(mzn)[:-4] + '_'
-        tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=prex_mzn,
-                                                   suffix='.mzn', mode='w+',
-                                                   delete=False)
-        log.debug('Copying %s to %s (keep=False)', mzn_file, tmp_mzn_file.name)
-        with open(mzn_file) as f:
-            shutil.copyfileobj(f, tmp_mzn_file)
-            tmp_mzn_file.file.flush()
-        mzn_file = tmp_mzn_file.name
-        output_base = mzn_file[:-4]
         args.append(('--output-base', output_base))
 
     if mzn_globals:
         args.append(('-G', mzn_globals))
+
+    if no_ozn:
+        args.append('--no-output-ozn')
 
     if data is not None:
         data = '"' + ' '.join(dzn(data)) + '"'
@@ -253,7 +258,7 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
         out_files.append(None)
 
     ozn_file = '.'.join([base, 'ozn'])
-    if os.path.isfile(ozn_file):
+    if not no_ozn and os.path.isfile(ozn_file):
         out_files.append(ozn_file)
     else:
         out_files.append(None)
@@ -261,9 +266,9 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
     return tuple(out_files)
 
 
-def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
-               n_solns=-1, parallel=1, time=0, seed=0, restart=None,
-               restart_base=None, restart_scale=None, suppress_segfault=False):
+def fzn_gecode(fzn_file, time=0, parallel=1, n_solns=-1, seed=0,
+               fzn_gecode_cmd='fzn-gecode', suppress_segfault=False,
+               restart=None, restart_base=None, restart_scale=None):
     """
     Solves a constrained optimization problem using the Gecode solver,
     provided a .fzn input problem file.
@@ -304,8 +309,6 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     """
     log = logging.getLogger(__name__)
     args = []
-    if output_file:
-        args.append(('-o', output_file))
     if n_solns >= 0:
         args.append(('-n', n_solns))
     if parallel != 1:
@@ -328,34 +331,25 @@ def fzn_gecode(fzn_file, output_file=None, fzn_gecode_cmd='fzn-gecode',
     cmd = command(fzn_gecode_cmd, args)
 
     try:
-        out = run(cmd)
+        solns = run(cmd)
     except BinaryRuntimeError as bin_err:
-        out = None
         err_msg = bin_err.err_msg
-        if suppress_segfault and err_msg.startswith('Segmentation fault'):
-            if not output_file and len(bin_err.out) > 0:
+        if (suppress_segfault and len(bin_err.out) > 0 and
+                err_msg.startswith('Segmentation fault')):
                 log.warning('Gecode returned error code {} (segmentation '
                             'fault) but a solution was found and returned '
                             '(suppress_segfault=True).'.format(bin_err.ret))
-                out = bin_err.out
-            elif output_file:
-                out = True
-        if not out:
+                solns = bin_err.out
+        else:
             log.exception('Gecode returned error code {} '
                           '(segmentation fault).'.format(bin_err.ret))
             raise bin_err
-
-    if output_file:
-        with open(output_file, 'rb') as f:
-            solns = f.read()
-    else:
-        solns = out
-
     return solns
 
 
-def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
-             output_base=None, keep=False, warn_on_unsolved=False, **kwargs):
+def minizinc(mzn, bin_path=None, keep=False, output_base=None,
+             fzn_cmd=fzn_gecode, fzn_flags=None, parse_solns=False,
+             warn_on_unsolved=False, **kwargs):
     """
     Workflow to solve a constrained optimization problem encoded with MiniZinc.
     It first calls mzn2fzn to get the fzn and ozn files, then calls the
@@ -401,6 +395,7 @@ def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
 
     mzn2fzn_args['keep'] = keep
     mzn2fzn_args['output_base'] = output_base
+    mzn2fzn_args['no_ozn'] = parse_solns
 
     # Execute mzn2fzn
     mzn_file, fzn_file, ozn_file = mzn2fzn(mzn, **mzn2fzn_args)
@@ -411,27 +406,23 @@ def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
     try:
         # Execute fzn_cmd
         solns = fzn_cmd(fzn_file, **fzn_flags)
+        solns2out_defaults = _get_defaults(solns2out)
+        solns2out_kwargs = set(solns2out_defaults.keys())
+        solns2out_args = _sub_dict(kwargs, solns2out_kwargs)
+        solns2out_def_cmd = solns2out_defaults['solns2out_cmd']
+        solns2out_cmd = solns2out_args.get('solns2out_cmd',
+                                           solns2out_def_cmd)
 
-        if ozn_file:
-            solns2out_defaults = _get_defaults(solns2out)
-            solns2out_kwargs = set(solns2out_defaults.keys())
-            solns2out_args = _sub_dict(kwargs, solns2out_kwargs)
-            solns2out_def_cmd = solns2out_defaults['solns2out_cmd']
-            solns2out_cmd = solns2out_args.get('solns2out_cmd',
-                                               solns2out_def_cmd)
+        # Adjust the path if bin_path is provided
+        if bin_path:
+            solns2out_path = os.path.join(bin_path, solns2out_cmd)
+            solns2out_args['solns2out_cmd'] = solns2out_path
 
-            # Adjust the path if bin_path is provided
-            if bin_path:
-                solns2out_path = os.path.join(bin_path, solns2out_cmd)
-                solns2out_args['solns2out_cmd'] = solns2out_path
-
-            # Execute solns2out
-            out = solns2out(solns, ozn_file, **solns2out_args)
-        else:
-            # Return the raw solution strings if no ozn file produced
-            out = solns
-    except (MiniZincUnsatisfiableError,
-            MiniZincUnknownError,
+        # Execute solns2out
+        # if parse_solns = True then ozn_file is put to None by mzn2fzn
+        # so if it is None, it tries to parse the solver solution stream
+        out = solns2out(solns, ozn_file, **solns2out_args)
+    except (MiniZincUnsatisfiableError, MiniZincUnknownError,
             MiniZincUnboundedError) as err:
         if warn_on_unsolved:
             log.warning('No solution found. {}'.format(err.message))
@@ -442,14 +433,11 @@ def minizinc(mzn, fzn_cmd=fzn_gecode, fzn_flags=None, bin_path=None,
     finally:
         if not keep:
             with contextlib.suppress(FileNotFoundError):
+                os.remove(mzn_file)
                 os.remove(fzn_file)
                 os.remove(ozn_file)
-                if not (_is_mzn_file(mzn) or output_base):
-                    os.remove(mzn_file)
-                    log.debug('Deleting files: %s %s %s',
-                              mzn_file, fzn_file, ozn_file)
-                else:
-                    log.debug('Deleting files: %s %s', fzn_file, ozn_file)
+                log.debug('Deleting files: %s %s %s',
+                          mzn_file, fzn_file, ozn_file)
     return out
 
 
@@ -474,7 +462,7 @@ class MiniZincModel(object):
     def add_variable(self, vartype, var, val=None):
         self.vars[var] = (vartype, val)
 
-    def compile(self, output_file=None):
+    def compile(self):
         model = []
 
         if self.file_mzn and os.path.exists(self.file_mzn):
@@ -498,12 +486,7 @@ class MiniZincModel(object):
         if self.output is not None:
             model.append('output {};'.format(self.output))
 
-        model = '\n'.join(model)
-        if output_file:
-            with open(output_file, 'w') as f:
-                f.write(model)
-
-        return model
+        return '\n'.join(model)
 
 
 def _is_mzn_file(mzn):
