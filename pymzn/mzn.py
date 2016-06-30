@@ -20,7 +20,7 @@ unbnd_msg_default = '=====UNBOUNDED====='
 
 # TODO: mzn2doc
 # TODO: optimatsat
-# TODO: check all the documentation
+# TODO: check all the documentation!!!!!
 
 
 def solns2out(solns_input, ozn_file=None, parse=parse_dzn,
@@ -197,9 +197,11 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
         if _is_mzn_file(mzn):
             mzn_file = mzn
             prex_mzn = os.path.basename(mzn_file)[:-4] + '_'
+            dir_mzn = os.path.dirname(mzn_file)
             tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=prex_mzn,
-                                                       suffix='.mzn', dir='.',
-                                                       mode='w+', delete=False)
+                                                       suffix='.mzn',
+                                                       dir=dir_mzn, mode='w+',
+                                                       delete=False)
             log.debug('Copying %s to %s (keep=False)', mzn_file,
                       tmp_mzn_file.name)
             with open(mzn_file) as f:
@@ -207,9 +209,16 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
                 tmp_mzn_file.file.flush()
             mzn_file = tmp_mzn_file.name
         elif isinstance(mzn, (str, IOBase)):
-            tmp_mzn_file = tempfile.NamedTemporaryFile(prefix='mznout',
-                                                       suffix='.mzn', dir='.',
-                                                       mode='w+', delete=False)
+            if output_base:
+                prex_mzn = os.path.basename(output_base) + '_'
+                dir_mzn = os.path.dirname(output_base)
+            else:
+                prex_mzn = 'mznout_'
+                dir_mzn = '.'
+            tmp_mzn_file = tempfile.NamedTemporaryFile(prefix=prex_mzn,
+                                                       suffix='.mzn',
+                                                       dir=dir_mzn, mode='w+',
+                                                       delete=False)
             mzn_file_name = tmp_mzn_file.name
             log.debug('Writing provided content to: %s', mzn_file_name)
             tmp_mzn_file.write(mzn)

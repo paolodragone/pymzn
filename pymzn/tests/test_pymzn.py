@@ -2,7 +2,8 @@ import shutil
 import tempfile
 import unittest
 
-from pymzn import minizinc, MiniZincRuntimeError
+from pymzn import minizinc
+from pymzn.binary import BinaryRuntimeError
 
 
 class MiniZincTest(unittest.TestCase):
@@ -26,7 +27,7 @@ class MiniZincTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile(mode='w+t', suffix='.mzn') as f:
             f.write(p)
             f.file.flush()
-            self.assertRaises(MiniZincRuntimeError, minizinc, f.name)
+            self.assertRaises(BinaryRuntimeError, minizinc, f.name)
 
 
 if __name__ == '__main__':
