@@ -225,7 +225,6 @@ def mzn2fzn(mzn, keep=False, output_base=None, data=None, dzn_files=None,
             tmp_mzn_file.close()
             mzn_file = mzn_file_name
         output_base = mzn_file[:-4]
-        args.append(('--output-base', output_base))
 
     if not mzn_file:
         raise TypeError('The specified MiniZinc model is not valid.')
