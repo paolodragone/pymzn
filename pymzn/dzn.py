@@ -182,7 +182,7 @@ def dzn(objs, fout=None):
 # For now support only numerical values and numeric arrays and sets
 
 # boolean pattern
-_bool_p = re.compile('(?:true|false)')
+_bool_p = re.compile('^(?:true|false)$')
 
 # integer pattern
 _int_p = re.compile('^[+\-]?\d+$')
