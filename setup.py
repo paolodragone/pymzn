@@ -22,7 +22,7 @@ setup(
     author_email='paolo.dragone@unitn.it',
     description='A Python3 wrapper for the MiniZinc tool pipeline.',
     long_description=long_description,
-    packages=find_packages(exclude=['*.tests']),
+    packages=find_packages(exclude=['*.test_pymzn']),
     platforms='any',
     classifiers=[
         'Programming Language :: Python',

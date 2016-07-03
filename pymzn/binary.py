@@ -1,6 +1,6 @@
 import logging
-import subprocess
 import numbers
+import subprocess
 import collections.abc
 
 
