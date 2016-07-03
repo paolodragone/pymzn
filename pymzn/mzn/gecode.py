@@ -34,10 +34,10 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
                                    returned when a segmentation fault has
                                    happened (this is unfortunately necessary
                                    sometimes due to some bugs in gecode).
-    :return: A binary string (bytes) containing the solution output stream
-             of the execution of Gecode on the specified problem; it can be
-             directly be given to the function solns2out or it can be read
-             as a string using `out.decode('ascii')`
+    :return: A string containing the solution output stream of the execution
+             of Gecode on the specified problem; it can be directly be given
+             to the function solns2out to be transformed into output and
+             then parsed
     :rtype: str
     """
     log = logging.getLogger(__name__)
@@ -64,9 +64,8 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
     try:
         solns = run(cmd)
     except BinaryRuntimeError as bin_err:
-        err_msg = bin_err.err_msg
         if (suppress_segfault and len(bin_err.out) > 0 and
-                err_msg.startswith('Segmentation fault')):
+                bin_err.err.startswith('Segmentation fault')):
             log.warning('Gecode returned error code {} (segmentation '
                         'fault) but a solution was found and returned '
                         '(suppress_segfault=True).'.format(bin_err.ret))

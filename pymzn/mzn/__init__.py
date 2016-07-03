@@ -6,5 +6,6 @@ from .model import MiniZincModel
 
 # TODO: mzn2doc
 # TODO: optimatsat
-# TODO: continue with the solutions as streams
 # TODO: isolation for dzns
+# TODO: explain isolation in the documentation of minizinc function
+# TODO: make it work on windows

@@ -235,8 +235,8 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
     Wraps the MiniZinc utility solns2out, executes it on the input solution
     stream, then parses and returns the output.
 
-    :param str or bytes solns_input: The solution stream as output by the
-                                     solver, or the content of a solution file
+    :param str solns_input: The solution stream as output by the
+                            solver, or the content of a solution file
     :param str ozn_file: The ozn file path produced by the mzn2fzn utility;
                          if None is provided (default) then the solns2out
                          utility is not used and the input stream is parsed
@@ -269,7 +269,7 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
         cmd = command(solns2out_cmd, args)
 
         try:
-            out = run(cmd, cmd_in=solns_input)
+            out = run(cmd, stdin=solns_input)
         except BinaryRuntimeError:
             log.exception('')
             raise
@@ -277,17 +277,20 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
         out = solns_input
         parse_fn = parse_dzn
 
-    if isinstance(out, bytes):
-        out = out.decode('ascii')
     lines = out.split('\n')
 
+    # To reach full stream-ability I need to pipe together the fzn with the
+    # solns2out, not so trivial at this point, so I go back to return a list
+    # of solutions for now, maybe in the future I will add this feature
+
+    solns = []
     curr_out = []
     for line in lines:
         line = line.strip()
         if line == soln_sep:
             soln = parse_fn(curr_out)
             log.debug('Solution found: %s', soln)
-            yield soln
+            solns.append(soln)
             curr_out = []
         elif line == search_complete_msg:
             break
@@ -299,6 +302,7 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
             raise MiniZincUnboundedError()
         else:
             curr_out.append(line)
+    return solns
 
 
 class MiniZincUnsatisfiableError(RuntimeError):

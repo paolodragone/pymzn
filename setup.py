@@ -1,9 +1,8 @@
-import codecs
 import os
+import codecs
+import pymzn
 
 from setuptools import setup, find_packages
-
-import pymzn
 
 here = os.path.abspath(os.path.dirname(__file__))
 

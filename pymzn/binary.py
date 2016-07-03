@@ -1,7 +1,7 @@
+import collections.abc
 import logging
 import numbers
 import subprocess
-import collections.abc
 
 
 def command(path, args):
@@ -35,20 +35,21 @@ def command(path, args):
     return ' '.join(cmd)
 
 
-# TODO: for the solutions as streams, collect output on the way while executing
-
-def run(cmd, cmd_in=None) -> bytes:
+def run(cmd, stdin=None):
     """
     Executes a shell command and waits for the result.
 
     :param str cmd: The command string to be executed, as returned from the
                     command function.
-    :param cmd_in: Input stream to pass to the command
-    :return: The output stream of the command
+    :param str stdin: String containing the input stream to pass to
+                      the command
+    :return: A string containing the output stream of the command
+    :rtype: str
     """
     log = logging.getLogger(__name__)
-    log.debug('Executing command: %s', cmd, extra={'cmd_in': cmd_in})
-    pipe = subprocess.Popen(cmd, shell=True,
+    log.debug('Executing command: %s', cmd, extra={'stdin': stdin})
+    proc = subprocess.Popen(cmd, shell=True, bufsize=1,
+                            universal_newlines=True,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
@@ -58,13 +59,54 @@ def run(cmd, cmd_in=None) -> bytes:
                             # (which I don't need anymore though)
                             # preexec_fn=os.setsid
                             )
-    out, err = pipe.communicate(input=cmd_in)
-    ret = pipe.wait()
+    out, err = proc.communicate(input=stdin)
+    ret = proc.wait()
 
     if ret != 0:
         raise BinaryRuntimeError(cmd, ret, out, err)
 
     return out
+
+
+def stream(cmd, stdin=None):
+    """
+    Executes a shell command and generates lines of output without waiting
+    for it to finish.
+
+    :param str cmd: The command string to be executed, as returned from the
+                    command function.
+    :param str stdin: Input stream to pass to the command
+    :return: A generator containing the lines in the output stream
+             of the command
+    :rtype: generator of str
+    """
+    log = logging.getLogger(__name__)
+    log.debug('Executing streaming command: %s', cmd, extra={'stdin': stdin})
+    proc = subprocess.Popen(cmd, shell=True, bufsize=1,
+                            universal_newlines=True,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            # Still not sure if needed, without it kills the
+                            #  subprocess after killing the parent,
+                            # but I can't kill it from inside the program
+                            # (which I don't need anymore though)
+                            # preexec_fn=os.setsid
+                            )
+    if stdin:
+        proc.stdin.write(stdin)
+        proc.stdin.close()
+
+    out = []
+    for line in proc.stdout:
+        out.append(line)
+        yield line
+    out = ''.join(out)
+    err = proc.stderr.read()
+
+    ret = proc.wait()
+    if ret != 0:
+        raise BinaryRuntimeError(cmd, ret, out, err)
 
 
 class BinaryRuntimeError(RuntimeError):
@@ -83,6 +125,5 @@ class BinaryRuntimeError(RuntimeError):
         self.ret = ret
         self.out = out
         self.err = err
-        self.err_msg = err.decode('utf-8')
         msg = 'An error occurred while executing the command: {}\n{}'
-        super().__init__(msg.format(self.cmd, self.err_msg))
+        super().__init__(msg.format(self.cmd, self.err))
