@@ -35,6 +35,8 @@ def command(path, args):
     return ' '.join(cmd)
 
 
+# TODO: for the solutions as streams, collect output on the way while executing
+
 def run(cmd, cmd_in=None) -> bytes:
     """
     Executes a shell command and waits for the result.

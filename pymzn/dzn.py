@@ -7,6 +7,8 @@ from numbers import Number, Integral
 from collections import Sized, Iterable, Set, Mapping
 
 
+# FIXME: Output format of the old parsing function compliant to the new one
+
 """ PYTHON TO DZN """
 
 
@@ -105,7 +107,7 @@ def _dzn_val(val):
 
 
 def _dzn_var(name, val):
-    return '{} = {};'.format(name, _dzn_val(val))
+    return '{} = {};'.format(name, val)
 
 
 def _dzn_set(vals):
@@ -137,11 +139,28 @@ def _dzn_array_nd(arr):
     return dzn_arr.format(dim, idx_set_str, arr_str)
 
 
+def dzn_value(val):
+    """
+    Serializes a value (bool, int, float, set, array) into its dzn
+    representation.
+
+    :param val: The value to serialize
+    :return: The serialized dzn representation of the value
+    """
+    if _is_value(val):
+        return _dzn_val(val)
+    elif _is_set(val):
+        return _dzn_set(val)
+    elif _is_array_type(val):
+        return _dzn_array_nd(val)
+    raise TypeError('Unsupported parsing for value: {}'.format(repr(val)), val)
+
+
 def dzn(objs, fout=None):
     """
-    Parse the objects in input and produces a list of strings encoding them
-    into the dzn format. Optionally, the produced dzn is written in a given
-    file.
+    Serializes the objects in input and produces a list of strings encoding
+    them into the dzn format. Optionally, the produced dzn is written in a
+    given file.
 
     Supported types of objects include: str, int, float, set, list or dict.
     List and dict are serialized into dzn (multi-dimensional) arrays. The
@@ -155,25 +174,12 @@ def dzn(objs, fout=None):
     :rtype: list
     """
 
-    vals = []
-    for key, val in objs.items():
-        if _is_value(val):
-            vals.append(_dzn_var(key, val))
-        elif _is_set(val):
-            s = _dzn_set(val)
-            vals.append(_dzn_var(key, s))
-        elif _is_array_type(val):
-            arr = _dzn_array_nd(val)
-            vals.append(_dzn_var(key, arr))
-        else:
-            raise TypeError('Unsupported parsing for value with key \'{}\': '
-                            '{}'.format(key, repr(val)), val)
+    vals = [_dzn_var(key, dzn_value(val)) for key, val in objs.items()]
 
     if fout:
         with open(fout, 'w') as f:
             for val in vals:
-                f.write(val + '\n')
-
+                f.write('{}\n'.format(val))
     return vals
 
 
