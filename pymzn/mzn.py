@@ -110,23 +110,13 @@ class MiniZincModel(object):
         return model
 
 
-soln_sep_fzn = '----------'
-search_complete_msg_fzn = '=========='
-unsat_msg_fzn = '=====UNSATISFIABLE====='
-unkn_msg_fzn = '=====UNKNOWN====='
-unbnd_msg_fzn = '=====UNBOUNDED====='
-
-
 # TODO: mzn2doc
 # TODO: optimatsat
 # TODO: check all the documentation!!!!!
 
 
 def solns2out(solns_input, ozn_file=None, parse=parse_dzn,
-              solns2out_cmd='solns2out', soln_sep=soln_sep_fzn,
-              unbnd_msg=unbnd_msg_fzn, unkn_msg=unkn_msg_fzn,
-              unsat_msg=unsat_msg_fzn,
-              search_complete_msg=search_complete_msg_fzn):
+              solns2out_cmd='solns2out'):
     """
     Wraps the MiniZinc utility solns2out, executes it on the input solution
     stream, then parses and returns the output.
@@ -167,6 +157,12 @@ def solns2out(solns_input, ozn_file=None, parse=parse_dzn,
     :rtype: list
     """
     log = logging.getLogger(__name__)
+
+    soln_sep = '----------'
+    search_complete_msg = '=========='
+    unsat_msg = '=====UNSATISFIABLE====='
+    unkn_msg = '=====UNKNOWN====='
+    unbnd_msg = '=====UNBOUNDED====='
 
     if ozn_file:
         args = [ozn_file]
