@@ -4,7 +4,7 @@ import numbers
 import subprocess
 
 
-def command(path, args):
+def cmd(path, args):
     """
     Returns the command string from the path to the binary with the provided
     arguments.
@@ -17,38 +17,38 @@ def command(path, args):
     :return: The string command
     :rtype: str
     """
-    cmd = [path]
+    cmd_ = [path]
     for arg in args:
         if isinstance(arg, str):
-            cmd.append(arg)
+            cmd_.append(arg)
         elif isinstance(arg, numbers.Number):
-            cmd.append(str(arg))
+            cmd_.append(str(arg))
         elif isinstance(arg, collections.abc.Iterable) and len(arg) == 2:
             k, v = arg
             if isinstance(k, str) and isinstance(v, (str, numbers.Number)):
-                cmd.append(str(k))
-                cmd.append(str(v))
+                cmd_.append(str(k))
+                cmd_.append(str(v))
             else:
-                raise ValueError('Invalid argument: {}'.format(arg), arg)
+                raise ValueError('Invalid argument: {}'.format(arg))
         else:
-            raise TypeError('Invalid argument: {}'.format(arg), arg)
-    return ' '.join(cmd)
+            raise TypeError('Invalid argument: {}'.format(arg))
+    return ' '.join(cmd_)
 
 
-def run(cmd, stdin=None):
+def run(cmd_, stdin=None):
     """
     Executes a shell command and waits for the result.
 
-    :param str cmd: The command string to be executed, as returned from the
-                    command function.
+    :param str cmd_: The command string to be executed, as returned from the
+                    cmd function.
     :param str stdin: String containing the input stream to pass to
                       the command
     :return: A string containing the output stream of the command
     :rtype: str
     """
     log = logging.getLogger(__name__)
-    log.debug('Executing command: %s', cmd, extra={'stdin': stdin})
-    proc = subprocess.Popen(cmd, shell=True, bufsize=1,
+    log.debug('Executing command: %s', cmd_, extra={'stdin': stdin})
+    proc = subprocess.Popen(cmd_, shell=True, bufsize=1,
                             universal_newlines=True,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
@@ -59,30 +59,31 @@ def run(cmd, stdin=None):
                             # (which I don't need anymore though)
                             # preexec_fn=os.setsid
                             )
+    subprocess.run()
     out, err = proc.communicate(input=stdin)
     ret = proc.wait()
 
     if ret != 0:
-        raise BinaryRuntimeError(cmd, ret, out, err)
+        raise BinaryRuntimeError(cmd_, ret, out, err)
 
     return out
 
 
-def stream(cmd, stdin=None):
+def stream(_cmd, stdin=None):
     """
     Executes a shell command and generates lines of output without waiting
     for it to finish.
 
-    :param str cmd: The command string to be executed, as returned from the
-                    command function.
+    :param str _cmd: The command string to be executed, as returned from the
+                     cmd function.
     :param str stdin: Input stream to pass to the command
     :return: A generator containing the lines in the output stream
              of the command
     :rtype: generator of str
     """
     log = logging.getLogger(__name__)
-    log.debug('Executing streaming command: %s', cmd, extra={'stdin': stdin})
-    proc = subprocess.Popen(cmd, shell=True, bufsize=1,
+    log.debug('Executing streaming command: %s', _cmd, extra={'stdin': stdin})
+    proc = subprocess.Popen(_cmd, shell=True, bufsize=1,
                             universal_newlines=True,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
@@ -106,7 +107,7 @@ def stream(cmd, stdin=None):
 
     ret = proc.wait()
     if ret != 0:
-        raise BinaryRuntimeError(cmd, ret, out, err)
+        raise BinaryRuntimeError(_cmd, ret, out, err)
 
 
 class BinaryRuntimeError(RuntimeError):

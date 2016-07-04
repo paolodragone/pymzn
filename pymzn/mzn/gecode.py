@@ -1,6 +1,6 @@
 import logging
 
-from pymzn.binary import command, run, BinaryRuntimeError
+from pymzn.bin import cmd, run, BinaryRuntimeError
 
 
 def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
@@ -59,7 +59,7 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
     args.append(fzn_file)
 
     log.debug('Calling %s with arguments: %s', fzn_gecode_cmd, args)
-    cmd = command(fzn_gecode_cmd, args)
+    cmd = cmd(fzn_gecode_cmd, args)
 
     try:
         solns = run(cmd)

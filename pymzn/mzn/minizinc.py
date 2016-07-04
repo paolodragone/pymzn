@@ -4,7 +4,7 @@ import itertools
 import contextlib
 
 from pymzn.dzn import parse_dzn, dzn
-from pymzn.binary import command, run, BinaryRuntimeError
+from pymzn.bin import cmd, run, BinaryRuntimeError
 from pymzn.mzn.gecode import fzn_gecode
 from pymzn.mzn.model import MiniZincModel
 
@@ -218,7 +218,7 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     args += [mzn_file] + dzn_files
 
     log.debug('Calling %s with arguments: %s', mzn2fzn_cmd, args)
-    cmd = command(mzn2fzn_cmd, args)
+    cmd = cmd(mzn2fzn_cmd, args)
 
     try:
         run(cmd)
@@ -276,7 +276,7 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
     if ozn_file and parse_fn:
         args = [ozn_file]
         log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
-        cmd = command(solns2out_cmd, args)
+        cmd = cmd(solns2out_cmd, args)
 
         try:
             out = run(cmd, stdin=solns_input)

@@ -3,7 +3,7 @@ import tempfile
 import unittest
 
 from pymzn import minizinc
-from pymzn.binary import BinaryRuntimeError
+from pymzn.bin import BinaryRuntimeError
 
 
 class MiniZincTest(unittest.TestCase):
