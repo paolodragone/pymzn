@@ -1,5 +1,4 @@
 import os
-import ast
 import logging
 import itertools
 import contextlib
@@ -84,9 +83,11 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
     else:
         raise TypeError('The input model is invalid.')
 
+    mzn = mzn_model.compile()
+
     # Ensures isolation of instances and thread safety
     global _minizinc_instance_counter
-    instance_number = _minizinc_instance_counter.netx()
+    instance_number = next(_minizinc_instance_counter)
 
     output_base = output_base or mzn_model.mzn_out_file[:-4]
     output_base = '{}_{}'.format(output_base, instance_number)
@@ -96,38 +97,47 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
         mzn2fzn_cmd = os.path.join(bin_path, mzn2fzn_cmd)
         solns2out_cmd = os.path.join(bin_path, solns2out_cmd)
 
-    # Execute mzn2fzn
-    mzn_file, fzn_file, ozn_file = mzn2fzn(mzn_model.compile(), data=data,
-                                           dzn_files=dzn_files,
-                                           output_base=output_base,
-                                           mzn_globals=mzn_globals,
-                                           mzn2fzn_cmd=mzn2fzn_cmd)
+    mzn_file = output_base + '.mzn'
+
     try:
-        # Execute fzn_fn
-        fzn_args = fzn_args or {}
-        solns = fzn_fn(fzn_file, **fzn_args)
+        # Execute mzn2fzn
+        mzn_file, fzn_file, ozn_file = mzn2fzn(mzn, data=data,
+                                               dzn_files=dzn_files,
+                                               output_base=output_base,
+                                               mzn_globals=mzn_globals,
+                                               mzn2fzn_cmd=mzn2fzn_cmd)
+        try:
+            # Execute fzn_fn
+            fzn_args = fzn_args or {}
+            solns = fzn_fn(fzn_file, **fzn_args)
 
-        # Execute solns2out
-        out = solns2out(solns, ozn_file=ozn_file, parse_fn=ast.literal_eval,
-                        solns2out_cmd=solns2out_cmd)
+            # Execute solns2out
+            out = solns2out(solns, ozn_file=ozn_file,
+                            parse_fn=parse_dzn,
+                            solns2out_cmd=solns2out_cmd)
 
-    except (MiniZincUnsatisfiableError, MiniZincUnknownError,
-            MiniZincUnboundedError) as err:
-        if warn_on_unsolved:
-            log.warning('No solution found. {}'.format(err.message))
-            out = None
-        else:
-            log.exception('')
-            raise
-
+        except (MiniZincUnknownError, MiniZincUnsatisfiableError,
+                MiniZincUnboundedError) as err:
+            if warn_on_unsolved:
+                log.warning('No solution found. {}'.format(err.message))
+                out = None
+            else:
+                log.exception('')
+                raise
+        finally:
+            if not keep:
+                with contextlib.suppress(FileNotFoundError):
+                    if fzn_file:
+                        os.remove(fzn_file)
+                        log.debug('Deleting file: %s', fzn_file)
+                    if ozn_file:
+                        os.remove(ozn_file)
+                        log.debug('Deleting file: %s', ozn_file)
     finally:
         if not keep:
             with contextlib.suppress(FileNotFoundError):
                 os.remove(mzn_file)
-                fzn_file and os.remove(fzn_file)
-                ozn_file and os.remove(ozn_file)
-                log.debug('Deleting files: %s %s %s',
-                          mzn_file, fzn_file, ozn_file)
+                log.debug('Deleting file: %s', mzn_file)
     return out
 
 
@@ -180,13 +190,13 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
         log.debug('Mzn file provided: %s', mzn_file)
     else:
         if output_base:
-            mzn_file = os.path.join(output_base, '.mzn')
+            mzn_file = ''.join([output_base, '.mzn'])
             output_base = None
         else:
             mzn_file = 'mznout.mzn'
 
         log.debug('Writing provided content to: %s', mzn_file)
-        with open(mzn_file) as f:
+        with open(mzn_file, 'w') as f:
             f.write(mzn)
 
     args = []
@@ -223,7 +233,7 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
         fzn_file = None
 
     ozn_file = '.'.join([base, 'ozn'])
-    if no_ozn or os.path.isfile(ozn_file):
+    if no_ozn or not os.path.isfile(ozn_file):
         ozn_file = None
 
     return mzn_file, fzn_file, ozn_file

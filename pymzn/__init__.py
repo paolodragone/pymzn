@@ -7,7 +7,7 @@ from .mzn import minizinc, mzn2fzn, solns2out, fzn_gecode, MiniZincModel, \
     MiniZincUnknownError, MiniZincUnsatisfiableError, MiniZincUnboundedError
 from .dzn import dzn, dzn_value, dict2list, parse_dzn
 
-__version__ = '0.9.8'
+__version__ = '0.9.9'
 
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)
