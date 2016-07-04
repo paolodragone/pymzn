@@ -71,7 +71,6 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
                         '(suppress_segfault=True).'.format(err.returncode))
             solns = err.stdout
         else:
-            log.exception('Gecode returned error code {} '
-                          '(segmentation fault).'.format(err.returncode))
+            log.exception(err.stderr)
             raise err
     return solns

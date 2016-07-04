@@ -52,9 +52,8 @@ def run(arg, stdin=None):
         arg = cmd(arg[0], arg[1:])
 
     log.debug('Executing command: %s', arg, extra={'stdin': stdin})
-    proc = subprocess.run(arg, shell=True, bufsize=1, universal_newlines=True,
-                          input=stdin,
-                          stdin=subprocess.PIPE,
+    proc = subprocess.run(arg, input=stdin, shell=True, bufsize=1,
+                          universal_newlines=True,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
     proc.check_returncode()
