@@ -58,7 +58,7 @@ def run(arg, stdin=None):
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
     proc.check_returncode()
-    return proc
+    return proc.stdout
 
 
 def stream(arg, stdin=None):
