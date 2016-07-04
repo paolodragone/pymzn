@@ -1,6 +1,7 @@
 import logging
+from subprocess import CalledProcessError
 
-from pymzn.bin import cmd, run, BinaryRuntimeError
+from pymzn.bin import cmd, run
 
 
 def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
@@ -59,19 +60,18 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
     args.append(fzn_file)
 
     log.debug('Calling %s with arguments: %s', fzn_gecode_cmd, args)
-    cmd = cmd(fzn_gecode_cmd, args)
 
     try:
-        solns = run(cmd)
-    except BinaryRuntimeError as bin_err:
-        if (suppress_segfault and len(bin_err.out) > 0 and
-                bin_err.err.startswith('Segmentation fault')):
+        solns = run(cmd(fzn_gecode_cmd, args))
+    except CalledProcessError as err:
+        if (suppress_segfault and len(err.stdout) > 0 and
+                err.stderr.startswith('Segmentation fault')):
             log.warning('Gecode returned error code {} (segmentation '
                         'fault) but a solution was found and returned '
-                        '(suppress_segfault=True).'.format(bin_err.ret))
-            solns = bin_err.out
+                        '(suppress_segfault=True).'.format(err.returncode))
+            solns = err.stdout
         else:
             log.exception('Gecode returned error code {} '
-                          '(segmentation fault).'.format(bin_err.ret))
-            raise bin_err
+                          '(segmentation fault).'.format(err.returncode))
+            raise err
     return solns

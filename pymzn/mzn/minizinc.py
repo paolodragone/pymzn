@@ -2,9 +2,10 @@ import os
 import logging
 import itertools
 import contextlib
+from subprocess import CalledProcessError
 
 from pymzn.dzn import parse_dzn, dzn
-from pymzn.bin import cmd, run, BinaryRuntimeError
+from pymzn.bin import cmd, run
 from pymzn.mzn.gecode import fzn_gecode
 from pymzn.mzn.model import MiniZincModel
 
@@ -218,11 +219,10 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     args += [mzn_file] + dzn_files
 
     log.debug('Calling %s with arguments: %s', mzn2fzn_cmd, args)
-    cmd = cmd(mzn2fzn_cmd, args)
 
     try:
-        run(cmd)
-    except BinaryRuntimeError:
+        run(cmd(mzn2fzn_cmd, args))
+    except CalledProcessError:
         log.exception('')
         raise
 
@@ -276,11 +276,10 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
     if ozn_file and parse_fn:
         args = [ozn_file]
         log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
-        cmd = cmd(solns2out_cmd, args)
 
         try:
-            out = run(cmd, stdin=solns_input)
-        except BinaryRuntimeError:
+            out = run(cmd(solns2out_cmd, args), stdin=solns_input)
+        except CalledProcessError:
             log.exception('')
             raise
     else:
