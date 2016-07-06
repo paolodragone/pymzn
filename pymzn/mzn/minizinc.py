@@ -224,7 +224,7 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
         run(cmd(mzn2fzn_cmd, args))
     except CalledProcessError as err:
         log.exception(err.stderr)
-        raise
+        raise RuntimeError(err.stderr) from err
 
     base = output_base or mzn_file[:-4]
 
@@ -281,7 +281,7 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
             out = run(cmd(solns2out_cmd, args), stdin=solns_input)
         except CalledProcessError as err:
             log.exception(err.stderr)
-            raise
+            raise RuntimeError(err.stderr) from err
     else:
         out = solns_input
         parse_fn = parse_dzn
