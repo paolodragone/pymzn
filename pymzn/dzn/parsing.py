@@ -104,31 +104,24 @@ def _parse_val(val):
     return None
 
 
-def parse_dzn(lines):
-    """
-    Parse the one solution from the output stream of the solns2out utility.
-
-    :param [str] lines: The stream of lines from a given solution
-    :return: A dictionary containing the variable assignments parsed from
-             the input stream
-    :rtype: dict
-    """
-    log = logging.getLogger(__name__)
+def _parse_dzn_soln(soln):
+    # log = logging.getLogger(__name__)
     parsed_vars = {}
-    for l in lines:
-        l = l.strip()
-        log.debug('Parsing line: %s', l)
-        var_m = _var_p.match(l)
+    lines = soln.split('\n')
+    for line in lines:
+        line = line.strip()
+        # log.debug('Parsing line: %s', line)
+        var_m = _var_p.match(line)
         if var_m:
             var = var_m.group('var')
             val = var_m.group('val')
             p_val = _parse_val(val)
             if p_val is not None:
                 parsed_vars[var] = p_val
-                log.debug('Parsed value: %s', p_val)
+                # log.debug('Parsed value: %s', p_val)
                 continue
 
-            log.debug('Parsing array: %s', val)
+            # log.debug('Parsing array: %s', val)
             array_m = _array_p.match(val)
             if array_m:
                 vals = array_m.group('vals')
@@ -137,16 +130,34 @@ def parse_dzn(lines):
                 if dim:  # explicit dimensions
                     dim = int(dim)
                     indices = array_m.group('indices')
-                    log.debug('Parsing indices: %s', indices)
+                    # log.debug('Parsing indices: %s', indices)
                     indices = _parse_indices(indices)
                     assert len(indices) == dim
-                    log.debug('Parsing values: %s', vals)
+                    # log.debug('Parsing values: %s', vals)
                     p_val = _parse_array(indices, vals)
                 else:  # assuming 1d array based on 0
-                    log.debug('Parsing values: %s', vals)
+                    # log.debug('Parsing values: %s', vals)
                     p_val = _parse_array([range(len(vals))], vals)
                 parsed_vars[var] = p_val
-                log.debug('Parsed array: %s', p_val)
+                # log.debug('Parsed array: %s', p_val)
                 continue
-        raise ValueError('Unsupported parsing for line:\n{}'.format(l), l)
+        raise ValueError('Unsupported parsing for line:\n{}'.format(line))
     return parsed_vars
+
+
+def parse_dzn(dzn):
+    """
+    Parse one or more pieces of dzn strings.
+
+    :param str or [str] dzn: A dzn string or a list of dzn strings
+    :return: A list of dictionaries containing the variable assignments
+             parsed from the inputs
+    :rtype: [dict]
+    """
+
+    if isinstance(dzn, str):
+        return [_parse_dzn_soln(dzn)]
+    elif isinstance(dzn, list):
+        return [_parse_dzn_soln(soln) for soln in dzn]
+    else:
+        raise TypeError('The input solutions are invalid.')
