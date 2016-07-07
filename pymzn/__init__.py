@@ -1,20 +1,19 @@
-# -*- coding: utf-8 -*-
 """Wrapper module for the MiniZinc tool pipeline."""
-
 import logging
 
+from .config import mzn2fzn_cmd, solns2out_cmd, gecode_cmd, optimatsat_cmd
 from .mzn import minizinc, mzn2fzn, solns2out, gecode, MiniZincModel, \
     MiniZincUnknownError, MiniZincUnsatisfiableError, MiniZincUnboundedError
 from .dzn import dzn, dzn_value, dict2list, parse_dzn
 
 __version__ = '0.9.9'
 
+# TODO: update the README
+# TODO: update python2 branch
+
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)
 pymzn_log.addHandler(logging.NullHandler())
-
-# TODO: update the README
-# TODO: update python2 branch
 
 
 def verbose(verb):

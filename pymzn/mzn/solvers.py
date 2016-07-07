@@ -1,21 +1,18 @@
 import logging
 from subprocess import CalledProcessError
 
+import pymzn.config as config
 from pymzn.bin import cmd, run
 
 
-def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
-           gecode_cmd='fzn-gecode', suppress_segfault=False,
-           restart=None, restart_base=None, restart_scale=None):
+def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
+           restart_base=None, restart_scale=None, suppress_segfault=False):
     """
     Solves a constrained optimization problem using the Gecode solver,
     provided a .fzn input problem file.
 
     :param str fzn_file: The path to the fzn file containing the problem to
                          be solved
-    :param str gecode_cmd: The command to call to execute the fzn-gecode
-                               program; defaults to 'fzn-gecode', assuming
-                               the program is the PATH
     :param int n_solns: The number of solutions to output (0 = all,
                         -1 = one/best); default is -1
     :param int parallel: The number of threads to use to solve the problem
@@ -59,10 +56,10 @@ def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
         args.append(('-restart-scale', restart_scale))
     args.append(fzn_file)
 
-    log.debug('Calling %s with arguments: %s', gecode_cmd, args)
+    log.debug('Calling %s with arguments: %s', config.gecode_cmd, args)
 
     try:
-        solns = run(cmd(gecode_cmd, args))
+        solns = run(cmd(config.gecode_cmd, args))
     except CalledProcessError as err:
         if (suppress_segfault and len(err.stdout) > 0 and
                 err.stderr.startswith('Segmentation fault')):

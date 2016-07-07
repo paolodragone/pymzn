@@ -5,7 +5,6 @@ from .solvers import gecode, optimatsat
 from .model import MiniZincModel
 
 # TODO: mzn2doc
-# TODO: update README
 # TODO: isolation for dzns
 # TODO: explain isolation in the documentation of minizinc function
 # TODO: make it work on windows

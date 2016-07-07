@@ -17,8 +17,8 @@ class MiniZincModel(object):
     """
     Wraps a minizinc model.
 
-    Can use a mzn file as template and add variables, constraints and modify
-    the solve statement. The output statement can be replaced by a
+    It can use a mzn file as template and add variables, constraints and
+    modify the solve statement. The output statement can be replaced by a
     pymzn-friendly one when using the minizinc function.
     The final model is a string combining the existing model (if provided)
     and the updates performed on the MinizincModel instance.

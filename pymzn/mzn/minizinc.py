@@ -4,6 +4,7 @@ import itertools
 import contextlib
 from subprocess import CalledProcessError
 
+import pymzn.config as config
 from pymzn.dzn import parse_dzn, dzn
 from pymzn.bin import cmd, run
 from pymzn.mzn.solvers import gecode
@@ -15,8 +16,7 @@ _minizinc_instance_counter = itertools.count()
 
 def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
              output_vars=None, mzn_globals='gecode', fzn_fn=gecode,
-             fzn_args=None, warn_on_unsolved=False, bin_path=None,
-             mzn2fzn_cmd='mzn2fzn', solns2out_cmd='solns2out'):
+             warn_on_unsolved=False, **fzn_args):
     """
     Workflow to solve a constrained optimization problem encoded with MiniZinc.
     It first calls mzn2fzn to get the fzn and ozn files, then calls the
@@ -60,14 +60,6 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
                                   unsatisfiable, unbounded or no solution
                                   was found. In that case, the returned value
                                   will be None.
-    :param str bin_path: The path to the directory containing the binaries of
-                         the libminizinc utilities
-    :param str mzn2fzn_cmd: The command to call to execute the mzn2fzn utility;
-                            defaults to 'mzn2fzn', assuming the utility is the
-                            PATH
-    :param str solns2out_cmd: The command to call to execute the solns2out
-                              utility; defaults to 'solns2out', assuming the
-                              utility is the PATH
     :return: Returns the solutions as returned by the solns2out utility.
              The solutions format depends on the parsing function used.
              The default one generates solutions represented  as dictionaries
@@ -93,28 +85,20 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
     output_base = output_base or mzn_model.mzn_out_file[:-4]
     output_base = '{}_{}'.format(output_base, instance_number)
 
-    # Adjust the path if bin_path is provided
-    if bin_path:
-        mzn2fzn_cmd = os.path.join(bin_path, mzn2fzn_cmd)
-        solns2out_cmd = os.path.join(bin_path, solns2out_cmd)
-
     mzn_file = output_base + '.mzn'
-
     try:
         # Execute mzn2fzn
         mzn_file, fzn_file, ozn_file = mzn2fzn(mzn, data=data,
                                                dzn_files=dzn_files,
                                                output_base=output_base,
-                                               mzn_globals=mzn_globals,
-                                               mzn2fzn_cmd=mzn2fzn_cmd)
+                                               mzn_globals=mzn_globals)
         try:
             # Execute fzn_fn
             fzn_args = fzn_args or {}
             solns = fzn_fn(fzn_file, **fzn_args)
 
             # Execute solns2out
-            out = solns2out(solns, ozn_file=ozn_file,
-                            solns2out_cmd=solns2out_cmd)
+            out = solns2out(solns, ozn_file)
 
             # Parse the solutions
             out = map(parse_dzn, out)
@@ -145,7 +129,7 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
 
 
 def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
-            mzn_globals='gecode', mzn2fzn_cmd='mzn2fzn'):
+            mzn_globals='gecode'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -177,9 +161,6 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
                             included files in the standard library; by default
                             the 'gecode' global library is used, since Pymzn
                             assumes Gecode as default solver
-    :param str mzn2fzn_cmd: The command to call to execute the mzn2fzn utility;
-                            defaults to 'mzn2fzn', assuming the utility is the
-                            PATH
     :return: The paths to the mzn, fzn and ozn files created by the function
     :rtype: (str, str, str)
     """
@@ -220,10 +201,10 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     dzn_files = dzn_files or []
     args += [mzn_file] + dzn_files
 
-    log.debug('Calling %s with arguments: %s', mzn2fzn_cmd, args)
+    log.debug('Calling %s with arguments: %s', config.mzn2fzn_cmd, args)
 
     try:
-        run(cmd(mzn2fzn_cmd, args))
+        run(cmd(config.mzn2fzn_cmd, args))
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -241,7 +222,7 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     return mzn_file, fzn_file, ozn_file
 
 
-def solns2out(solns_input, ozn_file=None, *, solns2out_cmd='solns2out'):
+def solns2out(solns_input, ozn_file=None):
     """
     Wraps the MiniZinc utility solns2out, executes it on the input solution
     stream, and then returns the output.
@@ -251,10 +232,7 @@ def solns2out(solns_input, ozn_file=None, *, solns2out_cmd='solns2out'):
     :param str ozn_file: The ozn file path produced by the mzn2fzn utility;
                          if None is provided (default) then the solns2out
                          utility is not used and the input stream is parsed
-                         via the parse_dzn function.
-    :param str solns2out_cmd: The command to call to execute the solns2out
-                              utility; defaults to 'solns2out', assuming the
-                              utility is the PATH
+                         via the parse_dzn function
     :return: A list of solutions as strings. The user needs to take care of
              the parsing. If the output is in dzn format one can use the
              parse_dzn function.
@@ -270,10 +248,10 @@ def solns2out(solns_input, ozn_file=None, *, solns2out_cmd='solns2out'):
 
     if ozn_file:
         args = [ozn_file]
-        log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
+        log.debug('Calling %s with arguments: %s', config.solns2out_cmd, args)
 
         try:
-            out = run(cmd(solns2out_cmd, args), stdin=solns_input)
+            out = run(cmd(config.solns2out_cmd, args), stdin=solns_input)
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
