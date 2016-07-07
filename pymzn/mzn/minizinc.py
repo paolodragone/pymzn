@@ -14,9 +14,9 @@ from pymzn.mzn.model import MiniZincModel
 _minizinc_instance_counter = itertools.count()
 
 
-def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
-             output_vars=None, mzn_globals='gecode', fzn_fn=gecode,
-             warn_on_unsolved=False, **fzn_args):
+def minizinc(mzn, dzn_files=None, *, data=None,
+             keep=False, output_base=None, output_vars=None,
+             mzn_globals_dir='gecode', fzn_fn=gecode, **fzn_args):
     """
     Workflow to solve a constrained optimization problem encoded with MiniZinc.
     It first calls mzn2fzn to get the fzn and ozn files, then calls the
@@ -46,20 +46,16 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
                               the default list is the list of free variables
                               in the model, i.e. those variables that are
                               declared but not defined in the model
-    :param str mzn_globals: The name of the directory to search for globals
-                            included files in the standard library; by default
-                            the 'gecode' global library is used, since Pymzn
-                            assumes Gecode as default solver
+    :param str mzn_globals_dir: The name of the directory to search for
+                                globals included files in the standard
+                                library; by default the 'gecode' global
+                                library is used, since Pymzn assumes Gecode
+                                as default solver
     :param func fzn_fn: The function to call for the solver; defaults to the
                          function fzn_gecode
     :param dict fzn_args: A dictionary containing the additional flags to
                           pass to the fzn_cmd; default is None, meaning no
                           additional attribute
-    :param bool warn_on_unsolved: Whether to log a warning message instead of
-                                  raising an exception when the model is
-                                  unsatisfiable, unbounded or no solution
-                                  was found. In that case, the returned value
-                                  will be None.
     :return: Returns the solutions as returned by the solns2out utility.
              The solutions format depends on the parsing function used.
              The default one generates solutions represented  as dictionaries
@@ -91,7 +87,7 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
         mzn_file, fzn_file, ozn_file = mzn2fzn(mzn, data=data,
                                                dzn_files=dzn_files,
                                                output_base=output_base,
-                                               mzn_globals=mzn_globals)
+                                               mzn_globals_dir=mzn_globals_dir)
         try:
             # Execute fzn_fn
             fzn_args = fzn_args or {}
@@ -102,15 +98,6 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
 
             # Parse the solutions
             out = map(parse_dzn, out)
-
-        except (MiniZincUnknownError, MiniZincUnsatisfiableError,
-                MiniZincUnboundedError) as err:
-            if warn_on_unsolved:
-                log.warning('No solution found. {}'.format(err.message))
-                out = None
-            else:
-                log.exception('')
-                raise
         finally:
             if not keep:
                 with contextlib.suppress(FileNotFoundError):
@@ -129,7 +116,7 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
 
 
 def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
-            mzn_globals='gecode'):
+            mzn_globals_dir='gecode'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -157,10 +144,11 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
                         minizinc function is used, it is recommended to use
                         a model in which replace_output_stmt=True, default
                         behaviour)
-    :param str mzn_globals: The name of the directory to search for globals
-                            included files in the standard library; by default
-                            the 'gecode' global library is used, since Pymzn
-                            assumes Gecode as default solver
+    :param str mzn_globals_dir: The name of the directory to search for
+                                globals included files in the standard
+                                library; by default the 'gecode' global
+                                library is used, since Pymzn assumes Gecode
+                                as default solver
     :return: The paths to the mzn, fzn and ozn files created by the function
     :rtype: (str, str, str)
     """
@@ -188,8 +176,8 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     if output_base:
         args.append(('--output-base', output_base))
 
-    if mzn_globals:
-        args.append(('-G', mzn_globals))
+    if mzn_globals_dir:
+        args.append(('-G', mzn_globals_dir))
 
     if no_ozn:
         args.append('--no-output-ozn')
