@@ -3,7 +3,7 @@
 
 import logging
 
-from .mzn import minizinc, mzn2fzn, solns2out, fzn_gecode, MiniZincModel, \
+from .mzn import minizinc, mzn2fzn, solns2out, gecode, MiniZincModel, \
     MiniZincUnknownError, MiniZincUnsatisfiableError, MiniZincUnboundedError
 from .dzn import dzn, dzn_value, dict2list, parse_dzn
 

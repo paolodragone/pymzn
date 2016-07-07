@@ -4,16 +4,16 @@ from subprocess import CalledProcessError
 from pymzn.bin import cmd, run
 
 
-def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
-               fzn_gecode_cmd='fzn-gecode', suppress_segfault=False,
-               restart=None, restart_base=None, restart_scale=None):
+def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
+           gecode_cmd='fzn-gecode', suppress_segfault=False,
+           restart=None, restart_base=None, restart_scale=None):
     """
     Solves a constrained optimization problem using the Gecode solver,
     provided a .fzn input problem file.
 
     :param str fzn_file: The path to the fzn file containing the problem to
                          be solved
-    :param str fzn_gecode_cmd: The command to call to execute the fzn-gecode
+    :param str gecode_cmd: The command to call to execute the fzn-gecode
                                program; defaults to 'fzn-gecode', assuming
                                the program is the PATH
     :param int n_solns: The number of solutions to output (0 = all,
@@ -59,10 +59,10 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
         args.append(('-restart-scale', restart_scale))
     args.append(fzn_file)
 
-    log.debug('Calling %s with arguments: %s', fzn_gecode_cmd, args)
+    log.debug('Calling %s with arguments: %s', gecode_cmd, args)
 
     try:
-        solns = run(cmd(fzn_gecode_cmd, args))
+        solns = run(cmd(gecode_cmd, args))
     except CalledProcessError as err:
         if (suppress_segfault and len(err.stdout) > 0 and
                 err.stderr.startswith('Segmentation fault')):
@@ -72,5 +72,21 @@ def fzn_gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0,
             solns = err.stdout
         else:
             log.exception(err.stderr)
-            raise err
+            raise RuntimeError(err.stderr) from err
+    return solns
+
+
+def optimatsat(fzn_file, *args, optimatsat_cmd='optimatsat'):
+    log = logging.getLogger(__name__)
+    args = list(args)
+    args.append('-input=fzn')
+    args.append(fzn_file)
+
+    log.debug('Calling %s with arguments: %s', optimatsat_cmd, args)
+
+    try:
+        solns = run(cmd(optimatsat_cmd, args))
+    except CalledProcessError as err:
+        log.exception(err.stderr)
+        raise RuntimeError(err.stderr) from err
     return solns

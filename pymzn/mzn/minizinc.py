@@ -6,7 +6,7 @@ from subprocess import CalledProcessError
 
 from pymzn.dzn import parse_dzn, dzn
 from pymzn.bin import cmd, run
-from pymzn.mzn.gecode import fzn_gecode
+from pymzn.mzn.solvers import gecode
 from pymzn.mzn.model import MiniZincModel
 
 
@@ -14,7 +14,7 @@ _minizinc_instance_counter = itertools.count()
 
 
 def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
-             output_vars=None, mzn_globals='gecode', fzn_fn=fzn_gecode,
+             output_vars=None, mzn_globals='gecode', fzn_fn=gecode,
              fzn_args=None, warn_on_unsolved=False, bin_path=None,
              mzn2fzn_cmd='mzn2fzn', solns2out_cmd='solns2out'):
     """
@@ -114,8 +114,10 @@ def minizinc(mzn, dzn_files=None, *, data=None, output_base=None, keep=False,
 
             # Execute solns2out
             out = solns2out(solns, ozn_file=ozn_file,
-                            parse_fn=parse_dzn,
                             solns2out_cmd=solns2out_cmd)
+
+            # Parse the solutions
+            out = map(parse_dzn, out)
 
         except (MiniZincUnknownError, MiniZincUnsatisfiableError,
                 MiniZincUnboundedError) as err:
@@ -239,11 +241,10 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     return mzn_file, fzn_file, ozn_file
 
 
-def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
-              solns2out_cmd='solns2out'):
+def solns2out(solns_input, ozn_file=None, *, solns2out_cmd='solns2out'):
     """
     Wraps the MiniZinc utility solns2out, executes it on the input solution
-    stream, then parses and returns the output.
+    stream, and then returns the output.
 
     :param str solns_input: The solution stream as output by the
                             solver, or the content of a solution file
@@ -251,19 +252,13 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
                          if None is provided (default) then the solns2out
                          utility is not used and the input stream is parsed
                          via the parse_dzn function.
-    :param func parse_fn: The function that parses the output of the solns2out
-                          utility, if None (default) then the solns2out
-                          utility is not used and the input stream is parsed
-                          via the parse_dzn function.
     :param str solns2out_cmd: The command to call to execute the solns2out
                               utility; defaults to 'solns2out', assuming the
                               utility is the PATH
-    :return: A list of solutions. The solutions format depends on the parsing
-             function used. The default one generates solutions represented
-             as dictionaries of returned variables assignments, converted
-             into their python representation (integers as ints, arrays as
-             lists, ...)
-    :rtype: list
+    :return: A list of solutions as strings. The user needs to take care of
+             the parsing. If the output is in dzn format one can use the
+             parse_dzn function.
+    :rtype: list of str
     """
     log = logging.getLogger(__name__)
 
@@ -273,7 +268,7 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
     unkn_msg = '=====UNKNOWN====='
     unbnd_msg = '=====UNBOUNDED====='
 
-    if ozn_file and parse_fn:
+    if ozn_file:
         args = [ozn_file]
         log.debug('Calling %s with arguments: %s', solns2out_cmd, args)
 
@@ -284,7 +279,6 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
             raise RuntimeError(err.stderr) from err
     else:
         out = solns_input
-        parse_fn = parse_dzn
 
     lines = out.split('\n')
 
@@ -297,7 +291,7 @@ def solns2out(solns_input, ozn_file=None, *, parse_fn=None,
     for line in lines:
         line = line.strip()
         if line == soln_sep:
-            soln = parse_fn(curr_out)
+            soln = '\n'.join(curr_out)
             log.debug('Solution found: %s', soln)
             solns.append(soln)
             curr_out = []
