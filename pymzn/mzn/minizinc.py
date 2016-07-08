@@ -14,7 +14,7 @@ from pymzn.mzn.model import MiniZincModel
 _minizinc_instance_counter = itertools.count()
 
 
-def minizinc(mzn, dzn_files=None, *, data=None,
+def minizinc(mzn, *dzn_files, data=None,
              keep=False, output_base=None, output_vars=None,
              mzn_globals_dir='gecode', fzn_fn=gecode, **fzn_args):
     """
@@ -28,24 +28,24 @@ def minizinc(mzn, dzn_files=None, *, data=None,
                                      instance of MinizincModel.
                                      If it is a string, it can be either the
                                      path to the mzn file or the content of
-                                     the model.
-    :param [str] dzn_files: A list of paths to dzn files to attach to the
-                            mzn2fzn execution; by default no data file is
-                            attached
+                                     the _model.
+    :param str *args dzn_files: A list of paths to dzn files to attach to
+                                the mzn2fzn execution; by default no data
+                                file is attached
     :param dict data: Dictionary of variables to use as data for the solving
                       of the minizinc problem
     :param str output_base: The base name for the fzn and ozn files (extension
                             are then attached automatically); by default the
                             mzn_file name is used. If the mzn argument is
-                            the content of the model, then the output base
-                            is used to name the file where the mzn model
+                            the content of the _model, then the output base
+                            is used to name the file where the mzn _model
                             will be written. In that case, if output_base is
                             None then a default name ('mznout') is used.
     :param bool keep: Whether to keep the generated mzn, fzn and ozn files
     :param [str] output_vars: The list of output variables. If not provided,
                               the default list is the list of free variables
-                              in the model, i.e. those variables that are
-                              declared but not defined in the model
+                              in the _model, i.e. those variables that are
+                              declared but not defined in the _model
     :param str mzn_globals_dir: The name of the directory to search for
                                 globals included files in the standard
                                 library; by default the 'gecode' global
@@ -68,10 +68,13 @@ def minizinc(mzn, dzn_files=None, *, data=None,
     if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
     elif isinstance(mzn, str):
-        mzn_model = MiniZincModel(mzn, output_vars)
+        mzn_model = MiniZincModel(mzn)
     else:
-        raise TypeError('The input model is invalid.')
+        raise TypeError('The input _model is invalid.')
 
+    # TODO: separate the handling of model related reads and writes from the
+    # minizinc function
+    mzn_model.dzn_output_stmt(output_vars)
     mzn = mzn_model.compile()
 
     # Ensures isolation of instances and thread safety
@@ -118,11 +121,11 @@ def minizinc(mzn, dzn_files=None, *, data=None,
 def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
             mzn_globals_dir='gecode'):
     """
-    Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
+    Flatten a MiniZinc _model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
 
-    :param str mzn: The path to a mzn file containing the MiniZinc model or
-                    the content of the model.
+    :param str mzn: The path to a mzn file containing the MiniZinc _model or
+                    the content of the _model.
     :param [str] dzn_files: A list of paths to dzn files to attach to the
                             mzn2fzn execution; by default no data file is
                             attached
@@ -131,18 +134,18 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     :param str output_base: The base name for the fzn and ozn files (extension
                             are then attached automatically); by default the
                             mzn_file name is used. If the mzn argument is
-                            the content of the model, then the output base
-                            is used to name the file where the mzn model
+                            the content of the _model, then the output base
+                            is used to name the file where the mzn _model
                             will be written. In that case, if output_base is
                             None then a default name ('mznout') is used.
     :param bool no_ozn: Whether to create the ozn file or not. Default is
                         False (create). If no ozn is created, it is still
                         possible to use solns2out to parse the solution
                         stream output of the solver. Notice though that
-                        MiniZinc optimizes the model also according to its
+                        MiniZinc optimizes the _model also according to its
                         output so it is recommended to use it (if the
                         minizinc function is used, it is recommended to use
-                        a model in which replace_output_stmt=True, default
+                        a _model in which replace_output_stmt=True, default
                         behaviour)
     :param str mzn_globals_dir: The name of the directory to search for
                                 globals included files in the standard
@@ -155,7 +158,7 @@ def mzn2fzn(mzn, dzn_files=None, *, data=None, output_base=None, no_ozn=False,
     log = logging.getLogger(__name__)
 
     if not isinstance(mzn, str):
-        raise ValueError('The input model must be a string.')
+        raise ValueError('The input _model must be a string.')
 
     if mzn.endswith('.mzn'):
         mzn_file = mzn

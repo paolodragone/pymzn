@@ -56,6 +56,7 @@ class _Config(object):
 
 _config = _Config()
 
+# Package level configuration properties
 mzn2fzn_cmd = _config.mzn2fzn_cmd
 solns2out_cmd = _config.solns2out_cmd
 gecode_cmd = _config.gecode_cmd
