@@ -18,7 +18,7 @@ class _Config(object):
         if os.path.exists(cmd):
             self._mzn2fzn_cmd = cmd
         else:
-            raise ValueError('The file does not exist: {}'.format(cmd))
+            raise ValueError('The given file does not exist: {}'.format(cmd))
 
     @property
     def solns2out_cmd(self):
@@ -29,7 +29,7 @@ class _Config(object):
         if os.path.exists(cmd):
             self._solns2out_cmd = cmd
         else:
-            raise ValueError('The file does not exist: {}'.format(cmd))
+            raise ValueError('The given file does not exist: {}'.format(cmd))
 
     @property
     def gecode_cmd(self):
@@ -40,7 +40,7 @@ class _Config(object):
         if os.path.exists(cmd):
             self._gecode_cmd = cmd
         else:
-            raise ValueError('The file does not exist: {}'.format(cmd))
+            raise ValueError('The given file does not exist: {}'.format(cmd))
 
     @property
     def optimatsat_cmd(self):
@@ -51,7 +51,7 @@ class _Config(object):
         if os.path.exists(cmd):
             self._optimatsat_cmd = cmd
         else:
-            raise ValueError('The file does not exist: {}'.format(cmd))
+            raise ValueError('The given file does not exist: {}'.format(cmd))
 
 
 _config = _Config()

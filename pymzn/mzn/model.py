@@ -1,16 +1,12 @@
 import logging
+import os.path
 import re
+
+import itertools
 
 from pymzn.dzn import dzn_value
 
-_stmt_p = re.compile('(?:^|;)\s*([^;]+)')
-_comm_p = re.compile('%.+?\n')
-_var_p = re.compile('^\s*([^:]+?):\s*([^=]+)\s*(?:=\s*(.+))?$')
-_var_type_p = re.compile('^\s*.*?var.+')
-_array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
-                           '\s+of\s+(.+?)$')
-_output_stmt_p = re.compile('(^|\s)output\s[^;]+?;')
-_solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
+_minizinc_instance_counter = itertools.count()
 
 
 class MiniZincModel(object):
@@ -24,26 +20,49 @@ class MiniZincModel(object):
     and the updates performed on the MinizincModel instance.
     """
 
-    def __init__(self, mzn=None):
+    _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
+    _comm_p = re.compile('%.+?\n')
+    _var_p = re.compile('^\s*([^:]+?):\s*([^=]+)\s*(?:=\s*(.+))?$')
+    _var_type_p = re.compile('^\s*.*?var.+')
+    _array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
+                               '\s+of\s+(.+?)$')
+    _output_stmt_p = re.compile('(^|\s)output\s[^;]+?;')
+    _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
+
+    def __init__(self, mzn=None, *, output_base=None, serialize=False):
         """
-        :param str or MiniZincModel mzn: The minizinc problem template.
-                                         It can be either a string or an
-                                         instance of MinizincModel. If it is
-                                         a string, it can be either the path
-                                         to the mzn file or the content of
-                                         the model.
+        :param str mzn: The minizinc problem template.
+                        It can be either a string or an instance of
+                        MiniZincModel. If it is a string, it can be either
+                        the path to the mzn file or the content of the model.
         """
-        self.mzn = mzn
-        self.mzn_out_file = ''
+        self._log = logging.getLogger(__name__)
+        if mzn:
+            base, ext = os.path.splitext(mzn)
+            if ext != '.mzn':
+                self._model = mzn
+                self._write_model = True
+                self._mzn_file = None
+                base = 'mznout'
+            else:
+                self._model = None
+                self._write_model = output_base is not None
+                self._mzn_file = mzn
+            self._output_base = output_base if output_base else base
+        else:
+            self._model = None
+            self._write_model = False
+            self._mzn_file = None
+            self._output_base = output_base if output_base else 'mznout'
+
+        self.serialize = serialize
         self.vars = {}
-        self._free_vars = set()
         self.constraints = []
         self.solve_stmt = None
         self.output_stmt = None
+        self._free_vars = set()
         self._array_dims = {}
-        self._model = None
-        self._gen = True
-        self._log = logging.getLogger(__name__)
+        self._modified = False
 
     def constraint(self, constr, comment=None):
         """
@@ -55,6 +74,7 @@ class MiniZincModel(object):
         :param str comment: A comment to attach to the constraint
         """
         self.constraints.append((constr, comment))
+        self._modified = True
 
     def solve(self, solve_stmt, comment=None):
         """
@@ -67,6 +87,7 @@ class MiniZincModel(object):
         :param str comment: A comment to attach to the statement
         """
         self.solve_stmt = (solve_stmt, comment)
+        self._modified = True
 
     def output(self, output_stmt, comment=None):
         """
@@ -79,6 +100,7 @@ class MiniZincModel(object):
         :param str comment: A comment to attach to the statement
         """
         self.output_stmt = (output_stmt, comment)
+        self._modified = True
 
     def var(self, vartype, var, val=None, comment=None):
         """
@@ -94,46 +116,36 @@ class MiniZincModel(object):
         """
         val = dzn_value(val) if val else None
         self.vars[var] = (vartype, val, comment)
-        if _var_type_p.match(vartype) and val is None:
+        if self._var_type_p.match(vartype) and val is None:
             self._free_vars.add(var)
-        _array_type_m = _array_type_p.match(vartype)
+        _array_type_m = self._array_type_p.match(vartype)
         if _array_type_m:
             dim = len(_array_type_m.group(1).split(','))
             self._array_dims[var] = dim
+        self._modified = True
 
     def _load_model(self):
-        if not self._model:
-            if self.mzn:
-                if isinstance(self.mzn, str):
-                    if self.mzn.endswith('.mzn'):
-                        with open(self.mzn) as f:
-                            self._model = f.read()
-                        self.mzn_out_file = self.mzn
-                    else:
-                        self._model = self.mzn
-                        self.mzn_out_file = 'mznout.mzn'
-                elif isinstance(self.mzn, MiniZincModel):
-                    self._model = self.mzn.compile()
-                    self.mzn_out_file = self.mzn.mzn_out_file
-                    self._gen = False
-                else:
-                    self._log.warning('The provided value for file_mzn '
-                                      'is not valid. It will be ignored.')
+        if self._model is None:
+            if self._mzn_file:
+                with open(self._mzn_file) as f:
+                    self._model = f.read()
+            else:
+                self._model = ''
         return self._model
 
     def _parse_model_stmts(self):
         model = self._load_model()
-        stmts = _stmt_p.findall(model)
+        stmts = self._stmt_p.findall(model)
         for stmt in stmts:
-            stmt = _comm_p.sub('', stmt)
-            _var_m = _var_p.match(stmt)
+            stmt = self._comm_p.sub('', stmt)
+            _var_m = self._var_p.match(stmt)
             if _var_m:
                 vartype = _var_m.group(1)
                 var = _var_m.group(2)
                 val = _var_m.group(3)
-                if _var_type_p.match(vartype) and val is None:
+                if self._var_type_p.match(vartype) and val is None:
                     self._free_vars.add(var)
-                _array_type_m = _array_type_p.match(vartype)
+                _array_type_m = self._array_type_p.match(vartype)
                 if _array_type_m:
                     dim = len(_array_type_m.group(1).split(','))
                     self._array_dims[var] = dim
@@ -187,35 +199,50 @@ class MiniZincModel(object):
 
         :return: A string containing the compiled _model.
         """
+
+        if not (self._write_model or self._modified):
+            if not self._mzn_file:
+                raise RuntimeError('Cannot compile an empty model.')
+            return self._mzn_file
+
+        # if serialize or not supposed to write but modified
+        if self.serialize or (self._modified and not self._write_model):
+            # Ensures isolation of instances and thread safety
+            sid = next(_minizinc_instance_counter)
+            output_file = '{}_{}.mzn'.format(self._output_base, sid)
+        else:
+            output_file = self._output_base + '.mzn'
+
         model = self._load_model()
 
-        if self._gen:
+        if self._modified:
             lines = ['\n\n\n%%% GENERATED BY PYMZN %%%\n\n']
-        else:
-            lines = ['\n\n\n']
 
-        for var, (vartype, val, comment) in self.vars.items():
-            comment and lines.append('% {}'.format(comment))
-            if val is not None:
-                lines.append('{}: {} = {};'.format(vartype, var, val))
-            else:
-                lines.append('{}: {};'.format(vartype, var))
+            for var, (vartype, val, comment) in self.vars.items():
+                comment and lines.append('% {}'.format(comment))
+                if val is not None:
+                    lines.append('{}: {} = {};'.format(vartype, var, val))
+                else:
+                    lines.append('{}: {};'.format(vartype, var))
 
-        for i, (constr, comment) in self.constraints:
-            comment and lines.append('% {}'.format(comment))
-            lines.append('constraint {};'.format(constr))
+            for i, (constr, comment) in self.constraints:
+                comment and lines.append('% {}'.format(comment))
+                lines.append('constraint {};'.format(constr))
 
-        if self.solve_stmt is not None:
-            model = _solve_stmt_p.sub('', model)
-            solve_stmt, comment = self.solve_stmt
-            comment and lines.append('% {}'.format(comment))
-            lines.append('solve {};'.format(solve_stmt))
+            if self.solve_stmt is not None:
+                model = self._solve_stmt_p.sub('', model)
+                solve_stmt, comment = self.solve_stmt
+                comment and lines.append('% {}'.format(comment))
+                lines.append('solve {};'.format(solve_stmt))
 
-        if self.output_stmt is not None:
-            model = _output_stmt_p.sub('', model)
-            output_stmt, comment = self.solve_stmt
-            comment and lines.append('% {}'.format(comment))
-            lines.append('output [{}];'.format(output_stmt))
+            if self.output_stmt is not None:
+                model = self._output_stmt_p.sub('', model)
+                output_stmt, comment = self.solve_stmt
+                comment and lines.append('% {}'.format(comment))
+                lines.append('output [{}];'.format(output_stmt))
+            model += '\n'.join(lines)
 
-        model += '\n'.join(lines)
-        return model
+        with open(output_file, 'w') as f:
+            f.write(model)
+
+        return output_file
