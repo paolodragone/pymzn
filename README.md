@@ -1,47 +1,67 @@
 [PyMzn](https://github.com/paolodragone/PyMzn)
 ==============================================
 
-PyMzn is a Python 3 wrapper for the MiniZinc tool pipeline. <br/>
+PyMzn is a Python wrapper for the MiniZinc tool pipeline. <br/>
 It is built on top of the libminizinc library (version 2.0) and provides a
 number of off-the-shelf functions to readily solve problems encoded in
 MiniZinc and parse the solutions into python objects.
 
+Currently, PyMzn is developed and maintained in Python v3.5 with a porting to
+Python v2.7 at every release (without the most recent changes).
+
 Install
 -------
 
-To install PyMzn, you first need to download and compile libminizinc from:
+PyMzn requires some additional software to be installed on your system before
+you can use it properly, namely:
+* The libminizinc library;
+* A CSP solver compatible with the FlatZinc encoding.
+
+### Install Libminizinc
+
+While you can install any bundled MiniZinc package, the minimal requirement to
+use PyMzn is to install the libminizinc library. You can download the source
+code of libminizinc from:
 <br/>
 https://github.com/MiniZinc/libminizinc/archive/master.zip
 <br/>
-Instructions on how to compile libminizinc are provided in the package itself.
-It is not necessary but strongly recommended to insert the path to the
-directory containing the binaries of the libminizinc tools into the PATH
-environment variable.
+Instructions on how to compile and install libminizinc are provided in the
+source code. If you install libminizinc in a location different from the
+default one, then it is strongly recommended to insert the libminizinc binary
+path into the PATH environment variable, in order to avoid to configure it in
+PyMzn at each use.
 
-There is also a `minizinc` package available through `apt-get`, but it is an
-older version and PyMzn has not been tested with it, so we recommend you to
-compile libminizinc from sources.
+### Install Gecode
 
-To use MiniZinc one also needs (at least) one compatible CSP solver installed.
-The default one assumed by this library is Gecode 4.4.0, which you can
-download from:
+The next step is to install a CSP solver compatible with FlatZinc. You can
+use any solver you like, but the default one for PyMzn is Gecode. If you use
+Gecode as solver, PyMzn will work out-of-the-box, otherwise it will need some
+little configuration (more on that in section [Solvers](#solvers)).
+
+To install Gecode v4.4.0, we recommend you to download and compile the source
+code, since binary packages are usually less frequently updated. The source
+code is available at:
 <br/>
 http://www.gecode.org/download/gecode-4.4.0.tar.gz
 <br/>
-In principle you can use any solver you like, provided it is compatible 
-with MiniZinc. If you use a solver that is not Gecode, please read carefully
-the following section *Solvers*.
+Instruction on how to compile and install are found in the source package.
+Again, it is recommended to either install in the default location otherwise
+to put the binary path of gecode into the PATH variable.
 
-After these preliminary steps, you can install PyMzn by either download the
-source code from the git repository or install it via Pip:
+### Install PyMzn
+
+After those preliminary steps, you can install PyMzn by either download the
+source code from the [GitHub](https://github.com/paolodragone/PyMzn)
+repository and include it in your project or install it through Pip:
 ```
 pip3 install pymzn
 ```
+Adjust the version of Pip according to the python version you want to use.
 
 Quick Start
 -----------
 
-First thing, you need a MiniZinc model encoding the problem to solve. Here 
+First, you need a MiniZinc model encoding the problem you want to solve. Here
 is a simple 0-1 knapsack problem encoded with MiniZinc:
 ```
 %% test.mzn %%
@@ -54,126 +74,115 @@ array[OBJ] of int: size = [14, 4, 10, 6, 9];
 
 var set of OBJ: x;
 constraint sum(i in x)(size[i]) <= capacity;
-
-solve maximize sum(i in x)(profit[i]);
+var int: obj = sum(i in x)(profit[i])
+solve maximize obj;
 ```
 
-Assuming that you have installed Gecode on your machine, you can solve the
-above problem using the `minizinc` function of pymzn in the following way:
+You can solve the above problem using the PyMzn `minizinc` function:
 ```
 import pymzn
 pymzn.minizinc('test.mzn')
 ```
-If you want to use a different solver, please read the following section
-on *Solvers*.
-
-If you did not specify the path to the binaries of libminizinc into the
-PATH environment variable, you need to pass it to the `minizinc` function
-through the `bin_path` argument:
-```
-pymzn.minizinc('test.mzn', bin_path='path/to/libminizinc')
-```
-
-The returned value will be:
+The result will be:
 ```
 [{'x': {3, 5}}]
 ```
-The output of the `minizinc` function is a list of solutions. Each solution is
-a dictionary containing the assignment of each variable to its value.
-The assignments are key-value pairs where the key is a string containing the
-name of the variable in the mzn file. Each output value can be automatically
-parsed and transformed into an equivalent value using python structures.
-This is the default behaviour, but it only works if no `output` statement is
-used in the minizinc model (or an equivalent output format is provided),
-more about parsing in the following section.
-The following list summarizes the Python types which the MiniZinc types
-are converted to:
- * int -> int
- * float -> float
- * set -> set
- * array1d -> dict {index: value}
- * array2d -> dict of dict {index: value}
- * array3d -> ...
+The `minizinc` function returns a list of solutions. The default behavior is
+to evaluate the solutions into python objects. Solutions are dictionaries
+containing variable assignments. The returned variables are, by default, the
+'free' variables, i.e. those that do not depend on other variables.
+If you are interested in the value of other variables for each solution you
+can specify the `output_vars` argument:
+```
+pymzn.minizinc('test.mzn', output_vars=['x', 'obj'])
+```
+This will override the default behavior so, if you are still interested in
+the default set of variables, you need to specify them as well.
 
-The array1d are converted to dictionaries because arrays in minizinc can
-use as index-set any contiguous interval of integers, so it could have some
-semantics associated with it. If the index-set is meaningless and you prefer
-to work with lists, the `pymzn` module also provides the convenience function
-`dict2array` which converts a dict-based array (as from the output of
-the `parse_dzn` function) into a list-based array, more suitable to represent
-vectors and matrices of numbers.
+The evaluation of the solutions by PyMzn uses an internal output
+representation (actually dzn format) specified as an output statement that
+overrides the one specified in the model if any (though the original output
+statement in your model is left untouched, more details on how PyMzn works
+internally are available in the documentation).
 
-The behaviour of the `minizinc` function can be adjusted by passing keywords
-arguments, which are listed and explained in detail in the documentation.
-There is an almost one-to-one match with command line arguments of the
-libminizinc utilities.
+If you wish to override the default behavior and get as output strings
+formatted with your original output statement you can use the `raw_output`
+argument:
+```
+pymzn.minizinc('test.mzn', raw_output=True)
+```
+This will disable the automatic parsing, so the `output_vars` will be ignored
+if specified.
 
-For instance, you can pass data to the `minizinc` function in the form of a
-dictionary of python objects, which are then converted in the right dzn
-format and fed to the mzn2fzn utility (more information about this in the
-*Data* section).
+### Data
+It is possible to specify data (.dzn) files to the `minizinc` function as
+additional positional arguments:
 ```
-pymzn.minizinc('test.mzn', data={'n': 10})
+pymzn.minizinc('test.mzn', 'data1.dzn', 'data2.dzn')
 ```
-Otherwise you can provide dzn files containing the data:
+It is also possible to specify additional data inline with the `minizinc`
+function:
 ```
-pymzn.minizinc('test.mzn', dzn_files=['data1.dzn', 'data2.dzn'])
+pymzn.minizinc('test.mzn', 'data1.dzn', 'data2.dzn', data={'n': 10, 'm': [1,3,5]})
 ```
-Or you can use both.
+With the `data` argument you can specify an assignment of variables that will
+be automatically converted to dzn format with the `pymzn.dzn` function (more
+details in the [Dzn files](#dzn) section).
 
-For more details on how to use each functions, please refer to the
-documentation. To compile the documentation, first make sure you installed Sphinx for
-Python 3, and then execute the make file inside the `docs` directory:
+### Solver's arguments
+Usually, solvers provide arguments that can be used to modify their behavior.
+You can specify arguments to pass to the solver as additional keyword
+arguments in the `minizinc` function. For instance, using the argument `time`
+for Gecode, it will set a time cut-off (in milliseconds) for the problem
+solving.
 ```
-make html
+pymzn.minizinc('test.mzn', time=30000)  # 30 seconds cut-off
 ```
-The documentation will then be compiled in the `docs/_build/html` folder.
+Adding the `parallel` argument, it will specify how many threads should Gecode
+use for the problem solving:
+```
+pymzn.minizinc('test.mzn', time=30000, parallel=0)  # 0 = number of available CPU cores
+```
+More details on available options are in the documentation.
+
+Additional configuration
+------------------------
+
+
+<a name="solvers"></a>
 
 Solvers
 -------
 If you want to use a different solver other than Gecode, you first need to
-make sure that it supports the MiniZinc interface.
+make sure that it supports the FlatZinc input.
 To solve your model through PyMzn using the selected solver, you need to
-provide a proxy function to handle the command line interface of the solver,
-this is an example of such function:
+use a proxy function.
+PyMzn provides natively a number of solvers proxy functions. If the solver
+your solver is not supported natively, you can use the generic proxy function
+`pymzn.solve`:
 ```
-import pymzn
+pymzn.minizinc('test.mzn', fzn_fn=pymzn.solve, solver_cmd='path/to/solver')
+```
 
-def fzn_solver(fzn_file, arg1=def_val1, arg2=def_val2):
-    solver_path = 'path/to/solver'  # Only the name if it's in the PATH
+If you want to provide additional arguments and flexibility to the solver, you
+can define your own proxy function. Here is an example:
+```
+from pymzn.binary import cmd, run
+
+def my_solver(fzn_file, arg1=def_val1, arg2=def_val2):
+    solver = 'path/to/solver'
     args = [('-arg1', arg1), ('-arg2', arg2), fzn_file]
-    solver_cmd = pymzn.binary.command(solver_path, args)
-    return pymzn.binary.run(solver_cmd, args)
+    return run(cmd(solver, args))
 ```
 Then you can run the `minizinc` function like this:
 ```
-pymzn.minizinc('test.mzn', fzn_cmd=fzn_solver, fzn_flags={'arg1':val1, 'arg2':val2})
+pymzn.minizinc('test.mzn', fzn_cmd=fzn_solver, arg1=val1, arg2=val2)
 ```
 
-Parsing output
---------------
-The output stream of the solver is parsed by the `solns2out` function. To
-parse the output one needs a specialized function. The default one is the
-`parse_dzn` function. If no parsing function (`parse=None`) is passed to the
-`solns2out` function then the raw output of the solver is used as output
-solution stream. If a custom output statement is used in the minizinc model,
- then an appropriate parsing function must be provided as well.
+<a name="dzn"></a>
 
- The parsing function will be of the form:
- ```
- def parse_fun(lines):
-    for line in lines:
-       # parse the line
-       ...
-    # return parsed solution
- ```
-It gets as input the raw lines (as strings) of the output stream of the solver.
-It is executed for each solution separately. It returns whatever object you
-like to represent the solutions of the solver in your application.
-
-
-Data (dzn files)
-----------------
+Dzn files
+----------------------
 The PyMzn library also provides a set of methods to convert python objects
 into dzn format.
 ```
@@ -203,6 +212,9 @@ The supported types of python objects are:
   contiguous set;
   * nested combinations of the previous two, provided that the children of
   every node have the same index-set. The maximum depth is 6.
+
+Serialization
+-------------
 
 Troubleshooting
 ---------------
