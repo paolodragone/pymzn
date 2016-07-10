@@ -60,7 +60,7 @@ class _Config(object):
 
     @cmd_arg_limit.setter
     def cmd_arg_limit(self, limit):
-        self._cmd_arg_limit= limit
+        self._cmd_arg_limit = limit
 
 
 _config = _Config()

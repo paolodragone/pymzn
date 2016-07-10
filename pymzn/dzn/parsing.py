@@ -1,5 +1,7 @@
 import re
 
+from pymzn import rebase_array
+
 
 # boolean pattern
 _bool_p = re.compile('^(?:true|false)$')
@@ -44,7 +46,7 @@ def _parse_array(indices, vals):
 
 
 def _parse_indices(st):
-    # Parse indices inside multi-dimensional arrays
+    # Parse indices of multi-dimensional arrays
     ss = st.strip().split(',')
     indices = []
     for s in ss:
@@ -103,7 +105,7 @@ def _parse_val(val):
     return None
 
 
-def _parse_dzn_soln(soln):
+def _parse_dzn_soln(soln, *, rebase_arrays=True):
     # log = logging.getLogger(__name__)
     parsed_vars = {}
     lines = soln.split('\n')
@@ -137,6 +139,8 @@ def _parse_dzn_soln(soln):
                 else:  # assuming 1d array based on 0
                     # log.debug('Parsing values: %s', vals)
                     p_val = _parse_array([range(len(vals))], vals)
+                if rebase_arrays:
+                    p_val = rebase_array(p_val)
                 parsed_vars[var] = p_val
                 # log.debug('Parsed array: %s', p_val)
                 continue
@@ -144,19 +148,23 @@ def _parse_dzn_soln(soln):
     return parsed_vars
 
 
-def parse_dzn(dzn):
+def parse_dzn(dzn, *, rebase_arrays=True):
     """
     Parse one or more pieces of dzn strings.
 
     :param str or [str] dzn: A dzn string or a list of dzn strings
+    :param bool rebase_arrays: Whether to return arrays as zero-based lists
+                               or to return them as dictionaries, thereby
+                               preserving the index-sets.
     :return: A list of dictionaries containing the variable assignments
              parsed from the inputs
     :rtype: [dict]
     """
 
     if isinstance(dzn, str):
-        return [_parse_dzn_soln(dzn)]
+        return [_parse_dzn_soln(dzn, rebase_arrays=rebase_arrays)]
     elif isinstance(dzn, list):
-        return [_parse_dzn_soln(soln) for soln in dzn]
+        return [_parse_dzn_soln(soln, rebase_arrays=rebase_arrays)
+                for soln in dzn]
     else:
         raise TypeError('The input solutions are invalid.')

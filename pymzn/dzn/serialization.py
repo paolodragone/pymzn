@@ -173,14 +173,13 @@ def dzn(objs, fout=None):
     return vals
 
 
-# TODO: This is deprecated, this must be updated as default behaviour
-def dict2list(d):
+def rebase_array(d):
     """
     Transform an indexed dictionary (such as those returned by the parse_dzn
-    function when parsing arrays) into an multi-dimensional array.
+    function when parsing arrays) into an multi-dimensional list.
 
     :param dict d: The indexed dictionary to convert
-    :return: A multi-dimensional array
+    :return: A multi-dimensional list
     :rtype: list
     """
     arr = []
@@ -189,6 +188,6 @@ def dict2list(d):
     for idx in idx_set:
         v = d[idx]
         if _is_dict(v):
-            v = dict2list(v)
+            v = rebase_array(v)
         arr.append(v)
     return arr

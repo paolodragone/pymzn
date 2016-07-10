@@ -4,7 +4,7 @@ import logging
 from .config import mzn2fzn_cmd, solns2out_cmd, gecode_cmd, optimatsat_cmd
 from .mzn import minizinc, mzn2fzn, solns2out, gecode, MiniZincModel, \
     MiniZincUnknownError, MiniZincUnsatisfiableError, MiniZincUnboundedError
-from .dzn import dzn, dzn_value, dict2list, parse_dzn
+from .dzn import dzn, dzn_value, rebase_array, parse_dzn
 
 __version__ = '0.9.9'
 
