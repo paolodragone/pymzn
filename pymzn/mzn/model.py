@@ -5,7 +5,7 @@ import re
 
 from pymzn.dzn import dzn_value
 
-_sid_counter = itertools.count()
+_sid_counter = itertools.count(1)
 
 
 class MiniZincModel(object):
@@ -237,13 +237,13 @@ class MiniZincModel(object):
 
             if self.output_stmt is not None:
                 model = self._output_stmt_p.sub('', model)
-                output_stmt, comment = self.solve_stmt
+                output_stmt, comment = self.output_stmt
                 comment and lines.append('% {}'.format(comment))
                 lines.append('output [{}];'.format(output_stmt))
             model += '\n'.join(lines)
 
         # Ensures isolation of instances and thread safety
-        sid = '' if not self.serialize else next(_sid_counter)
+        sid = 0 if not self.serialize else next(_sid_counter)
         output_file = '{}_{}.mzn'.format(self.output_base, sid)
 
         with open(output_file, 'w') as f:

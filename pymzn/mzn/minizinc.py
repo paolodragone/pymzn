@@ -1,13 +1,13 @@
-import contextlib
-import logging
 import os
+import logging
+import contextlib
 from subprocess import CalledProcessError
 
 import pymzn.config as config
 from pymzn.bin import cmd, run
 from pymzn.dzn import parse_dzn, dzn
-from pymzn.mzn.model import MiniZincModel
 from pymzn.mzn.solvers import gecode
+from pymzn.mzn.model import MiniZincModel
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
@@ -160,7 +160,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
     if mzn_globals_dir:
         args.append(('-G', mzn_globals_dir))
 
-    dzn_files = dzn_files or []
+    dzn_files = list(dzn_files)
 
     data_file = None
     if data is not None:

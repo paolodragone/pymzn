@@ -6,7 +6,7 @@ class _Config(object):
     def __init__(self):
         self._mzn2fzn_cmd = 'mzn2fzn'
         self._solns2out_cmd = 'solns2out'
-        self._gecode_cmd = 'gecode'
+        self._gecode_cmd = 'fzn-gecode'
         self._optimatsat_cmd = 'optimatsat'
         self._cmd_arg_limit = 2048
 
@@ -56,7 +56,7 @@ class _Config(object):
 
     @property
     def cmd_arg_limit(self):
-        return self._optimatsat_cmd
+        return self._cmd_arg_limit
 
     @cmd_arg_limit.setter
     def cmd_arg_limit(self, limit):

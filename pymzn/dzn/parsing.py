@@ -1,6 +1,7 @@
+import logging
 import re
 
-from pymzn import rebase_array
+from pymzn.dzn.serialization import rebase_array
 
 
 # boolean pattern
@@ -26,7 +27,7 @@ _val_p = re.compile(('(?:true|false|\{(?:[\d ,+\-]+)\}'
 
 # multi-dimensional array pattern
 _array_p = re.compile(('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
-                       '(?P<indices>[\d\.+\-](?:\s*,\s*[\d\.+\-]+)?)\s*,\s*)?'
+                       '(?P<indices>[\d\.+\-]+(?:\s*,\s*[\d\.+\-]+)?)\s*,\s*)?'
                        '\[(?P<vals>[\w \.,+\-\\\/\*^|\(\)\{\}]+)\]\)?$'))
 
 # variable pattern
@@ -122,23 +123,23 @@ def parse_dzn(dzn, *, rebase_arrays=True):
              parsed from the inputs
     :rtype: [dict]
     """
-    # log = logging.getLogger(__name__)
-    soln = {}
+    log = logging.getLogger(__name__)
+    assign = {}
     stmts = _stmt_p.findall(dzn)
     for stmt in stmts:
         stmt = _comm_p.sub('', stmt)
-        # log.debug('Parsing stmt: %s', stmt)
+        log.debug('Parsing stmt: %s', stmt)
         var_m = _var_p.match(stmt)
         if var_m:
             var = var_m.group('var')
             val = var_m.group('val')
             p_val = _parse_val(val)
             if p_val is not None:
-                soln[var] = p_val
-                # log.debug('Parsed value: %s', p_val)
+                assign[var] = p_val
+                log.debug('Parsed value: %s', p_val)
                 continue
 
-            # log.debug('Parsing array: %s', val)
+            log.debug('Parsing array: %s', val)
             array_m = _array_p.match(val)
             if array_m:
                 vals = array_m.group('vals')
@@ -147,18 +148,18 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                 if dim:  # explicit dimensions
                     dim = int(dim)
                     indices = array_m.group('indices')
-                    # log.debug('Parsing indices: %s', indices)
+                    log.debug('Parsing indices: %s', indices)
                     indices = _parse_indices(indices)
                     assert len(indices) == dim
-                    # log.debug('Parsing values: %s', vals)
+                    log.debug('Parsing values: %s', vals)
                     p_val = _parse_array(indices, vals)
                 else:  # assuming 1d array based on 0
-                    # log.debug('Parsing values: %s', vals)
+                    log.debug('Parsing values: %s', vals)
                     p_val = _parse_array([range(len(vals))], vals)
                 if rebase_arrays:
                     p_val = rebase_array(p_val)
-                soln[var] = p_val
-                # log.debug('Parsed array: %s', p_val)
+                assign[var] = p_val
+                log.debug('Parsed array: %s', p_val)
                 continue
         raise ValueError('Unsupported parsing for stmt:\n{}'.format(stmt))
-    return soln
+    return assign
