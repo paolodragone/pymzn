@@ -9,6 +9,8 @@ from .dzn import dzn, dzn_value, dict2list, parse_dzn
 __version__ = '0.9.9'
 
 # TODO: update the README
+# TODO: make a better documentation
+# TODO: upload documentation online (github)
 # TODO: update python2 branch
 
 debug_handler = None

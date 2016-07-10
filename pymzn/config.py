@@ -8,6 +8,7 @@ class _Config(object):
         self._solns2out_cmd = 'solns2out'
         self._gecode_cmd = 'gecode'
         self._optimatsat_cmd = 'optimatsat'
+        self._cmd_arg_limit = 2048
 
     @property
     def mzn2fzn_cmd(self):
@@ -53,6 +54,14 @@ class _Config(object):
         else:
             raise ValueError('The given file does not exist: {}'.format(cmd))
 
+    @property
+    def cmd_arg_limit(self):
+        return self._optimatsat_cmd
+
+    @cmd_arg_limit.setter
+    def cmd_arg_limit(self, limit):
+        self._cmd_arg_limit= limit
+
 
 _config = _Config()
 
@@ -61,3 +70,4 @@ mzn2fzn_cmd = _config.mzn2fzn_cmd
 solns2out_cmd = _config.solns2out_cmd
 gecode_cmd = _config.gecode_cmd
 optimatsat_cmd = _config.optimatsat_cmd
+cmd_arg_limit = _config.cmd_arg_limit

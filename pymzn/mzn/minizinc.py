@@ -1,13 +1,13 @@
-import os
-import logging
 import contextlib
+import logging
+import os
 from subprocess import CalledProcessError
 
 import pymzn.config as config
 from pymzn.bin import cmd, run
 from pymzn.dzn import parse_dzn, dzn
-from pymzn.mzn.solvers import gecode
 from pymzn.mzn.model import MiniZincModel
+from pymzn.mzn.solvers import gecode
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
@@ -28,11 +28,15 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                                      the model.
     :param dzn_files: A list of paths to dzn files to attach to the mzn2fzn
                       execution, provided as positional arguments; by default
-                      no data file is attached
+                      no data file is attached. Data files are meant to be
+                      used when there is data that is static across several
+                      minizinc executions.
     :param dict data: Additional data as a dictionary of variables assignments
                       to supply to the mzn2fnz function. The dictionary is
                       then automatically converted to dzn format by the
-                      pymzn.dzn function.
+                      pymzn.dzn function. This property is meant to include
+                      data that dynamically changes across several minizinc
+                      executions.
     :param bool keep: Whether to keep the generated mzn, fzn and
                       ozn files o not. Notice though that pymzn generated
                       files are not originally intended to be kept, but this
@@ -100,7 +104,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     mzn_file = mzn_model.compile()
 
     try:
-        fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
+        fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files,
+                                     data=data, keep_data=keep,
                                      mzn_globals_dir=mzn_globals_dir)
         try:
             solns = fzn_fn(fzn_file, **fzn_args)
@@ -127,7 +132,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                     log.debug('Deleting file: %s', mzn_file)
 
 
-def mzn2fzn(mzn_file, *dzn_files, data=None, mzn_globals_dir='gecode'):
+def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
+            mzn_globals_dir='gecode'):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -137,6 +143,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, mzn_globals_dir='gecode'):
                             mzn2fzn execution, provided as additional
                             positional arguments to this function
     :param dict data: Dictionary of variables to use as inline data
+    :param bool keep_data: If true, the inline data is written to a dzn file.
+                           Default is False.
     :param str mzn_globals_dir: The name of the directory where to search
                                 for global included files in the standard
                                 library; by default the 'gecode' global
@@ -152,11 +160,21 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, mzn_globals_dir='gecode'):
     if mzn_globals_dir:
         args.append(('-G', mzn_globals_dir))
 
-    if data is not None:
-        data = '"{}"'.format(' '.join(dzn(data)))
-        args.append(('-D', data))
-
     dzn_files = dzn_files or []
+
+    data_file = None
+    if data is not None:
+        data = dzn(data)
+        if keep_data or sum(map(len, data)) >= config.cmd_arg_limit:
+            mzn_base, __ = os.path.splitext(mzn_file)
+            data_file = mzn_base + '_data.dzn'
+            with open(data_file, 'w') as f:
+                f.write('\n'.join(data))
+            dzn_files.append(data_file)
+        else:
+            data = '"{}"'.format(' '.join(data))
+            args.append(('-D', data))
+
     args += [mzn_file] + dzn_files
 
     log.debug('Calling %s with arguments: %s', config.mzn2fzn_cmd, args)
@@ -166,6 +184,12 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, mzn_globals_dir='gecode'):
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
+
+    if not keep_data:
+        with contextlib.suppress(FileNotFoundError):
+            if data_file:
+                os.remove(data_file)
+                log.debug('Deleting file: %s', data_file)
 
     base = os.path.splitext(mzn_file)[0]
 
