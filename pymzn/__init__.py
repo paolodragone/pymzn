@@ -13,13 +13,14 @@ __version__ = '0.9.9'
 # TODO: make a better documentation
 # TODO: upload documentation online (github)
 # TODO: update python2 branch
+# TODO: config solver function and default arguments to solver
 
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)
 pymzn_log.addHandler(logging.NullHandler())
 
 
-def verbose(verb):
+def debug(verb=True):
     global pymzn_log
     global debug_handler
     if verb and debug_handler is None:
