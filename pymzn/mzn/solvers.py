@@ -38,7 +38,6 @@ def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
              then parsed
     :rtype: str
     """
-    log = logging.getLogger(__name__)
     args = []
     if n_solns >= 0:
         args.append(('-n', n_solns))
@@ -56,6 +55,7 @@ def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
         args.append(('-restart-scale', restart_scale))
     args.append(fzn_file)
 
+    log = logging.getLogger(__name__)
     log.debug('Calling %s with arguments: %s', config.gecode_cmd, args)
 
     try:
@@ -73,16 +73,28 @@ def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
     return solns
 
 
-def optimatsat(fzn_file, *args, optimatsat_cmd='optimatsat'):
-    log = logging.getLogger(__name__)
-    args = list(args)
-    args.append('-input=fzn')
-    args.append(fzn_file)
+def solve(fzn_file, solver_cmd=None):
+    args = [fzn_file]
 
-    log.debug('Calling %s with arguments: %s', optimatsat_cmd, args)
+    log = logging.getLogger(__name__)
+    log.debug('Calling %s with arguments: %s', solver_cmd, args)
 
     try:
-        solns = run(cmd(optimatsat_cmd, args))
+        solns = run(cmd(solver_cmd, args))
+    except CalledProcessError as err:
+        log.exception(err.stderr)
+        raise RuntimeError(err.stderr) from err
+    return solns
+
+
+def optimatsat(fzn_file):
+    args = ['-input=fzn', fzn_file]
+
+    log = logging.getLogger(__name__)
+    log.debug('Calling %s with arguments: %s', config.optimatsat_cmd, args)
+
+    try:
+        solns = run(cmd(config.optimatsat_cmd, args))
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err

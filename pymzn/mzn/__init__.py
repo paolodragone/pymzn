@@ -1,7 +1,7 @@
 
 from .minizinc import minizinc, mzn2fzn, solns2out, MiniZincUnknownError, \
     MiniZincUnsatisfiableError, MiniZincUnboundedError
-from .solvers import gecode, optimatsat
+from .solvers import gecode, optimatsat, solve
 from .model import MiniZincModel
 
 # TODO: mzn2doc
