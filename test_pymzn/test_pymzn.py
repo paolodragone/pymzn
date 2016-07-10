@@ -6,6 +6,8 @@ from pymzn import minizinc
 from pymzn.bin import BinaryRuntimeError
 
 
+# TODO: make some useful test
+
 class MiniZincTest(unittest.TestCase):
 
     def test_minizinc_exists(self):

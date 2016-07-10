@@ -1,8 +1,6 @@
 from numbers import Integral, Number
 from collections.abc import Set, Sized, Iterable, Mapping
 
-# FIXME: Output format of the old parsing function compliant to the new one
-
 
 def _is_int(obj):
     return isinstance(obj, Integral)

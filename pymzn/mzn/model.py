@@ -1,22 +1,21 @@
+import itertools
 import logging
 import os.path
 import re
 
-import itertools
-
 from pymzn.dzn import dzn_value
 
-_minizinc_instance_counter = itertools.count()
+_sid_counter = itertools.count()
 
 
 class MiniZincModel(object):
     """
-    Wraps a minizinc model.
+    Mutable class representing minizinc model.
 
-    It can use a mzn file as template and add variables, constraints and
-    modify the solve statement. The output statement can be replaced by a
-    pymzn-friendly one when using the minizinc function.
-    The final model is a string combining the existing _model (if provided)
+    It can use a mzn file as template, add variables and constraints,
+    modify the solve and output statements. The output statement can also be
+    replaced by a dzn representation of a list of output variables.
+    The final model is a string combining the existing model (if provided)
     and the updates performed on the MinizincModel instance.
     """
 
@@ -29,32 +28,34 @@ class MiniZincModel(object):
     _output_stmt_p = re.compile('(^|\s)output\s[^;]+?;')
     _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
 
-    def __init__(self, mzn=None, *, output_base=None, serialize=False):
+    def __init__(self, mzn='', *, output_base=None, serialize=False):
         """
         :param str mzn: The minizinc problem template.
-                        It can be either a string or an instance of
-                        MiniZincModel. If it is a string, it can be either
-                        the path to the mzn file or the content of the model.
+                        It can be either the path to a mzn file or the
+                        content of a model.
+        :param str output_base: The base name (including parent directories
+                                if different from the working one) for the
+                                output mzn, fzn and ozn files (extension are
+                                attached automatically). Parent directories
+                                are not created automatically so they are
+                                required to exist. If None is provided
+                                (default) the name of the input file is used.
+                                If the mzn input was a content string,
+                                then the default name 'mznout' is used.
+        :param bool serialize: Whether to serialize the current workflow or
+                               not. A serialized execution generates a
+                               series of mzn files that do not interfere
+                               with each other, thereby providing isolation
+                               of the executions. This property is
+                               especially important when solving multiple
+                               instances of the problem on separate threads.
+                               Notice though that this attribute will only
+                               guarantee the serialization of the generated
+                               files, thus it will not guarantee the
+                               serialization of the solving procedure and
+                               solution retrieval. The default is False.
         """
         self._log = logging.getLogger(__name__)
-        if mzn:
-            base, ext = os.path.splitext(mzn)
-            if ext != '.mzn':
-                self._model = mzn
-                self._write_model = True
-                self._mzn_file = None
-                base = 'mznout'
-            else:
-                self._model = None
-                self._write_model = output_base is not None
-                self._mzn_file = mzn
-            self._output_base = output_base if output_base else base
-        else:
-            self._model = None
-            self._write_model = False
-            self._mzn_file = None
-            self._output_base = output_base if output_base else 'mznout'
-
         self.serialize = serialize
         self.vars = {}
         self.constraints = []
@@ -63,6 +64,17 @@ class MiniZincModel(object):
         self._free_vars = set()
         self._array_dims = {}
         self._modified = False
+        self._stmts_parsed = False
+
+        mzn_base, mzn_ext = os.path.splitext(mzn)
+        if mzn_ext != '.mzn':
+            self._model = mzn
+            self._mzn_file = None
+            mzn_base = 'mznout'
+        else:
+            self._model = None
+            self._mzn_file = mzn
+        self.output_base = output_base if output_base else mzn_base
 
     def constraint(self, constr, comment=None):
         """
@@ -134,6 +146,8 @@ class MiniZincModel(object):
         return self._model
 
     def _parse_model_stmts(self):
+        if self._stmts_parsed:
+            return
         model = self._load_model()
         stmts = self._stmt_p.findall(model)
         for stmt in stmts:
@@ -149,6 +163,7 @@ class MiniZincModel(object):
                 if _array_type_m:
                     dim = len(_array_type_m.group(1).split(','))
                     self._array_dims[var] = dim
+        self._stmts_parsed = True
 
     def dzn_output_stmt(self, output_vars=None, comment=None):
         """
@@ -191,28 +206,13 @@ class MiniZincModel(object):
 
     def compile(self):
         """
-        Compiles the _model. The compiled _model contains the content of the
-        template (if provided) plus the added variables and constraints. The
-        solve statement will be replaced if provided a new one and the
-        output statement will be replaced with a pymzn-friendly one if
-        replace_output_stmt=True.
+        Compiles the model and writes it to file. The compiled model contains
+        the content of the template (if provided) plus the added variables and
+        constraints. The solve and output statements will be replaced if
+        new ones are provided.
 
-        :return: A string containing the compiled _model.
+        :return: A string containing the generated file path.
         """
-
-        if not (self._write_model or self._modified):
-            if not self._mzn_file:
-                raise RuntimeError('Cannot compile an empty model.')
-            return self._mzn_file
-
-        # if serialize or not supposed to write but modified
-        if self.serialize or (self._modified and not self._write_model):
-            # Ensures isolation of instances and thread safety
-            sid = next(_minizinc_instance_counter)
-            output_file = '{}_{}.mzn'.format(self._output_base, sid)
-        else:
-            output_file = self._output_base + '.mzn'
-
         model = self._load_model()
 
         if self._modified:
@@ -241,6 +241,10 @@ class MiniZincModel(object):
                 comment and lines.append('% {}'.format(comment))
                 lines.append('output [{}];'.format(output_stmt))
             model += '\n'.join(lines)
+
+        # Ensures isolation of instances and thread safety
+        sid = '' if not self.serialize else next(_sid_counter)
+        output_file = '{}_{}.mzn'.format(self.output_base, sid)
 
         with open(output_file, 'w') as f:
             f.write(model)
