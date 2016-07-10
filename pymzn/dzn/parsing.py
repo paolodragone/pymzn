@@ -25,13 +25,18 @@ _val_p = re.compile(('(?:true|false|\{(?:[\d ,+\-]+)\}'
                      '|[+\-]?\d+)'))
 
 # multi-dimensional array pattern
-_array_p = re.compile(('^(?:array(?P<dim>\d)d\s*'
-                       '\((?P<indices>(?:\s*[\d\.+\-]+(\s*,\s*)?)+)\s*,\s*)?'
+_array_p = re.compile(('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
+                       '(?P<indices>[\d\.+\-](?:\s*,\s*[\d\.+\-]+)?)\s*,\s*)?'
                        '\[(?P<vals>[\w \.,+\-\\\/\*^|\(\)\{\}]+)\]\)?$'))
 
 # variable pattern
-_var_p = re.compile(('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>[\w \.,+\-\\\/\*^|\('
-                     '\)\[\]\{\}]+);?$'))
+_var_p = re.compile('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>.+)$')
+
+# statement pattern
+_stmt_p = re.compile('(?:^|;)\s*([^;]+)')
+
+# comment pattern
+_comm_p = re.compile('%.+?\n')
 
 
 def _parse_array(indices, vals):
@@ -105,20 +110,31 @@ def _parse_val(val):
     return None
 
 
-def _parse_dzn_soln(soln, *, rebase_arrays=True):
+def parse_dzn(dzn, *, rebase_arrays=True):
+    """
+    Parse one or more pieces of dzn strings.
+
+    :param str or [str] dzn: A dzn string or a list of dzn strings
+    :param bool rebase_arrays: Whether to return arrays as zero-based lists
+                               or to return them as dictionaries, thereby
+                               preserving the index-sets.
+    :return: A list of dictionaries containing the variable assignments
+             parsed from the inputs
+    :rtype: [dict]
+    """
     # log = logging.getLogger(__name__)
-    parsed_vars = {}
-    lines = soln.split('\n')
-    for line in lines:
-        line = line.strip()
-        # log.debug('Parsing line: %s', line)
-        var_m = _var_p.match(line)
+    soln = {}
+    stmts = _stmt_p.findall(dzn)
+    for stmt in stmts:
+        stmt = _comm_p.sub('', stmt)
+        # log.debug('Parsing stmt: %s', stmt)
+        var_m = _var_p.match(stmt)
         if var_m:
             var = var_m.group('var')
             val = var_m.group('val')
             p_val = _parse_val(val)
             if p_val is not None:
-                parsed_vars[var] = p_val
+                soln[var] = p_val
                 # log.debug('Parsed value: %s', p_val)
                 continue
 
@@ -141,30 +157,8 @@ def _parse_dzn_soln(soln, *, rebase_arrays=True):
                     p_val = _parse_array([range(len(vals))], vals)
                 if rebase_arrays:
                     p_val = rebase_array(p_val)
-                parsed_vars[var] = p_val
+                soln[var] = p_val
                 # log.debug('Parsed array: %s', p_val)
                 continue
-        raise ValueError('Unsupported parsing for line:\n{}'.format(line))
-    return parsed_vars
-
-
-def parse_dzn(dzn, *, rebase_arrays=True):
-    """
-    Parse one or more pieces of dzn strings.
-
-    :param str or [str] dzn: A dzn string or a list of dzn strings
-    :param bool rebase_arrays: Whether to return arrays as zero-based lists
-                               or to return them as dictionaries, thereby
-                               preserving the index-sets.
-    :return: A list of dictionaries containing the variable assignments
-             parsed from the inputs
-    :rtype: [dict]
-    """
-
-    if isinstance(dzn, str):
-        return [_parse_dzn_soln(dzn, rebase_arrays=rebase_arrays)]
-    elif isinstance(dzn, list):
-        return [_parse_dzn_soln(soln, rebase_arrays=rebase_arrays)
-                for soln in dzn]
-    else:
-        raise TypeError('The input solutions are invalid.')
+        raise ValueError('Unsupported parsing for stmt:\n{}'.format(stmt))
+    return soln
