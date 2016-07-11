@@ -40,7 +40,7 @@ _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 _comm_p = re.compile('%.+?\n')
 
 
-def _parse_array(indices, vals):
+def _parse_array(indices, vals, rebase_arrays=True):
     # Recursive parsing of multi-dimensional arrays returned by the solns2out
     # utility of the type: array2d(2..4, 1..3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
     idx_set = indices[0]
@@ -48,6 +48,10 @@ def _parse_array(indices, vals):
         arr = {i: _parse_val(vals.pop(0)) for i in idx_set}
     else:
         arr = {i: _parse_array(indices[1:], vals) for i in idx_set}
+
+    if rebase_arrays and idx_set[0] == 1:
+        arr = rebase_array(arr)
+
     return arr
 
 
@@ -157,13 +161,10 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                     # log.debug('Parsing indices: %s', indices)
                     indices = _parse_indices(indices)
                     assert len(indices) == dim
-                    # log.debug('Parsing values: %s', vals)
-                    p_val = _parse_array(indices, vals)
-                else:  # assuming 1d array based on 0
-                    # log.debug('Parsing values: %s', vals)
-                    p_val = _parse_array([range(len(vals))], vals)
-                if rebase_arrays:
-                    p_val = rebase_array(p_val)
+                else:  # assuming 1d array based in 1
+                    indices = [range(1, len(vals) + 1)]
+                # log.debug('Parsing values: %s', vals)
+                p_val = _parse_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
                 # log.debug('Parsed array: %s', p_val)
                 continue
