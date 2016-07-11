@@ -9,7 +9,6 @@ from .dzn import dzn, dzn_value, rebase_array, parse_dzn
 
 __version__ = '0.9.9'
 
-# TODO: update the README
 # TODO: make a better documentation
 # TODO: upload documentation online (github)
 # TODO: update python2 branch
