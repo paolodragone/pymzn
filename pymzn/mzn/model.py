@@ -1,11 +1,8 @@
-import itertools
 import logging
 import os.path
 import re
 
 from pymzn.dzn import dzn_value
-
-_sid_counter = itertools.count(1)
 
 
 class MiniZincModel(object):
@@ -28,35 +25,13 @@ class MiniZincModel(object):
     _output_stmt_p = re.compile('(^|\s)output\s[^;]+?;')
     _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
 
-    def __init__(self, mzn='', *, output_base=None, serialize=False):
+    def __init__(self, mzn=''):
         """
         :param str mzn: The minizinc problem template.
                         It can be either the path to a mzn file or the
                         content of a model.
-        :param str output_base: The base name (including parent directories
-                                if different from the working one) for the
-                                output mzn, fzn and ozn files (extension are
-                                attached automatically). Parent directories
-                                are not created automatically so they are
-                                required to exist. If None is provided
-                                (default) the name of the input file is used.
-                                If the mzn input was a content string,
-                                then the default name 'mznout' is used.
-        :param bool serialize: Whether to serialize the current workflow or
-                               not. A serialized execution generates a
-                               series of mzn files that do not interfere
-                               with each other, thereby providing isolation
-                               of the executions. This property is
-                               especially important when solving multiple
-                               instances of the problem on separate threads.
-                               Notice though that this attribute will only
-                               guarantee the serialization of the generated
-                               files, thus it will not guarantee the
-                               serialization of the solving procedure and
-                               solution retrieval. The default is False.
         """
         self._log = logging.getLogger(__name__)
-        self.serialize = serialize
         self.vars = {}
         self.constraints = []
         self.solve_stmt = None
@@ -70,11 +45,9 @@ class MiniZincModel(object):
         if mzn_ext != '.mzn':
             self._model = mzn
             self._mzn_file = None
-            mzn_base = 'mznout'
         else:
             self._model = None
             self._mzn_file = mzn
-        self.output_base = output_base if output_base else mzn_base
 
     def constraint(self, constr, comment=None):
         """
@@ -204,7 +177,7 @@ class MiniZincModel(object):
         out_list = ', '.join(out_list)
         self.output(out_list, comment)
 
-    def compile(self):
+    def compile(self, output_file):
         """
         Compiles the model and writes it to file. The compiled model contains
         the content of the template (if provided) plus the added variables and
@@ -241,10 +214,6 @@ class MiniZincModel(object):
                 comment and lines.append('% {}'.format(comment))
                 lines.append('output [{}];'.format(output_stmt))
             model += '\n'.join(lines)
-
-        # Ensures isolation of instances and thread safety
-        sid = 0 if not self.serialize else next(_sid_counter)
-        output_file = '{}_{}.mzn'.format(self.output_base, sid)
 
         with open(output_file, 'w') as f:
             f.write(model)

@@ -1,13 +1,18 @@
 import os
 import logging
+import itertools
 import contextlib
 from subprocess import CalledProcessError
+
 
 import pymzn.config as config
 from pymzn.bin import cmd, run
 from pymzn.dzn import parse_dzn, dzn
 from pymzn.mzn.solvers import gecode
 from pymzn.mzn.model import MiniZincModel
+
+
+_sid_counter = itertools.count(1)
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
@@ -95,13 +100,21 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
     else:
-        mzn_model = MiniZincModel(mzn, output_base=output_base,
-                                  serialize=serialize)
+        mzn_model = MiniZincModel(mzn)
 
     if not raw_output:
         mzn_model.dzn_output_stmt(output_vars)
 
-    mzn_file = mzn_model.compile()
+    mzn_base, mzn_ext = os.path.splitext(mzn)
+    if mzn_ext != '.mzn':
+        mzn_base = 'mznout'
+    _output_base = output_base if output_base else mzn_base
+
+    # Ensures isolation of instances and thread safety
+    sid = 0 if not serialize else next(_sid_counter)
+    output_file = '{}_{}.mzn'.format(_output_base, sid)
+
+    mzn_file = mzn_model.compile(output_file)
 
     try:
         fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files,
