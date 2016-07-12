@@ -4,6 +4,9 @@ import numbers
 import subprocess
 
 
+__all__ = ['cmd', 'run']
+
+
 def cmd(path, args):
     """
     Returns the command string from the path to the binary with the provided

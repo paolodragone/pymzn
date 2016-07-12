@@ -4,6 +4,9 @@ import re
 from pymzn.dzn.serialization import rebase_array
 
 
+__all__ = ['parse_dzn']
+
+
 # boolean pattern
 _bool_p = re.compile('^(?:true|false)$')
 

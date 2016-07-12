@@ -12,6 +12,10 @@ from pymzn.mzn.solvers import gecode
 from pymzn.mzn.model import MiniZincModel
 
 
+__all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincUnsatisfiableError',
+           'MiniZincUnboundedError', 'MiniZincUnknownError']
+
+
 _sid_counter = itertools.count(1)
 
 

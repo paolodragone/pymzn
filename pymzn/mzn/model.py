@@ -5,6 +5,9 @@ import re
 from pymzn.dzn import dzn_value
 
 
+__all__ = ['MiniZincModel']
+
+
 class MiniZincModel(object):
     """
     Mutable class representing minizinc model.

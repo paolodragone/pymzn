@@ -1,19 +1,20 @@
-"""Wrapper module for the MiniZinc tool pipeline."""
-import logging
-
-from .config import mzn2fzn_cmd, solns2out_cmd, gecode_cmd, optimatsat_cmd
-from .mzn import (minizinc, mzn2fzn, solns2out, gecode, solve, MiniZincModel,
-                  MiniZincUnknownError, MiniZincUnsatisfiableError,
-                  MiniZincUnboundedError)
-from .dzn import dzn, dzn_value, rebase_array, parse_dzn
+"""
+Wrapper module for the MiniZinc tool pipeline.
+"""
+from pymzn.mzn import *
+from pymzn.dzn import *
 
 __version__ = '0.9.9'
+__all__ = ['mzn', 'dzn', 'debug']
 
 # TODO: make a better documentation
 # TODO: upload documentation online (github)
 # TODO: update python2 branch
 # TODO: config solver function and default arguments to solver
+# TODO: mzn2doc
+# TODO: make it work on windows
 
+import logging
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)
 pymzn_log.addHandler(logging.NullHandler())

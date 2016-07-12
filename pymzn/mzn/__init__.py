@@ -1,8 +1,9 @@
+"""
+"""
 
-from .minizinc import minizinc, mzn2fzn, solns2out, MiniZincUnknownError, \
-    MiniZincUnsatisfiableError, MiniZincUnboundedError
-from .solvers import gecode, optimatsat, solve
-from .model import MiniZincModel
+__all__ = ['minizinc', 'model', 'solvers']
 
-# TODO: mzn2doc
-# TODO: make it work on windows
+from pymzn.mzn.minizinc import *
+from pymzn.mzn.model import *
+from pymzn.mzn.solvers import *
+
