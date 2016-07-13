@@ -1,10 +1,6 @@
 import os.path
 
 
-__all__ = ['mzn2fzn_cmd', 'solns2out_cmd', 'gecode_cmd', 'optimatsat_cmd',
-           'cmd_arg_limit']
-
-
 class _Config(object):
 
     def __init__(self):

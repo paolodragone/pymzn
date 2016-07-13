@@ -6,14 +6,10 @@ from subprocess import CalledProcessError
 
 
 import pymzn.config as config
-from pymzn.bin import cmd, run
-from pymzn.dzn import parse_dzn, dzn
-from pymzn.mzn.solvers import gecode
-from pymzn.mzn.model import MiniZincModel
-
-
-__all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincUnsatisfiableError',
-           'MiniZincUnboundedError', 'MiniZincUnknownError']
+from ..bin import cmd, run
+from .._dzn import parse_dzn, dzn
+from ._solvers import gecode
+from ._model import MiniZincModel
 
 
 _sid_counter = itertools.count(1)

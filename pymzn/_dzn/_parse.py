@@ -1,10 +1,7 @@
 import os.path
 import re
 
-from pymzn.dzn.serialization import rebase_array
-
-
-__all__ = ['parse_dzn']
+from pymzn._dzn._marsh import rebase_array
 
 
 # boolean pattern
@@ -120,7 +117,7 @@ def _parse_val(val):
 
 def parse_dzn(dzn, *, rebase_arrays=True):
     """
-    Parse one or more pieces of dzn strings.
+    Parse a dzn string or file.
 
     :param str dzn: A dzn content string or a path to a dzn file
     :param bool rebase_arrays: Whether to return arrays as zero-based lists
