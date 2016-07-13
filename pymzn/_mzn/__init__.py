@@ -1,5 +1,3 @@
-"""
-"""
 
 __all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincUnsatisfiableError',
            'MiniZincUnknownError', 'MiniZincUnboundedError', 'MiniZincModel',

@@ -1,3 +1,10 @@
+"""
+PyMzn provides functions that mimic and enhance the tools from the libminizinc
+library. With those tools it is possible to compile a MiniZinc model into
+FlatZinc, solve a given problem and get the output solutions directly into the
+python code.
+"""
+
 import os
 import logging
 import itertools
@@ -6,8 +13,8 @@ from subprocess import CalledProcessError
 
 
 import pymzn.config as config
-from ..bin import cmd, run
-from .._dzn import parse_dzn, dzn
+from pymzn.bin import cmd, run
+from pymzn import parse_dzn, dzn
 from ._solvers import gecode
 from ._model import MiniZincModel
 

@@ -1,3 +1,46 @@
+"""
+
+
+If you want to specify custom paths to the MiniZinc or Gecode binaries
+you can set their values through the ``pymzn.config`` module.
+
+::
+
+    import pymzn.config
+
+    pymzn.config.mzn2fzn_cmd = path/to/mzn2fzn
+    pymzn.config.solns2out_cmd = path/to/solns2out
+    pymzn.config.gecode_cmd = path/to/fzn-gecode
+
+These settings persist throughout the execution of your application. The
+``pymzn.config`` module provides access to all the static settings of
+PyMzn.
+
+PyMzn can also be set to print debugging messages on standard output
+via:
+
+::
+
+    pymzn.debug()
+
+This function is meant to be used in interactive sessions or in
+applications that do not configure the ``logging`` library. If you
+configure the ``logging`` library in your application, then PyMzn will
+be affected as well. The logging level in PyMzn is always ``DEBUG``. To
+disable debugging messages you can then call:
+
+::
+
+    pymzn.debug(False)
+
+
+Provides configuration variables:
+ * mzn2fzn_cmd: ...
+ * solns2out_cmd: ...
+ * gecode_cmd: ...
+ * optimatsat_cmd: ...
+ * cmd_arg_limit: ...
+"""
 import os.path
 
 

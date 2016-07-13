@@ -6,7 +6,7 @@ from pymzn import minizinc
 from pymzn.bin import BinaryRuntimeError
 
 
-# TODO: make some useful test
+# TODO: make some useful test then update setup.py to include tests in sources
 
 class MiniZincTest(unittest.TestCase):
 

@@ -1,0 +1,4 @@
+Configuration
+-------------
+
+.. automodule:: config

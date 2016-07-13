@@ -1,7 +1,7 @@
 import os.path
 import re
 
-from pymzn._dzn._marsh import rebase_array
+from ._marsh import rebase_array
 
 
 # boolean pattern

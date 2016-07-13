@@ -2,7 +2,7 @@ import logging
 import os.path
 import re
 
-from pymzn._dzn import dzn_value
+from pymzn import dzn_value
 
 
 class MiniZincModel(object):
