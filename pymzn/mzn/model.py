@@ -25,7 +25,7 @@ class MiniZincModel(object):
     _var_type_p = re.compile('^\s*.*?var.+')
     _array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
                                '\s+of\s+(.+?)$')
-    _output_stmt_p = re.compile('(^|\s)output\s[^;]+?;')
+    _output_stmt_p = re.compile('(^|\s)output\s*\[.+?\]\s*;', re.DOTALL)
     _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
 
     def __init__(self, mzn=''):
