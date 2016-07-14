@@ -1,3 +1,25 @@
+"""
+PyMzn can also be used to dynamically change a model during runtime. For
+example, it can be useful to add constraints incrementally or change the
+solving statement dynamically. To modify dynamically a model, you can
+use the class ``MiniZincModel``, which can take an optional model file
+as input and then can be modified by adding variables and constraints,
+and by modifying the solve or output statements. An instance of
+``MiniZincModel`` can then be passed directly to the ``minizinc``
+function to be solved.
+
+::
+
+    model = pymzn.MiniZincModel('test.mzn')
+
+    for i in range(10):
+        model.add_constraint('arr_1[i] < arr_2[i]')
+        pymzn.minizinc(model)
+
+As you can see ``MiniZincModel`` is a mutable class which saves the
+internal states and can be modified after every solving.
+"""
+
 import logging
 import os.path
 import re

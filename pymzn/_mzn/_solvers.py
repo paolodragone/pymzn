@@ -1,3 +1,35 @@
+"""
+If you want to use a different solver other than Gecode, you first need
+to make sure that it supports the FlatZinc input. To solve your model
+through PyMzn using the selected solver, you need to use a proxy
+function. PyMzn provides natively a number of solvers proxy functions.
+If the solver your solver is not supported natively, you can use the
+generic proxy function ``pymzn.solve``:
+
+::
+
+    pymzn.minizinc('test.mzn', fzn_fn=pymzn.solve, solver_cmd='path/to/solver')
+
+If you want to provide additional arguments and flexibility to the
+solver, you can define your own proxy function. Here is an example:
+
+::
+
+    from pymzn.binary import cmd, run
+
+    def my_solver(fzn_file, arg1=def_val1, arg2=def_val2):
+        solver = 'path/to/solver'
+        args = [('-arg1', arg1), ('-arg2', arg2), fzn_file]
+        return run(cmd(solver, args))
+
+Then you can run the ``minizinc`` function like this:
+
+::
+
+    pymzn.minizinc('test.mzn', fzn_cmd=fzn_solver, arg1=val1, arg2=val2)
+
+"""
+
 import logging
 from subprocess import CalledProcessError
 

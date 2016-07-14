@@ -2,7 +2,7 @@ PyMzn
 =====
 
 Welcome to the documentation of the PyMzn project.
-PyMzn is a Python library that wraps and enhance the MiniZinc tools for CSP
+PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
 modelling and solving.
 
 `GitHub repository <https://github.com/paolodragone/pymzn>`__
@@ -17,6 +17,7 @@ Table of Contents
    quick_start
    config
    reference/index
+   internal
    troubleshooting
 
 Indices and tables

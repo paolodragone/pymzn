@@ -18,11 +18,10 @@ __all__.extend(_mzn.__all__)
 __all__.extend(_dzn.__all__)
 
 
-# TODO: make a better documentation
-# TODO: upload documentation online (github)
 # TODO: update python2 branch
 # TODO: config solver function and default arguments to solver
 # TODO: mzn2doc
+# TODO: check the import of other files in minizinc
 # TODO: make it work on windows
 # TODO: make a main function and runnable from command line
 
