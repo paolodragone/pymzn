@@ -1,5 +1,5 @@
-`PyMzn <https://github.com/paolodragone/PyMzn>`__
-=================================================
+PyMzn
+=====
 
 PyMzn is a Python wrapper for the MiniZinc tool pipeline. It is built on
 top of the libminizinc library (version 2.0) and provides a number of
@@ -9,6 +9,11 @@ and parse the solutions into python objects.
 Currently, PyMzn is developed and maintained in Python v3.5 with a
 porting to Python v2.7 at every release (without the most recent
 changes).
+
+Requirements
+------------
+
+
 
 Install
 -------
