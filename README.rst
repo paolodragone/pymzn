@@ -23,7 +23,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:
 
     var set of OBJ: x;
     constraint sum(i in x)(size[i]) <= capacity;
-    var int: obj = sum(i in x)(profit[i])
+    var int: obj = sum(i in x)(profit[i]);
     solve maximize obj;
 
 
