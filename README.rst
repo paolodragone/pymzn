@@ -60,7 +60,7 @@ For a follow-up of this example, read the
 `Quick Start guide <http://paolodragone.com/pymzn/quick_start.html>`__.
 
 For more information on the PyMzn functions read the
-`documentation <http://paolodragone.com/pymzn/reference/>`__.
+`reference manual <http://paolodragone.com/pymzn/reference/>`__.
 
 
 Install
