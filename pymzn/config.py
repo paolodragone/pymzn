@@ -16,6 +16,17 @@ These settings persist throughout the execution of your application. The
 ``pymzn.config`` module provides access to all the static settings of
 PyMzn.
 
+The configuration properties provided by ``pymzn.config`` are:
+ * mzn2fzn_cmd: Path to the MiniZinc *mzn2fzn* utility command executable;
+ * solns2out_cmd: Path to the MiniZinc *solns2out* utility command executable;
+ * gecode_cmd: Path to the Gecode *fzn-gecode* utility command executable;
+ * optimatsat_cmd: Path to the OptiMatSat *optimatsat* utility command
+                   executable;
+ * cmd_arg_limit: The limit of characters for command line arguments; This
+                  property is used to decide whether to provide inline data
+                  as a shell argument to mzn2fzn or to write it automatically
+                  on a dzn file if the limit is exceeded.
+
 PyMzn can also be set to print debugging messages on standard output
 via:
 
@@ -33,13 +44,6 @@ disable debugging messages you can then call:
 
     pymzn.debug(False)
 
-
-Provides configuration variables:
- * mzn2fzn_cmd: ...
- * solns2out_cmd: ...
- * gecode_cmd: ...
- * optimatsat_cmd: ...
- * cmd_arg_limit: ...
 """
 import os.path
 

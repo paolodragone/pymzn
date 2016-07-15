@@ -1,3 +1,22 @@
+"""
+PyMzn provides a set of utility functions to execute binary files and shell
+commands.
+
+The ``bin.run`` function takes a command string (or a list of inputs for the
+``cmd`` function) which is then executed and its standard output stream is
+returned. A command string can be build using the ``bin.cmd`` function in this
+way:
+::
+
+    pymzn.bin.cmd('path/to/command', [5, '-f', '--flag2', ('--arg1', 'val1'), ('--arg2', 2)])
+
+which will become:
+::
+
+    'path/to/command 5 -f --flag2 --arg1 val1 --arg2 2'
+
+"""
+
 import logging
 import numbers
 import subprocess

@@ -1,5 +1,10 @@
 """
-Wrapper module for the MiniZinc tool pipeline.
+PyMzn provides a set of utilities to:
+
+ * Flatten and solve CSP problems encoded with MiniZinc;
+ * Solve problems that change incrementally;
+ * Convert Python objects into dzn format and back;
+ * Interface with different CSP solvers.
 """
 
 __version__ = '0.10.1'

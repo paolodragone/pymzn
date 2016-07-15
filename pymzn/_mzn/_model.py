@@ -29,13 +29,16 @@ from pymzn import dzn_value
 
 class MiniZincModel(object):
     """
-    Mutable class representing minizinc model.
+    Mutable class representing a MiniZinc model.
 
     It can use a mzn file as template, add variables and constraints,
     modify the solve and output statements. The output statement can also be
     replaced by a dzn representation of a list of output variables.
     The final model is a string combining the existing model (if provided)
     and the updates performed on the MinizincModel instance.
+
+    :param str mzn: The minizinc problem template. It can be either the path
+                    to a mzn file or the content of a model.
     """
 
     _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
@@ -48,11 +51,6 @@ class MiniZincModel(object):
     _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
 
     def __init__(self, mzn=''):
-        """
-        :param str mzn: The minizinc problem template.
-                        It can be either the path to a mzn file or the
-                        content of a model.
-        """
         self._log = logging.getLogger(__name__)
         self.vars = {}
         self.constraints = []

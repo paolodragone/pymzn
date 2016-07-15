@@ -17,33 +17,6 @@ but the ``mzn2fzn`` and ``solns2out`` functions are in the public API to allow
 for maximum flexibility. The latter two functions are wrappers of the two
 homonym MiniZinc tools for, respectively, converting a MiniZinc model into a
 FlatZinc one and getting custom output from the solution stream of a solver.
-
-Serialization
--------------
-
-Another important aspect that PyMzn addresses is the "isolation" of
-solving instances of a problem. This problem arises when there are
-multiple solving instances of the same problem file running in parallel.
-This is especially important when the problems are continuously solved
-in separate threads. PyMzn can be set to make sure that the instances do
-not interfere with each other, by setting the argument
-``serialize=True`` in the ``minizinc`` function. For instance:
-
-::
-
-    import threading
-
-    solutions = {}
-
-    def solve(n):
-        solutions[n] = pymzn.minizinc('test.mzn', data={'n': n}, serialize=True)
-
-    for n in range(10):
-        threading.Thread(target=solve, args=(n,)).start()
-
-Setting ``serialize=True`` in each solving instance will prevent all the
-instances from interfering with each other.
-
 """
 
 import os
@@ -67,11 +40,11 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
              serialize=False, raw_output=False, output_vars=None,
              mzn_globals_dir='gecode', fzn_fn=gecode, **fzn_args):
     """
-    Main function of the library.
-    It implements the workflow to solve a constrained optimization problem
-    encoded with MiniZinc. It first calls mzn2fzn to compile the fzn and ozn
-    files, then it calls the provided solver and in the end it calls the
-    solns2out utility on the output of the solver.
+    Implements the workflow to solve a CSP problem encoded with MiniZinc.
+
+    It first calls mzn2fzn to compile the fzn and ozn files, then it calls the
+    provided solver and in the end it calls the solns2out utility on the
+    output of the solver.
 
     :param str or MinizincModel mzn: The minizinc problem to be solved.
                                      It can be either a string or an

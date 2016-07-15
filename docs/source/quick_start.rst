@@ -1,33 +1,35 @@
 Quick Start
 ===========
-
 First, you need a MiniZinc model encoding the problem you want to solve.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc:
 
 ::
 
     %% test.mzn %%
-
-    int: n = 5;
+    int: n;  % number of objects
     set of int: OBJ = 1..n;
-    int: capacity = 20;
-    array[OBJ] of int: profit = [10, 3, 9, 4, 8];
-    array[OBJ] of int: size = [14, 4, 10, 6, 9];
+    int: capacity;  % the capacity of the knapsack
+    array[OBJ] of int: profit;  % the profit of each object
+    array[OBJ] of int: size;  % the size of each object
 
     var set of OBJ: x;
     constraint sum(i in x)(size[i]) <= capacity;
     var int: obj = sum(i in x)(profit[i])
     solve maximize obj;
 
-You can solve the above problem using the PyMzn ``minizinc`` function:
 
+    %% test.dzn %%
+    n = 5;
+    profit = [10, 3, 9, 4, 8];
+    size = [14, 4, 10, 6, 9];
+
+You can solve the above problem using the ``pymzn.minizinc`` function:
 ::
 
     import pymzn
-    pymzn.minizinc('test.mzn')
+    pymzn.minizinc('test.mzn', 'test.dzn', data={'capacity': 20})
 
 The result will be:
-
 ::
 
     [{'x': {3, 5}}]
@@ -82,7 +84,7 @@ It is also possible to specify additional data inline with the
 
 With the ``data`` argument you can specify an assignment of variables
 that will be automatically converted to dzn format with the
-``pymzn.dzn`` function (more details in the `Dzn files <#dzn>`__
+``pymzn.dzn`` function (more details in the `Dzn files <reference/dzn/>`__
 section).
 
 Solver's arguments
@@ -92,7 +94,7 @@ Usually, solvers provide arguments that can be used to modify their
 behavior. You can specify arguments to pass to the solver as additional
 keyword arguments in the ``minizinc`` function. For instance, using the
 argument ``time`` for Gecode, it will set a time cut-off (in
-milliseconds) for the problem solving.
+milliseconds) for the problem solving:
 
 ::
 
@@ -105,4 +107,5 @@ should Gecode use for the problem solving:
 
     pymzn.minizinc('test.mzn', time=30000, parallel=0)  # 0 = number of available CPU cores
 
-More details on available options are in the documentation.
+More details on available options are in the `Solvers <reference/solvers/>`__
+section.

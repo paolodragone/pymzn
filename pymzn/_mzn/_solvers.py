@@ -1,8 +1,12 @@
 """
+PyMzn interfaces with solvers through *proxy* functions. Proxy functions
+executes a solver with the given arguments on the provided FlatZinc model.
+PyMzn's default solver is Gecode, which proxy function is `pymzn.gecode`.
+
 If you want to use a different solver other than Gecode, you first need
-to make sure that it supports the FlatZinc input. To solve your model
-through PyMzn using the selected solver, you need to use a proxy
-function. PyMzn provides natively a number of solvers proxy functions.
+to make sure that it supports the FlatZinc input format, then you need to find
+an appropriate proxy function if it exists, otherwise you can implement one by
+yourself. PyMzn provides natively a number of solvers proxy functions.
 If the solver your solver is not supported natively, you can use the
 generic proxy function ``pymzn.solve``:
 
@@ -40,8 +44,7 @@ from pymzn.bin import cmd, run
 def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
            restart_base=None, restart_scale=None, suppress_segfault=False):
     """
-    Solves a constrained optimization problem using the Gecode solver,
-    provided a .fzn input problem file.
+    Solves a constrained optimization problem using the Gecode solver.
 
     :param str fzn_file: The path to the fzn file containing the problem to
                          be solved
@@ -105,7 +108,21 @@ def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
     return solns
 
 
-def solve(fzn_file, solver_cmd=None):
+def solve(fzn_file, *, solver_cmd=None):
+    """
+    Generic proxy function to a solver.
+
+    This function provides a simple interface to a solver.
+    It does not provide any argument to the solver, so it can be used to only
+    execute the solver as is on the input fnz file.
+
+    :param str fzn_file: The path to the fzn file containing the problem to
+                         be solved
+    :param solver_cmd: The path to the command to execute the solver
+    :return: A string containing the solution output stream of the execution
+             of the solver on the specified problem
+    :rtype: str
+    """
     args = [fzn_file]
 
     log = logging.getLogger(__name__)
@@ -120,6 +137,19 @@ def solve(fzn_file, solver_cmd=None):
 
 
 def optimatsat(fzn_file):
+    """
+    Simple proxy function to the OptiMatSat solver.
+
+    This function is a simple interface to OptiMatSat which only specifies the
+    input format as a FlatZinc model, without providing any additional
+    arguments.
+
+    :param str fzn_file: The path to the fzn file containing the problem to
+                         be solved
+    :return: A string containing the solution output stream of the execution
+             of OptiMatSat on the specified problem
+    :rtype: str
+    """
     args = ['-input=fzn', fzn_file]
 
     log = logging.getLogger(__name__)

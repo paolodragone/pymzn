@@ -1,6 +1,8 @@
 Reference
 =========
 
+This is the reference manual of PyMzn.
+
 .. automodule:: pymzn
 
 .. toctree::

@@ -117,15 +117,15 @@ def _parse_val(val):
 
 def parse_dzn(dzn, *, rebase_arrays=True):
     """
-    Parse a dzn string or file.
+    Parse a dzn string or file into a Python dictionary of assignments.
 
     :param str dzn: A dzn content string or a path to a dzn file
     :param bool rebase_arrays: Whether to return arrays as zero-based lists
-                               or to return them as dictionaries, thereby
-                               preserving the index-sets.
-    :return: A list of dictionaries containing the variable assignments
-             parsed from the inputs
-    :rtype: [dict]
+                               or to return them as dictionaries,
+                               preserving the original index-sets.
+    :return: A dictionary containing the variable assignments parsed from the
+             input file or string
+    :rtype: dict
     """
     # log = logging.getLogger(__name__)
 

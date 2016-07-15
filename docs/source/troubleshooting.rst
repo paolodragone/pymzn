@@ -2,7 +2,7 @@ Troubleshooting
 ===============
 
 -  Gecode raises the following error at the first execution after the
-   installation:
+   installation (on Linux):
    ::
 
        fzn-gecode: error while loading shared libraries: libgecodeflatzinc.so.41: cannot open shared object file: No such file or directory
@@ -19,7 +19,7 @@ Troubleshooting
        source ~/.bashrc
 
 -  Minizinc raises the following error when trying to include the gecode
-   library with the ``-G gecode`` option:
+   library with the ``-G gecode`` option (on Linux):
    ::
 
        Cannot access include directory /usr/local/bin/../share/minizinc/gecode/
@@ -31,7 +31,7 @@ Troubleshooting
 
        cd /usr/local/share
        sudo mkdir minizinc/gecode
-       sudo cp gecode/mznlib/* minizinc/gecode/
+       sudo ln -s gecode/mznlib/* minizinc/gecode/
 
 -  The function ``pymzn.dzn`` arises a ``RecursionError`` when given a
    ``numpy.mat`` object as input. This problem arises because the
@@ -41,3 +41,4 @@ Troubleshooting
    ::
 
        matrix_array = np.asarray(matrix)
+
