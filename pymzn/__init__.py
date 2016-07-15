@@ -7,8 +7,6 @@ PyMzn provides a set of utilities to:
  * Interface with different CSP solvers.
 """
 
-__version__ = '0.10.1'
-
 import logging
 
 from . import config
@@ -18,6 +16,7 @@ from ._dzn import *
 from . import _mzn
 from ._mzn import *
 
+__version__ = '0.10.1'
 __all__ = ['debug', 'config', 'bin']
 __all__.extend(_dzn.__all__)
 __all__.extend(_mzn.__all__)
