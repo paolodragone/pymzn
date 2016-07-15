@@ -12,8 +12,7 @@ PyMzn requires some additional software to be installed on your system
 before you can use it properly, namely:
 
 * The `libminizinc library <https://github.com/MiniZinc/libminizinc>`__;
-* A CSP solver compatible with the FlatZinc encoding, e.g.
-`Gecode <https://www.gecode.org>`__.
+* A CSP solver compatible with the FlatZinc encoding, e.g. `Gecode <http://www.gecode.org>`__.
 
 Gecode is the default solver for PyMzn. If you use Gecode then PyMzn will work
 out-of-the-box, otherwise, if you want to use a different solver, a little more
@@ -88,7 +87,7 @@ perform `dynamic modelling <http://paolodragone.com/pymzn/reference/model/>`__,
 of the problems to solve, and more.
 
 For a follow-up of this example, read the
-`Quick Start guide <http://paolodragone.com/pymzn/quickstart.html>`__.
+`Quick Start guide <http://paolodragone.com/pymzn/quick_start.html>`__.
 
 For more information on the PyMzn functions read the
 `Reference documentation <http://paolodragone.com/pymzn/reference/>`__
