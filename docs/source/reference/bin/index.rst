@@ -9,4 +9,4 @@ Binary execution
    bin.cmd
    bin.run
 
-.. automodule:: bin
+.. automodule:: pymzn.bin

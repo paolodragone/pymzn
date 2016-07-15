@@ -10,4 +10,4 @@ Solvers
    optimatsat
    solve
 
-.. automodule:: _mzn._solvers
+.. automodule:: pymzn._mzn._solvers

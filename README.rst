@@ -108,7 +108,7 @@ If you find a bug or think of a feature, please submit an issue on the
 
 Pull requests are very welcome too. If you are interested in contributing to
 the PyMzn source code, read about its
-`internal behavior <http://paolodragone.com/pymzn/internal.html>`__.
+`implementation details <http://paolodragone.com/pymzn/internal.html>`__.
 Some things that would be very useful are:
 
 * Implement specific interfaces for not yet supported solvers;

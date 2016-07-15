@@ -13,4 +13,4 @@ MiniZinc tools
    MiniZincUnknownError
    MiniZincUnboundedError
 
-.. automodule:: _mzn._minizinc
+.. automodule:: pymzn._mzn._minizinc

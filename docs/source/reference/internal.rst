@@ -1,16 +1,8 @@
-Internal behavior
-=================
+Implementation details
+======================
 
 This page describes the internal behavior of PyMzn. It is useful to understand
 how problems are solved, serialization is ensured, and models are parsed.
-
-Binary execution
-----------------
-PyMzn wraps the MiniZinc tools by executing them with the ``subprocess.run``
-function from the standard library. The process of running a executable,
-checking for errors and returning the output is carried out by the
-``pymzn.bin.run`` function, which takes as input either a string or a list of
-arguments to pass to the ``pymzn.bin.cmd`` function.
 
 Model flattening
 ----------------
@@ -22,12 +14,12 @@ there is the possibility of executing the *mzn2fzn* writing the input model on
 the standard input, it is rather inconvenient since it excludes the possibility
 of providing inline data and data (dzn) files. Moreover, by flattening a model
 from command line, there would have been naming issues, because, as explained
-in the section on `file naming <#naming>`, PyMzn relies on a defined set of
-naming rules to ensure isolation of the solving instances of a model.
+in the section on `file naming <#file-naming>`__, PyMzn relies on a defined
+set of naming rules to ensure isolation of the solving instances of a model.
 The created files are left with the same name of the input file, as default of
-the *mzn2fzn* utility. Given the `file naming <#naming>` conventions and the
-internal behavior of the ``pymzn.minizinc`` function, the possibility of
-specifying an output-base has been deemed as irrelevant and confusing, and
+the *mzn2fzn* utility. Given the `file naming <#file-naming>`__ conventions
+and the internal behavior of the ``pymzn.minizinc`` function, the possibility
+of specifying an output-base has been deemed as irrelevant and confusing, and
 thus left out.
 
 Solver proxy functions
@@ -56,9 +48,8 @@ parsed into Python objects (unless specified otherwise). This is carried out
 by dropping the output statement of the original model and inserting a new
 output statement which encodes the output variables into dzn format. The
 original model file is isolated from the new model file, as specified in the
-`File naming <#naming>` section.
+`File naming <#file-naming>`__ section.
 
-<a name="naming"></a>
 
 File naming
 -----------

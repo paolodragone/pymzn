@@ -1,11 +1,11 @@
 """
-PyMzn provides a set of utility functions to execute binary files and shell
-commands.
+PyMzn wraps the MiniZinc tools by executing them with the ``subprocess.run``
+function from the standard library. The process of running a executable,
+checking for errors and returning the output is carried out by the
+``pymzn.bin.run`` function, which takes as input either a string or a list of
+arguments to pass to the ``pymzn.bin.cmd`` function.
 
-The ``bin.run`` function takes a command string (or a list of inputs for the
-``cmd`` function) which is then executed and its standard output stream is
-returned. A command string can be build using the ``bin.cmd`` function in this
-way:
+The ``pymzn.bin.cmd`` can be used in this way:
 ::
 
     pymzn.bin.cmd('path/to/command', [5, '-f', '--flag2', ('--arg1', 'val1'), ('--arg2', 2)])
