@@ -1,10 +1,8 @@
 """
-PyMzn provides a set of utilities to:
-
- * Flatten and solve CSP problems encoded with MiniZinc;
- * Solve problems that change incrementally;
- * Convert Python objects into dzn format and back;
- * Interface with different CSP solvers.
+PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
+modelling and solving. It is built on top of the libminizinc library
+(version 2.0) and provides a number of off-the-shelf functions to readily
+solve problems encoded in MiniZinc and parse the solutions into Python objects.
 """
 
 import logging

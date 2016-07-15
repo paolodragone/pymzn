@@ -11,4 +11,4 @@ Dzn files
    dzn_value
    rebase_array
 
-.. automodule:: _dzn
+.. automodule:: pymzn._dzn

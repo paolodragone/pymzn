@@ -1,9 +1,7 @@
-Reference
-=========
+Manual
+======
 
 This is the reference manual of PyMzn.
-
-.. automodule:: pymzn
 
 .. toctree::
    :maxdepth: 2
@@ -13,3 +11,6 @@ This is the reference manual of PyMzn.
    dzn/index
    solvers/index
    bin/index
+   config
+   serialization
+   internal

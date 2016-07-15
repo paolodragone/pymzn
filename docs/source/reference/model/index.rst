@@ -8,4 +8,4 @@ Modelling
 
    MiniZincModel
 
-.. automodule:: _mzn._model
+.. automodule:: pymzn._mzn._model

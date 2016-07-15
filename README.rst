@@ -53,7 +53,7 @@ PyMzn is also able to:
 * Convert python objects to `dzn <http://paolodragone.com/pymzn/reference/dzn/>`__ format and back;
 * Interface with `different solvers <http://paolodragone.com/pymzn/reference/solvers/>`__;
 * Perform `dynamic modelling <http://paolodragone.com/pymzn/reference/model/>`__;
-* `Serialize <http://paolodragone.com/pymzn/reference/minizinc/index.html#serialization>`__ several instances of one problem;
+* `Serialize <http://paolodragone.com/pymzn/reference/serialization.html>`__ several instances of one problem;
 * and more ...
 
 For a follow-up of this example, read the
@@ -108,7 +108,7 @@ If you find a bug or think of a feature, please submit an issue on the
 
 Pull requests are very welcome too. If you are interested in contributing to
 the PyMzn source code, read about its
-`internal behavior <http://paolodragone.com/pymzn/internal.html>`__.
+`implementation details <http://paolodragone.com/pymzn/reference/internal.html>`__.
 Some things that would be very useful are:
 
 * Implement specific interfaces for not yet supported solvers;
