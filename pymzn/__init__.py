@@ -6,16 +6,16 @@ __version__ = '0.10.1'
 
 import logging
 
-from . import _mzn
-from . import _dzn
-from ._mzn import *
-from ._dzn import *
-from . import bin
 from . import config
+from . import bin
+from . import _dzn
+from ._dzn import *
+from . import _mzn
+from ._mzn import *
 
-__all__ = ['bin', 'config', 'debug']
-__all__.extend(_mzn.__all__)
+__all__ = ['debug', 'config', 'bin']
 __all__.extend(_dzn.__all__)
+__all__.extend(_mzn.__all__)
 
 
 # TODO: update python2 branch

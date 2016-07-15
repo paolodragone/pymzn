@@ -27,6 +27,7 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-Maintainers
-===========
-`Paolo Dragone <http://paolodragone.com>`__
+Author
+======
+`Paolo Dragone <http://paolodragone.com>`__, PhD student at the University of
+Trento.
