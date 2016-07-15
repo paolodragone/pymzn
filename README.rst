@@ -50,13 +50,10 @@ solutions as Python dictionaries.
 
 PyMzn is also able to:
 
-* Convert python objects to
-`dzn <http://paolodragone.com/pymzn/reference/dzn/>`__ format and back;
-* Interface with
-`different solvers <http://paolodragone.com/pymzn/reference/solvers/>`__;
+* Convert python objects to `dzn <http://paolodragone.com/pymzn/reference/dzn/>`__ format and back;
+* Interface with `different solvers <http://paolodragone.com/pymzn/reference/solvers/>`__;
 * Perform `dynamic modelling <http://paolodragone.com/pymzn/reference/model/>`__;
-* `Serialize <http://paolodragone.com/pymzn/reference/minizinc/index.html#serialization>`__
-several instances of one problem;
+* `Serialize <http://paolodragone.com/pymzn/reference/minizinc/index.html#serialization>`__ several instances of one problem;
 * and more ...
 
 For a follow-up of this example, read the
