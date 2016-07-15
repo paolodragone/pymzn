@@ -1,7 +1,7 @@
 PyMzn
 =====
 
-PyMzn is a Python wrapper for the ``MiniZinc <http://minizinc.org>``__
+PyMzn is a Python wrapper for the `MiniZinc <http://minizinc.org>`__
 tool pipeline. It is built on top of the libminizinc library (version 2.0)
 and provides a number of off-the-shelf functions to readily solve problems
 encoded in MiniZinc and parse the solutions into python objects.
@@ -102,6 +102,7 @@ Pull requests are very welcome too. If you are interested in contributing to
 the source code, read about the
 `internal behavior <http://paolodragone.com/pymzn/internal.html>`__ of PyMzn.
 Some things that would be really useful are:
+
 * Implement specific interfaces for not yet supported solvers;
 * Enhance existing ones.
 
