@@ -88,7 +88,7 @@ perform `dynamic modelling <http://paolodragone.com/pymzn/reference/model/>`__,
 of the problems to solve, and more.
 
 For a follow-up of this example, read the
-`Quick Start guide <http://paolodragone.com/pymzn/quickstart.html>`__.
+`Quick Start guide <http://paolodragone.com/pymzn/quick_start.html>`__.
 
 For more information on the PyMzn functions read the
 `Reference documentation <http://paolodragone.com/pymzn/reference/>`__
