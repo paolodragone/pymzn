@@ -35,17 +35,16 @@ def _list_index_set(obj):
     return 1, len(obj)
 
 
-def _dict_index_set(obj):
-    min_val = min(obj.keys())
-    max_val = max(obj.keys())
-    return min_val, max_val
+def _extremes(s):
+    return min(s), max(s)
 
 
-def _is_contiguous(obj):
-    if all(map(_is_int, obj)):
-        min_val, max_val = min(obj), max(obj)
-        return all([v in obj for v in range(min_val, max_val + 1)])
-    return False
+def _is_int_set(obj):
+    return all(map(_is_int, obj))
+
+
+def _is_contiguous(obj, min_val, max_val):
+    return all([v in obj for v in range(min_val, max_val + 1)])
 
 
 def _index_set(obj):
@@ -54,7 +53,7 @@ def _index_set(obj):
             return ()
         if all(map(_is_elem, obj)):
             return _list_index_set(obj),
-        elif all(map(_is_array_type, obj)):
+        if all(map(_is_array_type, obj)):
             idx_sets = list(map(_index_set, obj))
             # all children index-sets must be identical
             if idx_sets[1:] == idx_sets[:-1]:
@@ -62,31 +61,34 @@ def _index_set(obj):
     elif _is_dict(obj):
         if len(obj) == 0:
             return ()
-        if _is_contiguous(obj.keys()):
-            if all(map(_is_elem, obj.values())):
-                return _dict_index_set(obj),
-            elif all(map(_is_array_type, obj.values())):
-                idx_sets = list(map(_index_set, obj.values()))
-                # all children index-sets must be identical
-                if idx_sets[1:] == idx_sets[:-1]:
-                    return (_dict_index_set(obj),) + idx_sets[0]
+        keys = obj.keys()
+        if _is_int_set(keys):
+            min_val, max_val = _extremes(keys)
+            if _is_contiguous(keys, min_val, max_val):
+                idx_set = (min_val, max_val),
+                if all(map(_is_elem, obj.values())):
+                    return idx_set
+                if all(map(_is_array_type, obj.values())):
+                    idx_sets = list(map(_index_set, obj.values()))
+                    # all children index-sets must be identical
+                    if idx_sets[1:] == idx_sets[:-1]:
+                        return idx_set + idx_sets[0]
     raise ValueError('The input object is not a proper array: '
                      '{}'.format(repr(obj)), obj)
 
 
 def _flatten_array(arr, lvl):
-    if lvl == 1:
-        return arr
-    flat_arr = []
-
     if _is_dict(arr):
         arr_it = arr.values()
     else:
         arr_it = arr
 
+    if lvl == 1:
+        return arr_it
+
+    flat_arr = []
     for sub_arr in arr_it:
-        for item in _flatten_array(sub_arr, lvl - 1):
-            flat_arr.append(item)
+        flat_arr.extend(_flatten_array(sub_arr, lvl - 1))
     return flat_arr
 
 
@@ -100,11 +102,12 @@ def _dzn_var(name, val):
     return '{} = {};'.format(name, val)
 
 
-def _dzn_set(vals):
-    if _is_contiguous(vals):
-        min_val, max_val = min(vals), max(vals)
-        return '{}..{}'.format(min_val, max_val)  # contiguous set
-    return '{{ {} }}'.format(', '.join(map(_dzn_val, vals)))
+def _dzn_set(s):
+    if s and _is_int_set(s):
+        min_val, max_val = _extremes(s)
+        if _is_contiguous(s, min_val, max_val):
+            return '{}..{}'.format(min_val, max_val)  # contiguous set
+    return '{{{}}}'.format(', '.join(map(_dzn_val, s)))
 
 
 def _dzn_array_nd(arr):
@@ -173,21 +176,21 @@ def dzn(objs, fout=None):
     return vals
 
 
-def rebase_array(d):
+def rebase_array(d, recursive=False):
     """
     Transform an indexed dictionary (such as those returned by the parse_dzn
     function when parsing arrays) into an multi-dimensional list.
 
     :param dict d: The indexed dictionary to convert
+    :param bool recursive: Whether to rebase the array recursively
     :return: A multi-dimensional list
     :rtype: list
     """
     arr = []
-    min_val, max_val = _dict_index_set(d)
-    idx_set = range(min_val, max_val + 1)
-    for idx in idx_set:
+    min_val, max_val = _extremes(d.keys())
+    for idx in range(min_val, max_val + 1):
         v = d[idx]
-        if _is_dict(v):
+        if recursive and _is_dict(v):
             v = rebase_array(v)
         arr.append(v)
     return arr
