@@ -3,7 +3,6 @@ import re
 
 from ._marsh import rebase_array
 
-
 # boolean pattern
 _bool_p = re.compile('^(?:true|false)$')
 
@@ -20,21 +19,22 @@ _cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
 _int_set_p = re.compile('^(\{(?P<vals>[\d ,+\-]*)\})$')
 
 # matches any of the previous
-_val_p = re.compile(('(?:true|false|\{(?:[\d ,+\-]+)\}'
-                     '|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)'
-                     '|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?'
-                     '|[+\-]?\d+)'))
+_val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]+)\}'
+                    '|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)'
+                    '|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?'
+                    '|[+\-]?\d+)')
 
 # multi-dimensional array pattern
-_array_p = re.compile(('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
-                       '(?P<indices>[\d\.+\-]+(?:\s*,\s*[\d\.+\-]+)?)\s*,\s*)?'
-                       '\[(?P<vals>[\w \.,+\-\\\/\*^|\(\)\{\}]+)\]\)?$'))
+_array_p = re.compile('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
+                      '(?P<indices>([\d\.+\-]+|\{\})'
+                      '(?:\s*,\s*([\d\.+\-]+|\{\}))?)\s*,\s*)?'
+                      '\[(?P<vals>[\w \.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$')
 
 # variable pattern
-_var_p = re.compile('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>.+)$')
+_var_p = re.compile('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>.+)$', re.DOTALL)
 
 # statement pattern
-_stmt_p = re.compile('(?:^|;)\s*([^;]+)')
+_stmt_p = re.compile('\s*([^;]+?);')
 
 # comment pattern
 _comm_p = re.compile('%.+?\n')
@@ -49,7 +49,8 @@ def _parse_array(indices, vals, rebase_arrays=True):
     else:
         arr = {i: _parse_array(indices[1:], vals) for i in idx_set}
 
-    if rebase_arrays and idx_set[0] == 1:
+    print(list(idx_set))
+    if rebase_arrays and list(idx_set)[0] == 1:
         arr = rebase_array(arr)
 
     return arr
@@ -66,6 +67,8 @@ def _parse_indices(st):
             v1 = int(cont_int_set_m.group(1))
             v2 = int(cont_int_set_m.group(2))
             indices.append(range(v1, v2 + 1))
+        elif s == '{}':
+            indices.append([])
         else:
             raise ValueError('Index \'{}\' is not well formatted.'.format(s))
     return indices
@@ -150,6 +153,7 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                 continue
 
             # log.debug('Parsing array: %s', val)
+            print(val)
             array_m = _array_p.match(val)
             if array_m:
                 vals = array_m.group('vals')
@@ -164,9 +168,13 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                 else:  # assuming 1d array based in 1
                     indices = [range(1, len(vals) + 1)]
                 # log.debug('Parsing values: %s', vals)
-                p_val = _parse_array(indices, vals, rebase_arrays)
+                if len(vals) == 0:
+                    p_val = []
+                else:
+                    p_val = _parse_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
                 # log.debug('Parsed array: %s', p_val)
                 continue
-        raise ValueError('Unsupported parsing for stmt:\n{}'.format(stmt))
+        raise ValueError('Unsupported parsing for stmt:\n'
+                         '{}'.format(repr(stmt)))
     return assign

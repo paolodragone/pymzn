@@ -38,6 +38,7 @@ setup(
     description='A Python wrapper for the MiniZinc tool pipeline.',
     long_description=read('README.rst'),
     packages=find_packages(exclude=['*tests*']),
+    test_suite="pymzn.tests",
     platforms='any',
     classifiers=[
         'Programming Language :: Python',

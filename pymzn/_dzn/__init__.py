@@ -94,8 +94,7 @@ instance:
     # returns: [[1, 2, 3], [2, 3]]
 
 """
-
-__all__ = ['dzn', 'dzn_value', 'rebase_array', 'parse_dzn']
-
 from ._marsh import *
 from ._parse import *
+
+__all__ = ['dzn', 'dzn_value', 'rebase_array', 'parse_dzn']

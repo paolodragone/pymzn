@@ -14,7 +14,7 @@ from ._dzn import *
 from . import _mzn
 from ._mzn import *
 
-__version__ = '0.10.2'
+__version__ = '0.10.3'
 __all__ = ['debug', 'config', 'bin']
 __all__.extend(_dzn.__all__)
 __all__.extend(_mzn.__all__)
