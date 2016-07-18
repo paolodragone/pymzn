@@ -198,7 +198,13 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
 
     data_file = None
     if data is not None:
-        data = dzn(data)
+        if isinstance(data, dict):
+            data = dzn(data)
+        elif isinstance(data, str):
+            data = [data]
+        elif not isinstance(data, list):
+            raise TypeError('The additional data provided is not valid.')
+
         if keep_data or sum(map(len, data)) >= config.cmd_arg_limit:
             mzn_base, __ = os.path.splitext(mzn_file)
             data_file = mzn_base + '_data.dzn'
