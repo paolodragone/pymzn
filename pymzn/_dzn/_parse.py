@@ -49,7 +49,6 @@ def _parse_array(indices, vals, rebase_arrays=True):
     else:
         arr = {i: _parse_array(indices[1:], vals) for i in idx_set}
 
-    print(list(idx_set))
     if rebase_arrays and list(idx_set)[0] == 1:
         arr = rebase_array(arr)
 
@@ -153,7 +152,6 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                 continue
 
             # log.debug('Parsing array: %s', val)
-            print(val)
             array_m = _array_p.match(val)
             if array_m:
                 vals = array_m.group('vals')
