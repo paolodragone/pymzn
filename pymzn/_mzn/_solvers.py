@@ -91,7 +91,7 @@ def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
     args.append(fzn_file)
 
     log = logging.getLogger(__name__)
-    log.debug('Calling %s with arguments: %s', config.gecode_cmd, args)
+    # log.debug('Calling %s with arguments: %s', config.gecode_cmd, args)
 
     try:
         solns = run(cmd(config.gecode_cmd, args))
@@ -126,7 +126,7 @@ def solve(fzn_file, *, solver_cmd=None):
     args = [fzn_file]
 
     log = logging.getLogger(__name__)
-    log.debug('Calling %s with arguments: %s', solver_cmd, args)
+    # log.debug('Calling %s with arguments: %s', solver_cmd, args)
 
     try:
         solns = run(cmd(solver_cmd, args))
@@ -153,7 +153,7 @@ def optimatsat(fzn_file):
     args = ['-input=fzn', fzn_file]
 
     log = logging.getLogger(__name__)
-    log.debug('Calling %s with arguments: %s', config.optimatsat_cmd, args)
+    # log.debug('Calling %s with arguments: %s', config.optimatsat_cmd, args)
 
     try:
         solns = run(cmd(config.optimatsat_cmd, args))

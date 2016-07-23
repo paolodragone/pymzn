@@ -217,7 +217,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
 
     args += [mzn_file] + dzn_files
 
-    log.debug('Calling %s with arguments: %s', config.mzn2fzn_cmd, args)
+    # log.debug('Calling %s with arguments: %s', config.mzn2fzn_cmd, args)
 
     try:
         run(cmd(config.mzn2fzn_cmd, args))
@@ -240,6 +240,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
     ozn_file = '.'.join([base, 'ozn'])
     if not os.path.isfile(ozn_file):
         ozn_file = None
+
+    log.debug('Generated files: {}, {}'.format(fzn_file, ozn_file))
 
     return fzn_file, ozn_file
 
@@ -266,7 +268,7 @@ def solns2out(solns_input, ozn_file):
     unbnd_msg = '=====UNBOUNDED====='
 
     args = [ozn_file]
-    log.debug('Calling %s with arguments: %s', config.solns2out_cmd, args)
+    # log.debug('Calling %s with arguments: %s', config.solns2out_cmd, args)
 
     try:
         out = run(cmd(config.solns2out_cmd, args), stdin=solns_input)
@@ -285,7 +287,7 @@ def solns2out(solns_input, ozn_file):
         line = line.strip()
         if line == soln_sep:
             soln = '\n'.join(curr_out)
-            log.debug('Solution found: %s', soln)
+            log.debug('Solution found: {}'.format(repr(soln)))
             solns.append(soln)
             curr_out = []
         elif line == search_complete_msg:

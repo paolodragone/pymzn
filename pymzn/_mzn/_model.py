@@ -239,6 +239,7 @@ class MiniZincModel(object):
                 lines.append('output [{}];'.format(output_stmt))
             model += '\n'.join(lines)
 
+        self._log.debug('Writing file: {}'.format(output_file))
         with open(output_file, 'w') as f:
             f.write(model)
 

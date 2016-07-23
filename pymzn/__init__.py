@@ -25,8 +25,6 @@ __all__.extend(_mzn.__all__)
 # TODO: check the import of other files in minizinc
 # TODO: make it work on windows
 # TODO: check the ctrl+C thing which seems to not work anymore
-# TODO: print timinig info in debug
-
 
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)

@@ -16,7 +16,7 @@ which will become:
     'path/to/command 5 -f --flag2 --arg1 val1 --arg2 2'
 
 """
-
+import time
 import logging
 import numbers
 import subprocess
@@ -71,11 +71,14 @@ def run(arg, stdin=None):
         arg = cmd(arg[0], arg[1:])
 
     log.debug('Executing command: %s', arg, extra={'stdin': stdin})
+    start = time.time()
     proc = subprocess.run(arg, input=stdin, shell=True, bufsize=1,
                           universal_newlines=True,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
+    end = time.time()
     proc.check_returncode()
+    log.debug('Done. Running time: {0:.2f} seconds'.format(end - start))
     return proc.stdout
 
 
