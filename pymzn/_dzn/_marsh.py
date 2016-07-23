@@ -1,6 +1,6 @@
 from numbers import Integral, Number
 from collections.abc import Set, Sized, Iterable, Mapping
-
+import pymzn.config
 
 def _is_int(obj):
     return isinstance(obj, Integral)
@@ -110,7 +110,7 @@ def _dzn_set(s):
     return '{{{}}}'.format(', '.join(map(_dzn_val, s)))
 
 
-def _dzn_array_nd(arr):
+def _dzn_array_nd(arr, spaces=0):
     idx_set = _index_set(arr)
     dim = max([len(idx_set), 1])
     if dim > 6:  # max 6-dimensional array in dzn language
@@ -128,11 +128,21 @@ def _dzn_array_nd(arr):
         idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
     else:
         idx_set_str = '{}'
-    arr_str = '[{}]'.format(', '.join(map(_dzn_val, flat_arr)))
+    spaces += 11 + len(idx_set_str)
+    vals = []
+    for i, val in enumerate(map(_dzn_val, flat_arr)):
+        if i > 0:
+            vals.append(', ')
+            if i % pymzn.config.vals_per_row == 0:
+                vals.append('\n')
+                vals.extend([' ' for _ in range(spaces)])
+        vals.append(val)
+
+    arr_str = '[{}]'.format(''.join(vals))
     return dzn_arr.format(dim, idx_set_str, arr_str)
 
 
-def dzn_value(val):
+def dzn_value(val, spaces=0):
     """
     Serializes a value (bool, int, float, set, array) into its dzn
     representation.
@@ -145,7 +155,7 @@ def dzn_value(val):
     elif _is_set(val):
         return _dzn_set(val)
     elif _is_array_type(val):
-        return _dzn_array_nd(val)
+        return _dzn_array_nd(val, spaces=spaces)
     raise TypeError('Unsupported parsing for value: {}'.format(repr(val)), val)
 
 
@@ -167,7 +177,10 @@ def dzn(objs, fout=None):
     :rtype: list
     """
 
-    vals = [_dzn_var(key, dzn_value(val)) for key, val in objs.items()]
+    vals = []
+    for key, val in objs.items():
+        spaces = len(key) + 3
+        vals.append(_dzn_var(key, dzn_value(val, spaces=spaces)))
 
     if fout:
         with open(fout, 'w') as f:

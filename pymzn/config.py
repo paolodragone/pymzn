@@ -56,6 +56,7 @@ class _Config(object):
         self._gecode_cmd = 'fzn-gecode'
         self._optimatsat_cmd = 'optimatsat'
         self._cmd_arg_limit = 2048
+        self._vals_per_row = 7
 
     @property
     def mzn2fzn_cmd(self):
@@ -109,6 +110,13 @@ class _Config(object):
     def cmd_arg_limit(self, limit):
         self._cmd_arg_limit = limit
 
+    @property
+    def vals_per_row(self):
+        return self._vals_per_row
+
+    @vals_per_row.setter
+    def vals_per_row(self, vals):
+        self._vals_per_row = vals
 
 _config = _Config()
 
@@ -118,3 +126,4 @@ solns2out_cmd = _config.solns2out_cmd
 gecode_cmd = _config.gecode_cmd
 optimatsat_cmd = _config.optimatsat_cmd
 cmd_arg_limit = _config.cmd_arg_limit
+vals_per_row = _config.vals_per_row

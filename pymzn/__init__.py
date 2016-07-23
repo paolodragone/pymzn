@@ -14,7 +14,7 @@ from ._dzn import *
 from . import _mzn
 from ._mzn import *
 
-__version__ = '0.10.3'
+__version__ = '0.10.4'
 __all__ = ['debug', 'config', 'bin']
 __all__.extend(_dzn.__all__)
 __all__.extend(_mzn.__all__)
@@ -24,6 +24,8 @@ __all__.extend(_mzn.__all__)
 # TODO: mzn2doc
 # TODO: check the import of other files in minizinc
 # TODO: make it work on windows
+# TODO: check the ctrl+C thing which seems to not work anymore
+# TODO: print timinig info in debug
 
 
 debug_handler = None
