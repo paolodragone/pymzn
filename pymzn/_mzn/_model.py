@@ -40,7 +40,7 @@ class MiniZincModel(object):
 
     _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
     _comm_p = re.compile('%.+?\n')
-    _var_p = re.compile('^\s*([^:]+?):\s*([^=]+)\s*(?:=\s*(.+))?$')
+    _var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
     _var_type_p = re.compile('^\s*.*?var.+')
     _array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
                                '\s+of\s+(.+?)$')
