@@ -1,6 +1,8 @@
+import logging
 from numbers import Integral, Number
 from collections.abc import Set, Sized, Iterable, Mapping
 import pymzn.config
+
 
 def _is_int(obj):
     return isinstance(obj, Integral)
@@ -176,6 +178,7 @@ def dzn(objs, fout=None):
     :return: List of strings containing the dzn encoded objects
     :rtype: list
     """
+    log = logging.getLogger(__name__)
 
     vals = []
     for key, val in objs.items():
@@ -183,6 +186,7 @@ def dzn(objs, fout=None):
         vals.append(_dzn_var(key, dzn_value(val, spaces=spaces)))
 
     if fout:
+        log.debug('Writing file: {}'.format(fout))
         with open(fout, 'w') as f:
             for val in vals:
                 f.write('{}\n'.format(val))

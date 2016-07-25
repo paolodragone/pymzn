@@ -48,11 +48,11 @@ def main():
 
     desc = 'PyMzn is a wrapper for the MiniZinc tool pipeline.'
     p = argparse.ArgumentParser(description=desc)
-    p.add_argument('-d', '--debug', action='store_true',
+    p.add_argument('--debug', action='store_true',
                    help='display debug messages on standard output')
     p.add_argument('mzn', help='the mzn file to solve')
     p.add_argument('dzn_files', nargs='*', help='additional dzn files')
-    p.add_argument('-D', '--data', type=ast.literal_eval,
+    p.add_argument('--data', type=ast.literal_eval,
                    help='additional inline data')
     p.add_argument('-k', '--keep', action='store_true',
                    help='whether to keep generated files')
