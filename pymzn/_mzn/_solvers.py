@@ -136,27 +136,27 @@ def solve(fzn_file, *, solver_cmd=None):
     return solns
 
 
-def optimatsat(fzn_file):
+def optimathsat(fzn_file):
     """
-    Simple proxy function to the OptiMatSat solver.
+    Simple proxy function to the OptiMathSat solver.
 
-    This function is a simple interface to OptiMatSat which only specifies the
+    This function is a simple interface to OptiMathSat which only specifies the
     input format as a FlatZinc model, without providing any additional
     arguments.
 
     :param str fzn_file: The path to the fzn file containing the problem to
                          be solved
     :return: A string containing the solution output stream of the execution
-             of OptiMatSat on the specified problem
+             of OptiMathSat on the specified problem
     :rtype: str
     """
     args = ['-input=fzn', fzn_file]
 
     log = logging.getLogger(__name__)
-    # log.debug('Calling %s with arguments: %s', config.optimatsat_cmd, args)
+    # log.debug('Calling %s with arguments: %s', config.optimathsat_cmd, args)
 
     try:
-        solns = run(cmd(config.optimatsat_cmd, args))
+        solns = run(cmd(config.optimathsat_cmd, args))
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
