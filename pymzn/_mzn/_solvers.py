@@ -153,10 +153,10 @@ def optimatsat(fzn_file):
     args = ['-input=fzn', fzn_file]
 
     log = logging.getLogger(__name__)
-    # log.debug('Calling %s with arguments: %s', config.optimatsat_cmd, args)
+    # log.debug('Calling %s with arguments: %s', config.optimathsat_cmd, args)
 
     try:
-        solns = run(cmd(config.optimatsat_cmd, args))
+        solns = run(cmd(config.optimathsat_cmd, args))
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err

@@ -54,9 +54,9 @@ class _Config(object):
         self._mzn2fzn_cmd = 'mzn2fzn'
         self._solns2out_cmd = 'solns2out'
         self._gecode_cmd = 'fzn-gecode'
-        self._optimatsat_cmd = 'optimatsat'
+        self._optimathsat_cmd = 'optimathsat'
         self._cmd_arg_limit = 2048
-        self._vals_per_row = 7
+        self._vals_per_row = 4
 
     @property
     def mzn2fzn_cmd(self):
@@ -92,13 +92,13 @@ class _Config(object):
             raise ValueError('The given file does not exist: {}'.format(cmd))
 
     @property
-    def optimatsat_cmd(self):
-        return self._optimatsat_cmd
+    def optimathsat_cmd(self):
+        return self._optimathsat_cmd
 
-    @optimatsat_cmd.setter
-    def optimatsat_cmd(self, cmd):
+    @optimathsat_cmd.setter
+    def optimathsat_cmd(self, cmd):
         if os.path.exists(cmd):
-            self._optimatsat_cmd = cmd
+            self._optimathsat_cmd = cmd
         else:
             raise ValueError('The given file does not exist: {}'.format(cmd))
 
@@ -124,6 +124,6 @@ _config = _Config()
 mzn2fzn_cmd = _config.mzn2fzn_cmd
 solns2out_cmd = _config.solns2out_cmd
 gecode_cmd = _config.gecode_cmd
-optimatsat_cmd = _config.optimatsat_cmd
+optimathsat_cmd = _config.optimathsat_cmd
 cmd_arg_limit = _config.cmd_arg_limit
 vals_per_row = _config.vals_per_row
