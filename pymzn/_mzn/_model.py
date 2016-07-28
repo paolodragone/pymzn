@@ -39,7 +39,7 @@ class MiniZincModel(object):
     """
 
     _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
-    _comm_p = re.compile('%.+?\n')
+    _comm_p = re.compile('%.*\n')
     _var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
     _var_type_p = re.compile('^\s*.*?var.+')
     _array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
@@ -146,9 +146,9 @@ class MiniZincModel(object):
         if self._stmts_parsed:
             return
         model = self._load_model()
+        model = self._comm_p.sub('', model)
         stmts = self._stmt_p.findall(model)
         for stmt in stmts:
-            stmt = self._comm_p.sub('', stmt)
             _var_m = self._var_p.match(stmt)
             if _var_m:
                 vartype = _var_m.group(1)

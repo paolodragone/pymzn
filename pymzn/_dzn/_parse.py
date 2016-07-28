@@ -117,6 +117,7 @@ def _parse_val(val):
     return None
 
 
+# TODO: maybe change to eval_dzn
 def parse_dzn(dzn, *, rebase_arrays=True):
     """
     Parse a dzn string or file into a Python dictionary of assignments.
