@@ -30,7 +30,7 @@ import pymzn.config as config
 from pymzn.bin import cmd, run
 from pymzn import parse_dzn, dzn
 from ._solvers import gecode
-from ._model import MiniZincModel
+from ._model import Model
 
 
 _sid_counter = itertools.count(1)
@@ -118,10 +118,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     """
     log = logging.getLogger(__name__)
 
-    if isinstance(mzn, MiniZincModel):
+    if isinstance(mzn, Model):
         mzn_model = mzn
     else:
-        mzn_model = MiniZincModel(mzn)
+        mzn_model = Model(mzn)
 
     if not raw_output:
         mzn_model.dzn_output_stmt(output_vars)
