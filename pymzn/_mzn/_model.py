@@ -27,7 +27,7 @@ import re
 from pymzn import dzn_value
 
 
-class MiniZincModel(object):
+class Model(object):
     """
     Mutable class representing a MiniZinc model.
 

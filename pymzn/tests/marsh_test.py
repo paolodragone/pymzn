@@ -1,6 +1,6 @@
 import unittest
 import pymzn
-
+import re
 
 class MarshTest(unittest.TestCase):
 
@@ -16,20 +16,25 @@ class MarshTest(unittest.TestCase):
         self.assertEqual(pymzn.dzn_value({1, 3}), '{1, 3}')
         self.assertEqual(pymzn.dzn_value({}), 'array1d({}, [])')
         self.assertEqual(pymzn.dzn_value([]), 'array1d({}, [])')
-        self.assertEqual(pymzn.dzn_value([1, 3]), 'array1d(1..2, [1, 3])')
-        self.assertEqual(pymzn.dzn_value({1: 1, 2: 3}),
-                         'array1d(1..2, [1, 3])')
-        self.assertEqual(pymzn.dzn_value([[1, 2], [3, 4]]),
+
+        def arr_value(val):
+            arr = pymzn.dzn_value(val)
+            arr = re.sub('\s+', ' ', arr)
+            return arr
+
+        self.assertEqual(arr_value([1, 3]), 'array1d(1..2, [1, 3])')
+        self.assertEqual(arr_value({1: 1, 2: 3}), 'array1d(1..2, [1, 3])')
+        self.assertEqual(arr_value([[1, 2], [3, 4]]),
                          'array2d(1..2, 1..2, [1, 2, 3, 4])')
-        self.assertEqual(pymzn.dzn_value([[1, 2, 3], [4, 5, 6]]),
+        self.assertEqual(arr_value([[1, 2, 3], [4, 5, 6]]),
                          'array2d(1..2, 1..3, [1, 2, 3, 4, 5, 6])')
-        self.assertEqual(pymzn.dzn_value({1: [1, 2, 3], 2: [4, 5, 6]}),
+        self.assertEqual(arr_value({1: [1, 2, 3], 2: [4, 5, 6]}),
                          'array2d(1..2, 1..3, [1, 2, 3, 4, 5, 6])')
-        self.assertEqual(pymzn.dzn_value({1: {1: 1, 2: 2, 3: 3},
-                                          2: [4, 5, 6]}),
+        self.assertEqual(arr_value({1: {1: 1, 2: 2, 3: 3},
+                                    2: [4, 5, 6]}),
                          'array2d(1..2, 1..3, [1, 2, 3, 4, 5, 6])')
-        self.assertEqual(pymzn.dzn_value({1: {1: 1, 2: 2, 3: 3},
-                                          2: {1: 4, 2: 5, 3: 6}}),
+        self.assertEqual(arr_value({1: {1: 1, 2: 2, 3: 3},
+                                    2: {1: 4, 2: 5, 3: 6}}),
                          'array2d(1..2, 1..3, [1, 2, 3, 4, 5, 6])')
 
     def test_raises_dzn_value(self):
