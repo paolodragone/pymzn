@@ -68,10 +68,10 @@ class Model(object):
         mzn_base, mzn_ext = os.path.splitext(mzn)
         if mzn_ext != '.mzn':
             self._model = mzn
-            self._mzn_file = None
+            self.mzn_file = 'mznout.mzn'
         else:
             self._model = None
-            self._mzn_file = mzn
+            self.mzn_file = mzn
 
     def constraint(self, constr, comment=None):
         """
@@ -135,8 +135,8 @@ class Model(object):
 
     def _load_model(self):
         if self._model is None:
-            if self._mzn_file:
-                with open(self._mzn_file) as f:
+            if self.mzn_file:
+                with open(self.mzn_file) as f:
                     self._model = f.read()
             else:
                 self._model = ''
@@ -222,7 +222,7 @@ class Model(object):
                 else:
                     lines.append('{}: {};'.format(vartype, var))
 
-            for i, (constr, comment) in self.constraints:
+            for constr, comment in self.constraints:
                 comment and lines.append('% {}'.format(comment))
                 lines.append('constraint {};'.format(constr))
 

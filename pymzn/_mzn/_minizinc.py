@@ -120,6 +120,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
 
     if isinstance(mzn, Model):
         mzn_model = mzn
+        mzn = mzn_model.mzn_file
     else:
         mzn_model = Model(mzn)
 
