@@ -4,4 +4,4 @@ from ._solvers import *
 
 __all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincUnsatisfiableError',
            'MiniZincUnknownError', 'MiniZincUnboundedError', 'Model',
-           'gecode', 'optimathsat', 'solve']
+           'gecode', 'optimathsat', 'solve', 'opturion']
