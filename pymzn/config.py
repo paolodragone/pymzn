@@ -55,6 +55,7 @@ class _Config(object):
         self._solns2out_cmd = 'solns2out'
         self._gecode_cmd = 'fzn-gecode'
         self._optimathsat_cmd = 'optimathsat'
+        self._opturion_cmd = 'opturion'
         self._cmd_arg_limit = 2048
         self._vals_per_row = 4
 
@@ -99,6 +100,17 @@ class _Config(object):
     def optimathsat_cmd(self, cmd):
         if os.path.exists(cmd):
             self._optimathsat_cmd = cmd
+        else:
+            raise ValueError('The given file does not exist: {}'.format(cmd))
+
+    @property
+    def opturion_cmd(self):
+        return self._opturion_cmd
+
+    @opturion_cmd.setter
+    def opturion_cmd(self, cmd):
+        if os.path.exists(cmd):
+            self._opturion_cmd = cmd
         else:
             raise ValueError('The given file does not exist: {}'.format(cmd))
 
