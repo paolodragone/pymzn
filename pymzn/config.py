@@ -55,7 +55,7 @@ class _Config(object):
         self._solns2out_cmd = 'solns2out'
         self._gecode_cmd = 'fzn-gecode'
         self._optimathsat_cmd = 'optimathsat'
-        self._opturion_cmd = 'opturion'
+        self._opturion_cmd = 'fzn-cpx'
         self._cmd_arg_limit = 2048
         self._vals_per_row = 4
 
@@ -137,5 +137,6 @@ mzn2fzn_cmd = _config.mzn2fzn_cmd
 solns2out_cmd = _config.solns2out_cmd
 gecode_cmd = _config.gecode_cmd
 optimathsat_cmd = _config.optimathsat_cmd
+opturion_cmd = _config.opturion_cmd
 cmd_arg_limit = _config.cmd_arg_limit
 vals_per_row = _config.vals_per_row
