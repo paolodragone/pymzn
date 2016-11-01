@@ -16,7 +16,9 @@ which will become:
     'path/to/command 5 -f --flag2 --arg1 val1 --arg2 2'
 
 """
+import os
 import time
+import signal
 import logging
 import numbers
 import subprocess
@@ -54,7 +56,7 @@ def cmd(path, args):
     return ' '.join(_cmd)
 
 
-def run(arg, stdin=None):
+def run(arg, stdin=None, timeout=None):
     """
     Executes a shell command and waits for the result.
 
@@ -72,14 +74,24 @@ def run(arg, stdin=None):
 
     log.debug('Executing command: %s', arg, extra={'stdin': stdin})
     start = time.time()
-    proc = subprocess.run(arg, input=stdin, shell=True, bufsize=1,
+    proc = subprocess.Popen(arg, shell=True, bufsize=1,
                           universal_newlines=True,
+                          stdin=subprocess.PIPE,
                           stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
+                          stderr=subprocess.PIPE,
+                          preexec_fn=os.setsid)
+    try:
+        out, err = proc.communicate(stdin, timeout=timeout)
+        ret = proc.wait()
+        if ret:
+            raise RuntimeError(err)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+        out, err = proc.communicate()
     end = time.time()
-    proc.check_returncode()
     log.debug('Done. Running time: {0:.2f} seconds'.format(end - start))
-    return proc.stdout
+    return out
 
 
 def stream(arg, stdin=None):

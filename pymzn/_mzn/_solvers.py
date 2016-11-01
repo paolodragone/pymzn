@@ -163,14 +163,19 @@ def optimathsat(fzn_file):
     return solns
 
 
-def opturion(fzn_file):
-    args = [fzn_file]
+def opturion(fzn_file, timeout=None):
+    args = []
+
+    if timeout:
+        args.append('-a')
+
+    args.append(fzn_file)
 
     log = logging.getLogger(__name__)
     # log.debug('Calling %s with arguments: %s', config.opturion_cmd, args)
 
     try:
-        solns = run(cmd(config.opturion_cmd, args))
+        solns = run(cmd(config.opturion_cmd, args), timeout=timeout)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
