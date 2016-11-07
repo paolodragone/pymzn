@@ -42,3 +42,7 @@ class ParseTest(unittest.TestCase):
         self.assertEqual(parsed['x14'], {2: [1, 2, 3], 3: [4, 5, 6]})
         self.assertEqual(parsed['x15'],
                          [{2: 1, 3: 2, 4: 3}, {2: 4, 3: 5, 4: 6}])
+
+
+if __name__ == '__main__':
+    unittest.main()
