@@ -38,6 +38,7 @@ _sid_counter = itertools.count(1)
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
              serialize=False, raw_output=False, output_vars=None,
+             monitor_completion=False,
              mzn_globals_dir='gecode', fzn_fn=gecode, **fzn_args):
     """
     Implements the workflow to solve a CSP problem encoded with MiniZinc.
@@ -100,6 +101,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                               declared but not defined in the model.
                               This argument is only used when raw_output
                               is True.
+    :param bool monitor_completion: If True, the completion status of the output
+                                    is returned. This is equivalent to looking at
+                                    the ========== message at the end of a minizinc
+                                    output.
     :param str mzn_globals_dir: The name of the directory where to search
                                 for global included files in the standard
                                 library; by default the 'gecode' global
@@ -144,12 +149,19 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                                      mzn_globals_dir=mzn_globals_dir)
         try:
             solns = fzn_fn(fzn_file, **fzn_args)
-            out = solns2out(solns, ozn_file)
+            out = solns2out(solns, ozn_file,
+                            monitor_completion=monitor_completion)
+            if monitor_completion:
+                out, completion_status = out
             # TODO: check if stream-ability possible now, in case remove list
             if raw_output:
-                return list(out)
+                out = list(out)
             else:
-                return list(map(parse_dzn, out))
+                out = list(map(parse_dzn, out))
+            if monitor_completion:
+                return out, completion_status
+            else:
+                return out
         finally:
             if not keep:
                 with contextlib.suppress(FileNotFoundError):
@@ -247,7 +259,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
     return fzn_file, ozn_file
 
 
-def solns2out(solns_input, ozn_file):
+def solns2out(solns_input, ozn_file, monitor_completion=False):
     """
     Wraps the solns2out utility, executes it on the input solution stream,
     and then returns the output.
@@ -255,6 +267,10 @@ def solns2out(solns_input, ozn_file):
     :param str solns_input: The solution stream as output by the
                             solver, or the content of a solution file
     :param str ozn_file: The ozn file path produced by the mzn2fzn utility
+    :param bool monitor_completion: If True, the completion status of the output
+                                    is returned. This is equivalent to looking at
+                                    the ========== message at the end of a minizinc
+                                    output.
     :return: A list of solutions as strings. The user needs to take care of
              the parsing. If the output is in dzn format one can use the
              parse_dzn function.
@@ -280,7 +296,7 @@ def solns2out(solns_input, ozn_file):
     # To reach full stream-ability I need to pipe together the fzn with the
     # solns2out, not so trivial at this point, so I go back to return a list
     # of solutions for now, maybe in the future I will add this feature
-
+    search_is_complete = False
     lines = out.split('\n')
     solns = []
     curr_out = []
@@ -292,6 +308,7 @@ def solns2out(solns_input, ozn_file):
             solns.append(soln)
             curr_out = []
         elif line == search_complete_msg:
+            search_is_complete = True
             break
         elif line == unkn_msg:
             raise MiniZincUnknownError()
@@ -301,6 +318,9 @@ def solns2out(solns_input, ozn_file):
             raise MiniZincUnboundedError()
         else:
             curr_out.append(line)
+
+    if monitor_completion:
+        solns = solns, search_is_complete
     return solns
 
 
