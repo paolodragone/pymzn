@@ -31,21 +31,21 @@ __all__.extend(_mzn.__all__)
 with open(os.path.join(appdirs.user_config_dir(__name__), 'config.yml')) as f:
     config = _utils.objectview(yaml.load(f))
 
-debug_handler = None
-pymzn_log = logging.getLogger(__name__)
-pymzn_log.addHandler(logging.NullHandler())
 
+_debug_handler = None
+_pymzn_logger = logging.getLogger(__name__)
+_pymzn_logger.addHandler(logging.NullHandler())
 
 def debug(dbg=True):
-    global debug_handler
-    if dbg and debug_handler is None:
-        debug_handler = logging.StreamHandler()
-        pymzn_log.addHandler(debug_handler)
-        pymzn_log.setLevel(logging.DEBUG)
-    elif not dbg and debug_handler is not None:
-        pymzn_log.removeHandler(debug_handler)
-        debug_handler = None
-        pymzn_log.setLevel(logging.WARNING)
+    global _debug_handler
+    if dbg and _debug_handler is None:
+        _debug_handler = logging.StreamHandler()
+        _pymzn_logger.addHandler(_debug_handler)
+        _pymzn_logger.setLevel(logging.DEBUG)
+    elif not dbg and _debug_handler is not None:
+        _pymzn_logger.removeHandler(_debug_handler)
+        _debug_handler = None
+        _pymzn_logger.setLevel(logging.WARNING)
 
 
 def main():
