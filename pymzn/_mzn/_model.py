@@ -20,14 +20,14 @@ As you can see ``Model`` is a mutable class which saves the
 internal states and can be modified after every solving.
 """
 
-import logging
-import os.path
 import re
+import os.path
 
 from pymzn import dzn_value
+from pymzn._utils import get_logger
 
 
-class Model(object):
+class MiniZincModel(object):
     """
     Mutable class representing a MiniZinc model.
 
@@ -55,7 +55,6 @@ class Model(object):
         :param str mzn: The minizinc problem template. It can be either the
                         path to a mzn file or the content of a model.
         """
-        self._log = logging.getLogger(__name__)
         self.vars = {}
         self.constraints = []
         self.solve_stmt = None
@@ -111,7 +110,7 @@ class Model(object):
         self.output_stmt = (output_stmt, comment)
         self._modified = True
 
-    def var(self, vartype, var, val=None, comment=None):
+    def add_var(self, vartype, var, val=None, comment=None):
         """
         Adds a variable (or parameter) to the model.
 
@@ -239,8 +238,8 @@ class Model(object):
                 lines.append('output [{}];'.format(output_stmt))
             model += '\n'.join(lines)
 
-        self._log.debug('Writing file: {}'.format(output_file))
-        with open(output_file, 'w') as f:
-            f.write(model)
+        log = get_logger(__name__)
+        log.debug('Writing file: {}', output_file)
+        output_file.write(model)
 
         return output_file
