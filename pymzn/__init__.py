@@ -6,8 +6,10 @@ solve problems encoded in MiniZinc and parse the solutions into Python objects.
 """
 import ast
 import logging
+import appdirs
+import yaml
 
-from . import config
+from . import _utils
 from . import bin
 from . import _dzn
 from ._dzn import *
@@ -25,6 +27,9 @@ __all__.extend(_mzn.__all__)
 # TODO: check the import of other files in minizinc
 # TODO: make it work on windows
 # TODO: check the ctrl+C thing which seems to not work anymore
+
+with open(os.path.join(appdirs.user_config_dir(__name__), 'config.yml')) as f:
+    config = _utils.objectview(yaml.load(f))
 
 debug_handler = None
 pymzn_log = logging.getLogger(__name__)
