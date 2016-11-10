@@ -38,7 +38,7 @@ from subprocess import CalledProcessError
 
 from pymzn._utils import get_logger
 import pymzn.config as config
-from pymzn.bin import cmd, run
+from pymzn.bin import run_cmd
 
 
 class Solver(object):
@@ -47,7 +47,7 @@ class Solver(object):
         self.support_ozn = support_ozn
         self.globals_dir = globals_dir
 
-    def run(self, fzn_file, *args, **kwargs):
+    def solve(self, fzn_file, *args, **kwargs):
         raise NotImplementedError()
 
 
@@ -60,7 +60,7 @@ class Gecode(Solver):
 
         self.cmd = path or 'gecode'
 
-    def run(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
+    def solve(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
             restart_base=None, restart_scale=None, suppress_segfault=False):
         """
         Solves a constrained optimization problem using the Gecode solver.
@@ -112,7 +112,7 @@ class Gecode(Solver):
         log = get_logger(__name__)
 
         try:
-            solns = run(cmd(self.path, args))
+            solns = run_cmd(self.path, args)
         except CalledProcessError as err:
             #TODO: this won't work anymore with the recent change in bin.py
             if (suppress_segfault and len(err.stdout) > 0 and
@@ -147,7 +147,7 @@ def optimathsat(fzn_file):
     # log.debug('Calling %s with arguments: %s', config.optimathsat_cmd, args)
 
     try:
-        solns = run(cmd(config.optimathsat_cmd, args))
+        solns = run_cmd(config.optimathsat_cmd, args)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -166,7 +166,7 @@ def opturion(fzn_file, timeout=None):
     # log.debug('Calling %s with arguments: %s', config.opturion_cmd, args)
 
     try:
-        solns = run(cmd(config.opturion_cmd, args), timeout=timeout)
+        solns = run_cmd(config.opturion_cmd, args, timeout=timeout)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err

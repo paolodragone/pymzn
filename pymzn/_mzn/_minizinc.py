@@ -28,14 +28,14 @@ from tempfile import NamedTemporaryFile
 import pymzn.config as config
 
 from pymzn._utils import get_logger
-from pymzn.bin import cmd, run
+from pymzn.bin import run_cmd
 from pymzn import parse_dzn, dzn
 from ._solvers import Gecode
 from ._model import MiniZincModel
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
-             globals_dir=None, stdlib_dir=None, no_ozn=False, parse_output=True,
+             globals_dir=None, stdlib_dir=None, parse_output=True,
              path=None, output_vars=None, solver=Gecode, **solver_args):
     """
     Implements the workflow to solve a CSP problem encoded with MiniZinc.
@@ -149,7 +149,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                                  globals_dir=_globals_dir,
                                  stdlib_dir=stdlib_dir)
 
-    solns = solver.run(fzn_file, **solver_args)
+    solns = solver.solve(fzn_file, **solver_args)
 
     if solver.support_ozn:
         try:
@@ -240,7 +240,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     args += [mzn_file] + dzn_files
 
     try:
-        run(cmd(config.get('mzn2fzn', 'mzn2fzn'), args))
+        run_cmd(config.get('mzn2fzn', 'mzn2fzn'), args)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -286,8 +286,8 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
     args = [ozn_file]
 
     try:
-        out = run(cmd(config.get('solns2out', 'solns2out'), args),
-                  stdin=solns_input)
+        cmd = config.get('solns2out', 'solns2out')
+        out = run_cmd(cmd, args, stdin=solns_input)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
