@@ -5,9 +5,9 @@ modelling and solving. It is built on top of the libminizinc library
 solve problems encoded in MiniZinc and parse the solutions into Python objects.
 """
 import ast
-import logging
-import appdirs
 import yaml
+import appdirs
+import logging
 
 from . import _utils
 from . import bin
@@ -17,7 +17,7 @@ from . import _mzn
 from ._mzn import *
 
 __version__ = '0.10.8'
-__all__ = ['debug', 'config', 'bin']
+__all__ = ['debug', 'config', 'bin', 'gecode']
 __all__.extend(_dzn.__all__)
 __all__.extend(_mzn.__all__)
 
@@ -27,10 +27,6 @@ __all__.extend(_mzn.__all__)
 # TODO: check the import of other files in minizinc
 # TODO: make it work on windows
 # TODO: check the ctrl+C thing which seems to not work anymore
-
-with open(os.path.join(appdirs.user_config_dir(__name__), 'config.yml')) as f:
-    config = _utils.objectview(yaml.load(f))
-
 
 _debug_handler = None
 _pymzn_logger = logging.getLogger(__name__)
@@ -46,6 +42,13 @@ def debug(dbg=True):
         _pymzn_logger.removeHandler(_debug_handler)
         _debug_handler = None
         _pymzn_logger.setLevel(logging.WARNING)
+
+
+with open(os.path.join(appdirs.user_config_dir(__name__), 'config.yml')) as f:
+    config = yaml.load(f)
+
+# Solvers
+gecode = Gecode(path=config.get('gecode'))
 
 
 def main():
