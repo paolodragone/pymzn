@@ -1,7 +1,9 @@
-import logging
+import pymzn.config as config
+
+from pymzn._utils import get_logger
+
 from numbers import Integral, Number
 from collections.abc import Set, Sized, Iterable, Mapping
-import pymzn.config
 
 
 def _is_int(obj):
@@ -135,7 +137,7 @@ def _dzn_array_nd(arr, spaces=0):
     for i, val in enumerate(map(_dzn_val, flat_arr)):
         if i > 0:
             vals.append(', ')
-            if i % pymzn.config.vals_per_row == 0:
+            if i % config.get('vals_per_row', 4) == 0:
                 vals.append('\n')
                 vals.extend([' ' for _ in range(spaces)])
         vals.append(val)
@@ -178,7 +180,7 @@ def dzn(objs, fout=None):
     :return: List of strings containing the dzn encoded objects
     :rtype: list
     """
-    log = logging.getLogger(__name__)
+    log = get_logger(__name__)
 
     vals = []
     for key, val in objs.items():

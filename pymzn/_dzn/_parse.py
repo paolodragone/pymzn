@@ -130,8 +130,6 @@ def parse_dzn(dzn, *, rebase_arrays=True):
              input file or string
     :rtype: dict
     """
-    # log = logging.getLogger(__name__)
-
     __, dzn_ext = os.path.splitext(dzn)
     if dzn_ext == 'dzn':
         with open(dzn) as f:
@@ -141,7 +139,6 @@ def parse_dzn(dzn, *, rebase_arrays=True):
     stmts = _stmt_p.findall(dzn)
     for stmt in stmts:
         stmt = _comm_p.sub('', stmt)
-        # log.debug('Parsing stmt: %s', stmt)
         var_m = _var_p.match(stmt)
         if var_m:
             var = var_m.group('var')
@@ -149,10 +146,8 @@ def parse_dzn(dzn, *, rebase_arrays=True):
             p_val = _parse_val(val)
             if p_val is not None:
                 assign[var] = p_val
-                # log.debug('Parsed value: %s', p_val)
                 continue
 
-            # log.debug('Parsing array: %s', val)
             array_m = _array_p.match(val)
             if array_m:
                 vals = array_m.group('vals')
@@ -161,18 +156,15 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                 if dim:  # explicit dimensions
                     dim = int(dim)
                     indices = array_m.group('indices')
-                    # log.debug('Parsing indices: %s', indices)
                     indices = _parse_indices(indices)
                     assert len(indices) == dim
                 else:  # assuming 1d array based in 1
                     indices = [range(1, len(vals) + 1)]
-                # log.debug('Parsing values: %s', vals)
                 if len(vals) == 0:
                     p_val = []
                 else:
                     p_val = _parse_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
-                # log.debug('Parsed array: %s', p_val)
                 continue
         raise ValueError('Unsupported parsing for stmt:\n'
                          '{}'.format(repr(stmt)))
