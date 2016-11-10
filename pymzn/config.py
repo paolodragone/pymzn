@@ -46,97 +46,42 @@ disable debugging messages you can then call:
 
 """
 import os.path
+import yaml
+import appdirs
 
 
-class _Config(object):
+_config = None
+_modified = False
 
-    def __init__(self):
-        self._mzn2fzn_cmd = 'mzn2fzn'
-        self._solns2out_cmd = 'solns2out'
-        self._gecode_cmd = 'fzn-gecode'
-        self._optimathsat_cmd = 'optimathsat'
-        self._opturion_cmd = 'fzn-cpx'
-        self._cmd_arg_limit = 2048
-        self._vals_per_row = 4
+def _cfg_file():
+    return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
 
-    @property
-    def mzn2fzn_cmd(self):
-        return self._mzn2fzn_cmd
 
-    @mzn2fzn_cmd.setter
-    def mzn2fzn_cmd(self, cmd):
-        if os.path.exists(cmd):
-            self._mzn2fzn_cmd = cmd
-        else:
-            raise ValueError('The given file does not exist: {}'.format(cmd))
+def get(key, default=None):
+    if _config is None:
+        _config = {}
+        cfg_file = _cfg_file()
+        if os.path.isfile(cfg_file)
+            with open(cfg_file) as f:
+                config = yaml.load(f)
+    return config.get(key, default)
 
-    @property
-    def solns2out_cmd(self):
-        return self._solns2out_cmd
 
-    @solns2out_cmd.setter
-    def solns2out_cmd(self, cmd):
-        if os.path.exists(cmd):
-            self._solns2out_cmd = cmd
-        else:
-            raise ValueError('The given file does not exist: {}'.format(cmd))
+def set(key, value):
+    _config[key] = value
+    _modified = True
 
-    @property
-    def gecode_cmd(self):
-        return self._gecode_cmd
 
-    @gecode_cmd.setter
-    def gecode_cmd(self, cmd):
-        if os.path.exists(cmd):
-            self._gecode_cmd = cmd
-        else:
-            raise ValueError('The given file does not exist: {}'.format(cmd))
+def append(key, value):
+    if key not in _config:
+        _config[key] = []
+    _config[key].append(value)
+    _modified = True
 
-    @property
-    def optimathsat_cmd(self):
-        return self._optimathsat_cmd
 
-    @optimathsat_cmd.setter
-    def optimathsat_cmd(self, cmd):
-        if os.path.exists(cmd):
-            self._optimathsat_cmd = cmd
-        else:
-            raise ValueError('The given file does not exist: {}'.format(cmd))
-
-    @property
-    def opturion_cmd(self):
-        return self._opturion_cmd
-
-    @opturion_cmd.setter
-    def opturion_cmd(self, cmd):
-        if os.path.exists(cmd):
-            self._opturion_cmd = cmd
-        else:
-            raise ValueError('The given file does not exist: {}'.format(cmd))
-
-    @property
-    def cmd_arg_limit(self):
-        return self._cmd_arg_limit
-
-    @cmd_arg_limit.setter
-    def cmd_arg_limit(self, limit):
-        self._cmd_arg_limit = limit
-
-    @property
-    def vals_per_row(self):
-        return self._vals_per_row
-
-    @vals_per_row.setter
-    def vals_per_row(self, vals):
-        self._vals_per_row = vals
-
-_config = _Config()
-
-# Package level configuration properties
-mzn2fzn_cmd = _config.mzn2fzn_cmd
-solns2out_cmd = _config.solns2out_cmd
-gecode_cmd = _config.gecode_cmd
-optimathsat_cmd = _config.optimathsat_cmd
-opturion_cmd = _config.opturion_cmd
-cmd_arg_limit = _config.cmd_arg_limit
-vals_per_row = _config.vals_per_row
+def dump()
+    if _modified:
+        cfg_file = _cfg_file()
+        with open(cfg_file, 'w') as f:
+            yaml.dump(_config, f)
+        _modified = False

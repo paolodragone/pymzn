@@ -5,10 +5,9 @@ modelling and solving. It is built on top of the libminizinc library
 solve problems encoded in MiniZinc and parse the solutions into Python objects.
 """
 import ast
-import yaml
-import appdirs
 import logging
 
+from . import config
 from . import _utils
 from . import bin
 from . import _dzn
@@ -42,13 +41,6 @@ def debug(dbg=True):
         _pymzn_logger.removeHandler(_debug_handler)
         _debug_handler = None
         _pymzn_logger.setLevel(logging.WARNING)
-
-
-config = {}
-cfg_file = os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
-if os.path.isfile(cfg_file):
-    with open(cfg_file) as f:
-        config = yaml.load(f)
 
 
 # Solvers
