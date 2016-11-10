@@ -44,8 +44,12 @@ def debug(dbg=True):
         _pymzn_logger.setLevel(logging.WARNING)
 
 
-with open(os.path.join(appdirs.user_config_dir(__name__), 'config.yml')) as f:
-    config = yaml.load(f)
+config = {}
+cfg_file = os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
+if os.path.isfile(cfg_file):
+    with open(cfg_file) as f:
+        config = yaml.load(f)
+
 
 # Solvers
 gecode = Gecode(path=config.get('gecode'))
