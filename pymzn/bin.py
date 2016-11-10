@@ -94,37 +94,3 @@ def run(arg, stdin=None, timeout=None):
     log.debug('Done. Running time: {0:.2f} seconds'.format(end - start))
     return out
 
-
-def stream(arg, stdin=None):
-    """
-    Executes a shell command and generates lines of output without waiting
-    for it to finish.
-
-    :param str arg: The command string to be executed, as returned from the
-                    cmd function.
-    :param str stdin: Input stream to pass to the command
-    :return: A generator containing the lines in the output stream
-             of the command
-    :rtype: generator of str
-    """
-    log = get_logger(__name__)
-    log.debug('Executing streaming command: %s', arg, extra={'stdin': stdin})
-    proc = subprocess.Popen(arg, shell=True, bufsize=1,
-                            universal_newlines=True,
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-    if stdin:
-        proc.stdin.write(stdin)
-        proc.stdin.close()
-
-    out = []
-    for line in proc.stdout:
-        out.append(line)
-        yield line
-    out = ''.join(out)
-    err = proc.stderr.read()
-
-    ret = proc.wait()
-    if ret:
-        raise subprocess.CalledProcessError(ret, arg, out, err)
