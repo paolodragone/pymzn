@@ -57,33 +57,63 @@ gecode = Gecode(path=config.get('gecode'))
 
 def main():
     import argparse
+    from textwrap import dedent
 
-    desc = 'PyMzn is a wrapper for the MiniZinc tool pipeline.'
-    p = argparse.ArgumentParser(description=desc)
-    p.add_argument('--debug', action='store_true',
-                   help='display debug messages on standard output')
-    p.add_argument('mzn', help='the mzn file to solve')
-    p.add_argument('dzn_files', nargs='*', help='additional dzn files')
-    p.add_argument('--data', type=ast.literal_eval,
-                   help='additional inline data')
-    p.add_argument('-k', '--keep', action='store_true',
-                   help='whether to keep generated files')
-    p.add_argument('-o', '--output-base',
-                   help='base name for generated files')
-    p.add_argument('-G', '--mzn-globals-dir',
-                   help='directory of global files in the standard library')
-    p.add_argument('-f', '--fzn-fn',
-                   help='name of proxy function for the solver')
-    p.add_argument('--fzn-args', type=ast.literal_eval, default={},
-                   help='arguments to pass to the solver')
-    args = p.parse_args()
+    def _minizinc(**_args):
+        print(minizinc(**_args))
 
-    if args.debug:
-        debug()
+    #TODO: finish description
+    desc = dedent('''PyMzn is a wrapper for the MiniZinc tool pipeline.
+        With PyMzn you can...
+    ''')
 
-    other_args = {**{'data': args.data, 'keep': args.keep,
-                     'output_base': args.output_base,
-                     'mzn_globals_dir': args.mzn_globals_dir,
-                     'fzn_fn': args.fzn_fn}, **args.fzn_args}
+    fmt = argparse.ArgumentDefaultsHelpFormatter
+    parser = argparse.ArgumentParser(description=desc, formatter_class=fmt)
+    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='display informative messages on standard output')
 
-    print(minizinc(args.mzn, *args.dzn_files, raw_output=True, **other_args))
+    subparsers = parser.add_subparsers()
+    mzn_parser = subparser.add_parser('minizinc',
+                                      help='solve a minizinc problem')
+    mzn_parser.add_argument('mzn',
+                            help='the mzn file to solve')
+    mzn_parser.add_argument('dzn_files', nargs='*',
+                            help='additional dzn files')
+    mzn_parser.add_argument('--data', type=ast.literal_eval,
+                            help='additional inline data')
+    mzn_parser.add_argument('-S', '--solver',
+                            help='name of the solver')
+    mzn_parser.add_argument('-s', '--solver-args', type=ast.literal_eval,
+                            default={},
+                            help='arguments to pass to the solver')
+    mzn_parser.add_argument('-k', '--keep', action='store_true',
+                            help='whether to keep generated files')
+    mzn_parser.add_argument('-o', '--output-base',
+                            help='base name for generated files if keeped')
+    mzn_parser.add_argument('-G', '--globals-dir',
+                            help=('directory of global files in the standard '
+                                  'library'))
+    mzn_parser.add_argument('-I', '--include', dest='path', action='append',
+                            help='directory the standard library')
+    mzn_parser.add_argument('--stdlib-dir',
+                            help='directory the standard library')
+    mzn_parser.add_argument('--no-parse', dest='parse_output',
+                            action='store_false',
+                            help=('return the content of the original output '
+                                  'statement'))
+    mzn_parser.set_defaults(func=_minizinc)
+
+    config_parser = subparser.add_parser('config',
+                                         help='config pymzn variables')
+    config_parser.add_argument('key',
+                               help='the property to get/set')
+    config_parser.add_argument('values', nargs='*',
+                               help='the value(s) to set')
+    config_parser.set_defaults(func=confing)
+
+    args = parser.parse_args()
+
+    debug(args.verbose)
+    args.func(**vars(args))
+
