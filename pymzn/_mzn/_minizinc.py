@@ -35,8 +35,8 @@ from ._model import MiniZincModel
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
-             globals_dir=None, stdlib_dir=None, path=None, parse_output=True,
-             output_vars=None, solver=Gecode, **solver_args):
+             globals_dir=None, stdlib_dir=None, no_ozn=False, parse_output=True,
+             path=None, output_vars=None, solver=Gecode, **solver_args):
     """
     Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -145,8 +145,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     mzn_file = output_file.name
 
     fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
-                                 keep_data=keep, no_ozn=(not parse_output),
-                                 path=path, globals_dir=_globals_dir,
+                                 keep_data=keep, path=path,
+                                 globals_dir=_globals_dir,
                                  stdlib_dir=stdlib_dir)
 
     solns = solver.run(fzn_file, **solver_args)
@@ -203,16 +203,12 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     log = get_logger(__name__)
 
     args = []
-
     if stdlib_dir:
         args.append(('--stdlib-dir', stdlib_dir))
-
     if globals_dir:
         args.append(('-G', globals_dir))
-
     if no_ozn:
         args.append('--no-output-ozn')
-
     if path:
         if isinstance(path, str):
             path = [path]
@@ -222,7 +218,6 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
             args.append(('-I', p))
 
     dzn_files = list(dzn_files)
-
     data_file = None
     if data:
         if isinstance(data, dict):
@@ -259,9 +254,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     mzn_base, __ = os.path.splitext(mzn_file)
     fzn_file = '.'.join([mzn_base, 'fzn']) if os.path.isfile(fzn_file) else None
     ozn_file = '.'.join([mzn_base, 'ozn']) if os.path.isfile(ozn_file) else None
-
     log.debug('Generated files: {}, {}'.format(fzn_file, ozn_file))
-
     return fzn_file, ozn_file
 
 
