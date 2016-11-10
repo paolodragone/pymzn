@@ -34,106 +34,97 @@ Then you can run the ``minizinc`` function like this:
 
 """
 
-import logging
 from subprocess import CalledProcessError
 
+from pymzn._utils import get_logger
 import pymzn.config as config
 from pymzn.bin import cmd, run
 
 
-def gecode(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
-           restart_base=None, restart_scale=None, suppress_segfault=False):
-    """
-    Solves a constrained optimization problem using the Gecode solver.
+class Solver(object):
 
-    :param str fzn_file: The path to the fzn file containing the problem to
-                         be solved
-    :param int n_solns: The number of solutions to output (0 = all,
-                        -1 = one/best); default is -1
-    :param int parallel: The number of threads to use to solve the problem
-                         (0 = #processing units); default is 1
-    :param int time: The time cutoff in milliseconds, after which the
-                     execution is truncated and the best solution so far is
-                     returned, 0 means no time cutoff; default is 0
-    :param int seed: random seed; default is 0
-    :param str restart: restart sequence type; default is None
-    :param str restart_base: base for geometric restart sequence; if None (
-                             default) the default value of Gecode is used,
-                             which is 1.5
-    :param str restart_scale: scale factor for restart sequence; if None (
-                              default) the default value of Gecode is used,
-                              which is 250
-    :param bool suppress_segfault: whether to accept or not a solution
-                                   returned when a segmentation fault has
-                                   happened (this is unfortunately necessary
-                                   sometimes due to some bugs in gecode).
-    :return: A string containing the solution output stream of the execution
-             of Gecode on the specified problem; it can be directly be given
-             to the function solns2out to be transformed into output and
-             then parsed
-    :rtype: str
-    """
-    args = []
-    if n_solns >= 0:
-        args.append(('-n', n_solns))
-    if parallel != 1:
-        args.append(('-p', parallel))
-    if time > 0:
-        args.append(('-time', time))
-    if seed != 0:
-        args.append(('-r', seed))
-    if restart:
-        args.append(('-restart', restart))
-    if restart_base:
-        args.append(('-restart-base', restart_base))
-    if restart_scale:
-        args.append(('-restart-scale', restart_scale))
-    args.append(fzn_file)
+    def __init__(self, support_ozn, globals_dir=None):
+        self.support_ozn = support_ozn
+        self.globals_dir = globals_dir
 
-    log = logging.getLogger(__name__)
-    # log.debug('Calling %s with arguments: %s', config.gecode_cmd, args)
-
-    try:
-        solns = run(cmd(config.gecode_cmd, args))
-    except CalledProcessError as err:
-        if (suppress_segfault and len(err.stdout) > 0 and
-                err.stderr.startswith('Segmentation fault')):
-            log.warning('Gecode returned error code {} (segmentation '
-                        'fault) but a solution was found and returned '
-                        '(suppress_segfault=True).'.format(err.returncode))
-            solns = err.stdout
-        else:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-    return solns
+    def run(self, fzn_file, *args, **kwargs):
+        raise NotImplementedError()
 
 
-def solve(fzn_file, *, solver_cmd=None):
-    """
-    Generic proxy function to a solver.
+class Gecode(Solver):
 
-    This function provides a simple interface to a solver.
-    It does not provide any argument to the solver, so it can be used to only
-    execute the solver as is on the input fnz file.
+    def __init__(self, path=None):
+        support_ozn = True
+        globals_dir = 'gecode'
+        super().__init__(support_ozn, globals_dir)
 
-    :param str fzn_file: The path to the fzn file containing the problem to
-                         be solved
-    :param solver_cmd: The path to the command to execute the solver
-    :return: A string containing the solution output stream of the execution
-             of the solver on the specified problem
-    :rtype: str
-    """
-    args = [fzn_file]
+        self.cmd = path or 'gecode'
 
-    log = logging.getLogger(__name__)
-    # log.debug('Calling %s with arguments: %s', solver_cmd, args)
+    def run(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
+            restart_base=None, restart_scale=None, suppress_segfault=False):
+        """
+        Solves a constrained optimization problem using the Gecode solver.
 
-    try:
-        solns = run(cmd(solver_cmd, args))
-    except CalledProcessError as err:
-        log.exception(err.stderr)
-        raise RuntimeError(err.stderr) from err
-    return solns
+        :param str fzn_file: The path to the fzn file containing the problem to
+                            be solved
+        :param int n_solns: The number of solutions to output (0 = all,
+                            -1 = one/best); default is -1
+        :param int parallel: The number of threads to use to solve the problem
+                            (0 = #processing units); default is 1
+        :param int time: The time cutoff in milliseconds, after which the
+                        execution is truncated and the best solution so far is
+                        returned, 0 means no time cutoff; default is 0
+        :param int seed: random seed; default is 0
+        :param str restart: restart sequence type; default is None
+        :param str restart_base: base for geometric restart sequence; if None (
+                                default) the default value of Gecode is used,
+                                which is 1.5
+        :param str restart_scale: scale factor for restart sequence; if None (
+                                default) the default value of Gecode is used,
+                                which is 250
+        :param bool suppress_segfault: whether to accept or not a solution
+                                    returned when a segmentation fault has
+                                    happened (this is unfortunately necessary
+                                    sometimes due to some bugs in gecode).
+        :return: A string containing the solution output stream of the execution
+                of Gecode on the specified problem; it can be directly be given
+                to the function solns2out to be transformed into output and
+                then parsed
+        :rtype: str
+        """
+        args = []
+        if n_solns >= 0:
+            args.append(('-n', n_solns))
+        if parallel != 1:
+            args.append(('-p', parallel))
+        if time > 0:
+            args.append(('-time', time))
+        if seed != 0:
+            args.append(('-r', seed))
+        if restart:
+            args.append(('-restart', restart))
+        if restart_base:
+            args.append(('-restart-base', restart_base))
+        if restart_scale:
+            args.append(('-restart-scale', restart_scale))
+        args.append(fzn_file)
+
+        log = get_logger(__name__)
+
+        try:
+            solns = run(cmd(self.path, args))
+        except CalledProcessError as err:
+            #TODO: this won't work anymore with the recent change in bin.py
+            if (suppress_segfault and len(err.stdout) > 0 and
+                    err.stderr.startswith('Segmentation fault')):
+                log.warning('Gecode returned error code {} (segmentation '
+                            'fault) but a solution was found and returned '
+                            '(suppress_segfault=True).'.format(err.returncode))
+                solns = err.stdout
+            else:
+                log.exception(err.stderr)
+                raise RuntimeError(err.stderr) from err
+        return solns
 
 
 def optimathsat(fzn_file):

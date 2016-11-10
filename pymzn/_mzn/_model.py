@@ -27,6 +27,16 @@ from pymzn import dzn_value
 from pymzn._utils import get_logger
 
 
+_stmt_p = re.compile('(?:^|;)\s*([^;]+)')
+_comm_p = re.compile('%.*\n')
+_var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
+_var_type_p = re.compile('^\s*.*?var.+')
+_array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
+                            '\s+of\s+(.+?)$')
+_output_stmt_p = re.compile('(^|\s)output\s*\[.+?\]\s*;', re.DOTALL)
+_solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
+
+
 class MiniZincModel(object):
     """
     Mutable class representing a MiniZinc model.
@@ -38,16 +48,7 @@ class MiniZincModel(object):
     and the updates performed on the MinizincModel instance.
     """
 
-    _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
-    _comm_p = re.compile('%.*\n')
-    _var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
-    _var_type_p = re.compile('^\s*.*?var.+')
-    _array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
-                               '\s+of\s+(.+?)$')
-    _output_stmt_p = re.compile('(^|\s)output\s*\[.+?\]\s*;', re.DOTALL)
-    _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
-
-    def __init__(self, mzn=''):
+    def __init__(self, mzn=None):
         """
         Creates a new Model starting from the input mzn template
         if provided.
@@ -62,15 +63,17 @@ class MiniZincModel(object):
         self._free_vars = set()
         self._array_dims = {}
         self._modified = False
-        self._stmts_parsed = False
+        self._parsed = False
 
-        mzn_base, mzn_ext = os.path.splitext(mzn)
-        if mzn_ext != '.mzn':
-            self._model = mzn
-            self.mzn_file = 'mznout.mzn'
-        else:
-            self._model = None
-            self.mzn_file = mzn
+        # TODO: use a list of statements and add them in order of insertion
+
+        if mzn and isinstance(mzn, str):
+            if os.path.isfile(mzn):
+                self.mzn_file = mzn
+                self._model = None
+            else:
+                self.mzn_file = None
+                self._model = mzn
 
     def constraint(self, constr, comment=None):
         """
@@ -110,7 +113,7 @@ class MiniZincModel(object):
         self.output_stmt = (output_stmt, comment)
         self._modified = True
 
-    def add_var(self, vartype, var, val=None, comment=None):
+    def var(self, vartype, var, val=None, comment=None):
         """
         Adds a variable (or parameter) to the model.
 
@@ -124,16 +127,16 @@ class MiniZincModel(object):
         """
         val = dzn_value(val) if val else None
         self.vars[var] = (vartype, val, comment)
-        if self._var_type_p.match(vartype) and val is None:
+        if _var_type_p.match(vartype) and val is None:
             self._free_vars.add(var)
-        _array_type_m = self._array_type_p.match(vartype)
+        _array_type_m = _array_type_p.match(vartype)
         if _array_type_m:
             dim = len(_array_type_m.group(1).split(','))
             self._array_dims[var] = dim
         self._modified = True
 
     def _load_model(self):
-        if self._model is None:
+        if not self._model:
             if self.mzn_file:
                 with open(self.mzn_file) as f:
                     self._model = f.read()
@@ -142,24 +145,24 @@ class MiniZincModel(object):
         return self._model
 
     def _parse_model_stmts(self):
-        if self._stmts_parsed:
+        if self._parsed:
             return
         model = self._load_model()
-        model = self._comm_p.sub('', model)
-        stmts = self._stmt_p.findall(model)
+        model = _comm_p.sub('', model)
+        stmts = _stmt_p.findall(model)
         for stmt in stmts:
-            _var_m = self._var_p.match(stmt)
+            _var_m = _var_p.match(stmt)
             if _var_m:
                 vartype = _var_m.group(1)
                 var = _var_m.group(2)
                 val = _var_m.group(3)
-                if self._var_type_p.match(vartype) and val is None:
+                if _var_type_p.match(vartype) and val is None:
                     self._free_vars.add(var)
-                _array_type_m = self._array_type_p.match(vartype)
+                _array_type_m = _array_type_p.match(vartype)
                 if _array_type_m:
                     dim = len(_array_type_m.group(1).split(','))
                     self._array_dims[var] = dim
-        self._stmts_parsed = True
+        self._parsed = True
 
     def dzn_output_stmt(self, output_vars=None, comment=None):
         """
@@ -176,8 +179,11 @@ class MiniZincModel(object):
         self._parse_model_stmts()
 
         # Set output vars to the free variables if None provided
-        if not output_vars:
+        if output_vars is None:
             output_vars = list(self._free_vars)
+
+        if not output_vars:
+            return
 
         # Build the output statement from the output variables
         out_var = '"{0} = ", show({0}), ";\\n"'
@@ -226,13 +232,13 @@ class MiniZincModel(object):
                 lines.append('constraint {};'.format(constr))
 
             if self.solve_stmt is not None:
-                model = self._solve_stmt_p.sub('', model)
+                model = _solve_stmt_p.sub('', model)
                 solve_stmt, comment = self.solve_stmt
                 comment and lines.append('% {}'.format(comment))
                 lines.append('solve {};'.format(solve_stmt))
 
             if self.output_stmt is not None:
-                model = self._output_stmt_p.sub('', model)
+                model = _output_stmt_p.sub('', model)
                 output_stmt, comment = self.output_stmt
                 comment and lines.append('% {}'.format(comment))
                 lines.append('output [{}];'.format(output_stmt))

@@ -20,26 +20,23 @@ FlatZinc one and getting custom output from the solution stream of a solver.
 """
 
 import os
-import logging
 import itertools
 import contextlib
 from subprocess import CalledProcessError
-
+from tempfile import NamedTemporaryFile
 
 import pymzn.config as config
+
+from pymzn._utils import get_logger
 from pymzn.bin import cmd, run
 from pymzn import parse_dzn, dzn
-from ._solvers import gecode
-from ._model import Model
-
-
-_sid_counter = itertools.count(1)
+from ._solvers import Gecode
+from ._model import MiniZincModel
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
-             serialize=False, raw_output=False, output_vars=None,
-             monitor_completion=False,
-             mzn_globals_dir='gecode', fzn_fn=gecode, **fzn_args):
+             globals_dir=None, stdlib_dir=None, path=None, parse_output=True,
+             output_vars=None, solver=Gecode, **solver_args):
     """
     Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -121,66 +118,69 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
              variable assignments, and the values are evaluated.
     :rtype: list
     """
-    log = logging.getLogger(__name__)
+    log = get_logger(__name__)
 
-    if isinstance(mzn, Model):
+    if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
-        mzn = mzn_model.mzn_file
     else:
-        mzn_model = Model(mzn)
+        mzn_model = MiniZincModel(mzn)
 
-    if not raw_output:
+    if parse_output:
         mzn_model.dzn_output_stmt(output_vars)
 
-    mzn_base, mzn_ext = os.path.splitext(mzn)
-    if mzn_ext != '.mzn':
-        mzn_base = 'mznout'
-    _output_base = output_base if output_base else mzn_base
+    _globals_dir = globals_dir or solver.globals_dir
 
-    # Ensures isolation of instances and thread safety
-    sid = 0 if not serialize else next(_sid_counter)
-    output_file = '{}_{}.mzn'.format(_output_base, sid)
+    output_dir = None
+    output_prefix = 'pymzn'
+    if keep:
+        if output_base:
+            output_dir, output_prefix = os.path.split(output_base)
+        elif mzn_model.mzn_file:
+            output_dir, mzn_name = os.path.split(mzn_file)
+            output_prefix, mzn_ext = os.path.split(mzn_name)
+    output_prefix += '_'
+    output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
+                                     delete=False)
+    mzn_model.compile(output_file)
+    mzn_file = output_file.name
 
-    mzn_file = mzn_model.compile(output_file)
+    fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
+                                 keep_data=keep, no_ozn=(not parse_output),
+                                 path=path, globals_dir=_globals_dir,
+                                 stdlib_dir=stdlib_dir)
 
-    try:
-        fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files,
-                                     data=data, keep_data=keep,
-                                     mzn_globals_dir=mzn_globals_dir)
+    solns = solver.run(fzn_file, **solver_args)
+
+    if solver.support_ozn:
         try:
-            solns = fzn_fn(fzn_file, **fzn_args)
-            out = solns2out(solns, ozn_file,
-                            monitor_completion=monitor_completion)
-            if monitor_completion:
-                out, completion_status = out
-            # TODO: check if stream-ability possible now, in case remove list
-            if raw_output:
-                out = list(out)
-            else:
-                out = list(map(parse_dzn, out))
-            if monitor_completion:
-                return out, completion_status
-            else:
-                return out
-        finally:
-            if not keep:
-                with contextlib.suppress(FileNotFoundError):
-                    if fzn_file:
-                        os.remove(fzn_file)
-                        log.debug('Deleting file: %s', fzn_file)
-                    if ozn_file:
-                        os.remove(ozn_file)
-                        log.debug('Deleting file: %s', ozn_file)
-    finally:
-        if not keep:
-            with contextlib.suppress(FileNotFoundError):
-                if mzn_file:
-                    os.remove(mzn_file)
-                    log.debug('Deleting file: %s', mzn_file)
+            complete, out = solns2out(solns, ozn_file)
+        except (MiniZincUnsatisfiableError, MiniZincUnknownError,
+                MiniZincUnboundedError) as err:
+            err.mzn_file = mzn_file
+            raise err
+    else:
+        complete, out = solns
+
+    if parse_output:
+        out = list(map(parse_dzn, out))
+
+    if not keep:
+        with contextlib.suppress(FileNotFoundError):
+            if mzn_file:
+                os.remove(mzn_file)
+                log.debug('Deleting file: %s', mzn_file)
+            if fzn_file:
+                os.remove(fzn_file)
+                log.debug('Deleting file: %s', fzn_file)
+            if ozn_file:
+                os.remove(ozn_file)
+                log.debug('Deleting file: %s', ozn_file)
+
+    return complete, out
 
 
-def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
-            mzn_globals_dir='gecode'):
+def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
+            stdlib_dir=None, path=None, no_ozn=False):
     """
     Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -200,17 +200,31 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
     :return: The paths to the fzn and ozn files created by the function
     :rtype: (str, str)
     """
-    log = logging.getLogger(__name__)
+    log = get_logger(__name__)
 
     args = []
 
-    if mzn_globals_dir:
-        args.append(('-G', mzn_globals_dir))
+    if stdlib_dir:
+        args.append(('--stdlib-dir', stdlib_dir))
+
+    if globals_dir:
+        args.append(('-G', globals_dir))
+
+    if no_ozn:
+        args.append('--no-output-ozn')
+
+    if path:
+        if isinstance(path, str):
+            path = [path]
+        elif not isinstance(path, list):
+            raise TypeError('The path provided is not valid.')
+        for p in path:
+            args.append(('-I', p))
 
     dzn_files = list(dzn_files)
 
     data_file = None
-    if data is not None:
+    if data:
         if isinstance(data, dict):
             data = dzn(data)
         elif isinstance(data, str):
@@ -218,10 +232,10 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
         elif not isinstance(data, list):
             raise TypeError('The additional data provided is not valid.')
 
-        if keep_data or sum(map(len, data)) >= config.cmd_arg_limit:
+        if keep_data or sum(map(len, data)) >= config.get('arg_limit', 80):
             mzn_base, __ = os.path.splitext(mzn_file)
             data_file = mzn_base + '_data.dzn'
-            with open(data_file, 'w') as f:
+            with open(data_file, 'w+b') as f:
                 f.write('\n'.join(data))
             dzn_files.append(data_file)
         else:
@@ -230,10 +244,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
 
     args += [mzn_file] + dzn_files
 
-    # log.debug('Calling %s with arguments: %s', config.mzn2fzn_cmd, args)
-
     try:
-        run(cmd(config.mzn2fzn_cmd, args))
+        run(cmd(config.get('mzn2fzn', 'mzn2fzn'), args))
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -244,15 +256,9 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False,
                 os.remove(data_file)
                 log.debug('Deleting file: %s', data_file)
 
-    base = os.path.splitext(mzn_file)[0]
-
-    fzn_file = '.'.join([base, 'fzn'])
-    if not os.path.isfile(fzn_file):
-        fzn_file = None
-
-    ozn_file = '.'.join([base, 'ozn'])
-    if not os.path.isfile(ozn_file):
-        ozn_file = None
+    mzn_base, __ = os.path.splitext(mzn_file)
+    fzn_file = '.'.join([mzn_base, 'fzn']) if os.path.isfile(fzn_file) else None
+    ozn_file = '.'.join([mzn_base, 'ozn']) if os.path.isfile(ozn_file) else None
 
     log.debug('Generated files: {}, {}'.format(fzn_file, ozn_file))
 
@@ -276,7 +282,7 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
              parse_dzn function.
     :rtype: list of str
     """
-    log = logging.getLogger(__name__)
+    log = get_logger(__name__)
 
     soln_sep = '----------'
     search_complete_msg = '=========='
@@ -285,10 +291,10 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
     unbnd_msg = '=====UNBOUNDED====='
 
     args = [ozn_file]
-    # log.debug('Calling %s with arguments: %s', config.solns2out_cmd, args)
 
     try:
-        out = run(cmd(config.solns2out_cmd, args), stdin=solns_input)
+        out = run(cmd(config.get('solns2out', 'solns2out'), args),
+                  stdin=solns_input)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -296,10 +302,10 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
     # To reach full stream-ability I need to pipe together the fzn with the
     # solns2out, not so trivial at this point, so I go back to return a list
     # of solutions for now, maybe in the future I will add this feature
-    search_is_complete = False
     lines = out.split('\n')
     solns = []
     curr_out = []
+    complete = False
     for line in lines:
         line = line.strip()
         if line == soln_sep:
@@ -308,7 +314,7 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
             solns.append(soln)
             curr_out = []
         elif line == search_complete_msg:
-            search_is_complete = True
+            complete = True
             break
         elif line == unkn_msg:
             raise MiniZincUnknownError()
@@ -319,12 +325,25 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
         else:
             curr_out.append(line)
 
-    if monitor_completion:
-        solns = solns, search_is_complete
-    return solns
+    return complete, solns
 
 
-class MiniZincUnsatisfiableError(RuntimeError):
+class MiniZincError(RuntimeError):
+
+    def __init__(self, msg=None):
+        super().__init__(msg)
+        self._mzn_file = None
+
+    @property
+    def mzn_file(self):
+        return self._mzn_file
+
+    @mzn_file.setter
+    def mzn_file(self, _mzn_file):
+        self._mzn_file = _mzn_file
+
+
+class MiniZincUnsatisfiableError(MiniZincError):
     """
     Error raised when a minizinc problem is found to be unsatisfiable.
     """
@@ -333,7 +352,7 @@ class MiniZincUnsatisfiableError(RuntimeError):
         super().__init__('The problem is unsatisfiable.')
 
 
-class MiniZincUnknownError(RuntimeError):
+class MiniZincUnknownError(MiniZincError):
     """
     Error raised when minizinc returns no solution (unknown).
     """
@@ -342,10 +361,11 @@ class MiniZincUnknownError(RuntimeError):
         super().__init__('The solution of the problem is unknown.')
 
 
-class MiniZincUnboundedError(RuntimeError):
+class MiniZincUnboundedError(MiniZincError):
     """
     Error raised when a minizinc problem is found to be unbounded.
     """
 
     def __init__(self):
         super().__init__('The problem is unbounded.')
+
