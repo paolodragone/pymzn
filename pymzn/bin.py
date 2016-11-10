@@ -26,6 +26,10 @@ import collections.abc
 from ._utils import get_logger
 
 
+def run_cmd(path, args, stdin=None, timeout=None):
+    return run(cmd(path, args), stdin=stdin, timeout=timeout)
+
+
 def cmd(path, args):
     """
     Returns the command string from the path to the binary with the provided
