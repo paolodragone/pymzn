@@ -19,10 +19,11 @@ which will become:
 import os
 import time
 import signal
-import logging
 import numbers
 import subprocess
 import collections.abc
+
+from ._utils import get_logger
 
 
 def cmd(path, args):
@@ -67,7 +68,7 @@ def run(arg, stdin=None, timeout=None):
     :return: A string containing the output stream of the command
     :rtype: str
     """
-    log = logging.getLogger(__name__)
+    log = get_logger(__name__)
 
     if isinstance(arg, list):
         arg = cmd(arg[0], arg[1:])
@@ -75,11 +76,11 @@ def run(arg, stdin=None, timeout=None):
     log.debug('Executing command: %s', arg, extra={'stdin': stdin})
     start = time.time()
     proc = subprocess.Popen(arg, shell=True, bufsize=1,
-                          universal_newlines=True,
-                          stdin=subprocess.PIPE,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE,
-                          preexec_fn=os.setsid)
+                            universal_newlines=True,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            preexec_fn=os.setsid)
     try:
         out, err = proc.communicate(stdin, timeout=timeout)
         ret = proc.wait()
@@ -106,7 +107,7 @@ def stream(arg, stdin=None):
              of the command
     :rtype: generator of str
     """
-    log = logging.getLogger(__name__)
+    log = get_logger(__name__)
     log.debug('Executing streaming command: %s', arg, extra={'stdin': stdin})
     proc = subprocess.Popen(arg, shell=True, bufsize=1,
                             universal_newlines=True,
