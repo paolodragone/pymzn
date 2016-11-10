@@ -1,7 +1,7 @@
 
 """ Logging utilities """
 
-class LazyMessage(object):
+class Message(object):
     def __init__(self, fmt, args):
         self.fmt = fmt
         self.args = args
