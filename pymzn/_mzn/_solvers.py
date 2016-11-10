@@ -61,7 +61,8 @@ class Gecode(Solver):
         self.cmd = path or 'gecode'
 
     def solve(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
-            restart_base=None, restart_scale=None, suppress_segfault=False):
+              restart_base=None, restart_scale=None, suppress_segfault=False,
+              **kwargs):
         """
         Solves a constrained optimization problem using the Gecode solver.
 
