@@ -34,7 +34,6 @@ Then you can run the ``minizinc`` function like this:
 
 """
 from subprocess import CalledProcessError
-from collections import namedtuple
 
 from pymzn.bin import run
 import pymzn.config as config
@@ -47,7 +46,7 @@ class Solver(object):
         self.support_ozn = support_ozn
         self.globals_dir = globals_dir
 
-    def solve(self, fzn_file, *args, **kwargs):
+    def solve(self, fzn_file, *args, check_complete=False, **kwargs):
         raise NotImplementedError()
 
 
@@ -60,9 +59,9 @@ class Gecode(Solver):
 
         self.cmd = path or 'gecode'
 
-    def solve(fzn_file, *, timeout=0, parallel=1, n_solns=-1, seed=0,
-              restart=None, restart_base=None, restart_scale=None,
-              suppress_segfault=False, **kwargs):
+    def solve(fzn_file, *, check_complete=False, timeout=0, parallel=1,
+              n_solns=-1, seed=0, restart=None, restart_base=None,
+              restart_scale=None, suppress_segfault=False, **kwargs):
         """
         Solves a constrained optimization problem using the Gecode solver.
 
@@ -119,7 +118,6 @@ class Gecode(Solver):
             args.append(restart_scale)
         args.append(fzn_file)
 
-        GecodeOutput = namedtuple('GecodeOutput', ['out', 'complete'])
         try:
             process = run(args)
             if process.time >= timeout:
@@ -135,8 +133,10 @@ class Gecode(Solver):
                 complete = False
             else:
                 log.exception(err.stderr)
-                raise err
-        return GecodeOutput(out, complete)
+                raise RuntimeError(err.stderr) from err
+        if check_complete:
+            return out, complete
+        return out
 
 
 def optimathsat(fzn_file):

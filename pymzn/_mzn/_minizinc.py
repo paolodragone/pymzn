@@ -29,14 +29,14 @@ import pymzn.config as config
 
 from pymzn._utils import get_logger
 from pymzn.bin import run_cmd
-from pymzn import parse_dzn, dzn
-from ._solvers import Gecode
+from pymzn import parse_dzn, dzn, gecode
 from ._model import MiniZincModel
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
-             globals_dir=None, stdlib_dir=None, parse_output=True,
-             path=None, output_vars=None, solver=Gecode, **solver_args):
+             globals_dir=None, stdlib_dir=None, parse_output=True, path=None,
+             output_vars=None, solver=gecode, check_complete=False,
+             **solver_args):
     """
     Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -149,17 +149,24 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                                  globals_dir=_globals_dir,
                                  stdlib_dir=stdlib_dir)
 
-    solns = solver.solve(fzn_file, **solver_args)
+    if not solver.support_ozn and check_complete:
+        out, complete = solver.solve(fzn_file, check_complete=True,
+                                     **solver_args)
+    else:
+        out = solver.solve(fzn_file, **solver_args)
 
     if solver.support_ozn:
         try:
-            complete, out = solns2out(solns, ozn_file)
+            if check_complete:
+                solns, complete = solns2out(out, ozn_file, check_complete=True)
+            else:
+                solns = solns2out(out, ozn_file)
         except (MiniZincUnsatisfiableError, MiniZincUnknownError,
                 MiniZincUnboundedError) as err:
             err.mzn_file = mzn_file
             raise err
     else:
-        complete, out = solns
+        solns = out
 
     if parse_output:
         out = list(map(parse_dzn, out))
@@ -176,7 +183,9 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                 os.remove(ozn_file)
                 log.debug('Deleting file: %s', ozn_file)
 
-    return complete, out
+    if check_complete:
+        return solns, complete
+    return solns
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -258,7 +267,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def solns2out(solns_input, ozn_file, monitor_completion=False):
+def solns2out(solver_output, ozn_file, check_complete=False):
     """
     Wraps the solns2out utility, executes it on the input solution stream,
     and then returns the output.
@@ -283,18 +292,15 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
     unkn_msg = '=====UNKNOWN====='
     unbnd_msg = '=====UNBOUNDED====='
 
-    args = [ozn_file]
+    args = [config.get('solns2out', 'solns2out'), ozn_file]
 
     try:
-        cmd = config.get('solns2out', 'solns2out')
-        out = run_cmd(cmd, args, stdin=solns_input)
+        process = run(args, stdin=solver_output)
+        out = process.stdout
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
 
-    # To reach full stream-ability I need to pipe together the fzn with the
-    # solns2out, not so trivial at this point, so I go back to return a list
-    # of solutions for now, maybe in the future I will add this feature
     lines = out.split('\n')
     solns = []
     curr_out = []
@@ -318,7 +324,9 @@ def solns2out(solns_input, ozn_file, monitor_completion=False):
         else:
             curr_out.append(line)
 
-    return complete, solns
+    if check_complete:
+        return solns, complete
+    return solns
 
 
 class MiniZincError(RuntimeError):
