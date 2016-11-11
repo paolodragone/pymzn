@@ -36,7 +36,6 @@ Then you can run the ``minizinc`` function like this:
 from subprocess import CalledProcessError
 
 from pymzn.bin import run
-import pymzn.config as config
 from pymzn._utils import get_logger
 
 
@@ -57,7 +56,7 @@ class Gecode(Solver):
         globals_dir = 'gecode'
         super().__init__(support_ozn, globals_dir)
 
-        self.cmd = path or 'gecode'
+        self.cmd = path or 'fzn-gecode'
 
     def solve(fzn_file, *, check_complete=False, timeout=0, parallel=1,
               n_solns=-1, seed=0, restart=None, restart_base=None,
@@ -139,47 +138,71 @@ class Gecode(Solver):
         return out
 
 
-def optimathsat(fzn_file):
-    """
-    Simple proxy function to the OptiMathSat solver.
+class Optimathsat(Solver):
 
-    This function is a simple interface to OptiMathSat which only specifies the
-    input format as a FlatZinc model, without providing any additional
-    arguments.
+    def __init__(self, path=None):
+        support_ozn = False
+        globals_dir = 'std'
+        super().__init__(support_ozn, globals_dir)
 
-    :param str fzn_file: The path to the fzn file containing the problem to
-                         be solved
-    :return: A string containing the solution output stream of the execution
-             of OptiMathSat on the specified problem
-    :rtype: str
-    """
-    args = ['-input=fzn', fzn_file]
+        self.cmd = path or 'optimathsat'
 
-    log = logging.getLogger(__name__)
-    # log.debug('Calling %s with arguments: %s', config.optimathsat_cmd, args)
+    def run(fzn_file, *, check_complete=False, **kwargs):
+        """Simple proxy function to the OptiMathSat solver.
 
-    try:
-        solns = run_cmd(config.optimathsat_cmd, args)
-    except CalledProcessError as err:
-        log.exception(err.stderr)
-        raise RuntimeError(err.stderr) from err
-    return solns
+        This function is a simple interface to OptiMathSat which only specifies
+        the input format as a FlatZinc model, without providing any additional
+        arguments.
+
+        :param str fzn_file: The path to the fzn file containing the problem to
+                            be solved
+        :return: A string containing the solution output stream of the execution
+                of OptiMathSat on the specified problem
+        :rtype: str
+        """
+        args = [self.cmd, '-input=fzn', fzn_file]
+
+        log = get_logger(__name__)
+        try:
+            process = run(args)
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+
+        if check_complete:
+            return out, True
+        return out
 
 
-def opturion(fzn_file, timeout=None):
-    args = []
+class Opturion(Solver):
 
-    if timeout:
-        args.append('-a')
+    def __init__(self, path=None):
+        support_ozn = True
+        globals_dir = 'opturion-cpx'
+        super().__init__(support_ozn, globals_dir)
 
-    args.append(fzn_file)
+        self.cmd = path or 'fzn-cpx'
 
-    log = logging.getLogger(__name__)
+    def solve(fzn_file, * check_complete=False, timeout=None, **kwargs):
+        args = [self.cmd]
 
-    try:
-        solns = run_cmd(config.opturion_cmd, args, timeout=timeout)
-    except CalledProcessError as err:
-        log.exception(err.stderr)
-        raise RuntimeError(err.stderr) from err
-    return solns
+        if timeout:
+            args.append('-a')
+
+        args.append(fzn_file)
+
+        log = get_logger(__name__)
+
+        try:
+            process = run(args, timeout=timeout)
+            complete = not process.expired
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+
+        if check_complete:
+            return out, complete
+        return out
 
