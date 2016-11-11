@@ -310,7 +310,7 @@ def solns2out(solver_output, ozn_file, check_complete=False):
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
 
-    lines = out.split('\n')
+    lines = out.splitlines()
     solns = []
     curr_out = []
     complete = False
@@ -318,7 +318,6 @@ def solns2out(solver_output, ozn_file, check_complete=False):
         line = line.strip()
         if line == soln_sep:
             soln = '\n'.join(curr_out)
-            log.debug('Solution found: {}'.format(repr(soln)))
             solns.append(soln)
             curr_out = []
         elif line == search_complete_msg:
@@ -332,6 +331,8 @@ def solns2out(solver_output, ozn_file, check_complete=False):
             raise MiniZincUnboundedError()
         else:
             curr_out.append(line)
+
+    log.debug('Solutions found: {}', len(soln))
 
     if check_complete:
         return solns, complete
