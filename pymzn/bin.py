@@ -8,64 +8,51 @@ arguments to pass to the ``pymzn.bin.cmd`` function.
 The ``pymzn.bin.cmd`` can be used in this way:
 ::
 
-    pymzn.bin.cmd('path/to/command', [5, '-f', '--flag2', ('--arg1', 'val1'), ('--arg2', 2)])
+    pymzn.bin.cmd('path/to/command', [5, '-f', '--flag2', ('--args1', 'val1'), ('--args2', 2)])
 
 which will become:
 ::
 
-    'path/to/command 5 -f --flag2 --arg1 val1 --arg2 2'
+    'path/to/command 5 -f --flag2 --args1 val1 --args2 2'
 
 """
 import os
 import time
 import signal
-import numbers
 import subprocess
-import collections.abc
 
 from ._utils import get_logger
 
 
-def run_cmd(path, args, stdin=None, timeout=None):
-    return run(cmd(path, args), stdin=stdin, timeout=timeout)
+class TimedCompletedProcess(subprocess.CompletedProcess):
+    def __init__(self, args, returncode, time, timeout=None, stdout=None,
+                 stderr=None):
+        super().__init__(args, returncode, stdout=stdout, stderr=stderr)
+        self.time = time
+        self.timeout = timeout
+        self.expired = not timeout or time >= timeout
+
+    def __repr__(self):
+        argss = ['argss={!r}'.format(self.argss),
+                'returncode={!r}'.format(self.returncode),
+                'time={!r}'.format(self.time),
+                'timeout={!r}'.format(self.timeout)]
+        if self.stdout is not None:
+            argss.append('stdout={!r}'.format(self.stdout))
+        if self.stderr is not None:
+            argss.append('stderr={!r}'.format(self.stderr))
+        return "{}({})".format(type(self).__name__, ', '.join(argss))
+
+    def check_returncode(self):
+        if not self.expired:
+            super().check_returncode()
 
 
-def cmd(path, args):
-    """
-    Returns the command string from the path to the binary with the provided
-    arguments.
-
-    :param string path: The path to the binary file to be executed. If the
-                        binary is in the PATH, then only the name is needed
-    :param list args: A list of arguments to pass to the command. Supported
-                      types of arguments are str, int, float and key-value
-                      tuples
-    :return: The string command
-    :rtype: str
-    """
-    _cmd = [path]
-    for arg in args:
-        if isinstance(arg, str):
-            _cmd.append(arg)
-        elif isinstance(arg, numbers.Number):
-            _cmd.append(str(arg))
-        elif isinstance(arg, collections.abc.Iterable) and len(arg) == 2:
-            k, v = arg
-            if isinstance(k, str) and isinstance(v, (str, numbers.Number)):
-                _cmd.append(str(k))
-                _cmd.append(str(v))
-            else:
-                raise ValueError('Invalid argument: {}'.format(arg))
-        else:
-            raise TypeError('Invalid argument: {}'.format(arg))
-    return ' '.join(_cmd)
-
-
-def run(arg, stdin=None, timeout=None):
+def run(args, stdin=None, timeout=None):
     """
     Executes a shell command and waits for the result.
 
-    :param str arg: The command string to be executed, as returned from the
+    :param str args: The command string to be executed, as returned from the
                     cmd function.
     :param str stdin: String containing the input stream to pass to
                       the command
@@ -73,28 +60,27 @@ def run(arg, stdin=None, timeout=None):
     :rtype: str
     """
     log = get_logger(__name__)
-
-    if isinstance(arg, list):
-        arg = cmd(arg[0], arg[1:])
-
-    log.debug('Executing command: %s', arg, extra={'stdin': stdin})
+    log.debug('Executing command with args: {}', args)
     start = time.time()
-    proc = subprocess.Popen(arg, shell=True, bufsize=1,
-                            universal_newlines=True,
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            preexec_fn=os.setsid)
-    try:
-        out, err = proc.communicate(stdin, timeout=timeout)
-        ret = proc.wait()
-        if ret:
-            raise RuntimeError(err)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-        out, err = proc.communicate()
-    end = time.time()
-    log.debug('Done. Running time: {0:.2f} seconds'.format(end - start))
-    return out
+    with subprocess.Popen(args, bufsize=1, universal_newlines=True,
+                          stdin=subprocess.PIPE,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          # preexec_fn not supported on windows, find a better
+                          # solution, maybe this all works even without the
+                          # line below
+                          preexec_fn=os.setsid) as process:
+        try:
+            out, err = process.communicate(stdin, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            out, err = process.communicate()
+        ret = process.poll()
+        end = time.time()
+    time = end - start
+    log.debug('Done. Running time: {0:.2f} seconds'.format(time))
+    process = TimedCompletedProcess(args, ret, time, timeout, out, err)
+    process.check_returncode()
+    return process
 
