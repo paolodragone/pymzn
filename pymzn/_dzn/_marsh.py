@@ -2,9 +2,20 @@ import pymzn.config as config
 
 from pymzn._utils import get_logger
 
+from textwrap import TextWrapper
 from numbers import Integral, Number
 from collections.abc import Set, Sized, Iterable, Mapping
 
+_wrapper = None
+
+def _get_wrapper():
+    global _wrapper
+    if not _wrapper:
+        width = config.get('width')
+        _wrapper = TextWrapper(width=config.get('width'),
+                               subsequent_indent=' '*4, break_long_words=False,
+                               break_on_hyphens = False)
+    return _wrapper
 
 def _is_int(obj):
     return isinstance(obj, Integral)
@@ -114,7 +125,7 @@ def _dzn_set(s):
     return '{{{}}}'.format(', '.join(map(_dzn_val, s)))
 
 
-def _dzn_array_nd(arr, spaces=0):
+def _dzn_array_nd(arr):
     idx_set = _index_set(arr)
     dim = max([len(idx_set), 1])
     if dim > 6:  # max 6-dimensional array in dzn language
@@ -132,21 +143,17 @@ def _dzn_array_nd(arr, spaces=0):
         idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
     else:
         idx_set_str = '{}'
-    spaces += 11 + len(idx_set_str)
     vals = []
     for i, val in enumerate(map(_dzn_val, flat_arr)):
         if i > 0:
             vals.append(', ')
-            if i % config.get('vals_per_row', 4) == 0:
-                vals.append('\n')
-                vals.extend([' ' for _ in range(spaces)])
         vals.append(val)
 
     arr_str = '[{}]'.format(''.join(vals))
     return dzn_arr.format(dim, idx_set_str, arr_str)
 
 
-def dzn_value(val, spaces=0):
+def dzn_value(val, wrap=True):
     """
     Serializes a value (bool, int, float, set, array) into its dzn
     representation.
@@ -154,16 +161,24 @@ def dzn_value(val, spaces=0):
     :param val: The value to serialize
     :return: The serialized dzn representation of the value
     """
+    dzn_val
     if _is_value(val):
-        return _dzn_val(val)
+        dzn_val = _dzn_val(val)
     elif _is_set(val):
-        return _dzn_set(val)
+        dzn_val = _dzn_set(val)
     elif _is_array_type(val):
-        return _dzn_array_nd(val, spaces=spaces)
-    raise TypeError('Unsupported parsing for value: {}'.format(repr(val)), val)
+        dzn_val =_dzn_array_nd(val)
+    else:
+        raise TypeError('Unsupported parsing for value: {}'.format(repr(val)))
+
+    if wrap:
+        wrapper = _get_wrapper()
+        dzn_val = wrapper.fill(dzn_val)
+
+    return dzn_val
 
 
-def dzn(objs, fout=None):
+def dzn(objs, fout=None, wrap=True):
     """
     Serializes the objects in input and produces a list of strings encoding
     them into the dzn format. Optionally, the produced dzn is written in a
@@ -184,14 +199,13 @@ def dzn(objs, fout=None):
 
     vals = []
     for key, val in objs.items():
-        spaces = len(key) + 3
-        vals.append(_dzn_var(key, dzn_value(val, spaces=spaces)))
+        vals.append(_dzn_var(key, dzn_value(val, wrap=wrap)))
 
     if fout:
         log.debug('Writing file: {}'.format(fout))
         with open(fout, 'w') as f:
             for val in vals:
-                f.write('{}\n'.format(val))
+                f.write('{}\n\n'.format(val))
     return vals
 
 
