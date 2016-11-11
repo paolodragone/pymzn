@@ -72,13 +72,6 @@ def set(key, value):
     _modified = True
 
 
-def append(key, value):
-    if key not in _config:
-        _config[key] = []
-    _config[key].append(value)
-    _modified = True
-
-
 def dump()
     if _modified:
         cfg_file = _cfg_file()

@@ -22,8 +22,6 @@ __all__.extend(_mzn.__all__)
 
 # TODO: update python2 branch
 # TODO: config solver function and default arguments to solver
-# TODO: mzn2doc
-# TODO: check the import of other files in minizinc
 # TODO: make it work on windows
 # TODO: check the ctrl+C thing which seems to not work anymore
 
@@ -53,6 +51,13 @@ def main():
 
     def _minizinc(**_args):
         print(minizinc(**_args))
+
+    def _config(key, value=None):
+        if value is None:
+            print(config.get(key))
+        else:
+            config.set(key, value)
+            config.dump()
 
     #TODO: finish description
     desc = dedent('''PyMzn is a wrapper for the MiniZinc tool pipeline.
@@ -100,9 +105,9 @@ def main():
                                          help='config pymzn variables')
     config_parser.add_argument('key',
                                help='the property to get/set')
-    config_parser.add_argument('values', nargs='*',
+    config_parser.add_argument('value', nargs='?',
                                help='the value(s) to set')
-    config_parser.set_defaults(func=confing)
+    config_parser.set_defaults(func=_confing)
 
     args = parser.parse_args()
 
