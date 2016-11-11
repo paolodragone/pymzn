@@ -206,7 +206,7 @@ class MiniZincModel(object):
         out_list = ', '.join(out_list)
         self.output(out_list, comment)
 
-    def compile(self, output_file):
+    def compile(self, output_file=None):
         """
         Compiles the model and writes it to file. The compiled model contains
         the content of the template (if provided) plus the added variables and
@@ -244,8 +244,9 @@ class MiniZincModel(object):
                 lines.append('output [{}];'.format(output_stmt))
             model += '\n'.join(lines)
 
-        log = get_logger(__name__)
-        log.debug('Writing file: {}', output_file)
-        output_file.write(model)
+        if output_file:
+            log = get_logger(__name__)
+            log.debug('Writing file: {}', output_file)
+            output_file.write(model)
 
-        return output_file
+        return model
