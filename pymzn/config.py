@@ -58,6 +58,7 @@ def _cfg_file():
 
 
 def get(key, default=None):
+    global _config
     if _config is None:
         _config = {}
         cfg_file = _cfg_file()
@@ -68,13 +69,18 @@ def get(key, default=None):
 
 
 def set(key, value):
+    global _config
+    global _modified
     _config[key] = value
     _modified = True
 
 
 def dump()
+    global _config
+    global _modified
     if _modified:
         cfg_file = _cfg_file()
         with open(cfg_file, 'w') as f:
             yaml.dump(_config, f)
         _modified = False
+
