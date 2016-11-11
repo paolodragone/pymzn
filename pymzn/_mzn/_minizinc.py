@@ -211,11 +211,13 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     """
     log = get_logger(__name__)
 
-    args = []
+    args = [config.get('mzn2fzn', 'mzn2fzn')]
     if stdlib_dir:
-        args.append(('--stdlib-dir', stdlib_dir))
+        args.append('--stdlib-dir')
+        args.append(stdlib_dir)
     if globals_dir:
-        args.append(('-G', globals_dir))
+        args.append('-G')
+        args.append(globals_dir)
     if no_ozn:
         args.append('--no-output-ozn')
     if path:
@@ -224,7 +226,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         elif not isinstance(path, list):
             raise TypeError('The path provided is not valid.')
         for p in path:
-            args.append(('-I', p))
+            args.append('-I')
+            args.append(p)
 
     dzn_files = list(dzn_files)
     data_file = None
@@ -242,14 +245,16 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
             with open(data_file, 'w+b') as f:
                 f.write('\n'.join(data))
             dzn_files.append(data_file)
+            log.debug('Generated file: {}', data_file)
         else:
             data = '"{}"'.format(' '.join(data))
-            args.append(('-D', data))
+            args.append('-D')
+            args.append(data)
 
     args += [mzn_file] + dzn_files
 
     try:
-        run_cmd(config.get('mzn2fzn', 'mzn2fzn'), args)
+        run(args)
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -260,10 +265,14 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
                 os.remove(data_file)
                 log.debug('Deleting file: %s', data_file)
 
-    mzn_base, __ = os.path.splitext(mzn_file)
+    mzn_base = os.path.splitext(mzn_file)[0]
     fzn_file = '.'.join([mzn_base, 'fzn']) if os.path.isfile(fzn_file) else None
     ozn_file = '.'.join([mzn_base, 'ozn']) if os.path.isfile(ozn_file) else None
-    log.debug('Generated files: {}, {}'.format(fzn_file, ozn_file))
+    if fzn_file:
+        log.debug('Generated file: {}', fzn_file)
+    if ozn_file:
+        log.debug('Generated file: {}', ozn_file)
+
     return fzn_file, ozn_file
 
 
