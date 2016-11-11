@@ -33,12 +33,12 @@ Then you can run the ``minizinc`` function like this:
     pymzn.minizinc('test.mzn', fzn_cmd=fzn_solver, arg1=val1, arg2=val2)
 
 """
-
 from subprocess import CalledProcessError
+from collections import namedtuple
 
-from pymzn._utils import get_logger
+from pymzn.bin import run
 import pymzn.config as config
-from pymzn.bin import run_cmd
+from pymzn._utils import get_logger
 
 
 class Solver(object):
@@ -60,9 +60,9 @@ class Gecode(Solver):
 
         self.cmd = path or 'gecode'
 
-    def solve(fzn_file, *, time=0, parallel=1, n_solns=-1, seed=0, restart=None,
-              restart_base=None, restart_scale=None, suppress_segfault=False,
-              **kwargs):
+    def solve(fzn_file, *, timeout=0, parallel=1, n_solns=-1, seed=0,
+              restart=None, restart_base=None, restart_scale=None,
+              suppress_segfault=False, **kwargs):
         """
         Solves a constrained optimization problem using the Gecode solver.
 
@@ -93,39 +93,50 @@ class Gecode(Solver):
                 then parsed
         :rtype: str
         """
-        args = []
-        if n_solns >= 0:
-            args.append(('-n', n_solns))
-        if parallel != 1:
-            args.append(('-p', parallel))
-        if time > 0:
-            args.append(('-time', time))
-        if seed != 0:
-            args.append(('-r', seed))
-        if restart:
-            args.append(('-restart', restart))
-        if restart_base:
-            args.append(('-restart-base', restart_base))
-        if restart_scale:
-            args.append(('-restart-scale', restart_scale))
-        args.append(fzn_file)
-
         log = get_logger(__name__)
 
+        args = [self.path]
+        if n_solns >= 0:
+            args.append('-n')
+            args.append(n_solns)
+        if parallel != 1:
+            args.append('-p')
+            args.append(parallel)
+        if time > 0:
+            args.append('-time')
+            args.append(timeout)
+        if seed != 0:
+            args.append('-r')
+            args.append(seed)
+        if restart:
+            args.append('-restart')
+            args.append(restart)
+        if restart_base:
+            args.append('-restart-base')
+            args.append(restart_base)
+        if restart_scale:
+            args.append('-restart-scale')
+            args.append(restart_scale)
+        args.append(fzn_file)
+
+        GecodeOutput = namedtuple('GecodeOutput', ['out', 'complete'])
         try:
-            solns = run_cmd(self.path, args)
+            process = run(args)
+            if process.time >= timeout:
+                complete = False
+            out = process.stdout
         except CalledProcessError as err:
-            #TODO: this won't work anymore with the recent change in bin.py
             if (suppress_segfault and len(err.stdout) > 0 and
                     err.stderr.startswith('Segmentation fault')):
                 log.warning('Gecode returned error code {} (segmentation '
                             'fault) but a solution was found and returned '
                             '(suppress_segfault=True).'.format(err.returncode))
-                solns = err.stdout
+                out = err.stdout
+                complete = False
             else:
                 log.exception(err.stderr)
-                raise RuntimeError(err.stderr) from err
-        return solns
+                raise err
+        return GecodeOutput(out, complete)
 
 
 def optimathsat(fzn_file):
@@ -164,7 +175,6 @@ def opturion(fzn_file, timeout=None):
     args.append(fzn_file)
 
     log = logging.getLogger(__name__)
-    # log.debug('Calling %s with arguments: %s', config.opturion_cmd, args)
 
     try:
         solns = run_cmd(config.opturion_cmd, args, timeout=timeout)
