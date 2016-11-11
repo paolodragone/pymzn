@@ -16,7 +16,7 @@ from . import _mzn
 from ._mzn import *
 
 __version__ = '0.10.8'
-__all__ = ['debug', 'config', 'bin', 'gecode']
+__all__ = ['debug', 'config', 'bin']
 __all__.extend(_dzn.__all__)
 __all__.extend(_mzn.__all__)
 
@@ -40,11 +40,6 @@ def debug(dbg=True):
         _debug_handler = None
         _pymzn_logger.setLevel(logging.WARNING)
 
-
-# Solvers
-gecode = Gecode(path=config.get('gecode'))
-opturion = Opturion(path=config.get('opturion'))
-optimathsat = Optimathsat(path=config.get('optimathsat'))
 
 def main():
     import argparse

@@ -22,15 +22,17 @@ FlatZinc one and getting custom output from the solution stream of a solver.
 import os
 import itertools
 import contextlib
+
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
 import pymzn.config as config
 
-from pymzn._utils import get_logger
-from pymzn.bin import run_cmd
-from pymzn import parse_dzn, dzn, gecode
+from pymzn.bin import run
+from ._solvers import gecode
 from ._model import MiniZincModel
+from pymzn._utils import get_logger
+from pymzn._dzn import parse_dzn, dzn
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
@@ -242,12 +244,12 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         if keep_data or sum(map(len, data)) >= config.get('arg_limit', 80):
             mzn_base, __ = os.path.splitext(mzn_file)
             data_file = mzn_base + '_data.dzn'
-            with open(data_file, 'w+b') as f:
+            with open(data_file, 'w') as f:
                 f.write('\n'.join(data))
             dzn_files.append(data_file)
             log.debug('Generated file: {}', data_file)
         else:
-            data = '"{}"'.format(' '.join(data))
+            data = ' '.join(data)
             args.append('-D')
             args.append(data)
 
@@ -266,8 +268,11 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
                 log.debug('Deleting file: %s', data_file)
 
     mzn_base = os.path.splitext(mzn_file)[0]
-    fzn_file = '.'.join([mzn_base, 'fzn']) if os.path.isfile(fzn_file) else None
-    ozn_file = '.'.join([mzn_base, 'ozn']) if os.path.isfile(ozn_file) else None
+    fzn_file = '.'.join([mzn_base, 'fzn'])
+    fzn_file = fzn_file if os.path.isfile(fzn_file) else None
+    ozn_file = '.'.join([mzn_base, 'ozn'])
+    ozn_file = ozn_file if os.path.isfile(ozn_file) else None
+
     if fzn_file:
         log.debug('Generated file: {}', fzn_file)
     if ozn_file:

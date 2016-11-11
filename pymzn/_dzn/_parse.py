@@ -16,7 +16,7 @@ _float_p = re.compile('^[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?$')
 _cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
 
 # integer set pattern
-_int_set_p = re.compile('^(\{(?P<vals>[\d ,+\-]*)\})$')
+_int_set_p = re.compile('^(\{(?P<vals>[\d\s,+\-]*)\})$')
 
 # matches any of the previous
 _val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]+)\}'
@@ -28,7 +28,7 @@ _val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]+)\}'
 _array_p = re.compile('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
                       '(?P<indices>([\d\.+\-]+|\{\})'
                       '(?:\s*,\s*([\d\.+\-]+|\{\}))?)\s*,\s*)?'
-                      '\[(?P<vals>[\w \.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$')
+                      '\[(?P<vals>[\w\s\.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$')
 
 # variable pattern
 _var_p = re.compile('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>.+)$', re.DOTALL)
@@ -130,7 +130,7 @@ def parse_dzn(dzn, *, rebase_arrays=True):
              input file or string
     :rtype: dict
     """
-    __, dzn_ext = os.path.splitext(dzn)
+    dzn_ext = os.path.splitext(dzn)[1]
     if dzn_ext == 'dzn':
         with open(dzn) as f:
             dzn = f.read()
@@ -166,6 +166,6 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                     p_val = _parse_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
                 continue
-        raise ValueError('Unsupported parsing for stmt:\n'
+        raise ValueError('Unsupported parsing for statement:\n'
                          '{}'.format(repr(stmt)))
     return assign

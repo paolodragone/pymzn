@@ -30,18 +30,18 @@ class TimedCompletedProcess(subprocess.CompletedProcess):
         super().__init__(args, returncode, stdout=stdout, stderr=stderr)
         self.time = time
         self.timeout = timeout
-        self.expired = not timeout or time >= timeout
+        self.expired = timeout and time >= timeout
 
     def __repr__(self):
-        argss = ['argss={!r}'.format(self.argss),
+        args = ['args={!r}'.format(self.args),
                 'returncode={!r}'.format(self.returncode),
                 'time={!r}'.format(self.time),
                 'timeout={!r}'.format(self.timeout)]
         if self.stdout is not None:
-            argss.append('stdout={!r}'.format(self.stdout))
+            args.append('stdout={!r}'.format(self.stdout))
         if self.stderr is not None:
-            argss.append('stderr={!r}'.format(self.stderr))
-        return "{}({})".format(type(self).__name__, ', '.join(argss))
+            args.append('stderr={!r}'.format(self.stderr))
+        return "{}({})".format(type(self).__name__, ', '.join(args))
 
     def check_returncode(self):
         if not self.expired:
@@ -78,9 +78,9 @@ def run(args, stdin=None, timeout=None):
             out, err = process.communicate()
         ret = process.poll()
         end = time.time()
-    time = end - start
-    log.debug('Done. Running time: {0:.2f} seconds'.format(time))
-    process = TimedCompletedProcess(args, ret, time, timeout, out, err)
+    elapsed = end - start
+    log.debug('Done. Running time: {0:.2f} seconds'.format(elapsed))
+    process = TimedCompletedProcess(args, ret, elapsed, timeout, out, err)
     process.check_returncode()
     return process
 

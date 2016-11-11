@@ -33,10 +33,12 @@ Then you can run the ``minizinc`` function like this:
     pymzn.minizinc('test.mzn', fzn_cmd=fzn_solver, arg1=val1, arg2=val2)
 
 """
-from subprocess import CalledProcessError
+import pymzn.config as config
 
 from pymzn.bin import run
 from pymzn._utils import get_logger
+
+from subprocess import CalledProcessError
 
 
 class Solver(object):
@@ -184,7 +186,7 @@ class Opturion(Solver):
 
         self.cmd = path or 'fzn-cpx'
 
-    def solve(fzn_file, * check_complete=False, timeout=None, **kwargs):
+    def solve(fzn_file, *, check_complete=False, timeout=None, **kwargs):
         args = [self.cmd]
 
         if timeout:
@@ -205,4 +207,9 @@ class Opturion(Solver):
         if check_complete:
             return out, complete
         return out
+
+# Default solvers
+gecode = Gecode(path=config.get('gecode'))
+opturion = Opturion(path=config.get('opturion'))
+optimathsat = Optimathsat(path=config.get('optimathsat'))
 

@@ -1,4 +1,7 @@
 
+import logging
+
+
 """ Logging utilities """
 
 class Message(object):

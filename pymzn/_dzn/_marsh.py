@@ -11,8 +11,7 @@ _wrapper = None
 def _get_wrapper():
     global _wrapper
     if not _wrapper:
-        width = config.get('width')
-        _wrapper = TextWrapper(width=config.get('width'),
+        _wrapper = TextWrapper(width=config.get('width', 70),
                                subsequent_indent=' '*4, break_long_words=False,
                                break_on_hyphens = False)
     return _wrapper
@@ -161,7 +160,6 @@ def dzn_value(val, wrap=True):
     :param val: The value to serialize
     :return: The serialized dzn representation of the value
     """
-    dzn_val
     if _is_value(val):
         dzn_val = _dzn_val(val)
     elif _is_set(val):
