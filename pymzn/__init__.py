@@ -43,7 +43,8 @@ def debug(dbg=True):
 
 # Solvers
 gecode = Gecode(path=config.get('gecode'))
-
+opturion = Opturion(path=config.get('opturion'))
+optimathsat = Optimathsat(path=config.get('optimathsat'))
 
 def main():
     import argparse
