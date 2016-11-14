@@ -142,7 +142,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
             output_prefix, mzn_ext = os.path.split(mzn_name)
     output_prefix += '_'
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
-                                     delete=False)
+                                     suffix='.mzn', delete=False, mode='w+',
+                                     buffering=1)
     mzn_model.compile(output_file)
     mzn_file = output_file.name
 
@@ -171,19 +172,19 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
         solns = out
 
     if parse_output:
-        out = list(map(parse_dzn, out))
+        solns = list(map(parse_dzn, solns))
 
     if not keep:
         with contextlib.suppress(FileNotFoundError):
             if mzn_file:
                 os.remove(mzn_file)
-                log.debug('Deleting file: %s', mzn_file)
+                log.debug('Deleting file: {}', mzn_file)
             if fzn_file:
                 os.remove(fzn_file)
-                log.debug('Deleting file: %s', fzn_file)
+                log.debug('Deleting file: {}', fzn_file)
             if ozn_file:
                 os.remove(ozn_file)
-                log.debug('Deleting file: %s', ozn_file)
+                log.debug('Deleting file: {}', ozn_file)
 
     if check_complete:
         return solns, complete
@@ -265,7 +266,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         with contextlib.suppress(FileNotFoundError):
             if data_file:
                 os.remove(data_file)
-                log.debug('Deleting file: %s', data_file)
+                log.debug('Deleting file: {}', data_file)
 
     mzn_base = os.path.splitext(mzn_file)[0]
     fzn_file = '.'.join([mzn_base, 'fzn'])

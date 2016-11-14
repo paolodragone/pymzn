@@ -10,7 +10,7 @@ class Message(object):
         self.args = args
 
     def __str__(self):
-        return self.fmt.format(self.args)
+        return self.fmt.format(*self.args)
 
 
 class BracesAdapter(logging.LoggerAdapter):

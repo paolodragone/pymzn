@@ -60,7 +60,7 @@ class Gecode(Solver):
 
         self.cmd = path or 'fzn-gecode'
 
-    def solve(fzn_file, *, check_complete=False, timeout=0, parallel=1,
+    def solve(self, fzn_file, *, check_complete=False, timeout=0, parallel=1,
               n_solns=-1, seed=0, restart=None, restart_base=None,
               restart_scale=None, suppress_segfault=False, **kwargs):
         """
@@ -95,14 +95,14 @@ class Gecode(Solver):
         """
         log = get_logger(__name__)
 
-        args = [self.path]
+        args = [self.cmd]
         if n_solns >= 0:
             args.append('-n')
             args.append(n_solns)
         if parallel != 1:
             args.append('-p')
             args.append(parallel)
-        if time > 0:
+        if timeout > 0:
             args.append('-time')
             args.append(timeout)
         if seed != 0:
@@ -149,7 +149,7 @@ class Optimathsat(Solver):
 
         self.cmd = path or 'optimathsat'
 
-    def run(fzn_file, *, check_complete=False, **kwargs):
+    def solve(self, fzn_file, *, check_complete=False, **kwargs):
         """Simple proxy function to the OptiMathSat solver.
 
         This function is a simple interface to OptiMathSat which only specifies
@@ -186,7 +186,7 @@ class Opturion(Solver):
 
         self.cmd = path or 'fzn-cpx'
 
-    def solve(fzn_file, *, check_complete=False, timeout=None, **kwargs):
+    def solve(self, fzn_file, *, check_complete=False, timeout=None, **kwargs):
         args = [self.cmd]
 
         if timeout:
