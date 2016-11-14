@@ -31,9 +31,6 @@ class MinizincTest(unittest.TestCase):
     data2 = 'capacity = 20;'
     data3 = '\n'.join([data1, data2])
 
-    def test_model(self):
-        pass
-
     def test_mzn2fzn(self):
 
         self.assertRaises(TypeError, pymzn.mzn2fzn, 0)
@@ -115,4 +112,12 @@ class MinizincTest(unittest.TestCase):
         os.remove(dzn)
 
         os.remove(mzn)
+
+
+    def test_minizinc(self):
+        out = pymzn.minizinc(self.model,
+                             data={'N': 5, 'profit': [10, 3, 9, 4, 8],
+                                   'size': [14, 4, 10, 6, 9],
+                                   'capacity': 20})
+        self.assertEqual(out, [{'x': {3, 5}}])
 
