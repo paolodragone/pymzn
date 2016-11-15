@@ -4,5 +4,6 @@ from ._minizinc import *
 
 __all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincUnsatisfiableError',
            'MiniZincUnknownError', 'MiniZincUnboundedError', 'MiniZincModel',
-           'Gecode', 'Optimathsat', 'Opturion', 'gecode', 'optimathsat',
-           'opturion']
+           'Statement', 'Constraint', 'Variable', 'ArrayVariable',
+           'OutputStatement', 'SolveStatement', 'Gecode', 'Optimathsat',
+           'Opturion', 'gecode', 'optimathsat', 'opturion']

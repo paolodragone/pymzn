@@ -1,23 +1,18 @@
-"""
-PyMzn can also be used to dynamically change a model during runtime. For
-example, it can be useful to add constraints incrementally or change the
-solving statement dynamically. To modify dynamically a model, you can
-use the class ``Model``, which can take an optional model file
-as input and then can be modified by adding variables and constraints,
-and by modifying the solve or output statements. An instance of
-``Model`` can then be passed directly to the ``minizinc``
-function to be solved.
+"""PyMzn can also be used to dynamically change a model during runtime. For
+example, it can be useful to add constraints incrementally or change the solving
+statement dynamically. To dynamically modify a model, you can use the class
+``MiniZincModel``, which can take an optional model file as input which can then
+be modified by adding variables and constraints, and by modifying the solve or
+output statements. An instance of ``MiniZincModel`` can then be passed directly
+to the ``minizinc`` function to be solved.
 
 ::
 
-    model = pymzn.Model('test.mzn')
+    model = pymzn.MiniZinModel('test.mzn')
 
     for i in range(10):
         model.add_constraint('arr_1[i] < arr_2[i]')
         pymzn.minizinc(model)
-
-As you can see ``Model`` is a mutable class which saves the
-internal states and can be modified after every solving.
 """
 
 import re
@@ -38,88 +33,150 @@ _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
 
 
 class Statement(object):
+    """A statement of a MiniZincModel.
 
-    def compile(self):
-        raise NotImplementedError()
-
-
-class Constraint(Statement):
-
-    def __init__(self, const, comment=None):
-        self.const = const
+    Attributes
+    ----------
+    stmt : str
+        The statement string.
+    comment : str
+        An optional comment to attach to the statement.
+    """
+    def __init__(self, stmt, comment=None):
+        self.stmt = stmt
         self.comment = comment
 
     def compile(self):
+        """Compiles the statement.
+
+        Returns
+        -------
+        str
+            The statement string plus an optional comment attached.
+        """
         s = ''
         if self.comment:
-            s += '% {}'.format(self.comment)
-        s += 'constraint {};'.format(self.const)
+            s += '% {}\n'.format(self.comment)
+        s += self.stmt
         return s
 
-class Variable(Statement):
 
+class Constraint(Statement):
+    """A constraint statement.
+
+    Attributes
+    ----------
+    const : str
+        The content of the constraint, i.e. only the actual constraint without
+        the starting 'constraint' and the ending semicolon.
+    comment : str
+        A comment to attach to the constraint.
+    """
+    def __init__(self, const, comment=None):
+        self.const = const
+        stmt = 'constraint {};'.format(self.const)
+        super().__init__(stmt, comment)
+
+
+class Variable(Statement):
+    """A variable statement.
+
+    Attributes
+    ----------
+    vartype : str
+        The type of the variable.
+    var : str
+        The name of the variable.
+    val : str
+        The optional value of the variable statement.
+    comment : str
+        A comment to attach to the variable statement.
+    """
     def __init__(self, vartype, var, val=None, comment=None):
         self.vartype = vartype
         self.var = var
         self.val = val
-        self.comment = comment
 
-    def compile(self):
-        s = ''
-        if self.comment:
-            s += '% {}\n'.format(self.comment)
         if self.val:
-            s += '{}: {} = {};'.format(self.vartype, self.var, self.val)
+            stmt = '{}: {} = {};'.format(self.vartype, self.var, self.val)
         else:
-            s += '{}: {};'.format(self.vartype, self.var)
-        return s
+            stmt = '{}: {};'.format(self.vartype, self.var)
+
+        super().__init__(stmt, comment)
 
 
 class ArrayVariable(Variable):
+    """An array variable statement.
 
+    Attributes
+    ----------
+    indexset : str
+        The indexset of the array.
+    domain : str
+        The domain of the array.
+    var : str
+        The name of the variable.
+    val : str
+        The optional value of the variable statement.
+    comment : str
+        A comment to attach to the variable statement.
+    """
     def __init__(self, indexset, domain, var, val=None, comment=None):
-        super().__init__('array[{}] of {}'.format(indexset, domain), var, val,
-                         comment)
+        self.indexset = indexset
+        self.domain = domain
+        vartype = 'array[{}] of {}'.format(self.indexset, self.domain)
+        super().__init__(vartype, var, val, comment)
 
 
 class OutputStatement(Statement):
+    """An output statement.
 
+    Attributes
+    ----------
+    output : str
+        The content of the output statement, i.e. only the actual output without
+        the starting 'output', the square brackets and the ending semicolon.
+    comment : str
+        A comment to attach to the output statement.
+    """
     def __init__(self, output, comment=None):
         self.output = output
-        self.comment = comment
+        stmt = 'output [{}];'.format(self.output)
+        super().__init__(stmt, comment)
 
-    def compile(self):
-        s = ''
-        if self.comment:
-            s += '% {}\n'.format(self.comment)
-        s += 'output [{}];'.format(self.output)
-        return s
 
 class SolveStatement(Statement):
+    """A solve statement.
+
+    Attributes
+    ----------
+    solve : str
+        The content of the solve statement, i.e. only the actual solve without
+        the starting 'solve' and the ending semicolon.
+    comment : str
+        A comment to attach to the solve statement.
+    """
 
     def __init__(self, solve, comment=None):
         self.solve = solve
-        self.comment = comment
-
-    def compile(self):
-        s = ''
-        if self.comment:
-            s += '% {}\n'.format(self.comment)
-        s += 'solve {};'.format(self.output)
-        return s
+        stmt = 'solve {};'.format(self.output)
+        super().__init__(stmt, comment)
 
 
 class MiniZincModel(object):
-    """
-    Mutable class representing a MiniZinc model.
+    """Mutable class representing a MiniZinc model.
 
     It can use a mzn file as template, add variables and constraints,
     modify the solve and output statements. The output statement can also be
     replaced by a dzn representation of a list of output variables.
     The final model is a string combining the existing model (if provided)
-    and the updates performed on the MinizincModel instance.
-    """
+    and the updates performed on the MiniZincModel instance.
 
+    Parameters
+    ----------
+    mzn : str
+        The content or the path to the template mzn file.
+    """
     def __init__(self, mzn=None):
         """
         Creates a new Model starting from the input mzn template
@@ -129,8 +186,8 @@ class MiniZincModel(object):
                         path to a mzn file or the content of a model.
         """
         self._statements = []
-        self.solve_stmt = None
-        self.output_stmt = None
+        self._solve_stmt = None
+        self._output_stmt = None
         self._free_vars = set()
         self._array_dims = {}
         self._modified = False
@@ -139,60 +196,74 @@ class MiniZincModel(object):
         if mzn and isinstance(mzn, str):
             if os.path.isfile(mzn):
                 self.mzn_file = mzn
-                self._model = None
+                self.model = None
             else:
                 self.mzn_file = None
-                self._model = mzn
+                self.model = mzn
 
-    def constraint(self, constr, comment=None):
-        """
-        Adds a constraint to the current model.
+    def constraint(self, const, comment=None):
+        """Adds a constraint to the current model.
 
-        :param str constr: The content of the constraint, i.e. only the actual
-                           constraint without the starting 'constraint' and
-                           the ending semicolon
-        :param str comment: A comment to attach to the constraint
+        Parameters
+        ----------
+        const : str or Constraint
+            As a string, the content of the constraint, i.e. only the actual
+            constraint without the starting 'constraint' and the ending
+            semicolon.
+        comment : str
+            A comment to attach to the constraint.
         """
-        self._statements.append(Constraint(const, comment))
+        if not isinstance(const, Constraint):
+            const = Constraint(const, comment)
+        self._statements.append(const)
         self._modified = True
 
     def solve(self, solve_stmt, comment=None):
-        """
-        Updates the solve statement of the model.
+        """Updates the solve statement of the model.
 
-        :param str solve_stmt: The content of the solve statement, i.e. only
-                               the solving expression (and possible
-                               annotations) without the starting 'solve' and
-                               the ending semicolon
-        :param str comment: A comment to attach to the statement
+        Parameters
+        ----------
+        solve_stmt : str
+            The content of the solve statement, i.e. only the actual solve
+            without the starting 'solve' and the ending semicolon.
+        comment : str
+            A comment to attach to the solve statement.
         """
-        self.solve_stmt = SolveStatement(solve_stmt, comment)
+        if not isinstance(solve_stmt, SolveStatement):
+            solve_stmt = SolveStatement(solve_stmt, comment)
+        self._solve_stmt = solve_stmt
         self._modified = True
 
     def output(self, output_stmt, comment=None):
-        """
-        Updates the output statement of the model.
+        """Updates the output statement of the model.
 
-        :param str output_stmt: The content of the output statement, i.e.
-                                only the output list (excluding the square
-                                brackets) without the starting 'output'
-                                and the ending semicolon
-        :param str comment: A comment to attach to the statement
+        Parameters
+        ----------
+        solve_stmt : str
+            The content of the output statement, i.e. only the actual output
+            without the starting 'output', the square brackets and the ending
+            semicolon.
+        comment : str
+            A comment to attach to the output statement.
         """
-        self.output_stmt = OutputStatement(output_stmt, comment)
+        if not isinstance(output_stmt, OutputStatement):
+            output_stmt = OutputStatement(output_stmt, comment)
+        self._output_stmt = output_stmt
         self._modified = True
 
     def var(self, vartype, var, val=None, comment=None):
-        """
-        Adds a variable (or parameter) to the model.
+        """Adds a variable (or parameter) to the model.
 
-        :param str vartype: The type of the variable (in the minizinc
-                            language), including 'var' if a variable.
-        :param str var: The name of the variable
-        :param any val: The value of the variable if any. It can be any value
-                        convertible to dzn through the dzn_value function
-        :param str comment: A comment to attach to the variable declaration
-                            statement
+        Parameters
+        ----------
+        vartype : str
+            The type of the variable.
+        var : str
+            The name of the variable.
+        val : str
+            The optional value of the variable statement.
+        comment : str
+            A comment to attach to the variable statement.
         """
         val = dzn_value(val) if val else None
         self._statements.append(Variable(vartype, var, val, comment))
@@ -205,13 +276,13 @@ class MiniZincModel(object):
         self._modified = True
 
     def _load_model(self):
-        if not self._model:
+        if not self.model:
             if self.mzn_file:
                 with open(self.mzn_file) as f:
-                    self._model = f.read()
+                    self.model = f.read()
             else:
-                self._model = ''
-        return self._model
+                self.model = ''
+        return self.model
 
     def _parse_model_stmts(self):
         if self._parsed:
@@ -234,14 +305,18 @@ class MiniZincModel(object):
         self._parsed = True
 
     def dzn_output_stmt(self, output_vars=None, comment=None):
-        """
-        Sets the output statement to be a dzn representation of output_vars.
-        If output_var is not provided (= None) then the free variables of
-        the model are used i.e. those variables that are declared but not
-        defined in the model (not depending on other variables).
+        """Sets the output statement to be a dzn representation of output_vars.
 
-        :param [str] output_vars: The list of output variables.
-        :param str comment: A comment to attach to the statement
+        If output_var is not provided (= None) then the free variables of the
+        model are used i.e. those variables that are declared but not defined in
+        the model (not depending on other variables).
+
+        Parameters
+        ----------
+        output_vars : list of str
+            The list of output variables.
+        comment : str
+            A comment to attach to the output statement.
         """
 
         # Look for free variables and array dimensions in the model statements
@@ -276,13 +351,21 @@ class MiniZincModel(object):
         self.output(out_list, comment)
 
     def compile(self, output_file=None):
-        """
-        Compiles the model and writes it to file. The compiled model contains
-        the content of the template (if provided) plus the added variables and
-        constraints. The solve and output statements will be replaced if
-        new ones are provided.
+        """Compiles the model and writes it to file.
 
-        :return: A string containing the generated file path.
+        The compiled model contains the content of the template (if provided)
+        plus the added variables and constraints. The solve and output
+        statements will be replaced if new ones are provided.
+
+        Parameters
+        ----------
+        output_file : file-like
+            The file where to write the compiled model.
+
+        Returns
+        -------
+        str
+            A string containing the generated model.
         """
         model = self._load_model()
 
@@ -292,19 +375,18 @@ class MiniZincModel(object):
             for stmt in self._statements:
                 lines.append(stmt.compile() + '\n')
 
-            if self.solve_stmt:
+            if self._solve_stmt:
                 model = _solve_stmt_p.sub('', model)
-                lines.append(self.solve_stmt.compile() + '\n')
+                lines.append(self._solve_stmt.compile() + '\n')
 
-            if self.output_stmt:
+            if self._output_stmt:
                 model = _output_stmt_p.sub('', model)
-                lines.append(self.output_stmt.compile() + '\n')
+                lines.append(self._output_stmt.compile() + '\n')
 
             model += '\n'.join(lines)
 
         if output_file:
-            log = get_logger(__name__)
-            log.debug('Writing file: {}', output_file)
             output_file.write(model)
 
         return model
+
