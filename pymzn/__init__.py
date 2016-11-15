@@ -58,17 +58,17 @@ def main():
 
     #TODO: finish description
     desc = dedent('''PyMzn is a wrapper for the MiniZinc tool pipeline.
-        With PyMzn you can...
     ''')
 
     fmt = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(description=desc, formatter_class=fmt)
-    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--version', action='version',
+                        version='PyMzn version: {}'.format(__version__))
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='display informative messages on standard output')
 
     subparsers = parser.add_subparsers()
-    mzn_parser = subparser.add_parser('minizinc',
+    mzn_parser = subparsers.add_parser('minizinc',
                                       help='solve a minizinc problem')
     mzn_parser.add_argument('mzn',
                             help='the mzn file to solve')
@@ -98,16 +98,20 @@ def main():
                                   'statement'))
     mzn_parser.set_defaults(func=_minizinc)
 
-    config_parser = subparser.add_parser('config',
+    config_parser = subparsers.add_parser('config',
                                          help='config pymzn variables')
     config_parser.add_argument('key',
                                help='the property to get/set')
     config_parser.add_argument('value', nargs='?',
                                help='the value(s) to set')
-    config_parser.set_defaults(func=_confing)
+    config_parser.set_defaults(func=_config)
 
     args = parser.parse_args()
 
     debug(args.verbose)
     args.func(**vars(args))
+
+
+if __name__ == '__main__':
+    main()
 
