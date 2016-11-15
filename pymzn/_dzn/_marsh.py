@@ -11,7 +11,7 @@ _wrapper = None
 def _get_wrapper():
     global _wrapper
     if not _wrapper:
-        _wrapper = TextWrapper(width=config.get('width', 70),
+        _wrapper = TextWrapper(width=config.get('dzn_width', 70),
                                subsequent_indent=' '*4, break_long_words=False,
                                break_on_hyphens = False)
     return _wrapper

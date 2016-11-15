@@ -247,7 +247,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         elif not isinstance(data, list):
             raise TypeError('The additional data provided is not valid.')
 
-        if keep_data or sum(map(len, data)) >= config.get('arg_limit', 80):
+        if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
             mzn_base, __ = os.path.splitext(mzn_file)
             data_file = mzn_base + '_data.dzn'
             with open(data_file, 'w') as f:

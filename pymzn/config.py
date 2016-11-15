@@ -1,36 +1,67 @@
+# -*- coding: utf-8 -*-
 """
 
+PyMzn can be configured with custom executable paths and other variables.
 
-If you want to specify custom paths to the MiniZinc or Gecode binaries
-you can set their values through the ``pymzn.config`` module.
+To inspect the current value of a variable one can use the PyMzn executable,if
+installed:::
 
-::
+    $ pymzn config mzn2fzn
+
+or equivalently:::
+
+    $ python3.5 -m pymzn config mzn2fzn
+
+Similarly, to configure a variable:::
+
+    $ pymzn config mzn2fzn /path/to/mzn2fzn
+
+or:::
+
+    $ python3.5 -m pymzn config mzn2fzn /path/to/mzn2fzn
+
+The configuration of PyMzn is contained into a configuration file contained in
+the home directory of the current user. The exact path of the configuration file
+is dependent on the operating system:
+
+    * Linux: ~/.local/share/pymzn/config.yml
+    * MacOS: ~/Library/Application Support/pymzn/config.yml
+    * Windows: %APPDATA%\\Local\\pymzn\\config.yml
+
+This is a YAML configuration file, which can be also manually modified.
+
+PyMzn can also be configured programmatically using the module ``pymzn.config``.
+For instance:::
 
     import pymzn.config
 
-    pymzn.config.mzn2fzn_cmd = path/to/mzn2fzn
-    pymzn.config.solns2out_cmd = path/to/solns2out
-    pymzn.config.gecode_cmd = path/to/fzn-gecode
+    # config.set sets the variable only for the current execution
+    pymzn.config.set('mzn2fzn', 'path/to/mzn2fzn')
+    pymzn.config.set('solns2out', 'path/to/solns2out')
+    pymzn.config.set('gecode', 'path/to/fzn-gecode')
 
-These settings persist throughout the execution of your application. The
-``pymzn.config`` module provides access to all the static settings of
-PyMzn.
+    # to make the changes persistent
+    pymzn.dump()
 
-The configuration properties provided by ``pymzn.config`` are:
+The configurable properties used by PyMzn are the following:
 
- * **mzn2fzn_cmd**: Path to the MiniZinc *mzn2fzn* utility command executable;
- * **solns2out_cmd**: Path to the MiniZinc *solns2out* utility command executable;
- * **gecode_cmd**: Path to the Gecode *fzn-gecode* utility command executable;
- * **optimatsat_cmd**: Path to the OptiMatSat *optimatsat* utility command executable;
- * **cmd_arg_limit**: The limit of characters for command line arguments;
-   This property is used to decide whether to provide inline data as a shell
-   argument to mzn2fzn or to write it automatically on a dzn file if the limit
-   is exceeded.
+ * **mzn2fzn**: Path to the *mzn2fzn* executable;
+ * **solns2out**: Path to the *solns2out* executable;
+ * **gecode**: Path to the Gecode *fzn-gecode* executable;
+ * **optimathsat**: Path to the OptiMathSat *optimathsat* executable;
+ * **opturion**: Path to the Opturion *fzn-cpx* executable;
+ * **dzn_width**: The horizontal character limit for dzn files;
+   This property is used to wrap long dzn statements when writing dzn files.
+   This property is also used in the ``pymzn.minizinc`` function as a limit to
+   decide whether to write the inline data into a file.
 
-PyMzn can also be set to print debugging messages on standard output
-via:
+One can also configure custom properties to be used for custom solvers.
 
-::
+
+Debug
+-----
+
+PyMzn can also be set to print debugging messages on standard output via:::
 
     pymzn.debug()
 
@@ -38,26 +69,47 @@ This function is meant to be used in interactive sessions or in
 applications that do not configure the ``logging`` library. If you
 configure the ``logging`` library in your application, then PyMzn will
 be affected as well. The logging level in PyMzn is always ``DEBUG``. To
-disable debugging messages you can then call:
-
-::
+disable debugging messages you can then call:::
 
     pymzn.debug(False)
 
 """
-import os.path
 import yaml
 import appdirs
+import os.path
 
 
-_config = None
 _modified = False
+_config = None
+_defaults = {
+        'mzn2fzn': 'mzn2fzn',
+        'solns2out': 'solns2out',
+        'gecode': 'fzn-gecode',
+        'optimathsat': 'optimathsat',
+        'opturion': 'fzn-cpx',
+        'dzn_width': 70
+    }
+
 
 def _cfg_file():
     return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
 
 
 def get(key, default=None):
+    """Get the value of a configuration variable.
+
+    Parameters
+    ----------
+    key : str
+        The key of the variable to retrieve.
+    default
+        The default value to return if the key does not exist.
+
+    Returns
+    -------
+        The value associated to the key if the key exists, otherwise the default
+        if provided.
+    """
     global _config
     if _config is None:
         _config = {}
@@ -65,10 +117,21 @@ def get(key, default=None):
         if os.path.isfile(cfg_file):
             with open(cfg_file) as f:
                 _config = yaml.load(f)
+    if not default:
+        default = _defaults.get(key)
     return _config.get(key, default)
 
 
 def set(key, value):
+    """Set the value of configuration variable.
+
+    Parameters
+    ----------
+    key : str
+        The key of the variable to set.
+    value
+        The value to assign to the variable.
+    """
     global _config
     global _modified
     _config[key] = value
@@ -76,6 +139,7 @@ def set(key, value):
 
 
 def dump():
+    """Writes the changes to the configuration file."""
     global _config
     global _modified
     if _modified:

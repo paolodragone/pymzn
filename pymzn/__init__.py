@@ -50,7 +50,7 @@ def main():
 
     def _config(key, value=None):
         if value is None:
-            print(config.get(key))
+            print('{} : {}'.format(key, config.get(key)))
         else:
             config.set(key, value)
             config.dump()
