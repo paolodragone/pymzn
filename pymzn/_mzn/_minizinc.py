@@ -38,7 +38,7 @@ from pymzn._dzn import parse_dzn, dzn
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
              globals_dir=None, stdlib_dir=None, parse_output=True, path=None,
              output_vars=None, solver=gecode, check_complete=False,
-             **solver_args):
+             all_solutions=False, **solver_args):
     """
     Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -152,11 +152,16 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
                                  globals_dir=_globals_dir,
                                  stdlib_dir=stdlib_dir)
 
-    if not solver.support_ozn and check_complete:
-        out, complete = solver.solve(fzn_file, check_complete=True,
-                                     **solver_args)
-    else:
-        out = solver.solve(fzn_file, **solver_args)
+    if not solver.support_all and all_solutions:
+        log.warning('Solver does not support returning all solutions.')
+
+    solver_check_complete = not solver.support_ozn and check_complete
+
+    out = solver.solve(fzn_file, check_complete=solver_check_complete,
+                       all_solutions=all_solutions, **solver_args)
+
+    if solver_check_complete:
+        out, complete = out
 
     if solver.support_ozn:
         try:
