@@ -95,6 +95,6 @@ instance:
 
 """
 from ._marsh import *
-from ._parse import *
+from ._eval import *
 
 __all__ = ['dzn', 'dzn_value', 'rebase_array', 'dzn_eval']
