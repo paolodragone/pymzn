@@ -97,4 +97,4 @@ instance:
 from ._marsh import *
 from ._parse import *
 
-__all__ = ['dzn', 'dzn_value', 'rebase_array', 'parse_dzn']
+__all__ = ['dzn', 'dzn_value', 'rebase_array', 'dzn_eval']

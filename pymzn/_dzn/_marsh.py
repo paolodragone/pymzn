@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pymzn.config as config
 
 from pymzn._utils import get_logger
@@ -153,12 +155,20 @@ def _dzn_array_nd(arr):
 
 
 def dzn_value(val, wrap=True):
-    """
-    Serializes a value (bool, int, float, set, array) into its dzn
+    """Serializes a value (bool, int, float, set, array) into its dzn
     representation.
 
-    :param val: The value to serialize
-    :return: The serialized dzn representation of the value
+    Parameters
+    ----------
+    val
+        The value to serialize
+    wrap : bool
+        Whether to wrap the serialized value.
+
+    Returns
+    -------
+    str
+        The serialized dzn representation of the value.
     """
     if _is_value(val):
         dzn_val = _dzn_val(val)
@@ -177,21 +187,28 @@ def dzn_value(val, wrap=True):
 
 
 def dzn(objs, fout=None, wrap=True):
-    """
-    Serializes the objects in input and produces a list of strings encoding
-    them into the dzn format. Optionally, the produced dzn is written in a
-    given file.
+    """Serializes the objects in input and produces a list of strings encoding
+    them into dzn format. Optionally, the produced dzn is written in a file.
 
     Supported types of objects include: str, int, float, set, list or dict.
     List and dict are serialized into dzn (multi-dimensional) arrays. The
     key-set of a dict is used as index-set of dzn arrays. The index-set of a
     list is implicitly set to 1..len(list).
 
-    :param dict objs: A dictionary containing key-value pairs where keys are
-                      the names of the variables
-    :param str fout: Path to the output file, if None no output file is written
-    :return: List of strings containing the dzn encoded objects
-    :rtype: list
+    Parameters
+    ----------
+    objs : dict
+        A dictionary containing the objects to serialize, the keys are the names
+        of the variables.
+    fout : str
+        Path to the output file, if None no output file is written.
+    wrap : bool
+        Whether to wrap the serialized values.
+
+    Returns
+    -------
+    list
+        List of strings containing the dzn-encoded objects.
     """
     log = get_logger(__name__)
 
@@ -200,7 +217,7 @@ def dzn(objs, fout=None, wrap=True):
         vals.append(_dzn_var(key, dzn_value(val, wrap=wrap)))
 
     if fout:
-        log.debug('Writing file: {}'.format(fout))
+        log.debug('Writing file: {}', fout)
         with open(fout, 'w') as f:
             for val in vals:
                 f.write('{}\n\n'.format(val))
@@ -208,14 +225,20 @@ def dzn(objs, fout=None, wrap=True):
 
 
 def rebase_array(d, recursive=False):
-    """
-    Transform an indexed dictionary (such as those returned by the parse_dzn
+    """Transform an indexed dictionary (such as those returned by the parse_dzn
     function when parsing arrays) into an multi-dimensional list.
 
-    :param dict d: The indexed dictionary to convert
-    :param bool recursive: Whether to rebase the array recursively
-    :return: A multi-dimensional list
-    :rtype: list
+    Parameters
+    ----------
+    d : dict
+        The indexed dictionary to convert.
+    bool : recursive
+        Whether to rebase the array recursively.
+
+    Returns
+    -------
+    list
+        A multi-dimensional list.
     """
     arr = []
     min_val, max_val = _extremes(d.keys())
@@ -225,3 +248,4 @@ def rebase_array(d, recursive=False):
             v = rebase_array(v)
         arr.append(v)
     return arr
+

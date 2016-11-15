@@ -1,5 +1,7 @@
-import os.path
+# -*- coding: utf-8 -*-
+
 import re
+import os.path
 
 from ._marsh import rebase_array
 
@@ -40,14 +42,14 @@ _stmt_p = re.compile('\s*([^;]+?);')
 _comm_p = re.compile('%.+?\n')
 
 
-def _parse_array(indices, vals, rebase_arrays=True):
+def _eval_array(indices, vals, rebase_arrays=True):
     # Recursive parsing of multi-dimensional arrays returned by the solns2out
     # utility of the type: array2d(2..4, 1..3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
     idx_set = indices[0]
     if len(indices) == 1:
-        arr = {i: _parse_val(vals.pop(0)) for i in idx_set}
+        arr = {i: _eval_val(vals.pop(0)) for i in idx_set}
     else:
-        arr = {i: _parse_array(indices[1:], vals) for i in idx_set}
+        arr = {i: _eval_array(indices[1:], vals) for i in idx_set}
 
     if rebase_arrays and list(idx_set)[0] == 1:
         arr = rebase_array(arr)
@@ -55,7 +57,7 @@ def _parse_array(indices, vals, rebase_arrays=True):
     return arr
 
 
-def _parse_indices(st):
+def _eval_indices(st):
     # Parse indices of multi-dimensional arrays
     ss = st.strip().split(',')
     indices = []
@@ -73,7 +75,7 @@ def _parse_indices(st):
     return indices
 
 
-def _parse_set(vals):
+def _eval_set(vals):
     # Parse sets of integers of the type: {41, 2, 53, 12, 8}
     p_s = set()
     for val in vals:
@@ -87,7 +89,7 @@ def _parse_set(vals):
     return p_s
 
 
-def _parse_val(val):
+def _eval_val(val):
     # boolean value
     if _bool_p.match(val):
         return {'true': True, 'false': False}[val]
@@ -112,23 +114,28 @@ def _parse_val(val):
     if set_m:
         vals = set_m.group('vals')
         if vals:
-            return _parse_set(vals.split(','))
+            return _eval_set(vals.split(','))
         return set()
     return None
 
 
-# TODO: maybe change to eval_dzn
-def parse_dzn(dzn, *, rebase_arrays=True):
-    """
-    Parse a dzn string or file into a Python dictionary of assignments.
+def dzn_eval(dzn, *, rebase_arrays=True):
+    """Evaluates a dzn string or file into a Python dictionary of variable
+    assignments.
 
-    :param str dzn: A dzn content string or a path to a dzn file
-    :param bool rebase_arrays: Whether to return arrays as zero-based lists
-                               or to return them as dictionaries,
-                               preserving the original index-sets.
-    :return: A dictionary containing the variable assignments parsed from the
-             input file or string
-    :rtype: dict
+    Parameters
+    ----------
+    dzn : str
+        A dzn content string or a path to a dzn file.
+    rebase_arrays : bool
+        Whether to return arrays as zero-based lists or to return them as
+        dictionaries, preserving the original index-sets.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the variable assignments evaluated from the
+        input file or string.
     """
     dzn_ext = os.path.splitext(dzn)[1]
     if dzn_ext == 'dzn':
@@ -143,7 +150,7 @@ def parse_dzn(dzn, *, rebase_arrays=True):
         if var_m:
             var = var_m.group('var')
             val = var_m.group('val')
-            p_val = _parse_val(val)
+            p_val = _eval_val(val)
             if p_val is not None:
                 assign[var] = p_val
                 continue
@@ -156,16 +163,17 @@ def parse_dzn(dzn, *, rebase_arrays=True):
                 if dim:  # explicit dimensions
                     dim = int(dim)
                     indices = array_m.group('indices')
-                    indices = _parse_indices(indices)
+                    indices = _eval_indices(indices)
                     assert len(indices) == dim
                 else:  # assuming 1d array based in 1
                     indices = [range(1, len(vals) + 1)]
                 if len(vals) == 0:
                     p_val = []
                 else:
-                    p_val = _parse_array(indices, vals, rebase_arrays)
+                    p_val = _eval_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
                 continue
         raise ValueError('Unsupported parsing for statement:\n'
                          '{}'.format(repr(stmt)))
     return assign
+

@@ -32,11 +32,11 @@ from pymzn.bin import run
 from ._solvers import gecode
 from ._model import MiniZincModel
 from pymzn._utils import get_logger
-from pymzn._dzn import parse_dzn, dzn
+from pymzn._dzn import dzn_eval, dzn
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
-             globals_dir=None, stdlib_dir=None, parse_output=True, path=None,
+             globals_dir=None, stdlib_dir=None, eval_output=True, path=None,
              output_vars=None, solver=gecode, check_complete=False,
              all_solutions=False, **solver_args):
     """
@@ -127,7 +127,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     else:
         mzn_model = MiniZincModel(mzn)
 
-    if parse_output:
+    if eval_output:
         mzn_model.dzn_output_stmt(output_vars)
 
     _globals_dir = globals_dir or solver.globals_dir
@@ -176,8 +176,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     else:
         solns = out
 
-    if parse_output:
-        solns = list(map(parse_dzn, solns))
+    if eval_output:
+        solns = list(map(dzn_eval, solns))
 
     if not keep:
         with contextlib.suppress(FileNotFoundError):
@@ -301,7 +301,7 @@ def solns2out(solver_output, ozn_file, check_complete=False):
                                     output.
     :return: A list of solutions as strings. The user needs to take care of
              the parsing. If the output is in dzn format one can use the
-             parse_dzn function.
+             eval_dzn function.
     :rtype: list of str
     """
     log = get_logger(__name__)

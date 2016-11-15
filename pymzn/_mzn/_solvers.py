@@ -91,8 +91,8 @@ class Solver(object):
         solutions compliant to the PyMzn solution format. This means that the
         the implementation of this method should parse the output of the solver
         and return the solutions as dictionaries of variable assignments (see
-        the ``parse_dzn`` method). In alternative the solutions should be
-        returned in dzn format, so they can be parsed by the ``parse_dzn``
+        the ``eval_dzn`` method). In alternative the solutions should be
+        returned in dzn format, so they can be evaluated by the ``eval_dzn``
         function.
 
         Parameters
@@ -119,7 +119,7 @@ class Solver(object):
             If the solver does not support the ozn parsing, then it should parse
             the solvers output by itself and thus return a list of solutions in
             PyMzn format (dictionaries of variable assignments, as in
-            ``pymzn.parse_dzn``).
+            ``pymzn.eval_dzn``).
 
             In both cases, if ``check_complete=True`` then the method should
             return a tuple containing the above output and a second boolean
@@ -186,9 +186,9 @@ class Gecode(Solver):
         str or tuple
             A string containing the solution output stream of the execution of
             Gecode on the specified problem; it can be directly be given to the
-            function solns2out to be parsed. If ``check_complete=True`` returns
-            an additional boolean, checking whether the search was completed
-            before the timeout.
+            function solns2out to be evaluated. If ``check_complete=True``
+            returns an additional boolean, checking whether the search was
+            completed before the timeout.
         """
         log = get_logger(__name__)
 
@@ -320,7 +320,7 @@ class Opturion(Solver):
         str or tuple
             A string containing the solution output stream of the execution of
             Opturion on the specified problem; it can be directly be given to
-            the function solns2out to be parsed. If ``check_complete=True``
+            the function solns2out to be evaluated. If ``check_complete=True``
             returns an additional boolean, checking whether the search was
             completed before the timeout.
         """

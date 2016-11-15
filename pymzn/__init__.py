@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
+"""PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
+modelling and solving. It is built on top of the libminizinc library (version
+2.0) and provides a number of off-the-shelf functions to readily solve problems
+encoded in MiniZinc and evaluate the solutions into Python objects.
 """
-PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
-modelling and solving. It is built on top of the libminizinc library
-(version 2.0) and provides a number of off-the-shelf functions to readily
-solve problems encoded in MiniZinc and parse the solutions into Python objects.
-"""
+
 import ast
 import logging
 
@@ -91,7 +92,7 @@ def main():
                             help='directory the standard library')
     mzn_parser.add_argument('--stdlib-dir',
                             help='directory the standard library')
-    mzn_parser.add_argument('--no-parse', dest='parse_output',
+    mzn_parser.add_argument('--no-eval', dest='eval_output',
                             action='store_false',
                             help=('return the content of the original output '
                                   'statement'))
