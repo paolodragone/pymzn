@@ -43,7 +43,7 @@ _comm_p = re.compile('%.+?\n')
 
 
 def _eval_array(indices, vals, rebase_arrays=True):
-    # Recursive parsing of multi-dimensional arrays returned by the solns2out
+    # Recursive evaluation of multi-dimensional arrays returned by the solns2out
     # utility of the type: array2d(2..4, 1..3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
     idx_set = indices[0]
     if len(indices) == 1:
@@ -173,7 +173,7 @@ def dzn_eval(dzn, *, rebase_arrays=True):
                     p_val = _eval_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
                 continue
-        raise ValueError('Unsupported parsing for statement:\n'
+        raise ValueError('Unsupported evaluation for statement:\n'
                          '{}'.format(repr(stmt)))
     return assign
 
