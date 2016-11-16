@@ -35,16 +35,6 @@ For instance:::
 Then one can run the ``minizinc`` function with the custom solver:::
 
     pymzn.minizinc('test.mzn', solver=MySolver(), arg1=val1, arg2=val2)
-
-
-Attributes
-----------
-gecode : Gecode
-    Default instance of Gecode.
-optimathsat : Optimathsat
-    Default instance of Optimathsat.
-opturion : Opturion
-    Default instance of Opturion.
 """
 
 import pymzn.config as config
@@ -346,8 +336,12 @@ class Opturion(Solver):
         return out
 
 
-# Default solvers
+#: Default Gecode instance.
 gecode = Gecode(path=config.get('gecode'))
-opturion = Opturion(path=config.get('opturion'))
+
+#: Default Optimathsat instance.
 optimathsat = Optimathsat(path=config.get('optimathsat'))
+
+#: Default Opturion instance.
+opturion = Opturion(path=config.get('opturion'))
 

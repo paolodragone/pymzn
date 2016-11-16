@@ -72,7 +72,7 @@ def run(args, stdin=None, timeout=None):
     """Executes a command and waits for the result.
 
     Parameters
-    ---------
+    ----------
     args : list
         The list of arguments for the program to execute. Arguments should be
         formatted as for the ``subprocess.Popen`` constructor.

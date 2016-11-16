@@ -178,13 +178,6 @@ class MiniZincModel(object):
         The content or the path to the template mzn file.
     """
     def __init__(self, mzn=None):
-        """
-        Creates a new Model starting from the input mzn template
-        if provided.
-
-        :param str mzn: The minizinc problem template. It can be either the
-                        path to a mzn file or the content of a model.
-        """
         self._statements = []
         self._solve_stmt = None
         self._output_stmt = None

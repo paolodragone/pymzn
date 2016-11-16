@@ -4,11 +4,12 @@ MiniZinc tools
 .. currentmodule:: pymzn
 
 .. autosummary::
-   :toctree:
+   :toctree: generated/
 
    minizinc
    mzn2fzn
    solns2out
+   MiniZincError
    MiniZincUnsatisfiableError
    MiniZincUnknownError
    MiniZincUnboundedError

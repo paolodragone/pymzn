@@ -8,5 +8,5 @@ __all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincError',
            'MiniZincUnsatisfiableError', 'MiniZincUnknownError',
            'MiniZincUnboundedError', 'MiniZincModel', 'Statement', 'Constraint',
            'Variable', 'ArrayVariable', 'OutputStatement', 'SolveStatement',
-           'Gecode', 'Optimathsat', 'Opturion', 'gecode', 'optimathsat',
-           'opturion']
+           'Solver', 'Gecode', 'Optimathsat', 'Opturion', 'gecode',
+           'optimathsat', 'opturion']

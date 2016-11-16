@@ -4,7 +4,7 @@ Modelling
 .. currentmodule:: pymzn
 
 .. autosummary::
-   :toctree:
+   :toctree: generated/
 
    MiniZincModel
 

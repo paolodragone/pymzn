@@ -4,10 +4,14 @@ Solvers
 .. currentmodule:: pymzn
 
 .. autosummary::
-   :toctree:
+   :toctree: generated/
 
+   Solver
+   Gecode
+   Optimathsat
+   Opturion
    gecode
-   optimatsat
-   solve
+   optimathsat
+   opturion
 
 .. automodule:: pymzn._mzn._solvers

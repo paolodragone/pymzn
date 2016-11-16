@@ -1,12 +1,13 @@
 Binary execution
 ================
 
-.. currentmodule:: pymzn
+.. currentmodule:: pymzn.bin
+
 
 .. autosummary::
-   :toctree:
+   :toctree: generated/
 
-   bin.cmd
-   bin.run
+   run
+   TimedCompletedProcess
 
 .. automodule:: pymzn.bin
