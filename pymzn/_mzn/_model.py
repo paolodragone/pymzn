@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """PyMzn can also be used to dynamically change a model during runtime. For
 example, it can be useful to add constraints incrementally or change the solving
 statement dynamically. To dynamically modify a model, you can use the class
@@ -5,7 +6,6 @@ statement dynamically. To dynamically modify a model, you can use the class
 be modified by adding variables and constraints, and by modifying the solve or
 output statements. An instance of ``MiniZincModel`` can then be passed directly
 to the ``minizinc`` function to be solved.
-
 ::
 
     model = pymzn.MiniZinModel('test.mzn')

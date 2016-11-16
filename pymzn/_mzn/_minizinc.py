@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 PyMzn provides functions that mimic and enhance the tools from the libminizinc
 library. With these tools, it is possible to compile a MiniZinc model into
@@ -6,8 +7,7 @@ python code.
 
 The main function that PyMzn provides is the ``minizinc`` function, which
 executes the entire workflow for solving a CSP problem encoded in MiniZinc.
-Solving a MiniZinc problem with PyMzn is as simple as:
-::
+Solving a MiniZinc problem with PyMzn is as simple as:::
 
     import pymzn
     pymzn.minizinc('test.mzn')
@@ -36,89 +36,95 @@ from pymzn._dzn import dzn_eval, dzn
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
-             globals_dir=None, stdlib_dir=None, eval_output=True, path=None,
+             globals_dir=None, stdlib_dir=None, path=None, eval_output=True,
              output_vars=None, solver=gecode, check_complete=False,
              all_solutions=False, **solver_args):
-    """
-    Implements the workflow to solve a CSP problem encoded with MiniZinc.
+    """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     It first calls mzn2fzn to compile the fzn and ozn files, then it calls the
     provided solver and in the end it calls the solns2out utility on the
     output of the solver.
 
-    :param str or MinizincModel mzn: The minizinc problem to be solved.
-                                     It can be either a string or an
-                                     instance of MinizincModel.
-                                     If it is a string, it can be either the
-                                     path to the mzn file or the content of
-                                     the model.
-    :param dzn_files: A list of paths to dzn files to attach to the mzn2fzn
-                      execution, provided as positional arguments; by default
-                      no data file is attached. Data files are meant to be
-                      used when there is data that is static across several
-                      minizinc executions.
-    :param dict data: Additional data as a dictionary of variables assignments
-                      to supply to the mzn2fnz function. The dictionary is
-                      then automatically converted to dzn format by the
-                      pymzn.dzn function. This property is meant to include
-                      data that dynamically changes across several minizinc
-                      executions.
-    :param bool keep: Whether to keep the generated mzn, fzn and
-                      ozn files o not. Notice though that pymzn generated
-                      files are not originally intended to be kept, but this
-                      property can be used for debugging purpose.
-                      Default is False.
-    :param str output_base: The base name (including parent directories if
-                            different from the working one) for the output
-                            mzn, fzn and ozn files (extension are attached
-                            automatically). Parent directories are not
-                            created automatically so they are required to
-                            exist. If None is provided (default) the name of
-                            the input file is used. If the mzn input was a
-                            content string, then the default name 'mznout'
-                            is used.
-    :param bool serialize: Whether to serialize the current workflow or not.
-                           A serialized execution generates a series of mzn
-                           files that do not interfere with each other,
-                           thereby providing isolation of the executions.
-                           This property is especially important when solving
-                           multiple instances of the problem on separate
-                           threads. Notice though that this attribute will
-                           only guarantee the serialization of the generated
-                           files, thus it will not guarantee the serialization
-                           of the solving procedure and solution retrieval.
-                           The default is False.
-    :param bool raw_output: The default value is False. When this argument
-                            is False, the output of this function is a list
-                            of evaluated solutions. Otherwise, the output is
-                            a list of strings containing the solutions
-                            formatted according to the original output
-                            statement of the model.
-    :param [str] output_vars: The list of output variables. If not provided,
-                              the default list is the list of free variables
-                              in the model, i.e. those variables that are
-                              declared but not defined in the model.
-                              This argument is only used when raw_output
-                              is True.
-    :param bool monitor_completion: If True, the completion status of the output
-                                    is returned. This is equivalent to looking at
-                                    the ========== message at the end of a minizinc
-                                    output.
-    :param str mzn_globals_dir: The name of the directory where to search
-                                for global included files in the standard
-                                library; by default the 'gecode' global
-                                library is used, since Pymzn assumes Gecode
-                                as default solver
-    :param func fzn_fn: The function to call for the solver; defaults to
-                        the function pymzn.gecode
-    :param dict fzn_args: A dictionary containing the additional arguments
-                          to pass to the fzn_fn, provided as additional
-                          keyword arguments to this function
-    :return: Returns a list of solutions. If raw_input is True,
-             the solutions are strings as returned from the solns2out
-             function. Otherwise they are returned as dictionaries of
-             variable assignments, and the values are evaluated.
-    :rtype: list
+    Parameters
+    ----------
+    mzn : str or MiniZincModel
+        The minizinc problem to be solved.  It can be either a string or an
+        instance of MiniZincModel.  If it is a string, it can be either the path
+        to the mzn file or the content of the model.
+    *dzn_files
+        A list of paths to dzn files to attach to the mzn2fzn execution,
+        provided as positional arguments; by default no data file is attached.
+        Data files are meant to be used when there is data that is static across
+        several minizinc executions.
+    data : dict
+        Additional data as a dictionary of variables assignments to supply to
+        the mzn2fnz function. The dictionary is then automatically converted to
+        dzn format by the pymzn.dzn function. This property is meant to include
+        data that dynamically changes across several minizinc executions.
+    keep : bool
+        Whether to keep the generated mzn, dzn, fzn and ozn files or not. If
+        False, the generated files are created as temporary files which will be
+        deleted right after the problem is solved. Though pymzn generated files
+        are not originally intended to be kept, this property can be used for
+        debugging purpose. Notice that in case of error the files are not
+        deleted even if this parameter is False.  Default is False.
+    output_base : str
+        If ``keep=True``, this parameter is used as the base name for the output
+        mzn, dzn, fzn and ozn files (extension are attached automatically). This
+        name should include the parent directories if different from the working
+        one.  Parent directories are not created automatically so they are
+        required to exist. If None is provided (default) the name of the input
+        file is used. If the mzn input was a content string, then the default
+        name 'pymzn' and the working directory are used.
+    globals_dir : str
+        The name of the directory where to search for global included files in
+        the standard library; by default the solver specific global library is
+        used.
+    stdlib_dir : str
+        The name of the directory containing the standard library of minizinc.
+        When None (default) the MiniZinc default is used.
+    path : str or list
+        One or more additional paths to search for included mzn files when
+        running ``mzn2fzn``.
+    eval_output : bool
+        Whether to evaluate the output of the solver or solns2out function into
+        Python objects with the ``pymzn.dzn_eval`` function. If the output is
+        not evaluated, then a list of strings containing the solutions is
+        returned. This is useful when a custom output statement is given in the
+        mzn file. The default value is True. When this argument
+    output_vars : list of str
+        The list of output variables. If not provided, the default list is the
+        list of free variables in the model, i.e. those variables that are
+        declared but not defined in the model.  This argument is only used when
+        ``eval_output`` is True.
+    solver : Solver
+        An instance of Solver to use to solve the minizinc problem. The default
+        is pymzn.gecode.
+    check_complete : bool
+        If True, a boolean value is returned, in addition to
+        the solutions of the problem, indicating the completion status of the
+        problem. The returned boolean is True when the solver completed its work
+        and, in case ``all_solutions=True``, returned all the solutions; it is
+        False when the solver did not complete its work because e.g. was
+        interrupted by a timeout.
+    all_solutions : bool
+        Whether all the solutions must be returned. Notice that this is only
+        used if the solver supports returning all solutions, otherwise it is
+        ignored. Default is False.
+    **solver_args
+        Additional arguments to pass to the solver, provided as additional
+        keyword arguments to this function check the solver documentation for
+        the available arguments.
+
+    Returns
+    -------
+    list or tuple
+        Returns a list of solutions. If eval_output is True, the solutions are
+        returned as dictionaries of variable assignments, otherwise they are
+        solution strings as returned from the solns2out function. If
+        ``check_complete=True`` the result is a tuple containing the solution
+        list as first argument and a boolean value indicating the completion
+        status of the problem as second argument.
     """
     log = get_logger(__name__)
 
@@ -198,24 +204,46 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
             stdlib_dir=None, path=None, no_ozn=False):
-    """
-    Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
+    """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
 
-    :param str mzn_file: The path to the mzn file containing model.
-    :param [str] dzn_files: A list of paths to dzn files to attach to the
-                            mzn2fzn execution, provided as additional
-                            positional arguments to this function
-    :param dict data: Dictionary of variables to use as inline data
-    :param bool keep_data: If true, the inline data is written to a dzn file.
-                           Default is False.
-    :param str mzn_globals_dir: The name of the directory where to search
-                                for global included files in the standard
-                                library; by default the 'gecode' global
-                                library is used, since Pymzn assumes Gecode
-                                as default solver
-    :return: The paths to the fzn and ozn files created by the function
-    :rtype: (str, str)
+    Parameters
+    ----------
+    mzn : str or MiniZincModel
+        The minizinc problem to be solved.  It can be either a string or an
+        instance of MiniZincModel.  If it is a string, it can be either the path
+        to the mzn file or the content of the model.
+    *dzn_files
+        A list of paths to dzn files to attach to the mzn2fzn execution,
+        provided as positional arguments; by default no data file is attached.
+        Data files are meant to be used when there is data that is static across
+        several minizinc executions.
+    data : dict
+        Additional data as a dictionary of variables assignments to supply to
+        the mzn2fnz function. The dictionary is then automatically converted to
+        dzn format by the pymzn.dzn function. This property is meant to include
+        data that dynamically changes across several minizinc executions.
+    keep_data : bool
+        Whether to write the dzn inline data provided in the ``data`` parameter
+        into a file and keep it. Default is False.
+    globals_dir : str
+        The name of the directory where to search for global included files in
+        the standard library; by default the solver specific global library is
+        used.
+    stdlib_dir : str
+        The name of the directory containing the standard library of minizinc.
+        When None (default) the MiniZinc default is used.
+    path : str or list
+        One or more additional paths to search for included mzn files when
+        running ``mzn2fzn``.
+    no_ozn : bool
+        If True, the ozn file is not produced, False otherwise.
+
+    Returns
+    -------
+    tuple (str, str)
+        The paths to the generated fzn and ozn files. If ``no_ozn=True``, the
+        second argument is None.
     """
     log = get_logger(__name__)
 
@@ -287,22 +315,28 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def solns2out(solver_output, ozn_file, check_complete=False):
-    """
-    Wraps the solns2out utility, executes it on the input solution stream,
-    and then returns the output.
+def solns2out(soln_stream, ozn_file, check_complete=False):
+    """Wraps the solns2out utility, executes it on the solution stream, and 
+    then returns the output.
 
-    :param str solns_input: The solution stream as output by the
-                            solver, or the content of a solution file
-    :param str ozn_file: The ozn file path produced by the mzn2fzn utility
-    :param bool monitor_completion: If True, the completion status of the output
-                                    is returned. This is equivalent to looking at
-                                    the ========== message at the end of a minizinc
-                                    output.
-    :return: A list of solutions as strings. The user needs to take care of
-             the parsing. If the output is in dzn format one can use the
-             eval_dzn function.
-    :rtype: list of str
+    Parameters
+    ----------
+    soln_stream : str
+        The solution stream returned by the solver.
+    ozn_file : str
+        The ozn file path produced by the mzn2fzn function.
+    check_complete : bool
+        If True, a boolean value is returned, in addition to
+        the solutions of the problem, indicating the completion status of the
+        problem.
+
+    Returns
+    -------
+    list or tuple
+        Returns a list of solution strings. If ``check_complete=True`` the
+        result is a tuple containing the solution list as first argument and a
+        boolean value indicating the completion status of the problem as second
+        argument.
     """
     log = get_logger(__name__)
 
@@ -315,7 +349,7 @@ def solns2out(solver_output, ozn_file, check_complete=False):
     args = [config.get('solns2out', 'solns2out'), ozn_file]
 
     try:
-        process = run(args, stdin=solver_output)
+        process = run(args, stdin=soln_stream)
         out = process.stdout
     except CalledProcessError as err:
         log.exception(err.stderr)
@@ -351,6 +385,7 @@ def solns2out(solver_output, ozn_file, check_complete=False):
 
 
 class MiniZincError(RuntimeError):
+    """Generic error for the MiniZinc functions."""
 
     def __init__(self, msg=None):
         super().__init__(msg)
@@ -358,6 +393,7 @@ class MiniZincError(RuntimeError):
 
     @property
     def mzn_file(self):
+        """str: the mzn file that generated the error."""
         return self._mzn_file
 
     @mzn_file.setter
@@ -366,27 +402,21 @@ class MiniZincError(RuntimeError):
 
 
 class MiniZincUnsatisfiableError(MiniZincError):
-    """
-    Error raised when a minizinc problem is found to be unsatisfiable.
-    """
+    """Error raised when a minizinc problem is found to be unsatisfiable."""
 
     def __init__(self):
         super().__init__('The problem is unsatisfiable.')
 
 
 class MiniZincUnknownError(MiniZincError):
-    """
-    Error raised when minizinc returns no solution (unknown).
-    """
+    """Error raised when minizinc returns no solution (unknown)."""
 
     def __init__(self):
         super().__init__('The solution of the problem is unknown.')
 
 
 class MiniZincUnboundedError(MiniZincError):
-    """
-    Error raised when a minizinc problem is found to be unbounded.
-    """
+    """Error raised when a minizinc problem is found to be unbounded."""
 
     def __init__(self):
         super().__init__('The problem is unbounded.')
