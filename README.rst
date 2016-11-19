@@ -1,25 +1,23 @@
 PyMzn
 =====
 
-PyMzn is a Python library that wraps and enhances the
-`MiniZinc <http://minzinc.org>`__ tools for CSP modelling and solving.
-It is built on top of the libminizinc library (version 2.0)
-and provides a number of off-the-shelf functions to readily solve problems
-encoded in MiniZinc and parse the solutions into Python objects.
+PyMzn is a Python library that wraps and enhances the `MiniZinc
+<http://minzinc.org>`__ tools for CSP modelling and solving.  It is built on top
+of the libminizinc library and provides a number of off-the-shelf functions to
+readily solve problems encoded in MiniZinc and parse the solutions into Python
+objects.
 
 Usage
 -----
 First, you need a MiniZinc model encoding the problem you want to solve.
-Here is a simple 0-1 knapsack problem encoded with MiniZinc:
-
-::
+Here is a simple 0-1 knapsack problem encoded with MiniZinc:::
 
     %% test.mzn %%
-    int: n;  % number of objects
+    int: n;                     % number of objects
     set of int: OBJ = 1..n;
-    int: capacity;  % the capacity of the knapsack
+    int: capacity;              % the capacity of the knapsack
     array[OBJ] of int: profit;  % the profit of each object
-    array[OBJ] of int: size;  % the size of each object
+    array[OBJ] of int: size;    % the size of each object
 
     var set of OBJ: x;
     constraint sum(i in x)(size[i]) <= capacity;
@@ -32,14 +30,12 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:
     profit = [10, 3, 9, 4, 8];
     size = [14, 4, 10, 6, 9];
 
-You can solve the above problem using the ``pymzn.minizinc`` function:
-::
+You can solve the above problem using the ``pymzn.minizinc`` function:::
 
     import pymzn
     pymzn.minizinc('test.mzn', 'test.dzn', data={'capacity': 20})
 
-The result will be:
-::
+The result will be:::
 
     [{'x': {3, 5}}]
 
@@ -66,14 +62,12 @@ For more information on the PyMzn functions read the
 Install
 -------
 
-PyMzn can be installed via Pip:
-::
+PyMzn can be installed via Pip:::
 
     pip3 install pymzn
 
 or from the source code available
-on `GitHub <https://github.com/paolodragone/pymzn>`__:
-::
+on `GitHub <https://github.com/paolodragone/pymzn>`__:::
 
     python3 setup.py install
 
@@ -103,7 +97,7 @@ of the documentation.
 Contribute
 ----------
 
-If you find a bug or think of a feature, please submit an issue on the
+If you find a bug or think of a useful feature, please submit an issue on the
 `GitHub page <https://github.com/paolodragone/pymzn/>`__ of PyMzn.
 
 Pull requests are very welcome too. If you are interested in contributing to
@@ -113,6 +107,18 @@ Some things that would be very useful are:
 
 * Implement specific interfaces for not yet supported solvers;
 * Enhance existing ones.
+
+
+Heads up on future changes
+--------------------------
+
+Be aware that this project is still currently under development and thus it is
+not in a stable version yet. Things in the future *will* certainly change. This
+is especially due to recent changes in the minizinc library, which are
+introducing lots of new features that could make some of PyMzn's features
+obsolete. At any rate, PyMzn will stay updated to the most recent changes in
+MiniZinc and keep enhancing its python interface.
+
 
 Author
 ------
