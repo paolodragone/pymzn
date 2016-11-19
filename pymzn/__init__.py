@@ -16,15 +16,14 @@ from ._dzn import *
 from . import _mzn
 from ._mzn import *
 
-__version__ = '0.11.1'
+__version__ = '0.11.2'
 __all__ = ['debug', 'config', 'bin']
 __all__.extend(_dzn.__all__)
 __all__.extend(_mzn.__all__)
 
 # TODO: update python2 branch
-# TODO: config solver function and default arguments to solver
 # TODO: make it work on windows
-# TODO: check the ctrl+C thing which seems to not work anymore
+# TODO: check the ctrl+C thing which seems not to work anymore
 
 _debug_handler = None
 _pymzn_logger = logging.getLogger(__name__)
@@ -49,7 +48,7 @@ def main():
     def _minizinc(**_args):
         print(minizinc(**_args))
 
-    def _config(key, value=None):
+    def _config(key, value=None, **__):
         if value is None:
             print('{} : {}'.format(key, config.get(key)))
         else:

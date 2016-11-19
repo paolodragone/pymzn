@@ -74,9 +74,9 @@ disable debugging messages you can then call:::
     pymzn.debug(False)
 
 """
+import os
 import yaml
 import appdirs
-import os.path
 
 
 _modified = False
@@ -144,6 +144,8 @@ def dump():
     global _modified
     if _modified:
         cfg_file = _cfg_file()
+        cfg_dir, __ = os.path.split(cfg_file)
+        os.makedirs(cfg_dir, exist_ok=True)
         with open(cfg_file, 'w') as f:
             yaml.dump(_config, f)
         _modified = False
