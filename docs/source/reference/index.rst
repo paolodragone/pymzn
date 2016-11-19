@@ -12,5 +12,4 @@ This is the reference manual of PyMzn.
    solvers/index
    bin/index
    config
-   serialization
    internal
