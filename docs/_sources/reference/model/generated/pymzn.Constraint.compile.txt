@@ -1,0 +1,6 @@
+pymzn.Constraint.compile
+========================
+
+.. currentmodule:: pymzn
+
+.. automethod:: Constraint.compile

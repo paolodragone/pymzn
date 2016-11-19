@@ -1,0 +1,21 @@
+pymzn.bin.TimedCompletedProcess
+===============================
+
+.. currentmodule:: pymzn.bin
+
+.. autoclass:: TimedCompletedProcess
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~TimedCompletedProcess.check_returncode
+   
+   
+
+   
+   
+   

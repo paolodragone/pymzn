@@ -1,0 +1,6 @@
+pymzn.bin.TimedCompletedProcess.check_returncode
+================================================
+
+.. currentmodule:: pymzn.bin
+
+.. automethod:: TimedCompletedProcess.check_returncode

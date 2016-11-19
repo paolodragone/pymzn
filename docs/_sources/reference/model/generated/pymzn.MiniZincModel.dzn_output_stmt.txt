@@ -1,0 +1,6 @@
+pymzn.MiniZincModel.dzn_output_stmt
+===================================
+
+.. currentmodule:: pymzn
+
+.. automethod:: MiniZincModel.dzn_output_stmt

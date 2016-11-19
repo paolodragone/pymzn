@@ -1,0 +1,6 @@
+pymzn.MiniZincModel.var
+=======================
+
+.. currentmodule:: pymzn
+
+.. automethod:: MiniZincModel.var

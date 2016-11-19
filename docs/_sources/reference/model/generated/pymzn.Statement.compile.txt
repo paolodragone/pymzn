@@ -1,0 +1,6 @@
+pymzn.Statement.compile
+=======================
+
+.. currentmodule:: pymzn
+
+.. automethod:: Statement.compile

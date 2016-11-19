@@ -1,0 +1,6 @@
+pymzn.SolveStatement.compile
+============================
+
+.. currentmodule:: pymzn
+
+.. automethod:: SolveStatement.compile

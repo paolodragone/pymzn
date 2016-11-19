@@ -1,0 +1,6 @@
+pymzn.ArrayVariable.compile
+===========================
+
+.. currentmodule:: pymzn
+
+.. automethod:: ArrayVariable.compile

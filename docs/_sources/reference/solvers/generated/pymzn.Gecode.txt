@@ -1,0 +1,21 @@
+pymzn.Gecode
+============
+
+.. currentmodule:: pymzn
+
+.. autoclass:: Gecode
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~Gecode.solve
+   
+   
+
+   
+   
+   

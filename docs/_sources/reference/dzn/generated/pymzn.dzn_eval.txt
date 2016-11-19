@@ -1,0 +1,6 @@
+pymzn.dzn_eval
+==============
+
+.. currentmodule:: pymzn
+
+.. autofunction:: dzn_eval
