@@ -29,18 +29,22 @@ def read(*parts):
 
 
 setup(
-    name='pymzn',
-    version=find_version('pymzn', '__init__.py'),
-    url='https://github.com/paolodragone/PyMzn',
-    license='MIT',
-    author='Paolo Dragone',
-    author_email='paolo.dragone@unitn.it',
-    description='A Python wrapper for the MiniZinc tool pipeline.',
-    long_description=read('README.rst'),
-    packages=find_packages(exclude=['*tests*']),
-    test_suite="pymzn.tests",
-    platforms='any',
-    classifiers=[
+    name = 'pymzn',
+    version = find_version('pymzn', '__init__.py'),
+    url = 'https://github.com/paolodragone/pymzn',
+    license = 'MIT',
+    author = 'Paolo Dragone',
+    author_email = 'paolo.dragone@unitn.it',
+    description = 'A Python wrapper for the MiniZinc tool pipeline.',
+    long_description = read('README.rst'),
+    packages = find_packages(exclude=['*tests*']),
+    test_suite = "pymzn.tests",
+    install_requires = [
+        'appdirs',
+        'pyyaml'
+    ],
+    platforms = 'any',
+    classifiers = [
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
@@ -52,8 +56,9 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Topic :: Software Development :: Libraries :: Python Modules'],
-    entry_points={
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ],
+    entry_points = {
         'console_scripts': [
             'pymzn=pymzn:main'
         ]
