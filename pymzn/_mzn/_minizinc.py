@@ -146,6 +146,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
         elif mzn_model.mzn_file:
             output_dir, mzn_name = os.path.split(mzn_file)
             output_prefix, mzn_ext = os.path.split(mzn_name)
+        else:
+            output_dir = os.getcwd()
     output_prefix += '_'
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix='.mzn', delete=False, mode='w+',
