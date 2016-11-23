@@ -193,7 +193,7 @@ class Gecode(Solver):
             args.append(parallel)
         if timeout > 0:
             args.append('-time')
-            args.append(int(timeout * 1000)) # Gecode takes milliseconds
+            args.append(str(timeout * 1000)) # Gecode takes milliseconds
         if seed != 0:
             args.append('-r')
             args.append(seed)
@@ -344,4 +344,3 @@ optimathsat = Optimathsat(path=config.get('optimathsat'))
 
 #: Default Opturion instance.
 opturion = Opturion(path=config.get('opturion'))
-
