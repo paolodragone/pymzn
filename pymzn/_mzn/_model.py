@@ -258,7 +258,7 @@ class MiniZincModel(object):
         comment : str
             A comment to attach to the variable statement.
         """
-        val = dzn_value(val) if val else None
+        val = dzn_value(val) if val is not None else None
         self._statements.append(Variable(vartype, var, val, comment))
         if _var_type_p.match(vartype) and val is None:
             self._free_vars.add(var)
