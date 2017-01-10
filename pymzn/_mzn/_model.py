@@ -159,7 +159,7 @@ class SolveStatement(Statement):
 
     def __init__(self, solve, comment=None):
         self.solve = solve
-        stmt = 'solve {};'.format(self.output)
+        stmt = 'solve {};'.format(self.solve)
         super().__init__(stmt, comment)
 
 
