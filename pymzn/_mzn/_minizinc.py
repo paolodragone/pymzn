@@ -144,7 +144,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
         if output_base:
             output_dir, output_prefix = os.path.split(output_base)
         elif mzn_model.mzn_file:
-            output_dir, mzn_name = os.path.split(mzn_file)
+            output_dir, mzn_name = os.path.split(mzn_model.mzn_file)
             output_prefix, mzn_ext = os.path.split(mzn_name)
         else:
             output_dir = os.getcwd()
