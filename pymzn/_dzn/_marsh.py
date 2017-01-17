@@ -5,7 +5,7 @@ import pymzn.config as config
 from pymzn._utils import get_logger
 
 from textwrap import TextWrapper
-from numbers import Integral, Number
+from numbers import Integral, Real, Number
 from collections.abc import Set, Sized, Iterable, Mapping
 
 _wrapper = None
@@ -18,8 +18,17 @@ def _get_wrapper():
                                break_on_hyphens = False)
     return _wrapper
 
+
+def _is_bool(obj):
+    return isinstance(obj, bool)
+
+
 def _is_int(obj):
     return isinstance(obj, Integral)
+
+
+def _is_float(obj):
+    return isinstance(obj, Real)
 
 
 def _is_value(obj):
@@ -114,16 +123,16 @@ def _dzn_val(val):
     return str(val)
 
 
-def _dzn_var(name, val):
-    return '{} = {};'.format(name, val)
-
-
 def _dzn_set(s):
     if s and _is_int_set(s):
         min_val, max_val = _extremes(s)
         if _is_contiguous(s, min_val, max_val):
             return '{}..{}'.format(min_val, max_val)  # contiguous set
     return '{{{}}}'.format(', '.join(map(_dzn_val, s)))
+
+
+def _index_set_str(idx_set):
+    return ', '.join(['{}..{}'.format(*s) for s in idx_set])
 
 
 def _dzn_array_nd(arr):
@@ -141,9 +150,9 @@ def _dzn_array_nd(arr):
 
     dzn_arr = 'array{}d({}, {})'
     if len(idx_set) > 0:
-        idx_set_str = ', '.join(['{}..{}'.format(*s) for s in idx_set])
+        idx_set_str = _index_set_str(idx_set)
     else:
-        idx_set_str = '{}'
+        idx_set_str = '{}' # Empty index set
     vals = []
     for i, val in enumerate(map(_dzn_val, flat_arr)):
         if i > 0:
@@ -152,6 +161,35 @@ def _dzn_array_nd(arr):
 
     arr_str = '[{}]'.format(''.join(vals))
     return dzn_arr.format(dim, idx_set_str, arr_str)
+
+
+def _array_elem_type(arr, idx_set):
+    if len(idx_set) == 0:
+        return _dzn_type(arr)
+
+    it = iter(arr.values()) if _is_dict(arr) else iter(arr)
+    return _array_elem_type(next(it), idx_set[1:])
+
+
+def _dzn_type(val):
+    if _is_bool(val):
+        return 'bool'
+    if _is_int(val):
+        return 'int'
+    if _is_float(val):
+        return 'float'
+    if _is_set(val):
+        if len(val) == 0:
+            raise TypeError('The given set is empty.')
+        return 'set of {}'.format(_dzn_type(next(iter(val[0]))))
+    if _is_array_type(val):
+        idx_set = _index_set(arr)
+        if len(idx_set) == 0:
+            raise TypeError('The given array is empty.')
+        idx_set_str = _index_set_str(idx_set)
+        elem_type = _array_elem_type(val, idx_set)
+        return 'array[{}] of {}'.format(idx_set_str, elem_type)
+    raise TypeError('Unsupported parsing for value: {}'.format(repr(val)))
 
 
 def dzn_value(val, wrap=True):
@@ -186,7 +224,43 @@ def dzn_value(val, wrap=True):
     return dzn_val
 
 
-def dzn(objs, fout=None, wrap=True):
+def dzn_statement(name, val, declare=True, assign=True, wrap=True):
+    """Returns a dzn statement declaring and assigning the given value.
+
+    Parameters
+    ----------
+    val
+        The value to serialize.
+    declare : bool
+        Whether to include the declaration of the variable in the statement or
+        just the assignment.
+    assign : bool
+        Wheter to include assignment of the value in the statement or just the
+        declaration.
+    wrap : bool
+        Whether to wrap the serialized value.
+
+    Returns
+    -------
+    str
+        The serialized dzn representation of the value.
+    """
+    if not (declare or assign):
+        raise ValueError('The statement must be a declaration or an assignment.')
+
+    stmt = []
+    if declare:
+        val_type = dzn_type(val)
+        stmt.append('{}: '.format(val_type))
+    stmt.append(name)
+    if assign:
+        val_str = dzn_value(val, wrap=wrap)
+        stmt.append(' = {}'.format(val_str))
+    stmt.append(';')
+    return ''.join(stmt)
+
+
+def dzn(objs, declare=False, assign=True, wrap=True, fout=None):
     """Serializes the objects in input and produces a list of strings encoding
     them into dzn format. Optionally, the produced dzn is written in a file.
 
@@ -200,10 +274,16 @@ def dzn(objs, fout=None, wrap=True):
     objs : dict
         A dictionary containing the objects to serialize, the keys are the names
         of the variables.
-    fout : str
-        Path to the output file, if None no output file is written.
+    declare : bool
+        Whether to include the declaration of the variable in the statements or
+        just the assignment. (Default is False for backward compatibility)
+    assign : bool
+        Wheter to include assignment of the value in the statements or just the
+        declaration.
     wrap : bool
         Whether to wrap the serialized values.
+    fout : str
+        Path to the output file, if None no output file is written.
 
     Returns
     -------
@@ -214,7 +294,8 @@ def dzn(objs, fout=None, wrap=True):
 
     vals = []
     for key, val in objs.items():
-        vals.append(_dzn_var(key, dzn_value(val, wrap=wrap)))
+        stmt = dzn_statement(key, val, declare=declare, assign=assign, wrap=wrap)
+        vals.append(stmt)
 
     if fout:
         log.debug('Writing file: {}', fout)
