@@ -84,8 +84,11 @@ class Parameter(Statement):
 
     Attributes
     ----------
-    par
-        The python object to convert into a parameter. It must be 
+    name : str
+        The name of the parameter.
+    val
+        The python object to convert into a parameter. The type is inferred from
+        the python object.
     assign : bool
         If True the parameter value will be assigned directly into the model,
         otherwise it will only be declared in the model and then it will have to
@@ -93,8 +96,8 @@ class Parameter(Statement):
     comment : str
         A comment to attach to the variable statement.
     """
-    def __init__(self, par, assign=True, comment=None):
-        stmt = dzn_statement(par, assign=assign)
+    def __init__(self, name, val, assign=True, comment=None):
+        stmt = dzn_statement(name, val, assign=assign)
         super().__init__(stmt, comment)
 
 
@@ -264,12 +267,14 @@ class MiniZincModel(object):
         self._output_stmt = output_stmt
         self._modified = True
 
-    def par(self, par, assign=True, comment=None):
+    def par(self, name, val, assign=True, comment=None):
         """Adds a parameter to the model.
 
         Parameters
         ----------
-        par : obj or Parameter
+        name
+            The name of the parameter.
+        val : obj or Parameter
             The python object to add as a parameter to the model.
         assign : bool
             If True the parameter value will be assigned directly into the
@@ -279,7 +284,7 @@ class MiniZincModel(object):
             A comment to attach to the parameter statement.
         """
         if not isinstance(par, Parameter):
-            par = Parameter(par, comment)
+            par = Parameter(name, par, comment)
         self._statements.append(par)
         self._modified = True
 
