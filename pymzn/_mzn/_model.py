@@ -121,9 +121,9 @@ class Variable(Statement):
         self.val = val
 
         if self.val:
-            stmt = 'var {}: {} = {};'.format(self.vartype, self.var, self.val)
+            stmt = '{}: {} = {};'.format(self.vartype, self.var, self.val)
         else:
-            stmt = 'var {}: {};'.format(self.vartype, self.var)
+            stmt = '{}: {};'.format(self.vartype, self.var)
 
         super().__init__(stmt, comment)
 
