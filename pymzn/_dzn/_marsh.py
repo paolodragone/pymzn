@@ -183,7 +183,7 @@ def _dzn_type(val):
             raise TypeError('The given set is empty.')
         return 'set of {}'.format(_dzn_type(next(iter(val[0]))))
     if _is_array_type(val):
-        idx_set = _index_set(arr)
+        idx_set = _index_set(val)
         if len(idx_set) == 0:
             raise TypeError('The given array is empty.')
         idx_set_str = _index_set_str(idx_set)
@@ -250,7 +250,7 @@ def dzn_statement(name, val, declare=True, assign=True, wrap=True):
 
     stmt = []
     if declare:
-        val_type = dzn_type(val)
+        val_type = _dzn_type(val)
         stmt.append('{}: '.format(val_type))
     stmt.append(name)
     if assign:
