@@ -274,7 +274,7 @@ class MiniZincModel(object):
         ----------
         name
             The name of the parameter.
-        val : obj or Parameter
+        val : obj
             The python object to add as a parameter to the model.
         assign : bool
             If True the parameter value will be assigned directly into the
@@ -283,8 +283,7 @@ class MiniZincModel(object):
         comment : str
             A comment to attach to the parameter statement.
         """
-        if not isinstance(par, Parameter):
-            par = Parameter(name, par, comment)
+        par = Parameter(name, val, assign=assign, comment=comment)
         self._statements.append(par)
         self._modified = True
 
