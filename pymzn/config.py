@@ -87,6 +87,7 @@ _defaults = {
         'gecode': 'fzn-gecode',
         'optimathsat': 'optimathsat',
         'opturion': 'fzn-cpx',
+        'gurobi': 'mzn-gurobi',
         'dzn_width': 70
     }
 

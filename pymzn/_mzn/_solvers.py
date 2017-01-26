@@ -336,6 +336,68 @@ class Opturion(Solver):
         return out
 
 
+class Gurobi(Solver):
+    """Interface to the Gurobi solver.
+
+    Parameters
+    ----------
+    path : str
+        The path to the Gurobi executable. If None, ``mzn-gurobi`` is used.
+    """
+
+    def __init__(self, path=None):
+        super().__init__(True, True, globals_dir='std')
+        self.cmd = path or 'mzn-gurobi'
+
+    def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
+              timeout=None, **kwargs):
+        """Solves a problem with the Opturion Gurobi solver.
+
+        Parameters
+        ----------
+        fzn_file : str
+            The path to the fzn file to use as input of the solver.
+        all_solutions : bool
+            Whether to return all solutions.
+        check_complete : bool
+            Whether to return a second boolean value indicating if the search
+            was completed successfully.
+        timeout : int or float
+            The time cutoff in seconds, after which the execution is truncated
+            and the best solution so far is returned, 0 or None means no cutoff;
+            default is None.
+
+        Returns
+        -------
+        str or tuple
+            A string containing the solution output stream of the execution of
+            Opturion on the specified problem; it can be directly be given to
+            the function solns2out to be evaluated. If ``check_complete=True``
+            returns an additional boolean, checking whether the search was
+            completed before the timeout.
+        """
+        args = [self.cmd]
+
+        if timeout or all_solutions:
+            args.append('-a')
+
+        args.append(fzn_file)
+
+        log = get_logger(__name__)
+
+        try:
+            process = run(args, timeout=timeout)
+            complete = not process.expired
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+
+        if check_complete:
+            return out, complete
+        return out
+
+
 #: Default Gecode instance.
 gecode = Gecode(path=config.get('gecode'))
 
@@ -344,3 +406,7 @@ optimathsat = Optimathsat(path=config.get('optimathsat'))
 
 #: Default Opturion instance.
 opturion = Opturion(path=config.get('opturion'))
+
+#: Default Gurobi instance.
+gurobi = Opturion(path=config.get('gurobi'))
+
