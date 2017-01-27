@@ -216,6 +216,9 @@ class MiniZincModel(object):
             else:
                 self.mzn_file = None
                 self.model = mzn
+        else:
+            self.mzn_file = None
+            self.model = None
 
     def constraint(self, const, comment=None):
         """Adds a constraint to the current model.
