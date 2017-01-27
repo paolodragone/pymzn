@@ -181,7 +181,7 @@ def _dzn_type(val):
     if _is_set(val):
         if len(val) == 0:
             raise TypeError('The given set is empty.')
-        return 'set of {}'.format(_dzn_type(next(iter(val[0]))))
+        return 'set of {}'.format(_dzn_type(next(iter(val))))
     if _is_array_type(val):
         idx_set = _index_set(val)
         if len(idx_set) == 0:
