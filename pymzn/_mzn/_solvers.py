@@ -185,27 +185,27 @@ class Gecode(Solver):
         args = [self.cmd]
         if n_solns > 0:
             args.append('-n')
-            args.append(n_solns)
+            args.append(str(n_solns))
         elif n_solns == 0 or all_solutions:
             args.append('-a')
         if parallel != 1:
             args.append('-p')
-            args.append(parallel)
+            args.append(str(parallel))
         if timeout > 0:
             args.append('-time')
             args.append(str(timeout * 1000)) # Gecode takes milliseconds
         if seed != 0:
             args.append('-r')
-            args.append(seed)
+            args.append(str(seed))
         if restart:
             args.append('-restart')
-            args.append(restart)
+            args.append(str(restart))
         if restart_base:
             args.append('-restart-base')
-            args.append(restart_base)
+            args.append(str(restart_base))
         if restart_scale:
             args.append('-restart-scale')
-            args.append(restart_scale)
+            args.append(str(restart_scale))
         args.append(fzn_file)
 
         try:
