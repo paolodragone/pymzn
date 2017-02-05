@@ -250,6 +250,17 @@ class MiniZincModel(object):
         self._statements.append(constr)
         self._modified = True
 
+    def constraints(self, constrs):
+        """Add a list of constraints.
+
+        Parameters
+        ----------
+        constrs : list of str or Constraint
+            A list of constraints.
+        """
+        for constr in constrs:
+            self.constraint(constr)
+
     def solve(self, solve_stmt, comment=None):
         """Updates the solve statement of the model.
 
