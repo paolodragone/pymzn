@@ -233,21 +233,21 @@ class MiniZincModel(object):
             self.mzn_file = None
             self.model = None
 
-    def constraint(self, const, comment=None):
+    def constraint(self, constr, comment=None):
         """Adds a constraint to the current model.
 
         Parameters
         ----------
-        const : str or Constraint
+        constr : str or Constraint
             As a string, the content of the constraint, i.e. only the actual
             constraint without the starting 'constraint' and the ending
             semicolon.
         comment : str
             A comment to attach to the constraint.
         """
-        if not isinstance(const, Constraint):
-            const = Constraint(const, comment)
-        self._statements.append(const)
+        if not isinstance(constr, Constraint):
+            constr = Constraint(constr, comment)
+        self._statements.append(constr)
         self._modified = True
 
     def solve(self, solve_stmt, comment=None):
