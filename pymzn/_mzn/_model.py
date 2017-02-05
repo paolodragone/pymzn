@@ -329,6 +329,26 @@ class MiniZincModel(object):
         self._statements.append(par)
         self._modified = True
 
+    def pars(self, pars, assign=True):
+        """Add a list of parameters.
+
+        Parameters
+        ----------
+        pars : list of (name, val) or Parameter
+            The list of parameters to add to the model.
+        assign : bool
+            If True the parameters value will be assigned directly into the
+            model, otherwise they will only be declared in the model and then
+            they will have to be assigned in the data.
+        """
+        for par in pars:
+            if isinstance(par, Parameter):
+                self._statements.append(par)
+            else:
+                name, val = par
+                self.par(name, val, assign)
+        self._modified = True
+
     def var(self, vartype, var, val=None, output=False, comment=None):
         """Adds a variable to the model.
 
