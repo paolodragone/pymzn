@@ -266,6 +266,21 @@ class MiniZincModel(object):
         self._solve_stmt = solve_stmt
         self._modified = True
 
+    def satisfy(self, comment=None):
+        """ Shorthand for solve('satisfy') """
+        self._solve_stmt = SolveStatement('satisfy', comment)
+        self._modified = True
+
+    def maximize(self, expr, comment=None):
+        """ Shorthand for solve('maximize ' + expr) """
+        self._solve_stmt = SolveStatement('maximize ' + expr, comment)
+        self._modified = True
+
+    def minimize(self, expr, comment=None):
+        """ Shorthand for solve('minimize ' + expr) """
+        self._solve_stmt = SolveStatement('minimize ' + expr, comment)
+        self._modified = True
+
     def output(self, output_stmt, comment=None):
         """Updates the output statement of the model.
 
