@@ -112,18 +112,28 @@ class Variable(Statement):
         The name of the variable.
     val : str
         The optional value of the variable statement.
+    output : bool
+        Whether the variable is an output variable.
     comment : str
         A comment to attach to the variable statement.
     """
-    def __init__(self, vartype, var, val=None, comment=None):
+    def __init__(self, vartype, var, val=None, output=False, comment=None):
         self.vartype = vartype
         self.var = var
         self.val = val
+        self.output = output
 
+        stmt = '{} : {}'.format(self.vartype, self.var)
         if self.val:
-            stmt = '{}: {} = {};'.format(self.vartype, self.var, self.val)
-        else:
-            stmt = '{}: {};'.format(self.vartype, self.var)
+            stmt += ' = {}'.format(self.val)
+        if output:
+            _array_type_m = _array_type_p.match(vartype)
+            if _array_type_m:
+                indexset = _array_type_m.group(1)
+                stmt += ' :: output_array([{}])'.format(indexset)
+            else:
+                stmt += ' :: output_var'
+        stmt += ';'
 
         super().__init__(stmt, comment)
 
@@ -141,14 +151,17 @@ class ArrayVariable(Variable):
         The name of the variable.
     val : str
         The optional value of the variable statement.
+    output : bool
+        Whether the array variable is an output array.
     comment : str
         A comment to attach to the variable statement.
     """
-    def __init__(self, indexset, domain, var, val=None, comment=None):
+    def __init__(self, indexset, domain, var, val=None, output=False,
+                 comment=None):
         self.indexset = indexset
         self.domain = domain
         vartype = 'array[{}] of var {}'.format(self.indexset, self.domain)
-        super().__init__(vartype, var, val, comment)
+        super().__init__(vartype, var, val, output, comment)
 
 
 class OutputStatement(Statement):
@@ -290,7 +303,7 @@ class MiniZincModel(object):
         self._statements.append(par)
         self._modified = True
 
-    def var(self, vartype, var, val=None, comment=None):
+    def var(self, vartype, var, val=None, output=False, comment=None):
         """Adds a variable to the model.
 
         Parameters
@@ -301,17 +314,46 @@ class MiniZincModel(object):
             The name of the variable.
         val : str
             The optional value of the variable statement.
+        output : bool
+            Whether the variable is an output variable.
         comment : str
             A comment to attach to the variable statement.
         """
         val = dzn_value(val) if val is not None else None
-        self._statements.append(Variable(vartype, var, val, comment))
-        if _var_type_p.match(vartype) and val is None:
+        self._statements.append(Variable(vartype, var, val, output, comment))
+        if output or _var_type_p.match(vartype) and val is None:
             self._free_vars.add(var)
         _array_type_m = _array_type_p.match(vartype)
         if _array_type_m:
             dim = len(_array_type_m.group(1).split(','))
             self._array_dims[var] = dim
+        self._modified = True
+
+    def array_var(self, indexset, domain, var, val=None, output=False,
+                  comment=None):
+        """Adds an array variable to the model.
+
+        Parameters
+        ----------
+        indexset : str
+            The indexset of the array.
+        domain : str
+            The domain of the array.
+        var : str
+            The name of the array.
+        val : str
+            The optional value of the array variable statement.
+        output : bool
+            Whether the array variable is an output array.
+        comment : str
+            A comment to attach to the variable statement.
+        """
+        val = dzn_value(val) if val is not None else None
+        self._statements.append(ArrayVariable(indexset, domain, var, val, output,
+                                              comment))
+        if output or _var_type_p.match(domain) and val is None:
+            self._free_vars.add(var)
+        self._array_dims[var] = len(indexset.split(','))
         self._modified = True
 
     def _load_model(self):
