@@ -216,8 +216,7 @@ class Gecode(Solver):
                     complete = False
             out = process.stdout
         except CalledProcessError as err:
-            if (suppress_segfault and len(err.stdout) > 0 and
-                    err.stderr.startswith('Segmentation fault')):
+            if suppress_segfault:
                 log.warning('Gecode returned error code {} (segmentation '
                             'fault) but a solution was found and returned '
                             '(suppress_segfault=True).'.format(err.returncode))
