@@ -118,18 +118,25 @@ class Variable(Statement):
         A comment to attach to the variable statement.
     """
     def __init__(self, vartype, var, val=None, output=False, comment=None):
-        self.vartype = vartype
         self.var = var
         self.val = val
         self.output = output
+
+        _array_type_m = _array_type_p.match(vartype)
+        if _array_type_m:
+            indexset = _array_type_m.group(1)
+            domain = _array_type_m.group(2)
+            if 'var' not in domain:
+                vartype = 'array[{}] of var {}'.format(indexset, domain)
+        elif 'var' not in vartype:
+            vartype = 'var ' + vartype
+        self.vartype = vartype
 
         stmt = '{} : {}'.format(self.vartype, self.var)
         if self.val:
             stmt += ' = {}'.format(self.val)
         if output:
-            _array_type_m = _array_type_p.match(vartype)
             if _array_type_m:
-                indexset = _array_type_m.group(1)
                 stmt += ' :: output_array([{}])'.format(indexset)
             else:
                 stmt += ' :: output_var'
