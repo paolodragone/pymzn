@@ -81,5 +81,5 @@ transform it into a list (list of lists). For instance:::
 from ._marsh import *
 from ._eval import *
 
-__all__ = ['dzn', 'dzn_value', 'rebase_array', 'dzn_eval']
+__all__ = ['dzn', 'dzn_statement', 'dzn_value', 'rebase_array', 'dzn_eval']
 
