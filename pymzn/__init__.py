@@ -75,6 +75,9 @@ def main():
                             help='additional dzn files')
     mzn_parser.add_argument('--data', type=ast.literal_eval,
                             help='additional inline data')
+    mzn_parser.add_argument('-a', '--all-solutions', action='store_true',
+                            help=('wheter to return all solutions '
+                                  '(if supported by the solver)'))
     mzn_parser.add_argument('-S', '--solver',
                             help='name of the solver')
     mzn_parser.add_argument('-s', '--solver-args', type=ast.literal_eval,
