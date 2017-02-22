@@ -29,6 +29,7 @@ from tempfile import NamedTemporaryFile
 import pymzn.config as config
 
 from pymzn.bin import run
+from . import _solvers
 from ._solvers import gecode
 from ._model import MiniZincModel
 from pymzn._utils import get_logger
@@ -135,6 +136,11 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
 
     if eval_output:
         mzn_model.dzn_output_stmt(output_vars)
+
+    if not solver:
+        solver = gecode
+    elif isinstance(solver, str):
+        solver = getattr(_solvers, solver)
 
     _globals_dir = globals_dir or solver.globals_dir
 

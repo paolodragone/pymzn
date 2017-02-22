@@ -111,7 +111,7 @@ def main():
     args = parser.parse_args()
 
     debug(args.verbose)
-    args.func(**vars(args))
+    args.func(**{**vars(args), **args.solver_args})
 
 
 if __name__ == '__main__':
