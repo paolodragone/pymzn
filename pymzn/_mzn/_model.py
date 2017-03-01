@@ -18,9 +18,8 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from pymzn import dzn_value
 from pymzn._utils import get_logger
-from pymzn._dzn._marsh import dzn_statement
+from pymzn._dzn._marsh import dzn_statement, dzn_value
 
 
 _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
@@ -73,7 +72,7 @@ class Constraint(Statement):
     """
     def __init__(self, constr, comment=None):
         self.constr = constr
-        stmt = 'constraint {};'.format(self.const)
+        stmt = 'constraint {};'.format(constr)
         super().__init__(stmt)
 
 
@@ -159,22 +158,22 @@ class ArrayVariable(Variable):
 
     Attributes
     ----------
+    name : str
+        The name of the variable.
     indexset : str
         The indexset of the array.
     domain : str
         The domain of the array.
-    var : str
-        The name of the variable.
-    val : str
+    value : str
         The optional value of the variable statement.
     output : bool
         Whether the array variable is an output array.
     """
-    def __init__(self, indexset, domain, var, val=None, output=False):
+    def __init__(self, name, indexset, domain, value=None, output=False):
         self.indexset = indexset
         self.domain = domain
         vartype = 'array[{}] of var {}'.format(indexset, domain)
-        super().__init__(vartype, var, val, output)
+        super().__init__(name, vartype, value, output)
 
 
 class OutputStatement(Statement):
@@ -185,8 +184,6 @@ class OutputStatement(Statement):
     output : str
         The content of the output statement, i.e. only the actual output without
         the starting 'output', the square brackets and the ending semicolon.
-    comment : str
-        A comment to attach to the output statement.
     """
     def __init__(self, output):
         self.output = output
@@ -202,8 +199,6 @@ class SolveStatement(Statement):
     solve : str
         The content of the solve statement, i.e. only the actual solve without
         the starting 'solve' and the ending semicolon.
-    comment : str
-        A comment to attach to the solve statement.
     """
 
     def __init__(self, solve):
