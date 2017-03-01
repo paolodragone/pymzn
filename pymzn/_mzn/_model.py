@@ -57,6 +57,7 @@ class Comment(Statement):
         The comment string.
     """
     def __init__(self, comment):
+        self.comment = comment
         stmt = '% {}\n'.format(comment)
         super().__init__(stmt)
 
@@ -66,12 +67,12 @@ class Constraint(Statement):
 
     Attributes
     ----------
-    const : str
+    constr : str
         The content of the constraint, i.e. only the actual constraint without
         the starting 'constraint' and the ending semicolon.
     """
-    def __init__(self, const, comment=None):
-        self.const = const
+    def __init__(self, constr, comment=None):
+        self.constr = constr
         stmt = 'constraint {};'.format(self.const)
         super().__init__(stmt)
 
@@ -92,6 +93,9 @@ class Parameter(Statement):
         be assigned in the data.
     """
     def __init__(self, name, val, assign=True):
+        self.name = name
+        self.val = val
+        self.assign = assign
         stmt = dzn_statement(name, val, assign=assign)
         super().__init__(stmt)
 
@@ -125,7 +129,7 @@ class Variable(Statement):
             vartype = 'var ' + vartype
         self.vartype = vartype
 
-        stmt = '{} : {}'.format(self.vartype, self.var)
+        stmt = '{}: {}'.format(self.vartype, self.var)
         if self.val:
             stmt += ' = {}'.format(self.val)
         if output:
@@ -157,7 +161,7 @@ class ArrayVariable(Variable):
     def __init__(self, indexset, domain, var, val=None, output=False):
         self.indexset = indexset
         self.domain = domain
-        vartype = 'array[{}] of var {}'.format(self.indexset, self.domain)
+        vartype = 'array[{}] of var {}'.format(indexset, domain)
         super().__init__(vartype, var, val, output)
 
 
@@ -174,7 +178,7 @@ class OutputStatement(Statement):
     """
     def __init__(self, output):
         self.output = output
-        stmt = 'output [{}];'.format(self.output)
+        stmt = 'output [{}];'.format(output)
         super().__init__(stmt)
 
 
@@ -192,7 +196,7 @@ class SolveStatement(Statement):
 
     def __init__(self, solve):
         self.solve = solve
-        stmt = 'solve {};'.format(self.solve)
+        stmt = 'solve {};'.format(solve)
         super().__init__(stmt)
 
 
