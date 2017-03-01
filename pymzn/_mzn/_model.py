@@ -84,19 +84,31 @@ class Parameter(Statement):
     ----------
     name : str
         The name of the parameter.
-    val
-        The python object to convert into a parameter. The type is inferred from
-        the python object.
+    partype : str
+        The MiniZinc type of the parameter.
+    value : obj
+        The python object to convert into a parameter. If partype is not
+        specified, the type of the parameter is inferred from the python object.
     assign : bool
         If True the parameter value will be assigned directly into the model,
         otherwise it will only be declared in the model and then it will have to
         be assigned in the data.
     """
-    def __init__(self, name, val, assign=True):
+    def __init__(self, name, partype=None, value=None, assign=True):
+        if not partype and not value:
+            raise ValueError('Either the type or the value of the parameter '
+                             'must be provided.')
         self.name = name
-        self.val = val
+        self.partype = partype
+        self.value = value
         self.assign = assign
-        stmt = dzn_statement(name, val, assign=assign)
+        if partype:
+            stmt = '{}: {}'.format(partype, name)
+            if value and assign:
+                stmt += ' = {}'.format(dzn_value(value))
+            stmt += ';'
+        else:
+            stmt = dzn_statement(name, value, assign=assign)
         super().__init__(stmt)
 
 
