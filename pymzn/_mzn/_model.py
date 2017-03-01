@@ -40,12 +40,9 @@ class Statement(object):
     ----------
     stmt : str
         The statement string.
-    comment : str
-        An optional comment to attach to the statement.
     """
-    def __init__(self, stmt, comment=None):
+    def __init__(self, stmt):
         self.stmt = stmt
-        self.comment = comment
 
     def compile(self):
         """Compiles the statement.
@@ -55,11 +52,7 @@ class Statement(object):
         str
             The statement string plus an optional comment attached.
         """
-        s = ''
-        if self.comment:
-            s += '% {}\n'.format(self.comment)
-        s += self.stmt
-        return s
+        return self.stmt
 
 
 class Comment(Statement):
