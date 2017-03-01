@@ -117,18 +117,18 @@ class Variable(Statement):
 
     Attributes
     ----------
+    name : str
+        The name of the variable.
     vartype : str
         The type of the variable.
-    var : str
-        The name of the variable.
-    val : str
+    value : str
         The optional value of the variable statement.
     output : bool
         Whether the variable is an output variable.
     """
-    def __init__(self, vartype, var, val=None, output=False):
-        self.var = var
-        self.val = val
+    def __init__(self, name, vartype, value=None, output=False):
+        self.name = name
+        self.value = value
         self.output = output
 
         _array_type_m = _array_type_p.match(vartype)
@@ -141,14 +141,14 @@ class Variable(Statement):
             vartype = 'var ' + vartype
         self.vartype = vartype
 
-        stmt = '{}: {}'.format(self.vartype, self.var)
-        if self.val:
-            stmt += ' = {}'.format(self.val)
+        stmt = '{}: {}'.format(vartype, name)
         if output:
             if _array_type_m:
                 stmt += ' :: output_array([{}])'.format(indexset)
             else:
                 stmt += ' :: output_var'
+        if value:
+            stmt += ' = {}'.format(value)
         stmt += ';'
 
         super().__init__(stmt)
