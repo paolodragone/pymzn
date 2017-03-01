@@ -62,6 +62,19 @@ class Statement(object):
         return s
 
 
+class Comment(Statement):
+    """A comment statement.
+
+    Attributes
+    ----------
+    comment : str
+        The comment string.
+    """
+    def __init__(self, comment):
+        stmt = '% {}\n'.format(comment)
+        super().__init__(stmt)
+
+
 class Constraint(Statement):
     """A constraint statement.
 
