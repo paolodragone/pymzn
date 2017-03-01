@@ -44,14 +44,7 @@ class Statement(object):
     def __init__(self, stmt):
         self.stmt = stmt
 
-    def compile(self):
-        """Compiles the statement.
-
-        Returns
-        -------
-        str
-            The statement string plus an optional comment attached.
-        """
+    def __str__(self):
         return self.stmt
 
 
