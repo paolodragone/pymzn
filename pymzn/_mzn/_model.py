@@ -69,13 +69,11 @@ class Constraint(Statement):
     const : str
         The content of the constraint, i.e. only the actual constraint without
         the starting 'constraint' and the ending semicolon.
-    comment : str
-        A comment to attach to the constraint.
     """
     def __init__(self, const, comment=None):
         self.const = const
         stmt = 'constraint {};'.format(self.const)
-        super().__init__(stmt, comment)
+        super().__init__(stmt)
 
 
 class Parameter(Statement):
@@ -92,12 +90,10 @@ class Parameter(Statement):
         If True the parameter value will be assigned directly into the model,
         otherwise it will only be declared in the model and then it will have to
         be assigned in the data.
-    comment : str
-        A comment to attach to the variable statement.
     """
-    def __init__(self, name, val, assign=True, comment=None):
+    def __init__(self, name, val, assign=True):
         stmt = dzn_statement(name, val, assign=assign)
-        super().__init__(stmt, comment)
+        super().__init__(stmt)
 
 
 class Variable(Statement):
@@ -113,10 +109,8 @@ class Variable(Statement):
         The optional value of the variable statement.
     output : bool
         Whether the variable is an output variable.
-    comment : str
-        A comment to attach to the variable statement.
     """
-    def __init__(self, vartype, var, val=None, output=False, comment=None):
+    def __init__(self, vartype, var, val=None, output=False):
         self.var = var
         self.val = val
         self.output = output
@@ -141,7 +135,7 @@ class Variable(Statement):
                 stmt += ' :: output_var'
         stmt += ';'
 
-        super().__init__(stmt, comment)
+        super().__init__(stmt)
 
 
 class ArrayVariable(Variable):
@@ -159,15 +153,12 @@ class ArrayVariable(Variable):
         The optional value of the variable statement.
     output : bool
         Whether the array variable is an output array.
-    comment : str
-        A comment to attach to the variable statement.
     """
-    def __init__(self, indexset, domain, var, val=None, output=False,
-                 comment=None):
+    def __init__(self, indexset, domain, var, val=None, output=False):
         self.indexset = indexset
         self.domain = domain
         vartype = 'array[{}] of var {}'.format(self.indexset, self.domain)
-        super().__init__(vartype, var, val, output, comment)
+        super().__init__(vartype, var, val, output)
 
 
 class OutputStatement(Statement):
@@ -181,10 +172,10 @@ class OutputStatement(Statement):
     comment : str
         A comment to attach to the output statement.
     """
-    def __init__(self, output, comment=None):
+    def __init__(self, output):
         self.output = output
         stmt = 'output [{}];'.format(self.output)
-        super().__init__(stmt, comment)
+        super().__init__(stmt)
 
 
 class SolveStatement(Statement):
@@ -199,10 +190,10 @@ class SolveStatement(Statement):
         A comment to attach to the solve statement.
     """
 
-    def __init__(self, solve, comment=None):
+    def __init__(self, solve):
         self.solve = solve
         stmt = 'solve {};'.format(self.solve)
-        super().__init__(stmt, comment)
+        super().__init__(stmt)
 
 
 class MiniZincModel(object):
