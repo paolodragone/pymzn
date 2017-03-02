@@ -356,30 +356,33 @@ class MiniZincModel(object):
                 self.par(name, val, assign)
         self._modified = True
 
-    def var(self, vartype, var, val=None, output=False, comment=None):
+    def variable(self, name, vartype, value=None, output=False):
         """Adds a variable to the model.
 
         Parameters
         ----------
+        name : str
+            The name of the variable.
         vartype : str
             The type of the variable.
-        var : str
-            The name of the variable.
-        val : str
+        value : str
             The optional value of the variable statement.
         output : bool
             Whether the variable is an output variable.
-        comment : str
-            A comment to attach to the variable statement.
         """
-        val = dzn_value(val) if val is not None else None
-        self._statements.append(Variable(vartype, var, val, output, comment))
-        if output or _var_type_p.match(vartype) and val is None:
-            self._free_vars.add(var)
+        value = dzn_value(value) if value is not None else None
         _array_type_m = _array_type_p.match(vartype)
         if _array_type_m:
-            dim = len(_array_type_m.group(1).split(','))
-            self._array_dims[var] = dim
+            indexset = _array_type_m.group(1)
+            domain = _array_type_m.group(2)
+            dim = len(indexset.split(','))
+            self._array_dims[name] = dim
+            var = ArrayVariable(name, indexset, domain, value, output)
+        else:
+            var = Variable(name, vartype, value, output)
+        self._statements.append(var)
+        if output or _var_type_m and value is None:
+            self._free_vars.add(name)
         self._modified = True
 
     def array_var(self, indexset, domain, var, val=None, output=False,
