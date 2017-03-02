@@ -237,6 +237,32 @@ class MiniZincModel(object):
             else:
                 self.model = mzn
 
+    def comment(self, comment):
+        if not isinstance(comment, Comment):
+            comment = Comment(comment)
+        self._statements.append(comment)
+        self._modified = True
+
+    def parameter(self, *par, assign=True):
+        """Adds a parameter to the model.
+
+        Parameters
+        ----------
+        par : Parameter or (str, str) or (str, obj)
+            Either a Parameter, a (name, type) pair or a (name, value) pair. In
+            the latter case, the type is inferred automatically from the value.
+        assign : bool
+            If True the parameter value will be assigned directly into the
+            model, otherwise it will only be declared in the model and then it
+            will have to be assigned in the data.
+        """
+        if isinstance(par[0], Parameter):
+            par = par[0]
+        else:
+            par = Parameter(*par, assign=assign)
+        self._statements.append(par)
+        self._modified = True
+
     def parameters(self, pars, assign=True):
         """Add a list of parameters.
 
@@ -374,26 +400,6 @@ class MiniZincModel(object):
         if not isinstance(output_stmt, OutputStatement):
             output_stmt = OutputStatement(output_stmt)
         self._output_stmt = output_stmt
-        self._modified = True
-
-    def parameter(self, *par, assign=True):
-        """Adds a parameter to the model.
-
-        Parameters
-        ----------
-        par : Parameter or (str, str) or (str, obj)
-            Either a Parameter, a (name, type) pair or a (name, value) pair. In
-            the latter case, the type is inferred automatically from the value.
-        assign : bool
-            If True the parameter value will be assigned directly into the
-            model, otherwise it will only be declared in the model and then it
-            will have to be assigned in the data.
-        """
-        if isinstance(par[0], Parameter):
-            par = par[0]
-        else:
-            par = Parameter(*par, assign=assign)
-        self._statements.append(par)
         self._modified = True
 
     def _load_model(self):
