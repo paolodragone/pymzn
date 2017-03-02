@@ -229,114 +229,15 @@ class MiniZincModel(object):
         self._modified = False
         self._parsed = False
 
+        self.mzn_file = None
+        self.model = None
         if mzn and isinstance(mzn, str):
             if os.path.isfile(mzn):
                 self.mzn_file = mzn
-                self.model = None
             else:
-                self.mzn_file = None
                 self.model = mzn
-        else:
-            self.mzn_file = None
-            self.model = None
 
-    def constraint(self, constr, comment=None):
-        """Adds a constraint to the current model.
-
-        Parameters
-        ----------
-        constr : str or Constraint
-            As a string, the content of the constraint, i.e. only the actual
-            constraint without the starting 'constraint' and the ending
-            semicolon.
-        comment : str
-            A comment to attach to the constraint.
-        """
-        if not isinstance(constr, Constraint):
-            constr = Constraint(constr, comment)
-        self._statements.append(constr)
-        self._modified = True
-
-    def constraints(self, constrs):
-        """Add a list of constraints.
-
-        Parameters
-        ----------
-        constrs : list of str or Constraint
-            A list of constraints.
-        """
-        for constr in constrs:
-            self.constraint(constr)
-
-    def solve(self, solve_stmt, comment=None):
-        """Updates the solve statement of the model.
-
-        Parameters
-        ----------
-        solve_stmt : str
-            The content of the solve statement, i.e. only the actual solve
-            without the starting 'solve' and the ending semicolon.
-        comment : str
-            A comment to attach to the solve statement.
-        """
-        if not isinstance(solve_stmt, SolveStatement):
-            solve_stmt = SolveStatement(solve_stmt, comment)
-        self._solve_stmt = solve_stmt
-        self._modified = True
-
-    def satisfy(self, comment=None):
-        """ Shorthand for solve('satisfy') """
-        self._solve_stmt = SolveStatement('satisfy', comment)
-        self._modified = True
-
-    def maximize(self, expr, comment=None):
-        """ Shorthand for solve('maximize ' + expr) """
-        self._solve_stmt = SolveStatement('maximize ' + expr, comment)
-        self._modified = True
-
-    def minimize(self, expr, comment=None):
-        """ Shorthand for solve('minimize ' + expr) """
-        self._solve_stmt = SolveStatement('minimize ' + expr, comment)
-        self._modified = True
-
-    def output(self, output_stmt, comment=None):
-        """Updates the output statement of the model.
-
-        Parameters
-        ----------
-        solve_stmt : str
-            The content of the output statement, i.e. only the actual output
-            without the starting 'output', the square brackets and the ending
-            semicolon.
-        comment : str
-            A comment to attach to the output statement.
-        """
-        if not isinstance(output_stmt, OutputStatement):
-            output_stmt = OutputStatement(output_stmt, comment)
-        self._output_stmt = output_stmt
-        self._modified = True
-
-    def par(self, name, val, assign=True, comment=None):
-        """Adds a parameter to the model.
-
-        Parameters
-        ----------
-        name
-            The name of the parameter.
-        val : obj
-            The python object to add as a parameter to the model.
-        assign : bool
-            If True the parameter value will be assigned directly into the
-            model, otherwise it will only be declared in the model and then it
-            will have to be assigned in the data.
-        comment : str
-            A comment to attach to the parameter statement.
-        """
-        par = Parameter(name, val, assign=assign, comment=comment)
-        self._statements.append(par)
-        self._modified = True
-
-    def pars(self, pars, assign=True):
+    def parameters(self, pars, assign=True):
         """Add a list of parameters.
 
         Parameters
@@ -349,11 +250,7 @@ class MiniZincModel(object):
             they will have to be assigned in the data.
         """
         for par in pars:
-            if isinstance(par, Parameter):
-                self._statements.append(par)
-            else:
-                name, val = par
-                self.par(name, val, assign)
+            self.parameter(*par, assign)
         self._modified = True
 
     def variable(self, name, vartype, value=None, output=False):
@@ -385,8 +282,7 @@ class MiniZincModel(object):
             self._free_vars.add(name)
         self._modified = True
 
-    def array_var(self, indexset, domain, var, val=None, output=False,
-                  comment=None):
+    def array_variable(self, indexset, domain, name, value=None, output=False):
         """Adds an array variable to the model.
 
         Parameters
@@ -395,21 +291,109 @@ class MiniZincModel(object):
             The indexset of the array.
         domain : str
             The domain of the array.
-        var : str
+        name : str
             The name of the array.
-        val : str
+        value : str
             The optional value of the array variable statement.
         output : bool
             Whether the array variable is an output array.
-        comment : str
-            A comment to attach to the variable statement.
         """
-        val = dzn_value(val) if val is not None else None
-        self._statements.append(ArrayVariable(indexset, domain, var, val, output,
-                                              comment))
-        if output or _var_type_p.match(domain) and val is None:
+        value = dzn_value(value) if value is not None else None
+        var = ArrayVariable(indexset, domain, name, value, output)
+        self._statements.append(var)
+        if output or _var_type_p.match(domain) and value is None:
             self._free_vars.add(var)
         self._array_dims[var] = len(indexset.split(','))
+        self._modified = True
+
+    def constraint(self, constr):
+        """Adds a constraint to the current model.
+
+        Parameters
+        ----------
+        constr : str or Constraint
+            As a string, the content of the constraint, i.e. only the actual
+            constraint without the starting 'constraint' and the ending
+            semicolon.
+        """
+        if not isinstance(constr, Constraint):
+            constr = Constraint(constr)
+        self._statements.append(constr)
+        self._modified = True
+
+    def constraints(self, constrs):
+        """Add a list of constraints.
+
+        Parameters
+        ----------
+        constrs : list of str or Constraint
+            A list of constraints.
+        """
+        for constr in constrs:
+            self.constraint(constr)
+
+    def solve(self, solve_stmt):
+        """Updates the solve statement of the model.
+
+        Parameters
+        ----------
+        solve_stmt : str
+            The content of the solve statement, i.e. only the actual solve
+            without the starting 'solve' and the ending semicolon.
+        """
+        if not isinstance(solve_stmt, SolveStatement):
+            solve_stmt = SolveStatement(solve_stmt)
+        self._solve_stmt = solve_stmt
+        self._modified = True
+
+    def satisfy(self):
+        """ Shorthand for solve('satisfy') """
+        self._solve_stmt = SolveStatement('satisfy')
+        self._modified = True
+
+    def maximize(self, expr):
+        """ Shorthand for solve('maximize ' + expr) """
+        self._solve_stmt = SolveStatement('maximize ' + expr)
+        self._modified = True
+
+    def minimize(self, expr):
+        """ Shorthand for solve('minimize ' + expr) """
+        self._solve_stmt = SolveStatement('minimize ' + expr)
+        self._modified = True
+
+    def output(self, output_stmt):
+        """Updates the output statement of the model.
+
+        Parameters
+        ----------
+        solve_stmt : str
+            The content of the output statement, i.e. only the actual output
+            without the starting 'output', the square brackets and the ending
+            semicolon.
+        """
+        if not isinstance(output_stmt, OutputStatement):
+            output_stmt = OutputStatement(output_stmt)
+        self._output_stmt = output_stmt
+        self._modified = True
+
+    def parameter(self, *par, assign=True):
+        """Adds a parameter to the model.
+
+        Parameters
+        ----------
+        par : Parameter or (str, str) or (str, obj)
+            Either a Parameter, a (name, type) pair or a (name, value) pair. In
+            the latter case, the type is inferred automatically from the value.
+        assign : bool
+            If True the parameter value will be assigned directly into the
+            model, otherwise it will only be declared in the model and then it
+            will have to be assigned in the data.
+        """
+        if isinstance(par[0], Parameter):
+            par = par[0]
+        else:
+            par = Parameter(*par, assign=assign)
+        self._statements.append(par)
         self._modified = True
 
     def _load_model(self):
