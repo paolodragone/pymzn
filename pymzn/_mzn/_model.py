@@ -25,9 +25,9 @@ from pymzn._dzn._marsh import dzn_statement, dzn_value
 _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 _comm_p = re.compile('%.*\n')
 _var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
+_type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]|array\[\s\w\.\]\s*of\s*[\s\w\.])')
 _var_type_p = re.compile('^\s*.*?var.+')
-_array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
-                            '\s+of\s+(.+?)$')
+_array_type_p = re.compile('^\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+?)$')
 _output_stmt_p = re.compile('(^|\s)output\s*\[.+?\]\s*;', re.DOTALL)
 _solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
 
@@ -81,33 +81,32 @@ class Parameter(Statement):
 
     Attributes
     ----------
-    name : str
-        The name of the parameter.
-    partype : str
-        The MiniZinc type of the parameter.
-    value : obj
-        The python object to convert into a parameter. If partype is not
-        specified, the type of the parameter is inferred from the python object.
+    par : (str, str) or (str, obj)
+        Either a (name, type) pair or a (name, value) pair. In the latter case
+        the type is automatically inferred from the value.
     assign : bool
         If True the parameter value will be assigned directly into the model,
         otherwise it will only be declared in the model and then it will have to
         be assigned in the data.
     """
-    def __init__(self, name, partype=None, value=None, assign=True):
+    def __init__(self, *par, assign=True):
         if not partype and not value:
             raise ValueError('Either the type or the value of the parameter '
                              'must be provided.')
+        name, par = par
         self.name = name
-        self.partype = partype
-        self.value = value
+        self.type = None
+        self.value = None
         self.assign = assign
-        if partype:
-            stmt = '{}: {}'.format(partype, name)
-            if value and assign:
-                stmt += ' = {}'.format(dzn_value(value))
-            stmt += ';'
+        _type_m = _type_p.match(par)
+        if _type_m:
+            self.type = par
         else:
-            stmt = dzn_statement(name, value, assign=assign)
+            self.value = par
+        if self.type:
+            stmt = '{}: {};'.format(self.type, self.name)
+        else:
+            stmt = dzn_statement(self.name, self.value, assign=assign)
         super().__init__(stmt)
 
 
