@@ -238,6 +238,13 @@ class MiniZincModel(object):
                 self.model = mzn
 
     def comment(self, comment):
+        """Add a comment to the model.
+
+        Parameters
+        ----------
+        comment : str
+            The comment string.
+        """
         if not isinstance(comment, Comment):
             comment = Comment(comment)
         self._statements.append(comment)
@@ -373,17 +380,17 @@ class MiniZincModel(object):
         self._modified = True
 
     def satisfy(self):
-        """ Shorthand for solve('satisfy') """
+        """Shorthand for solve('satisfy')"""
         self._solve_stmt = SolveStatement('satisfy')
         self._modified = True
 
     def maximize(self, expr):
-        """ Shorthand for solve('maximize ' + expr) """
+        """Shorthand for solve('maximize ' + expr)"""
         self._solve_stmt = SolveStatement('maximize ' + expr)
         self._modified = True
 
     def minimize(self, expr):
-        """ Shorthand for solve('minimize ' + expr) """
+        """Shorthand for solve('minimize ' + expr)"""
         self._solve_stmt = SolveStatement('minimize ' + expr)
         self._modified = True
 
