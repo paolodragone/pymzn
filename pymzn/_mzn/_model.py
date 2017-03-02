@@ -24,12 +24,52 @@ from pymzn._dzn._marsh import dzn_statement, dzn_value
 
 _stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 _comm_p = re.compile('%.*\n')
-_var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
-_type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]|array\[\s\w\.\]\s*of\s*[\s\w\.])')
-_var_type_p = re.compile('^\s*.*?var.+')
-_array_type_p = re.compile('^\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+?)$')
-_output_stmt_p = re.compile('(^|\s)output\s*\[.+?\]\s*;', re.DOTALL)
-_solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
+_var_p = re.compile('\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
+_type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
+_var_type_p = re.compile('\s*.*?var.+\s*')
+_array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+?)\s*')
+_output_stmt_p = re.compile('\s*output\s*\[.+?\]\s*(?:;)?\s*')
+_solve_stmt_p = re.compile('\s*solve\s[^;]+\s*(?:;)?\s*')
+_constraint_p = re.compile('\s*constraint\s*(.+)\s*')
+
+
+def parse(model):
+    model = _comm_p.sub('', model)
+    stmts = _stmt_p.findall(model)
+    parameters = []
+    variables = []
+    constraints = []
+    solve = None
+    output = None
+    for stmt in stmts:
+        _var_m = _var_p.match(stmt)
+        if _var_m:
+            vartype = _var_m.group(1)
+            name = _var_m.group(2)
+            value = _var_m.group(3)
+            _var_type_m = _var_type_p.match(vartype)
+            if not _var_type_m:
+                par = name, vartype, value
+                parameters.append(par)
+                continue
+            var = name, vartype, value
+            variables.append(var)
+            continue
+        _constraint_m = _constraint_p.match(stmt)
+        if _constraint_m:
+            constraint = _constraint_m.group(1)
+            constraints.append(constraint)
+            continue
+        _solve_stmt_m = _solve_stmt_p.match(stmt)
+        if _solve_stmt_m:
+            solve = _solve_stmt_m.group(1)
+            continue
+        _output_stmt_m = _output_stmt_p.match(stmt)
+        if _output_stmt_m:
+            output = _output_stmt_m.group(1)
+            continue
+        raise ValueError('Cannot interpret statement: {}'.format(stmt))
+    return parameters, variables, constraints, solve, output
 
 
 class Statement(object):
@@ -422,20 +462,15 @@ class MiniZincModel(object):
         if self._parsed:
             return
         model = self._load_model()
-        model = _comm_p.sub('', model)
-        stmts = _stmt_p.findall(model)
-        for stmt in stmts:
-            _var_m = _var_p.match(stmt)
-            if _var_m:
-                vartype = _var_m.group(1)
-                var = _var_m.group(2)
-                val = _var_m.group(3)
-                if _var_type_p.match(vartype) and val is None:
-                    self._free_vars.add(var)
-                _array_type_m = _array_type_p.match(vartype)
-                if _array_type_m:
-                    dim = len(_array_type_m.group(1).split(','))
-                    self._array_dims[var] = dim
+        _, variables, _, _, _ = parse(model)
+        for var in variables:
+            name, vartype, value = var
+            if _var_type_p.match(vartype) and value is None:
+                self._free_vars.add(name)
+            _array_type_m = _array_type_p.match(vartype)
+            if _array_type_m:
+                dim = len(_array_type_m.group(1).split(','))
+                self._array_dims[name] = dim
         self._parsed = True
 
     def dzn_output_stmt(self, output_vars=None, comment=None):
