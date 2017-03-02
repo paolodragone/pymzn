@@ -20,56 +20,7 @@ import os.path
 
 from pymzn._utils import get_logger
 from pymzn._dzn._marsh import dzn_statement, dzn_value
-
-
-_stmt_p = re.compile('(?:^|;)\s*([^;]+)')
-_comm_p = re.compile('%.*\n')
-_var_p = re.compile('\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
-_type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
-_var_type_p = re.compile('\s*.*?var.+\s*')
-_array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+?)\s*')
-_output_stmt_p = re.compile('\s*output\s*\[.+?\]\s*(?:;)?\s*')
-_solve_stmt_p = re.compile('\s*solve\s[^;]+\s*(?:;)?\s*')
-_constraint_p = re.compile('\s*constraint\s*(.+)\s*')
-
-
-def parse(model):
-    model = _comm_p.sub('', model)
-    stmts = _stmt_p.findall(model)
-    parameters = []
-    variables = []
-    constraints = []
-    solve = None
-    output = None
-    for stmt in stmts:
-        _var_m = _var_p.match(stmt)
-        if _var_m:
-            vartype = _var_m.group(1)
-            name = _var_m.group(2)
-            value = _var_m.group(3)
-            _var_type_m = _var_type_p.match(vartype)
-            if not _var_type_m:
-                par = name, vartype, value
-                parameters.append(par)
-                continue
-            var = name, vartype, value
-            variables.append(var)
-            continue
-        _constraint_m = _constraint_p.match(stmt)
-        if _constraint_m:
-            constraint = _constraint_m.group(1)
-            constraints.append(constraint)
-            continue
-        _solve_stmt_m = _solve_stmt_p.match(stmt)
-        if _solve_stmt_m:
-            solve = _solve_stmt_m.group(1)
-            continue
-        _output_stmt_m = _output_stmt_p.match(stmt)
-        if _output_stmt_m:
-            output = _output_stmt_m.group(1)
-            continue
-        raise ValueError('Cannot interpret statement: {}'.format(stmt))
-    return parameters, variables, constraints, solve, output
+from pymzn._mzn._parse import *
 
 
 class Statement(object):
@@ -130,16 +81,13 @@ class Parameter(Statement):
         be assigned in the data.
     """
     def __init__(self, *par, assign=True):
-        if not partype and not value:
-            raise ValueError('Either the type or the value of the parameter '
-                             'must be provided.')
         name, par = par
         self.name = name
         self.type = None
         self.value = None
         self.assign = assign
-        _type_m = _type_p.match(par)
-        if _type_m:
+        type_m = type_p.match(par)
+        if type_m:
             self.type = par
         else:
             self.value = par
@@ -169,10 +117,10 @@ class Variable(Statement):
         self.value = value
         self.output = output
 
-        _array_type_m = _array_type_p.match(vartype)
-        if _array_type_m:
-            indexset = _array_type_m.group(1)
-            domain = _array_type_m.group(2)
+        array_type_m = array_type_p.match(vartype)
+        if array_type_m:
+            indexset = array_type_m.group(1)
+            domain = array_type_m.group(2)
             if 'var' not in domain:
                 vartype = 'array[{}] of var {}'.format(indexset, domain)
         elif 'var' not in vartype:
@@ -181,7 +129,7 @@ class Variable(Statement):
 
         stmt = '{}: {}'.format(vartype, name)
         if output:
-            if _array_type_m:
+            if array_type_m:
                 stmt += ' :: output_array([{}])'.format(indexset)
             else:
                 stmt += ' :: output_var'
@@ -341,17 +289,19 @@ class MiniZincModel(object):
             Whether the variable is an output variable.
         """
         value = dzn_value(value) if value is not None else None
-        _array_type_m = _array_type_p.match(vartype)
-        if _array_type_m:
-            indexset = _array_type_m.group(1)
-            domain = _array_type_m.group(2)
+        array_type_m = array_type_p.match(vartype)
+        if array_type_m:
+            indexset = array_type_m.group(1)
+            domain = array_type_m.group(2)
             dim = len(indexset.split(','))
             self._array_dims[name] = dim
             var = ArrayVariable(name, indexset, domain, value, output)
         else:
             var = Variable(name, vartype, value, output)
         self._statements.append(var)
-        if output or _var_type_m and value is None:
+
+        var_type_m = var_type_p.match(vartype)
+        if output or var_type_m and value is None:
             self._free_vars.add(name)
         self._modified = True
 
@@ -374,7 +324,7 @@ class MiniZincModel(object):
         value = dzn_value(value) if value is not None else None
         var = ArrayVariable(indexset, domain, name, value, output)
         self._statements.append(var)
-        if output or _var_type_p.match(domain) and value is None:
+        if output or var_type_p.match(domain) and value is None:
             self._free_vars.add(var)
         self._array_dims[var] = len(indexset.split(','))
         self._modified = True
@@ -465,10 +415,10 @@ class MiniZincModel(object):
         _, variables, _, _, _ = parse(model)
         for var in variables:
             name, vartype, value = var
-            if _var_type_p.match(vartype) and value is None:
+            if var_type_p.match(vartype) and value is None:
                 self._free_vars.add(name)
-            _array_type_m = _array_type_p.match(vartype)
-            if _array_type_m:
+            array_type_m = array_type_p.match(vartype)
+            if array_type_m:
                 dim = len(_array_type_m.group(1).split(','))
                 self._array_dims[name] = dim
         self._parsed = True
@@ -545,11 +495,11 @@ class MiniZincModel(object):
                 lines.append(str(stmt))
 
             if self._solve_stmt:
-                model = _solve_stmt_p.sub('', model)
+                model = solve_stmt_p.sub('', model)
                 lines.append(str(self._solve_stmt) + '\n')
 
             if self._output_stmt:
-                model = _output_stmt_p.sub('', model)
+                model = output_stmt_p.sub('', model)
                 lines.append(str(self._output_stmt) + '\n')
 
             model += '\n'.join(lines)
