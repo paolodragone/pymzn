@@ -86,10 +86,11 @@ class Parameter(Statement):
         self.type = None
         self.value = None
         self.assign = assign
-        type_m = type_p.match(par)
-        if type_m:
-            self.type = par
-        else:
+        if isinstance(par, str):
+            type_m = type_p.match(par)
+            if type_m:
+                self.type = par
+        if not self.type:
             self.value = par
         if self.type:
             stmt = '{}: {};'.format(self.type, self.name)
@@ -271,7 +272,7 @@ class MiniZincModel(object):
             they will have to be assigned in the data.
         """
         for par in pars:
-            self.parameter(*par, assign)
+            self.parameter(*par, assign=assign)
         self._modified = True
 
     def variable(self, name, vartype, value=None, output=False):
@@ -305,27 +306,27 @@ class MiniZincModel(object):
             self._free_vars.add(name)
         self._modified = True
 
-    def array_variable(self, indexset, domain, name, value=None, output=False):
+    def array_variable(self, name, indexset, domain, value=None, output=False):
         """Adds an array variable to the model.
 
         Parameters
         ----------
+        name : str
+            The name of the array.
         indexset : str
             The indexset of the array.
         domain : str
             The domain of the array.
-        name : str
-            The name of the array.
         value : str
             The optional value of the array variable statement.
         output : bool
             Whether the array variable is an output array.
         """
         value = dzn_value(value) if value is not None else None
-        var = ArrayVariable(indexset, domain, name, value, output)
+        var = ArrayVariable(name, indexset, domain, value, output)
         self._statements.append(var)
         if output or var_type_p.match(domain) and value is None:
-            self._free_vars.add(var)
+            self._free_vars.add(name)
         self._array_dims[var] = len(indexset.split(','))
         self._modified = True
 
@@ -412,7 +413,7 @@ class MiniZincModel(object):
         if self._parsed:
             return
         model = self._load_model()
-        _, variables, _, _, _ = parse(model)
+        _, variables, *_ = parse(model)
         for var in variables:
             name, vartype, value = var
             if var_type_p.match(vartype) and value is None:
@@ -467,7 +468,7 @@ class MiniZincModel(object):
             else:
                 out_list.append(out_var.format(var))
         out_list = ', '.join(out_list)
-        self.output(out_list, comment)
+        self.output(out_list)
 
     def compile(self, output_file=None):
         """Compiles the model and writes it to file.
