@@ -6,7 +6,7 @@ comm_p = re.compile('%.*\n')
 var_p = re.compile('\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
 type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
 var_type_p = re.compile('\s*.*?var.+\s*')
-array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+?)\s*')
+array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
 output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
 solve_stmt_p = re.compile('\s*solve\s*([^;]+)\s*(?:;)?\s*')
 constraint_p = re.compile('\s*constraint\s*(.+)\s*')
@@ -20,6 +20,7 @@ def parse(model):
     constraints = []
     solve = None
     output = None
+    others = []
     for stmt in stmts:
         if not stmt.strip():
             continue
@@ -49,5 +50,5 @@ def parse(model):
         if output_stmt_m:
             output = output_stmt_m.group(1)
             continue
-        raise ValueError('Cannot interpret statement: {}'.format(stmt))
-    return parameters, variables, constraints, solve, output
+        others.append(stmt)
+    return parameters, variables, constraints, solve, output, others
