@@ -39,7 +39,7 @@ from pymzn._dzn import dzn_eval, dzn
 def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
              globals_dir=None, stdlib_dir=None, path=None, eval_output=True,
              output_vars=None, solver=gecode, check_complete=False,
-             all_solutions=False, **solver_args):
+             all_solutions=False, parse_output=True, **solver_args):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     It first calls mzn2fzn to compile the fzn and ozn files, then it calls the
@@ -177,7 +177,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     if solver_check_complete:
         out, complete = out
 
-    if solver.support_ozn:
+    if solver.support_ozn and parse_output:
         try:
             if check_complete:
                 solns, complete = solns2out(out, ozn_file, check_complete=True)
