@@ -134,7 +134,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     else:
         mzn_model = MiniZincModel(mzn)
 
-    if eval_output:
+    if eval_output and parse_output:
         mzn_model.dzn_output_stmt(output_vars)
 
     if not solver:
@@ -177,12 +177,13 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     if solver_check_complete:
         out, complete = out
 
-    if solver.support_ozn and parse_output:
+    if solver.support_ozn:
         try:
             if check_complete:
-                solns, complete = solns2out(out, ozn_file, check_complete=True)
+                solns, complete = solns2out(out, ozn_file, check_complete=True,
+                                            parse_output=parse_output)
             else:
-                solns = solns2out(out, ozn_file)
+                solns = solns2out(out, ozn_file, parse_output=parse_output)
         except (MiniZincUnsatisfiableError, MiniZincUnknownError,
                 MiniZincUnboundedError) as err:
             err.mzn_file = mzn_file
@@ -323,8 +324,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def solns2out(soln_stream, ozn_file, check_complete=False):
-    """Wraps the solns2out utility, executes it on the solution stream, and 
+def solns2out(soln_stream, ozn_file, check_complete=False, parse_output=True):
+    """Wraps the solns2out utility, executes it on the solution stream, and
     then returns the output.
 
     Parameters
@@ -354,14 +355,16 @@ def solns2out(soln_stream, ozn_file, check_complete=False):
     unkn_msg = '=====UNKNOWN====='
     unbnd_msg = '=====UNBOUNDED====='
 
-    args = [config.get('solns2out', 'solns2out'), ozn_file]
-
-    try:
-        process = run(args, stdin=soln_stream)
-        out = process.stdout
-    except CalledProcessError as err:
-        log.exception(err.stderr)
-        raise RuntimeError(err.stderr) from err
+    if parse_output:
+        args = [config.get('solns2out', 'solns2out'), ozn_file]
+        try:
+            process = run(args, stdin=soln_stream)
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+    else:
+        out = soln_stream
 
     lines = out.splitlines()
     solns = []
