@@ -385,7 +385,7 @@ def solns2out(soln_stream, ozn_file, check_complete=False):
         else:
             curr_out.append(line)
 
-    log.debug('Solutions found: {}', len(soln))
+    log.debug('Solutions found: {}', len(solns))
 
     if check_complete:
         return solns, complete
