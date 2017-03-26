@@ -420,7 +420,7 @@ class MiniZincModel(object):
                 self._free_vars.add(name)
             array_type_m = array_type_p.match(vartype)
             if array_type_m:
-                dim = len(_array_type_m.group(1).split(','))
+                dim = len(array_type_m.group(1).split(','))
                 self._array_dims[name] = dim
         self._parsed = True
 
