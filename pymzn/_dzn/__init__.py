@@ -42,7 +42,7 @@ variable assignments. For instance, given the following dzn file:::
 
 Running the function:::
 
-    pymzn.parse_dzn('test.dzn')
+    pymzn.dzn_eval('test.dzn')
 
 will return:::
 
@@ -61,7 +61,7 @@ explicit keys. For instance:::
 but when translating back the array, whose index-set is based in 1, will be
 translated into a list:::
 
-    pymzn.parse_dzn('a = array1d(1..3, [2, 4, 6]);')
+    pymzn.dzn_eval('a = array1d(1..3, [2, 4, 6]);')
     # returns: {'a': [2, 4, 6]}
 
 If you wish to avoid this behavior and get all arrays as dictionaries then you
