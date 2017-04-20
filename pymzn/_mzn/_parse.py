@@ -2,18 +2,20 @@
 import re
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
-comm_p = re.compile('%.*\n')
-var_p = re.compile('\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
+block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
+line_comm_p = re.compile('%.*\n')
+var_p = re.compile('\s*([\s\w,\.\(\)\[\]\{\}\+\-\*/]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
 type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
 var_type_p = re.compile('\s*.*?var.+\s*')
 array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
 output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
 solve_stmt_p = re.compile('\s*solve\s*([^;]+)\s*(?:;)?\s*')
-constraint_p = re.compile('\s*constraint\s*(.+)\s*')
+constraint_p = re.compile('\s*constraint\s*(.+)\s*', re.DOTALL)
 
 
 def parse(model):
-    model = comm_p.sub('', model)
+    model = block_comm_p.sub('', model)
+    model = line_comm_p.sub('', model)
     stmts = stmt_p.findall(model)
     parameters = []
     variables = []
@@ -25,7 +27,7 @@ def parse(model):
         if not stmt.strip():
             continue
         var_m = var_p.match(stmt)
-        if var_m:
+        if var_m and not ('function' in stmt or 'predicate' in stmt):
             vartype = var_m.group(1)
             name = var_m.group(2)
             value = var_m.group(3)
@@ -52,3 +54,4 @@ def parse(model):
             continue
         others.append(stmt)
     return parameters, variables, constraints, solve, output, others
+
