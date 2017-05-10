@@ -18,19 +18,9 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from pymzn import dzn_value
 from pymzn._utils import get_logger
-from pymzn._dzn._marsh import dzn_statement
-
-
-_stmt_p = re.compile('(?:^|;)\s*([^;]+)')
-_comm_p = re.compile('%.*\n')
-_var_p = re.compile('^\s*([^:]+?):\s*(\w+)\s*(?:=\s*(.+))?$')
-_var_type_p = re.compile('^\s*.*?var.+')
-_array_type_p = re.compile('^\s*array\[([\w\.]+(?:\s*,\s*[\w\.]+)*)\]'
-                            '\s+of\s+(.+?)$')
-_output_stmt_p = re.compile('(^|\s)output\s*\[.+?\]\s*;', re.DOTALL)
-_solve_stmt_p = re.compile('(^|\s)solve\s[^;]+?;')
+from pymzn._dzn._marsh import dzn_statement, dzn_value
+from pymzn._mzn._parse import *
 
 
 class Statement(object):
@@ -40,26 +30,26 @@ class Statement(object):
     ----------
     stmt : str
         The statement string.
-    comment : str
-        An optional comment to attach to the statement.
     """
-    def __init__(self, stmt, comment=None):
+    def __init__(self, stmt):
         self.stmt = stmt
+
+    def __str__(self):
+        return self.stmt
+
+
+class Comment(Statement):
+    """A comment statement.
+
+    Attributes
+    ----------
+    comment : str
+        The comment string.
+    """
+    def __init__(self, comment):
         self.comment = comment
-
-    def compile(self):
-        """Compiles the statement.
-
-        Returns
-        -------
-        str
-            The statement string plus an optional comment attached.
-        """
-        s = ''
-        if self.comment:
-            s += '% {}\n'.format(self.comment)
-        s += self.stmt
-        return s
+        stmt = '% {}\n'.format(comment)
+        super().__init__(stmt)
 
 
 class Constraint(Statement):
@@ -67,16 +57,14 @@ class Constraint(Statement):
 
     Attributes
     ----------
-    const : str
+    constr : str
         The content of the constraint, i.e. only the actual constraint without
         the starting 'constraint' and the ending semicolon.
-    comment : str
-        A comment to attach to the constraint.
     """
-    def __init__(self, const, comment=None):
-        self.const = const
-        stmt = 'constraint {};'.format(self.const)
-        super().__init__(stmt, comment)
+    def __init__(self, constr, comment=None):
+        self.constr = constr
+        stmt = 'constraint {};'.format(constr)
+        super().__init__(stmt)
 
 
 class Parameter(Statement):
@@ -84,21 +72,31 @@ class Parameter(Statement):
 
     Attributes
     ----------
-    name : str
-        The name of the parameter.
-    val
-        The python object to convert into a parameter. The type is inferred from
-        the python object.
+    par : (str, str) or (str, obj)
+        Either a (name, type) pair or a (name, value) pair. In the latter case
+        the type is automatically inferred from the value.
     assign : bool
         If True the parameter value will be assigned directly into the model,
         otherwise it will only be declared in the model and then it will have to
         be assigned in the data.
-    comment : str
-        A comment to attach to the variable statement.
     """
-    def __init__(self, name, val, assign=True, comment=None):
-        stmt = dzn_statement(name, val, assign=assign)
-        super().__init__(stmt, comment)
+    def __init__(self, *par, assign=True):
+        name, par = par
+        self.name = name
+        self.type = None
+        self.value = None
+        self.assign = assign
+        if isinstance(par, str):
+            type_m = type_p.match(par)
+            if type_m:
+                self.type = par
+        if not self.type:
+            self.value = par
+        if self.type:
+            stmt = '{}: {};'.format(self.type, self.name)
+        else:
+            stmt = dzn_statement(self.name, self.value, assign=assign)
+        super().__init__(stmt)
 
 
 class Variable(Statement):
@@ -106,43 +104,41 @@ class Variable(Statement):
 
     Attributes
     ----------
+    name : str
+        The name of the variable.
     vartype : str
         The type of the variable.
-    var : str
-        The name of the variable.
-    val : str
+    value : str
         The optional value of the variable statement.
     output : bool
         Whether the variable is an output variable.
-    comment : str
-        A comment to attach to the variable statement.
     """
-    def __init__(self, vartype, var, val=None, output=False, comment=None):
-        self.var = var
-        self.val = val
+    def __init__(self, name, vartype, value=None, output=False):
+        self.name = name
+        self.value = value
         self.output = output
 
-        _array_type_m = _array_type_p.match(vartype)
-        if _array_type_m:
-            indexset = _array_type_m.group(1)
-            domain = _array_type_m.group(2)
+        array_type_m = array_type_p.match(vartype)
+        if array_type_m:
+            indexset = array_type_m.group(1)
+            domain = array_type_m.group(2)
             if 'var' not in domain:
                 vartype = 'array[{}] of var {}'.format(indexset, domain)
         elif 'var' not in vartype:
             vartype = 'var ' + vartype
         self.vartype = vartype
 
-        stmt = '{} : {}'.format(self.vartype, self.var)
-        if self.val:
-            stmt += ' = {}'.format(self.val)
+        stmt = '{}: {}'.format(vartype, name)
         if output:
-            if _array_type_m:
+            if array_type_m:
                 stmt += ' :: output_array([{}])'.format(indexset)
             else:
                 stmt += ' :: output_var'
+        if value:
+            stmt += ' = {}'.format(value)
         stmt += ';'
 
-        super().__init__(stmt, comment)
+        super().__init__(stmt)
 
 
 class ArrayVariable(Variable):
@@ -150,25 +146,22 @@ class ArrayVariable(Variable):
 
     Attributes
     ----------
+    name : str
+        The name of the variable.
     indexset : str
         The indexset of the array.
     domain : str
         The domain of the array.
-    var : str
-        The name of the variable.
-    val : str
+    value : str
         The optional value of the variable statement.
     output : bool
         Whether the array variable is an output array.
-    comment : str
-        A comment to attach to the variable statement.
     """
-    def __init__(self, indexset, domain, var, val=None, output=False,
-                 comment=None):
+    def __init__(self, name, indexset, domain, value=None, output=False):
         self.indexset = indexset
         self.domain = domain
-        vartype = 'array[{}] of var {}'.format(self.indexset, self.domain)
-        super().__init__(vartype, var, val, output, comment)
+        vartype = 'array[{}] of var {}'.format(indexset, domain)
+        super().__init__(name, vartype, value, output)
 
 
 class OutputStatement(Statement):
@@ -179,13 +172,11 @@ class OutputStatement(Statement):
     output : str
         The content of the output statement, i.e. only the actual output without
         the starting 'output', the square brackets and the ending semicolon.
-    comment : str
-        A comment to attach to the output statement.
     """
-    def __init__(self, output, comment=None):
+    def __init__(self, output):
         self.output = output
-        stmt = 'output [{}];'.format(self.output)
-        super().__init__(stmt, comment)
+        stmt = 'output [{}];'.format(output)
+        super().__init__(stmt)
 
 
 class SolveStatement(Statement):
@@ -196,14 +187,12 @@ class SolveStatement(Statement):
     solve : str
         The content of the solve statement, i.e. only the actual solve without
         the starting 'solve' and the ending semicolon.
-    comment : str
-        A comment to attach to the solve statement.
     """
 
-    def __init__(self, solve, comment=None):
+    def __init__(self, solve):
         self.solve = solve
-        stmt = 'solve {};'.format(self.solve)
-        super().__init__(stmt, comment)
+        stmt = 'solve {};'.format(solve)
+        super().__init__(stmt)
 
 
 class MiniZincModel(object):
@@ -229,18 +218,119 @@ class MiniZincModel(object):
         self._modified = False
         self._parsed = False
 
+        self.mzn_file = None
+        self.model = None
         if mzn and isinstance(mzn, str):
             if os.path.isfile(mzn):
                 self.mzn_file = mzn
-                self.model = None
             else:
-                self.mzn_file = None
                 self.model = mzn
-        else:
-            self.mzn_file = None
-            self.model = None
 
-    def constraint(self, constr, comment=None):
+    def comment(self, comment):
+        """Add a comment to the model.
+
+        Parameters
+        ----------
+        comment : str
+            The comment string.
+        """
+        if not isinstance(comment, Comment):
+            comment = Comment(comment)
+        self._statements.append(comment)
+        self._modified = True
+
+    def parameter(self, *par, assign=True):
+        """Adds a parameter to the model.
+
+        Parameters
+        ----------
+        par : Parameter or (str, str) or (str, obj)
+            Either a Parameter, a (name, type) pair or a (name, value) pair. In
+            the latter case, the type is inferred automatically from the value.
+        assign : bool
+            If True the parameter value will be assigned directly into the
+            model, otherwise it will only be declared in the model and then it
+            will have to be assigned in the data.
+        """
+        if isinstance(par[0], Parameter):
+            par = par[0]
+        else:
+            par = Parameter(*par, assign=assign)
+        self._statements.append(par)
+        self._modified = True
+
+    def parameters(self, pars, assign=True):
+        """Add a list of parameters.
+
+        Parameters
+        ----------
+        pars : list of (name, val) or Parameter
+            The list of parameters to add to the model.
+        assign : bool
+            If True the parameters value will be assigned directly into the
+            model, otherwise they will only be declared in the model and then
+            they will have to be assigned in the data.
+        """
+        for par in pars:
+            self.parameter(*par, assign=assign)
+        self._modified = True
+
+    def variable(self, name, vartype, value=None, output=False):
+        """Adds a variable to the model.
+
+        Parameters
+        ----------
+        name : str
+            The name of the variable.
+        vartype : str
+            The type of the variable.
+        value : str
+            The optional value of the variable statement.
+        output : bool
+            Whether the variable is an output variable.
+        """
+        value = dzn_value(value) if value is not None else None
+        array_type_m = array_type_p.match(vartype)
+        if array_type_m:
+            indexset = array_type_m.group(1)
+            domain = array_type_m.group(2)
+            dim = len(indexset.split(','))
+            self._array_dims[name] = dim
+            var = ArrayVariable(name, indexset, domain, value, output)
+        else:
+            var = Variable(name, vartype, value, output)
+        self._statements.append(var)
+
+        var_type_m = var_type_p.match(vartype)
+        if output or var_type_m and value is None:
+            self._free_vars.add(name)
+        self._modified = True
+
+    def array_variable(self, name, indexset, domain, value=None, output=False):
+        """Adds an array variable to the model.
+
+        Parameters
+        ----------
+        name : str
+            The name of the array.
+        indexset : str
+            The indexset of the array.
+        domain : str
+            The domain of the array.
+        value : str
+            The optional value of the array variable statement.
+        output : bool
+            Whether the array variable is an output array.
+        """
+        value = dzn_value(value) if value is not None else None
+        var = ArrayVariable(name, indexset, domain, value, output)
+        self._statements.append(var)
+        if output or var_type_p.match(domain) and value is None:
+            self._free_vars.add(name)
+        self._array_dims[var] = len(indexset.split(','))
+        self._modified = True
+
+    def constraint(self, constr):
         """Adds a constraint to the current model.
 
         Parameters
@@ -249,11 +339,9 @@ class MiniZincModel(object):
             As a string, the content of the constraint, i.e. only the actual
             constraint without the starting 'constraint' and the ending
             semicolon.
-        comment : str
-            A comment to attach to the constraint.
         """
         if not isinstance(constr, Constraint):
-            constr = Constraint(constr, comment)
+            constr = Constraint(constr)
         self._statements.append(constr)
         self._modified = True
 
@@ -268,7 +356,7 @@ class MiniZincModel(object):
         for constr in constrs:
             self.constraint(constr)
 
-    def solve(self, solve_stmt, comment=None):
+    def solve(self, solve_stmt):
         """Updates the solve statement of the model.
 
         Parameters
@@ -276,30 +364,28 @@ class MiniZincModel(object):
         solve_stmt : str
             The content of the solve statement, i.e. only the actual solve
             without the starting 'solve' and the ending semicolon.
-        comment : str
-            A comment to attach to the solve statement.
         """
         if not isinstance(solve_stmt, SolveStatement):
-            solve_stmt = SolveStatement(solve_stmt, comment)
+            solve_stmt = SolveStatement(solve_stmt)
         self._solve_stmt = solve_stmt
         self._modified = True
 
-    def satisfy(self, comment=None):
-        """ Shorthand for solve('satisfy') """
-        self._solve_stmt = SolveStatement('satisfy', comment)
+    def satisfy(self):
+        """Shorthand for solve('satisfy')"""
+        self._solve_stmt = SolveStatement('satisfy')
         self._modified = True
 
-    def maximize(self, expr, comment=None):
-        """ Shorthand for solve('maximize ' + expr) """
-        self._solve_stmt = SolveStatement('maximize ' + expr, comment)
+    def maximize(self, expr):
+        """Shorthand for solve('maximize ' + expr)"""
+        self._solve_stmt = SolveStatement('maximize ' + expr)
         self._modified = True
 
-    def minimize(self, expr, comment=None):
-        """ Shorthand for solve('minimize ' + expr) """
-        self._solve_stmt = SolveStatement('minimize ' + expr, comment)
+    def minimize(self, expr):
+        """Shorthand for solve('minimize ' + expr)"""
+        self._solve_stmt = SolveStatement('minimize ' + expr)
         self._modified = True
 
-    def output(self, output_stmt, comment=None):
+    def output(self, output_stmt):
         """Updates the output statement of the model.
 
         Parameters
@@ -308,105 +394,10 @@ class MiniZincModel(object):
             The content of the output statement, i.e. only the actual output
             without the starting 'output', the square brackets and the ending
             semicolon.
-        comment : str
-            A comment to attach to the output statement.
         """
         if not isinstance(output_stmt, OutputStatement):
-            output_stmt = OutputStatement(output_stmt, comment)
+            output_stmt = OutputStatement(output_stmt)
         self._output_stmt = output_stmt
-        self._modified = True
-
-    def par(self, name, val, assign=True, comment=None):
-        """Adds a parameter to the model.
-
-        Parameters
-        ----------
-        name
-            The name of the parameter.
-        val : obj
-            The python object to add as a parameter to the model.
-        assign : bool
-            If True the parameter value will be assigned directly into the
-            model, otherwise it will only be declared in the model and then it
-            will have to be assigned in the data.
-        comment : str
-            A comment to attach to the parameter statement.
-        """
-        par = Parameter(name, val, assign=assign, comment=comment)
-        self._statements.append(par)
-        self._modified = True
-
-    def pars(self, pars, assign=True):
-        """Add a list of parameters.
-
-        Parameters
-        ----------
-        pars : list of (name, val) or Parameter
-            The list of parameters to add to the model.
-        assign : bool
-            If True the parameters value will be assigned directly into the
-            model, otherwise they will only be declared in the model and then
-            they will have to be assigned in the data.
-        """
-        for par in pars:
-            if isinstance(par, Parameter):
-                self._statements.append(par)
-            else:
-                name, val = par
-                self.par(name, val, assign)
-        self._modified = True
-
-    def var(self, vartype, var, val=None, output=False, comment=None):
-        """Adds a variable to the model.
-
-        Parameters
-        ----------
-        vartype : str
-            The type of the variable.
-        var : str
-            The name of the variable.
-        val : str
-            The optional value of the variable statement.
-        output : bool
-            Whether the variable is an output variable.
-        comment : str
-            A comment to attach to the variable statement.
-        """
-        val = dzn_value(val) if val is not None else None
-        self._statements.append(Variable(vartype, var, val, output, comment))
-        if output or _var_type_p.match(vartype) and val is None:
-            self._free_vars.add(var)
-        _array_type_m = _array_type_p.match(vartype)
-        if _array_type_m:
-            dim = len(_array_type_m.group(1).split(','))
-            self._array_dims[var] = dim
-        self._modified = True
-
-    def array_var(self, indexset, domain, var, val=None, output=False,
-                  comment=None):
-        """Adds an array variable to the model.
-
-        Parameters
-        ----------
-        indexset : str
-            The indexset of the array.
-        domain : str
-            The domain of the array.
-        var : str
-            The name of the array.
-        val : str
-            The optional value of the array variable statement.
-        output : bool
-            Whether the array variable is an output array.
-        comment : str
-            A comment to attach to the variable statement.
-        """
-        val = dzn_value(val) if val is not None else None
-        self._statements.append(ArrayVariable(indexset, domain, var, val, output,
-                                              comment))
-        if output or _var_type_p.match(domain) and val is None:
-            self._free_vars.add(var)
-        self._array_dims[var] = len(indexset.split(','))
         self._modified = True
 
     def _load_model(self):
@@ -422,20 +413,15 @@ class MiniZincModel(object):
         if self._parsed:
             return
         model = self._load_model()
-        model = _comm_p.sub('', model)
-        stmts = _stmt_p.findall(model)
-        for stmt in stmts:
-            _var_m = _var_p.match(stmt)
-            if _var_m:
-                vartype = _var_m.group(1)
-                var = _var_m.group(2)
-                val = _var_m.group(3)
-                if _var_type_p.match(vartype) and val is None:
-                    self._free_vars.add(var)
-                _array_type_m = _array_type_p.match(vartype)
-                if _array_type_m:
-                    dim = len(_array_type_m.group(1).split(','))
-                    self._array_dims[var] = dim
+        _, variables, *_ = parse(model)
+        for var in variables:
+            name, vartype, value = var
+            if var_type_p.match(vartype) and value is None:
+                self._free_vars.add(name)
+            array_type_m = array_type_p.match(vartype)
+            if array_type_m:
+                dim = len(array_type_m.group(1).split(','))
+                self._array_dims[name] = dim
         self._parsed = True
 
     def dzn_output_stmt(self, output_vars=None, comment=None):
@@ -482,7 +468,7 @@ class MiniZincModel(object):
             else:
                 out_list.append(out_var.format(var))
         out_list = ', '.join(out_list)
-        self.output(out_list, comment)
+        self.output(out_list)
 
     def compile(self, output_file=None):
         """Compiles the model and writes it to file.
@@ -507,15 +493,15 @@ class MiniZincModel(object):
             lines = ['\n\n\n%%% GENERATED BY PYMZN %%%\n\n']
 
             for stmt in self._statements:
-                lines.append(stmt.compile())
+                lines.append(str(stmt))
 
             if self._solve_stmt:
-                model = _solve_stmt_p.sub('', model)
-                lines.append(self._solve_stmt.compile() + '\n')
+                model = solve_stmt_p.sub('', model)
+                lines.append(str(self._solve_stmt) + '\n')
 
             if self._output_stmt:
-                model = _output_stmt_p.sub('', model)
-                lines.append(self._output_stmt.compile() + '\n')
+                model = output_stmt_p.sub('', model)
+                lines.append(str(self._output_stmt) + '\n')
 
             model += '\n'.join(lines)
 
