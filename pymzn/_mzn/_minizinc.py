@@ -189,7 +189,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
             err.mzn_file = mzn_file
             raise err
     else:
-        solns = out
+        solns = [out]
 
     if eval_output:
         solns = list(map(dzn_eval, solns))
