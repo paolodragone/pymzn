@@ -32,6 +32,9 @@ _array_p = re.compile('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
                       '(?:\s*,\s*([\d\.+\-]+|\{\}))?)\s*,\s*)?'
                       '\[(?P<vals>[\w\s\.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$')
 
+# ratio pattern (used in OptiMathSat)
+_ratio_p = re.compile('^\s*(?P<numerator>\d+)/(?P<denominator>\d+)$')
+
 # variable pattern
 _var_p = re.compile('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>.+)$', re.DOTALL)
 
@@ -172,6 +175,13 @@ def dzn_eval(dzn, *, rebase_arrays=True):
                 else:
                     p_val = _eval_array(indices, vals, rebase_arrays)
                 assign[var] = p_val
+                continue
+
+            ratio_m = _ratio_p.match(val)
+            if ratio_m:
+                num = float(ratio_m.group('numerator'))
+                den = float(ratio_m.group('denominator'))
+                assign[var] = num / den
                 continue
         raise ValueError('Unsupported evaluation for statement:\n'
                          '{}'.format(repr(stmt)))
