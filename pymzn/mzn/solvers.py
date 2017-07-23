@@ -45,6 +45,35 @@ from pymzn._utils import get_logger
 from subprocess import CalledProcessError
 
 
+class Solver1(ABC):
+
+    @property
+    @abc.abstractmethod
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+
+    @property
+    @abc.abstractmethod
+    def support_json(self):
+        """Whether the solver supports json output"""
+
+    @property
+    @abc.abstractmethod
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+
+    @property
+    @abc.abstractmethod
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+
+    @abc.abstractmethod
+    def solve(self, mzn, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, **kwargs):
+        """
+        """
+
+
 class Solver(object):
     """Abstract solver class.
 
