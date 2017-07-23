@@ -45,7 +45,16 @@ from pymzn._utils import get_logger
 from subprocess import CalledProcessError
 
 
-class Solver1(ABC):
+class Solver(ABC):
+    """Abstract solver class.
+
+    All the solvers inherit from this base class.
+    """
+
+    @property
+    def globals_dir(self):
+        """Global included files directory in the standard library"""
+        return 'std'
 
     @property
     @abc.abstractmethod
@@ -54,8 +63,23 @@ class Solver1(ABC):
 
     @property
     @abc.abstractmethod
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+
+    @property
+    @abc.abstractmethod
     def support_json(self):
         """Whether the solver supports json output"""
+
+    @property
+    @abc.abstractmethod
+    def support_item(self):
+        """Whether the solver supports item output"""
+
+    @property
+    @abc.abstractmethod
+    def support_dict(self):
+        """Whether the solver supports dict output"""
 
     @property
     @abc.abstractmethod
@@ -68,181 +92,173 @@ class Solver1(ABC):
         """Whether the solver supports a timeout"""
 
     @abc.abstractmethod
-    def solve(self, mzn, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, **kwargs):
-        """
-        """
-
-
-class Solver(object):
-    """Abstract solver class.
-
-    All solver classes inherit from this class and provide implementations for
-    the ``solve`` method.
-
-    Attributes
-    ----------
-    support_ozn : bool
-        Whether the solver's output can be parsed by ``solns2out``.
-    support_all : bool
-        Whether the solver supports the output of all solutions.
-    globals_dir : str
-        The directory containing the solver-specific redefinitions of global
-        constraints, used when calling ``mzn2fzn``. This should be the default
-        for the solver. When None is provided (default) the ``std`` directory is
-        used.
-    """
-    def __init__(self, support_ozn, support_all, globals_dir=None):
-        self.support_ozn = support_ozn
-        self.support_all = support_all
-        self.globals_dir = globals_dir
-
-    def solve(self, fzn_file, *, all_solutions=False,
-              check_complete=False, **kwargs):
-        """Solve a problem encoded in FlatZinc.
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='dzn', **kwargs):
+        """Solve a problem encoded with MiniZinc/FlatZinc.
 
         This method should call an external solver, wait for the solution and
         provide the output of the solver. If the solver does not have a Python
-        interface, the ``pymzn.bin`` module can be used to run external
+        interface, the ``pymzn.util.run`` module can be used to run external
         executables.
 
-        If ``support_ozn`` is ``False``, the solver should directly provide
-        solutions compliant to the PyMzn solution format. This means that the
-        the implementation of this method should parse the output of the solver
-        and return the solutions as dictionaries of variable assignments (see
-        the ``eval_dzn`` method). In alternative the solutions should be
-        returned in dzn format, so they can be evaluated by the ``eval_dzn``
-        function.
+        If a solver supports neither dzn nor json output, then its PyMzn
+        implementation should take care of parsing the solver output and return
+        a SolnsStream with solutions evaluated as dictionaries.
 
         Parameters
         ----------
-        fzn_file : str
-            The path to the fzn file to use as input of the solver.
+        mzn_file : str
+            The path to the mzn file to solve.
+        dzn_files
+            A list of paths to dzn files.
+        data : str
+            A dzn string containing additional inline data to pass to the solver.
+        include : str or [str]
+            A path or a list of paths to included files.
+        timeout : int
+            The timeout for the solver. If None, no timeout given.
         all_solutions : bool
-            Whether the solver should output all the solutions. If
-            ``support_all=False`` then the implementation should ignore the
-            value of this parameter.
-        check_complete : bool
-            Whether the solver should return a second boolean value indicating
-            if the search was completed successfully.
-        **kwargs
-            Additional arguments for the solver provided through the
-            ``pymzn.minizinc`` function.
+            Whether to return all solutions.
+        output_mode : 'dzn', 'json', 'item', 'dict'
+            The output mode required.
 
         Returns
         -------
-        str, list or tuple
-            This method should return a string if the solver supports ozn
-            parsing via ``solns2out``. The string simply contains the output of
-            the solver.
-            If the solver does not support the ozn parsing, then it should parse
-            the solvers output by itself and thus return a list of solutions in
-            PyMzn format (dictionaries of variable assignments, as in
-            ``pymzn.eval_dzn``).
-
-            In both cases, if ``check_complete=True`` then the method should
-            return a tuple containing the above output and a second boolean
-            indicating whether the search was completed successfully.
+        str or SolnsStream
+            The output of the solver if output_mode in ['dzn', 'json', 'item']
+            or a SolnsStream of evaluated solutions if output_mode == 'dict'.
         """
-        raise NotImplementedError()
 
 
 class Gecode(Solver):
-    """Interface to the Gecode MILP solver.
+    """Interface to the Gecode solver.
 
     Parameters
     ----------
     path : str
         The path to the Gecode executable. If None, ``fzn-gecode`` is used.
     """
-    def __init__(self, path=None):
-        super().__init__(True, True, globals_dir='gecode')
-        self.cmd = path or 'fzn-gecode'
+    def __init__(self, mzn_path='mzn-gecode', fzn_path='fzn-gecode',
+                 globals_dir='gecode'):
+        self.mzn_cmd = mzn_path
+        self.fzn_cmd = fzn_path
+        self._globals_dir = globals_dir
 
-    def solve(self, fzn_file, *, check_complete=False, all_solutions=False,
-              timeout=0, parallel=1, n_solns=-1, seed=0, restart=None,
-              restart_base=None, restart_scale=None, suppress_segfault=False,
-              **kwargs):
-        """Solves a problem with the Gecode solver.
+    @property
+    def globals_dir(self):
+        return self._globals_dir
+
+    @property
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+        return True
+
+    @property
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+        return True
+
+    @property
+    def support_json(self):
+        """Whether the solver supports json output"""
+        return False
+
+    @property
+    def support_item(self):
+        """Whether the solver supports item output"""
+
+    @property
+    @abc.abstractmethod
+    def support_dict(self):
+        """Whether the solver supports dict output"""
+
+    @property
+    @abc.abstractmethod
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+
+    @property
+    @abc.abstractmethod
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', parallel=1, seed=0,
+              suppress_segfault=False, **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with Gecode.
 
         Parameters
         ----------
-        fzn_file : str
-            The path to the fzn file to use as input of the solver.
+        mzn_file : str
+            The path to the mzn file to solve.
+        dzn_files
+            A list of paths to dzn files.
+        data : str
+            A dzn string containing additional inline data to pass to the solver.
+        include : str or [str]
+            A path or a list of paths to included files.
+        timeout : int
+            The timeout for the solver. If None, no timeout given.
         all_solutions : bool
-            Whether the solver should output all the solutions. Equivalent to
-            ``n_solns=0``.
-        check_complete : bool
-            Whether the solver should return a second boolean value indicating
-            if the search was completed successfully.
-        n_solns : int
-            The number of solutions to output (0 = all, -1 = one/best);
-            the default is -1.
+            Whether to return all solutions.
+        output_mode : 'dzn', 'json', 'item', 'dict'
+            The output mode required.
         parallel : int
             The number of threads to use to solve the problem
             (0 = #processing units); default is 1.
-        time : int or float
-            The time cutoff in seconds, after which the execution is truncated
-            and the best solution so far is returned, 0 means no time cutoff;
-            default is 0.
-        seed : int
-            Random seed; default is 0.
-        restart : str
-            Restart sequence type; default is None.
-        restart_base : str
-            Base for geometric restart sequence; if None (default) the default
-            value of Gecode is used, which is 1.5.
-        restart_scale : str
-            Scale factor for restart sequence; if None (default) the default
-            value of Gecode is used, which is 250.
         suppress_segfault : bool
             Whether to accept or not a solution returned when a segmentation
             fault has happened (this is unfortunately necessary sometimes due to
             some bugs in Gecode).
-
         Returns
         -------
-        str or tuple
-            A string containing the solution output stream of the execution of
-            Gecode on the specified problem; it can be directly be given to the
-            function solns2out to be evaluated. If ``check_complete=True``
-            returns an additional boolean, checking whether the search was
-            completed before the timeout.
+        str or SolnsStream
+            The output of the solver if output_mode in ['dzn', 'json', 'item']
+            or a SolnsStream of evaluated solutions if output_mode == 'dict'.
         """
         log = get_logger(__name__)
 
-        args = [self.cmd]
-        if n_solns > 0:
-            args.append('-n')
-            args.append(str(n_solns))
-        elif n_solns == 0 or all_solutions:
+        mzn = False
+        args = []
+        if mzn_file.endswith('fzn'):
+            if output_mode != 'dzn':
+                raise ValueError('Only dzn output available with fzn input.')
+            args.append(self.fzn_cmd)
+        else:
+            if output_mode != 'item':
+                raise ValueError('Only item output available with mzn input.')
+            mzn = True
+            args.append(self.mzn_cmd)
+            args.append('-G')
+            args.append(self.globals_dir)
+            if include:
+                if isinstance(include, str):
+                    include = [include]
+                for path in include:
+                    args.append('-I')
+                    args.append(path)
+            if data:
+                args.append('-D')
+                args.append(data)
+
+        if all_solutions:
             args.append('-a')
         if parallel != 1:
             args.append('-p')
             args.append(str(parallel))
-        if timeout > 0:
+        if timeout and timeout > 0:
             args.append('-time')
             args.append(str(timeout * 1000)) # Gecode takes milliseconds
         if seed != 0:
             args.append('-r')
             args.append(str(seed))
-        if restart:
-            args.append('-restart')
-            args.append(str(restart))
-        if restart_base:
-            args.append('-restart-base')
-            args.append(str(restart_base))
-        if restart_scale:
-            args.append('-restart-scale')
-            args.append(str(restart_scale))
-        args.append(fzn_file)
+        args.append(mzn_file)
+        if mzn and dzn_files:
+            for dzn_file in dzn_files:
+                args.append(dzn_files)
 
         try:
             process = run(args)
-            if timeout > 0:
-                process.timeout = timeout
-                if process.time >= timeout:
-                    complete = False
             out = process.stdout
         except CalledProcessError as err:
             if suppress_segfault:
@@ -250,12 +266,9 @@ class Gecode(Solver):
                             'fault) but a solution was found and returned '
                             '(suppress_segfault=True).'.format(err.returncode))
                 out = err.stdout
-                complete = False
             else:
                 log.exception(err.stderr)
                 raise RuntimeError(err.stderr) from err
-        if check_complete:
-            return out, complete
         return out
 
 
