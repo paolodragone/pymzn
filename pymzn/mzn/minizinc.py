@@ -324,7 +324,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def solns2out(soln_stream, ozn_file, check_complete=False, parse_output=True):
+def solns2out(soln_stream, ozn_file):
     """Wraps the solns2out utility, executes it on the solution stream, and
     then returns the output.
 
@@ -334,10 +334,6 @@ def solns2out(soln_stream, ozn_file, check_complete=False, parse_output=True):
         The solution stream returned by the solver.
     ozn_file : str
         The ozn file path produced by the mzn2fzn function.
-    check_complete : bool
-        If True, a boolean value is returned, in addition to
-        the solutions of the problem, indicating the completion status of the
-        problem.
 
     Returns
     -------
@@ -348,24 +344,24 @@ def solns2out(soln_stream, ozn_file, check_complete=False, parse_output=True):
         argument.
     """
     log = get_logger(__name__)
+    args = [config.get('solns2out', 'solns2out'), ozn_file]
+    try:
+        process = run(args, stdin=soln_stream)
+        out = process.stdout
+    except CalledProcessError as err:
+        log.exception(err.stderr)
+        raise RuntimeError(err.stderr) from err
+    return out
 
-    soln_sep = '----------'
-    search_complete_msg = '=========='
-    unsat_msg = '=====UNSATISFIABLE====='
-    unkn_msg = '=====UNKNOWN====='
-    unbnd_msg = '=====UNBOUNDED====='
 
-    if parse_output:
-        args = [config.get('solns2out', 'solns2out'), ozn_file]
-        try:
-            process = run(args, stdin=soln_stream)
-            out = process.stdout
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-    else:
-        out = soln_stream
+soln_sep = '----------'
+search_complete_msg = '=========='
+unsat_msg = '=====UNSATISFIABLE====='
+unkn_msg = '=====UNKNOWN====='
+unbnd_msg = '=====UNBOUNDED====='
 
+
+def split_solns(out):
     lines = out.splitlines()
     solns = []
     curr_out = []
@@ -387,12 +383,7 @@ def solns2out(soln_stream, ozn_file, check_complete=False, parse_output=True):
             raise MiniZincUnboundedError()
         else:
             curr_out.append(line)
-
-    log.debug('Solutions found: {}', len(solns))
-
-    if check_complete:
-        return solns, complete
-    return solns
+    return solns, complete
 
 
 class MiniZincError(RuntimeError):
