@@ -18,9 +18,9 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from pymzn._utils import get_logger
-from pymzn._dzn._marsh import dzn_statement, dzn_value
-from pymzn._mzn._parse import *
+from pymzn.utils import get_logger
+from pymzn.dzn.marsh import dzn_statement, dzn_value
+from pymzn.mzn.parse import *
 
 
 class Statement(object):
@@ -175,7 +175,10 @@ class OutputStatement(Statement):
     """
     def __init__(self, output):
         self.output = output
-        stmt = 'output [{}];'.format(output)
+        if output:
+            stmt = 'output [{}];'.format(output)
+        else:
+            stmt = ''
         super().__init__(stmt)
 
 
