@@ -51,10 +51,8 @@ class Solver(ABC):
     All the solvers inherit from this base class.
     """
 
-    @property
-    def globals_dir(self):
-        """Global included files directory in the standard library"""
-        return 'std'
+    def __init__(self, globals_dir='std'):
+        self.globals_dir = globals_dir
 
     @property
     @abc.abstractmethod
@@ -140,13 +138,9 @@ class Gecode(Solver):
     """
     def __init__(self, mzn_path='mzn-gecode', fzn_path='fzn-gecode',
                  globals_dir='gecode'):
+        super().__init__(globals_dir)
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
-        self._globals_dir = globals_dir
-
-    @property
-    def globals_dir(self):
-        return self._globals_dir
 
     @property
     def support_mzn(self):
