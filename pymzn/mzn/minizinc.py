@@ -211,8 +211,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, output_base=None,
     return solns
 
 
-def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
-            stdlib_dir=None, path=None, no_ozn=False):
+def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
+            no_ozn=False):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
 
@@ -235,14 +235,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     keep_data : bool
         Whether to write the dzn inline data provided in the ``data`` parameter
         into a file and keep it. Default is False.
-    globals_dir : str
-        The name of the directory where to search for global included files in
-        the standard library; by default the solver specific global library is
-        used.
-    stdlib_dir : str
-        The name of the directory containing the standard library of minizinc.
-        When None (default) the MiniZinc default is used.
-    path : str or list
+    include : str or list
         One or more additional paths to search for included mzn files when
         running ``mzn2fzn``.
     no_ozn : bool
@@ -257,22 +250,16 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     log = get_logger(__name__)
 
     args = [config.get('mzn2fzn', 'mzn2fzn')]
-    if stdlib_dir:
-        args.append('--stdlib-dir')
-        args.append(stdlib_dir)
-    if globals_dir:
-        args.append('-G')
-        args.append(globals_dir)
     if no_ozn:
         args.append('--no-output-ozn')
-    if path:
-        if isinstance(path, str):
-            path = [path]
-        elif not isinstance(path, list):
+    if include:
+        if isinstance(include, str):
+            include = [include]
+        elif not isinstance(include, list):
             raise TypeError('The path provided is not valid.')
-        for p in path:
+        for path in include:
             args.append('-I')
-            args.append(p)
+            args.append(path)
 
     dzn_files = list(dzn_files)
     data_file = None
