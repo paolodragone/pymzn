@@ -50,7 +50,7 @@ todo_include_todos = False
 htmlhelp_basename = 'pymzn'
 
 project = 'PyMzn'
-copyright = '2016, Paolo Dragone (MIT Licence)'
+copyright = '2017, Paolo Dragone (MIT Licence)'
 author = 'Paolo Dragone'
 
 version = find_version('..', '..', 'pymzn', '__init__.py')

@@ -14,4 +14,4 @@ Modelling
    OutputStatement
    SolveStatement
 
-.. automodule:: pymzn._mzn._model
+.. automodule:: pymzn.mzn.model

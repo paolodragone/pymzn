@@ -6,6 +6,7 @@ MiniZinc tools
 .. autosummary::
    :toctree: generated/
 
+   SolnStream
    minizinc
    mzn2fzn
    solns2out
@@ -14,4 +15,4 @@ MiniZinc tools
    MiniZincUnknownError
    MiniZincUnboundedError
 
-.. automodule:: pymzn._mzn._minizinc
+.. automodule:: pymzn.mzn.minizinc

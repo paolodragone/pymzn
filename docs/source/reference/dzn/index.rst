@@ -6,9 +6,10 @@ Dzn files
 .. autosummary::
    :toctree: generated/
 
-   dzn
-   dzn_value
-   dzn_eval
+   dict2dzn
+   dzn2dict
+   stmt2dzn
+   val2dzn
    rebase_array
 
-.. automodule:: pymzn._dzn
+.. automodule:: pymzn.dzn

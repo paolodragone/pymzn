@@ -10,8 +10,10 @@ Solvers
    Gecode
    Optimathsat
    Opturion
+   Gurobi
    gecode
    optimathsat
    opturion
+   gurobi
 
-.. automodule:: pymzn._mzn._solvers
+.. automodule:: pymzn.mzn.solvers
