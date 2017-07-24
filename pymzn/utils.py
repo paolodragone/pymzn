@@ -1,4 +1,7 @@
 
+import os
+import time
+import signal
 import logging
 import subprocess
 
@@ -56,15 +59,24 @@ def run(args, stdin=None):
     log = get_logger(__name__)
     log.debug('Executing command with args: {}', args)
     start = time.time()
+    sigint = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, lambda *args: None)
     with subprocess.Popen(args, bufsize=1, universal_newlines=True,
                           stdin=subprocess.PIPE,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as process:
-        out, err = process.communicate(stdin)
-        ret = process.poll()
+        try:
+            out, err = process.communicate(stdin)
+        except (KeyboardInterrupt, SystemExit):
+            process.kill()
+            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            out, err = process.communicate(stdin)
+        finally:
+            ret = process.poll()
+            signal.signal(signal.SIGINT, sigint)
     elapsed = time.time() - start
     log.debug('Done. Running time: {0:.2f} seconds'.format(elapsed))
     process = subprocess.CompletedProcess(args, ret, out, err)
-    process.check_returncode()
+    #process.check_returncode()
     return process
 
