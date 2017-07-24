@@ -38,6 +38,7 @@ Then one can run the ``minizinc`` function with the custom solver:::
 """
 
 import logging
+
 import pymzn.config as config
 
 from pymzn.utils import run
@@ -250,7 +251,7 @@ class Gecode(Solver):
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
-                args.append(dzn_files)
+                args.append(dzn_file)
 
         try:
             process = run(args)
@@ -266,8 +267,8 @@ class Gecode(Solver):
                 raise RuntimeError(err.stderr) from err
         return out
 
-'''
-class Optimathsat(Solver):
+
+class Optimathsat:
     """Simple wrapper for the OptiMathSat solver.
 
     This is a simple interface to OptiMathSat which only specifies the input
@@ -279,7 +280,7 @@ class Optimathsat(Solver):
         The path to the OptiMathSat executable. If None, ``optimathsat`` is used.
     """
     def __init__(self, path=None):
-        super().__init__(False, False, globals_dir='std')
+        #super().__init__(False, False, globals_dir='std')
         self.cmd = path or 'optimathsat'
 
     def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
@@ -310,7 +311,7 @@ class Optimathsat(Solver):
         return out
 
 
-class Opturion(Solver):
+class Opturion:
     """Interface to the Opturion CPX solver.
 
     Parameters
@@ -320,7 +321,7 @@ class Opturion(Solver):
     """
 
     def __init__(self, path=None):
-        super().__init__(True, True, globals_dir='opturion-cpx')
+        #super().__init__(True, True, globals_dir='opturion-cpx')
         self.cmd = path or 'fzn-cpx'
 
     def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
@@ -372,7 +373,7 @@ class Opturion(Solver):
         return out
 
 
-class Gurobi(Solver):
+class Gurobi:
     """Interface to the Gurobi solver.
 
     Parameters
@@ -382,7 +383,7 @@ class Gurobi(Solver):
     """
 
     def __init__(self, path=None):
-        super().__init__(True, True, globals_dir='std')
+        #super().__init__(True, True, globals_dir='std')
         self.cmd = path or 'mzn-gurobi'
 
     def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
@@ -432,12 +433,12 @@ class Gurobi(Solver):
         if check_complete:
             return out, complete
         return out
-'''
+
 
 #: Default Gecode instance.
 gecode = Gecode()
 
-'''
+
 #: Default Optimathsat instance.
 optimathsat = Optimathsat(path=config.get('optimathsat'))
 
@@ -446,5 +447,5 @@ opturion = Opturion(path=config.get('opturion'))
 
 #: Default Gurobi instance.
 gurobi = Opturion(path=config.get('gurobi'))
-'''
+
 
