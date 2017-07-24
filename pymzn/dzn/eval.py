@@ -138,7 +138,7 @@ def dzn2dict(dzn, *, rebase_arrays=True):
         input file or string.
     """
     dzn_ext = os.path.splitext(dzn)[1]
-    if dzn_ext == 'dzn':
+    if dzn_ext == '.dzn':
         with open(dzn) as f:
             dzn = f.read()
 
