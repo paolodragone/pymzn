@@ -9,21 +9,19 @@ import ast
 import logging
 
 from . import config
-from . import _utils
-from . import bin
-from . import _dzn
-from ._dzn import *
-from . import _mzn
-from ._mzn import *
+from . import utils
+from . import dzn
+from .dzn import *
+from . import mzn
+from .mzn import *
 
-__version__ = '0.13.0'
-__all__ = ['debug', 'config', 'bin']
-__all__.extend(_dzn.__all__)
-__all__.extend(_mzn.__all__)
+__version__ = '0.14.0'
+__all__ = ['debug', 'config']
+__all__.extend(dzn.__all__)
+__all__.extend(mzn.__all__)
 
 # TODO: update python2 branch
 # TODO: make it work on windows
-# TODO: check the ctrl+C thing which seems not to work anymore
 
 _debug_handler = None
 _pymzn_logger = logging.getLogger(__name__)
