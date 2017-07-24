@@ -48,6 +48,13 @@ class SolnStream:
     def __getitem__(self, key):
         return self._solns[key]
 
+    def __repr__(self):
+        return 'SolnStream(solns={}, complete={})' \
+                    .format(repr(self._solns), repr(self.complete))
+
+    def __str__(self):
+        return str(self._solns)
+
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode,
              output_mode='dict', all_solutions=False, timeout=None,
