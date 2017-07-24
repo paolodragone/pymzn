@@ -142,7 +142,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
 
     try:
         if force_flatten or not solver.support_mzn or \
-                (output_mode='item' and not solver.support_item):
+                (output_mode == 'item' and not solver.support_item):
             fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
                                         keep_data=keep, include=include,
                                         no_ozn=(output_mode != 'item'))
