@@ -11,7 +11,7 @@ class MarshTest(unittest.TestCase):
             return re.sub('\s+', ' ', s)
 
         def _dzn_value(val):
-            return _unwrap(pymzn.dzn_value(val))
+            return _unwrap(pymzn.val2dzn(val))
 
         self.assertEqual(_dzn_value(1), '1')
         self.assertEqual(_dzn_value(-1), '-1')
@@ -41,13 +41,13 @@ class MarshTest(unittest.TestCase):
     def test_raises_dzn_value(self):
         class _Dummy(object):
             pass
-        self.assertRaises(TypeError, pymzn.dzn_value, _Dummy())
-        self.assertRaises(ValueError, pymzn.dzn_value, [[[[[[[1]]]]]]])
-        self.assertRaises(ValueError, pymzn.dzn_value, {'1': 1, '2': 2})
-        self.assertRaises(ValueError, pymzn.dzn_value, {0.1: 1, 0.2: 2})
+        self.assertRaises(TypeError, pymzn.val2dzn, _Dummy())
+        self.assertRaises(ValueError, pymzn.val2dzn, [[[[[[[1]]]]]]])
+        self.assertRaises(ValueError, pymzn.val2dzn, {'1': 1, '2': 2})
+        self.assertRaises(ValueError, pymzn.val2dzn, {0.1: 1, 0.2: 2})
 
     def test_dzn(self):
-        dzn = pymzn.dzn({'x': 1, 'y': 2})
+        dzn = pymzn.dict2dzn({'x': 1, 'y': 2})
         self.assertIn('x = 1;', dzn)
         self.assertIn('y = 2;', dzn)
 
