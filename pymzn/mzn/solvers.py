@@ -37,6 +37,7 @@ Then one can run the ``minizinc`` function with the custom solver:::
     pymzn.minizinc('test.mzn', solver=MySolver(), arg1=val1, arg2=val2)
 """
 
+import re
 import logging
 
 import pymzn.config as config
@@ -50,6 +51,11 @@ class Solver(ABC):
     """Abstract solver class.
 
     All the solvers inherit from this base class.
+
+    Parameters
+    ----------
+    globals_dir : str
+        The path to the directory for global included files.
     """
 
     def __init__(self, globals_dir='std'):
@@ -134,8 +140,12 @@ class Gecode(Solver):
 
     Parameters
     ----------
-    path : str
-        The path to the Gecode executable. If None, ``fzn-gecode`` is used.
+    mzn_path : str
+        The path to the mzn-gecode executable.
+    fzn_path : str
+        The path to the fzn-gecode executable.
+    globals_dir : str
+        The path to the directory for global included files.
     """
     def __init__(self, mzn_path='mzn-gecode', fzn_path='fzn-gecode',
                  globals_dir='gecode'):
@@ -208,13 +218,11 @@ class Gecode(Solver):
             some bugs in Gecode).
         Returns
         -------
-        str or SolnsStream
-            The output of the solver if output_mode in ['dzn', 'json', 'item']
-            or a SolnsStream of evaluated solutions if output_mode == 'dict'.
+        str
+            The output of the solver.
         """
         log = logging.getLogger(__name__)
 
-        mzn = False
         args = []
         if mzn_file.endswith('fzn'):
             if output_mode != 'dzn':
@@ -268,37 +276,81 @@ class Gecode(Solver):
         return out
 
 
-class Optimathsat:
-    """Simple wrapper for the OptiMathSat solver.
-
-    This is a simple interface to OptiMathSat which only specifies the input
-    format as a FlatZinc model, without providing any additional arguments.
+class Optimathsat(Solver):
+    """Interface to the Optimathsat solver.
 
     Parameters
     ----------
     path : str
-        The path to the OptiMathSat executable. If None, ``optimathsat`` is used.
+        The path to the optimathsat executable.
+    globals_dir : str
+        The path to the directory for global included files.
     """
-    def __init__(self, path=None):
-        #super().__init__(False, False, globals_dir='std')
-        self.cmd = path or 'optimathsat'
+    def __init__(self, path='optimathsat'):
+        super().__init__()
+        self.cmd = path
+        self._line_comm_p = re.compile('%.*\n')
+        self._rational_p = re.compile('(\d+)\/(\d+)')
 
-    def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
-              **kwargs):
-        """Solves a problem with the OptiMathSat solver.
+    @property
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+        return False
+
+    @property
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+        return True
+
+    @property
+    def support_json(self):
+        """Whether the solver supports json output"""
+        return False
+
+    @property
+    def support_item(self):
+        """Whether the solver supports item output"""
+        return False
+
+    @property
+    def support_dict(self):
+        """Whether the solver supports dict output"""
+        return False
+
+    @property
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+        return False
+
+    @property
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+        return False
+
+    def _parse_out(self, out):
+        out = self._line_comm_p.sub(out, '')
+        for m in self._rational_p.finditer(out):
+            n, d = m.groups()
+            val = float(n) / float(d)
+            out = re.sub('{}/{}'.format(n, d), str(val), out)
+        return out
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with Optimathsat.
 
         Parameters
         ----------
-        fzn_file : str
-            The path to the fzn file to use as input of the solver.
-        all_solutions : bool
-            Ignored.
-        check_complete : bool
-            Ignored.
+        mzn_file : str
+            The path to the fzn file to solve.
+        Returns
+        -------
+        str
+            The output of the solver in dzn format.
         """
-        args = [self.cmd, '-input=fzn', fzn_file]
-
         log = logging.getLogger(__name__)
+
+        args = [self.cmd, '-input=fzn', mzn_file]
         try:
             process = run(args)
             out = process.stdout
@@ -306,9 +358,7 @@ class Optimathsat:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
 
-        if check_complete:
-            return out, True
-        return out
+        return self._parse_out(out)
 
 
 class Opturion:
@@ -317,135 +367,208 @@ class Opturion:
     Parameters
     ----------
     path : str
-        The path to the Opturion executable. If None, ``fzn-cpx`` is used.
+        The path to the fzn-cpx executable.
     """
 
-    def __init__(self, path=None):
-        #super().__init__(True, True, globals_dir='opturion-cpx')
-        self.cmd = path or 'fzn-cpx'
+    def __init__(self, path='fzn-cpx'):
+        super().__init__()
+        self.cmd = path
 
-    def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
-              timeout=None, **kwargs):
-        """Solves a problem with the Opturion CPX solver.
+    @property
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+        return False
+
+    @property
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+        return True
+
+    @property
+    def support_json(self):
+        """Whether the solver supports json output"""
+        return False
+
+    @property
+    def support_item(self):
+        """Whether the solver supports item output"""
+        return False
+
+    @property
+    def support_dict(self):
+        """Whether the solver supports dict output"""
+        return False
+
+    @property
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+        return True
+
+    @property
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+        return False
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with Opturion CPX.
 
         Parameters
         ----------
-        fzn_file : str
-            The path to the fzn file to use as input of the solver.
-        all_solutions : bool
-            Whether to return all solutions.
-        check_complete : bool
-            Whether to return a second boolean value indicating if the search
-            was completed successfully.
-        timeout : int or float
-            The time cutoff in seconds, after which the execution is truncated
-            and the best solution so far is returned, 0 or None means no cutoff;
-            default is None.
-
+        mzn_file : str
+            The path to the fzn file to solve.
         Returns
         -------
-        str or tuple
-            A string containing the solution output stream of the execution of
-            Opturion on the specified problem; it can be directly be given to
-            the function solns2out to be evaluated. If ``check_complete=True``
-            returns an additional boolean, checking whether the search was
-            completed before the timeout.
+        str
+            The output of the solver in dzn format.
         """
-        args = [self.cmd]
-
-        if timeout or all_solutions:
-            args.append('-a')
-
-        args.append(fzn_file)
-
         log = logging.getLogger(__name__)
 
+        args = [self.cmd]
+        if all_solutions:
+            args.append('-a')
+        args.append(mzn_file)
+
         try:
-            process = run(args, timeout=timeout)
-            complete = not process.expired
+            process = run(args)
             out = process.stdout
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
 
-        if check_complete:
-            return out, complete
         return out
 
 
-class Gurobi:
+class Gurobi(Solver):
     """Interface to the Gurobi solver.
 
     Parameters
     ----------
     path : str
-        The path to the Gurobi executable. If None, ``mzn-gurobi`` is used.
+        The path to the mzn-gurobi executable.
     """
 
-    def __init__(self, path=None):
-        #super().__init__(True, True, globals_dir='std')
-        self.cmd = path or 'mzn-gurobi'
+    def __init__(self, path='mzn-gurobi'):
+        super().__init__()
+        self.cmd = path
 
-    def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
-              timeout=None, **kwargs):
-        """Solves a problem with the Opturion Gurobi solver.
+    @property
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+        return True
+
+    @property
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+        return True
+
+    @property
+    def support_json(self):
+        """Whether the solver supports json output"""
+        return True
+
+    @property
+    def support_item(self):
+        """Whether the solver supports item output"""
+        return True
+
+    @property
+    def support_dict(self):
+        """Whether the solver supports dict output"""
+        return False
+
+    @property
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+        return True
+
+    @property
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+        return True
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', parallel=1, **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with Gurobi.
 
         Parameters
         ----------
-        fzn_file : str
-            The path to the fzn file to use as input of the solver.
+        mzn_file : str
+            The path to the mzn file to solve.
+        dzn_files
+            A list of paths to dzn files.
+        data : str
+            A dzn string containing additional inline data to pass to the solver.
+        include : str or [str]
+            A path or a list of paths to included files.
+        timeout : int
+            The timeout for the solver. If None, no timeout given.
         all_solutions : bool
             Whether to return all solutions.
-        check_complete : bool
-            Whether to return a second boolean value indicating if the search
-            was completed successfully.
-        timeout : int or float
-            The time cutoff in seconds, after which the execution is truncated
-            and the best solution so far is returned, 0 or None means no cutoff;
-            default is None.
-
+        output_mode : 'dzn', 'json', 'item', 'dict'
+            The output mode required.
+        parallel : int
+            The number of threads to use to solve the problem; default is 1.
         Returns
         -------
-        str or tuple
-            A string containing the solution output stream of the execution of
-            Opturion on the specified problem; it can be directly be given to
-            the function solns2out to be evaluated. If ``check_complete=True``
-            returns an additional boolean, checking whether the search was
-            completed before the timeout.
+        str
+            The output of the solver.
         """
-        args = [self.cmd]
-
-        if timeout or all_solutions:
-            args.append('-a')
-
-        args.append(fzn_file)
-
         log = logging.getLogger(__name__)
 
+        args = [self.cmd]
+        if mzn_file.endswith('fzn') and output_mode not in ['dzn', 'json']:
+            raise ValueError('Only dzn or json output available with fzn input.')
+        else:
+            if output_mode != 'item':
+                raise ValueError('Only item output available with mzn input.')
+            mzn = True
+            if include:
+                if isinstance(include, str):
+                    include = [include]
+                for path in include:
+                    args.append('-I')
+                    args.append(path)
+            if data:
+                args.append('-D')
+                args.append(data)
+
+        if all_solutions:
+            args.append('-a')
+            args.append('--unique')
+        if parallel != 1:
+            args.append('-p')
+            args.append(str(parallel))
+        if timeout and timeout > 0:
+            args.append('-time')
+            args.append(str(timeout)) # Gurobi takes seconds
+
+        args.append('--output-mode')
+        args.append(output_mode)
+        args.append(mzn_file)
+        if mzn and dzn_files:
+            for dzn_file in dzn_files:
+                args.append(dzn_file)
+
         try:
-            process = run(args, timeout=timeout)
-            complete = not process.expired
+            process = run(args)
             out = process.stdout
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
-
-        if check_complete:
-            return out, complete
         return out
 
 
 #: Default Gecode instance.
 gecode = Gecode()
 
-
 #: Default Optimathsat instance.
-optimathsat = Optimathsat(path=config.get('optimathsat'))
+optimathsat = Optimathsat()
 
 #: Default Opturion instance.
-opturion = Opturion(path=config.get('opturion'))
+opturion = Opturion()
 
 #: Default Gurobi instance.
-gurobi = Opturion(path=config.get('gurobi'))
+gurobi = Opturion()
 
 
