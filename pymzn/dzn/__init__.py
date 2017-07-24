@@ -78,8 +78,8 @@ transform it into a list (list of lists). For instance:::
 
 """
 
-from ._marsh import *
-from ._eval import *
+from .marsh import *
+from .eval import *
 
-__all__ = ['dzn', 'dzn_statement', 'dzn_value', 'rebase_array', 'dzn_eval']
+__all__ = ['dict2dzn', 'stmt2dzn', 'val2dzn', 'rebase_array', 'dzn2dict']
 
