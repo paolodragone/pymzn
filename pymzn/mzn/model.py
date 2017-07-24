@@ -21,6 +21,13 @@ import os.path
 from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 
+type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
+var_type_p = re.compile('\s*.*?var.+\s*')
+array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
+output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
+solve_stmt_p = re.compile('\s*solve\s*([^;]+)\s*(?:;)?\s*')
+
+
 class Statement(object):
     """A statement of a MiniZincModel.
 
