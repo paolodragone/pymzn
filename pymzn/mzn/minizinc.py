@@ -93,7 +93,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
 
     Returns
     -------
-    SolnsStream
+    SolnStream
         Returns a list of solutions. If eval_output is True, the solutions are
         returned as dictionaries of variable assignments, otherwise they are
         solution strings as returned from the solns2out function. If
@@ -155,9 +155,9 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                                 output_mode=output_mode, **solver_args)
                 if ozn_file:
                     out = solns2out(out, ozn_file)
-                    stream = SolnsStream(*split_solns(out))
+                    stream = SolnStream(*split_solns(out))
                 else:
-                    stream = SolnsStream(*split_solns(out))
+                    stream = SolnStream(*split_solns(out))
             else:
                 out = solver.solve(fzn_file, timeout=timeout,
                         all_solutions=all_solutions,
@@ -168,7 +168,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                     solns = list(map(json.loads, solns))
                 else:
                     solns = list(map(dzn2dict, solns))
-                stream = SolnsStream(solns, complete)
+                stream = SolnStream(solns, complete)
         elif output_mode in ['dzn', 'json', 'item']:
             dzn_files = list(dzn_files)
             data, data_file = process_data(mzn_file, data, keep)
@@ -193,7 +193,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                 solns = list(map(json.loads, solns))
             else:
                 solns = list(map(dzn2dict, solns))
-            stream = SolnsStream(solns, complete)
+            stream = SolnStream(solns, complete)
     except (MiniZincUnsatisfiableError, MiniZincUnknownError,
             MiniZincUnboundedError) as err:
         err.mzn_file = mzn_file
