@@ -37,9 +37,10 @@ Then one can run the ``minizinc`` function with the custom solver:::
     pymzn.minizinc('test.mzn', solver=MySolver(), arg1=val1, arg2=val2)
 """
 
+import logging
 import pymzn.config as config
 
-from pymzn.utils import get_logger, run
+from pymzn.utils import run
 from subprocess import CalledProcessError
 
 
@@ -208,7 +209,7 @@ class Gecode(Solver):
             The output of the solver if output_mode in ['dzn', 'json', 'item']
             or a SolnsStream of evaluated solutions if output_mode == 'dict'.
         """
-        log = get_logger(__name__)
+        log = logging.getLogger(__name__)
 
         mzn = False
         args = []
@@ -294,7 +295,7 @@ class Optimathsat(Solver):
         """
         args = [self.cmd, '-input=fzn', fzn_file]
 
-        log = get_logger(__name__)
+        log = logging.getLogger(__name__)
         try:
             process = run(args)
             out = process.stdout
@@ -354,7 +355,7 @@ class Opturion(Solver):
 
         args.append(fzn_file)
 
-        log = get_logger(__name__)
+        log = logging.getLogger(__name__)
 
         try:
             process = run(args, timeout=timeout)
@@ -416,7 +417,7 @@ class Gurobi(Solver):
 
         args.append(fzn_file)
 
-        log = get_logger(__name__)
+        log = logging.getLogger(__name__)
 
         try:
             process = run(args, timeout=timeout)

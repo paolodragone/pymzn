@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import pymzn.config as config
-
-from pymzn.utils import get_logger
 
 from textwrap import TextWrapper
 from numbers import Integral, Real, Number
@@ -290,7 +289,7 @@ def dict2dzn(objs, declare=False, assign=True, wrap=True, fout=None):
     list
         List of strings containing the dzn-encoded objects.
     """
-    log = get_logger(__name__)
+    log = logging.getLogger(__name__)
 
     vals = []
     for key, val in objs.items():
@@ -298,7 +297,7 @@ def dict2dzn(objs, declare=False, assign=True, wrap=True, fout=None):
         vals.append(stmt)
 
     if fout:
-        log.debug('Writing file: {}', fout)
+        log.debug('Writing file: {}'.format(fout))
         with open(fout, 'w') as f:
             for val in vals:
                 f.write('{}\n\n'.format(val))

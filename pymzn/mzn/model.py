@@ -18,7 +18,6 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from pymzn.utils import get_logger
 from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 

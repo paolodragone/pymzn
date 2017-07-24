@@ -21,7 +21,7 @@ FlatZinc one and getting custom output from the solution stream of a solver.
 
 import os
 import json
-import itertools
+import logging
 import contextlib
 
 from subprocess import CalledProcessError
@@ -32,7 +32,7 @@ import pymzn.config as config
 from . import solvers
 from .solvers import gecode
 from .model import MiniZincModel
-from pymzn.utils import get_logger, run
+from pymzn.utils import run
 from pymzn.dzn import dict2dzn, dzn2dict
 
 
@@ -101,7 +101,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         list as first argument and a boolean value indicating the completion
         status of the problem as second argument.
     """
-    log = get_logger(__name__)
+    log = logging.getLogger(__name__)
 
     if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
@@ -191,13 +191,13 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         with contextlib.suppress(FileNotFoundError):
             if mzn_file:
                 os.remove(mzn_file)
-                log.debug('Deleting file: {}', mzn_file)
+                log.debug('Deleting file: {}'.format(mzn_file))
             if fzn_file:
                 os.remove(fzn_file)
-                log.debug('Deleting file: {}', fzn_file)
+                log.debug('Deleting file: {}'.format(fzn_file))
             if ozn_file:
                 os.remove(ozn_file)
-                log.debug('Deleting file: {}', ozn_file)
+                log.debug('Deleting file: {}'.format(ozn_file))
 
     return stream
 
@@ -238,7 +238,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
         The paths to the generated fzn and ozn files. If ``no_ozn=True``, the
         second argument is None.
     """
-    log = get_logger(__name__)
+    log = logging.getLogger(__name__)
 
     args = [config.get('mzn2fzn', 'mzn2fzn')]
     if no_ozn:
@@ -268,7 +268,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
             with open(data_file, 'w') as f:
                 f.write('\n'.join(data))
             dzn_files.append(data_file)
-            log.debug('Generated file: {}', data_file)
+            log.debug('Generated file: {}'.format(data_file))
         else:
             data = ' '.join(data)
             args.append('-D')
@@ -286,7 +286,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
         with contextlib.suppress(FileNotFoundError):
             if data_file:
                 os.remove(data_file)
-                log.debug('Deleting file: {}', data_file)
+                log.debug('Deleting file: {}'.format(data_file))
 
     mzn_base = os.path.splitext(mzn_file)[0]
     fzn_file = '.'.join([mzn_base, 'fzn'])
@@ -295,9 +295,9 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
     ozn_file = ozn_file if os.path.isfile(ozn_file) else None
 
     if fzn_file:
-        log.debug('Generated file: {}', fzn_file)
+        log.debug('Generated file: {}'.format(fzn_file))
     if ozn_file:
-        log.debug('Generated file: {}', ozn_file)
+        log.debug('Generated file: {}'.format(ozn_file))
 
     return fzn_file, ozn_file
 
@@ -321,7 +321,7 @@ def solns2out(soln_stream, ozn_file):
         boolean value indicating the completion status of the problem as second
         argument.
     """
-    log = get_logger(__name__)
+    log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]
     try:
         process = run(args, stdin=soln_stream)
