@@ -2,7 +2,7 @@
 
 import pymzn.config as config
 
-from pymzn._utils import get_logger
+from pymzn.utils import get_logger
 
 from textwrap import TextWrapper
 from numbers import Integral, Real, Number
@@ -192,7 +192,7 @@ def _dzn_type(val):
     raise TypeError('Unsupported parsing for value: {}'.format(repr(val)))
 
 
-def dzn_value(val, wrap=True):
+def val2dzn(val, wrap=True):
     """Serializes a value (bool, int, float, set, array) into its dzn
     representation.
 
@@ -224,7 +224,7 @@ def dzn_value(val, wrap=True):
     return dzn_val
 
 
-def dzn_statement(name, val, declare=True, assign=True, wrap=True):
+def stmt2dzn(name, val, declare=True, assign=True, wrap=True):
     """Returns a dzn statement declaring and assigning the given value.
 
     Parameters
@@ -254,13 +254,13 @@ def dzn_statement(name, val, declare=True, assign=True, wrap=True):
         stmt.append('{}: '.format(val_type))
     stmt.append(name)
     if assign:
-        val_str = dzn_value(val, wrap=wrap)
+        val_str = val2dzn(val, wrap=wrap)
         stmt.append(' = {}'.format(val_str))
     stmt.append(';')
     return ''.join(stmt)
 
 
-def dzn(objs, declare=False, assign=True, wrap=True, fout=None):
+def dict2dzn(objs, declare=False, assign=True, wrap=True, fout=None):
     """Serializes the objects in input and produces a list of strings encoding
     them into dzn format. Optionally, the produced dzn is written in a file.
 
@@ -294,7 +294,7 @@ def dzn(objs, declare=False, assign=True, wrap=True, fout=None):
 
     vals = []
     for key, val in objs.items():
-        stmt = dzn_statement(key, val, declare=declare, assign=assign, wrap=wrap)
+        stmt = stmt2dzn(key, val, declare=declare, assign=assign, wrap=wrap)
         vals.append(stmt)
 
     if fout:

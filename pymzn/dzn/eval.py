@@ -3,7 +3,7 @@
 import re
 import os.path
 
-from ._marsh import rebase_array
+from .marsh import rebase_array
 
 # boolean pattern
 _bool_p = re.compile('^(?:true|false)$')
@@ -14,7 +14,7 @@ _int_p = re.compile('^[+\-]?\d+$')
 # float pattern
 _float_p = re.compile('^[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?$')
 
-# continuous integer set pattern
+# contiguous integer set pattern
 _cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
 
 # integer set pattern
@@ -102,7 +102,7 @@ def _eval_val(val):
     if _float_p.match(val):
         return float(val)
 
-    # continuous integer set
+    # contiguous integer set
     cont_int_set_m = _cont_int_set_p.match(val)
     if cont_int_set_m:
         v1 = int(cont_int_set_m.group(1))
@@ -119,7 +119,7 @@ def _eval_val(val):
     return None
 
 
-def dzn_eval(dzn, *, rebase_arrays=True):
+def dzn2dict(dzn, *, rebase_arrays=True):
     """Evaluates a dzn string or file into a Python dictionary of variable
     assignments.
 
