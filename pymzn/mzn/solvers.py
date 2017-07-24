@@ -569,6 +569,6 @@ optimathsat = Optimathsat()
 opturion = Opturion()
 
 #: Default Gurobi instance.
-gurobi = Opturion()
+gurobi = Gurobi()
 
 
