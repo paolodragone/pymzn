@@ -2,10 +2,10 @@
 """Provides classes to interface solvers with PyMzn.
 
 PyMzn interfaces with solvers through the ``Solver`` class. This class includes
-the necessary infomation for PyMzn to setup the solver. This class also include
-the ``solve`` method which takes care of the actual solving of a FlatZinc model.
-The solvers classes are subclasses of the ``Solver`` class, providing
-implementations of the ``solve`` method.
+the necessary infomation for PyMzn to setup the solver. This class also includes
+the ``solve`` method which takes care of the actual solving of a
+MiniZinc/FlatZinc model. The solvers classes are subclasses of the ``Solver``
+class, providing implementations of the ``solve`` method.
 PyMzn provides a number of solver implementations out-of-the-box.
 PyMzn's default solver is Gecode, which class is `pymzn.Gecode` and the default
 instance is ``pymzn.gecode``.
@@ -13,28 +13,62 @@ instance is ``pymzn.gecode``.
 To use a different solver or to exend an existing one, one has to subclass the
 Solver class and implement the ``solve`` method.
 
-For instance:::
+For instance::
 
-    from pymzn.bin import run
     from pymzn import Solver
+    from pymzn.utils import run
 
     class MySolver(Solver):
         def __init__(self, path='/path/to/solver'):
-            self.path = path
-            support_ozn = True
-            support_all = False
-            super().__init__(support_ozn, support_all)
+            super().__init__()
+            self.cmd = path
 
-        def solve(self, fzn_file, *, all_solutions=False, check_complete=False,
+        @property
+        def support_mzn(self):
+            return False
+
+        @property
+        def support_dzn(self):
+            return True
+
+        @property
+        def support_json(self):
+            return False
+
+        @property
+        def support_item(self):
+            return False
+
+        @property
+        def support_dict(self):
+            return False
+
+        @property
+        def support_all(self):
+            return False
+
+        @property
+        def support_timeout(self):
+            return False
+
+        # You can ignore the dzn_files, data and include if the solver does not
+        # support mzn inputs. Similarly, you can ignore timeout and
+        # all_solutions if the solver does not support the timeout and returning
+        # all solutions respectively. Check out the Gecode implementation for
+        # an example of how to handle these parameters if needed.
+        def solve(self, mzn_file, *dzn_files, data=None, include=None,
+                  timeout=None, all_solutions=False, output_mode='dzn',
                   arg1=def_val1, arg2=def_val2, **kwargs):
-        args = [self.path, '-arg1', arg1, '-arg2', arg2, fzn_file]
+        # mzn_file contains a fzn if the solver does not support mzn inputs
+        args = [self.path, '-arg1', arg1, '-arg2', arg2, mzn_file]
         process = run(args)
-        return process.stdout
+        return process.stdout    # assuming the solver returns dzn solutions
 
 
-Then one can run the ``minizinc`` function with the custom solver:::
+Then one can run the ``minizinc`` function with the custom solver::
 
-    pymzn.minizinc('test.mzn', solver=MySolver(), arg1=val1, arg2=val2)
+    my_solver = MySolver()
+    pymzn.minizinc('test.mzn', solver=my_solver(), arg1=val1, arg2=val2)
 """
 
 import re

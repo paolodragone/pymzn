@@ -3,24 +3,24 @@
 
 PyMzn can be configured with custom executable paths and other variables.
 
-To inspect the current value of a variable one can use the PyMzn executable,if
-installed:::
+To inspect the current value of a variable one can use the PyMzn executable, if
+installed::
 
     $ pymzn config mzn2fzn
 
-or equivalently:::
+or equivalently::
 
     $ python3.5 -m pymzn config mzn2fzn
 
-Similarly, to configure a variable:::
+Similarly, to configure a variable::
 
     $ pymzn config mzn2fzn /path/to/mzn2fzn
 
-or:::
+or::
 
     $ python3.5 -m pymzn config mzn2fzn /path/to/mzn2fzn
 
-The configuration of PyMzn is contained into a configuration file contained in
+The configuration of PyMzn is contained into a configuration file located in
 the home directory of the current user. The exact path of the configuration file
 is dependent on the operating system:
 
@@ -31,14 +31,13 @@ is dependent on the operating system:
 This is a YAML configuration file, which can be also manually modified.
 
 PyMzn can also be configured programmatically using the module ``pymzn.config``.
-For instance:::
+For instance::
 
     import pymzn.config
 
     # config.set sets the variable only for the current execution
     pymzn.config.set('mzn2fzn', 'path/to/mzn2fzn')
     pymzn.config.set('solns2out', 'path/to/solns2out')
-    pymzn.config.set('gecode', 'path/to/fzn-gecode')
 
     # to make the changes persistent
     pymzn.dump()
@@ -58,15 +57,15 @@ One can also configure custom properties to be used for custom solvers.
 Debug
 -----
 
-PyMzn can also be set to print debugging messages on standard output via:::
+PyMzn can also be set to print debugging messages on standard output via::
 
     pymzn.debug()
 
 This function is meant to be used in interactive sessions or in
-applications that do not configure the ``logging`` library. If you
-configure the ``logging`` library in your application, then PyMzn will
-be affected as well. The logging level in PyMzn is always ``DEBUG``. To
-disable debugging messages you can then call:::
+applications that do not configure the ``logging`` library. If you configure the
+``logging`` library in your application, then PyMzn will print logging messages
+as well. The logging level in PyMzn is always ``DEBUG``. To disable debugging
+messages you can then call::
 
     pymzn.debug(False)
 

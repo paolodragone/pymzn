@@ -7,16 +7,17 @@ python code.
 
 The main function that PyMzn provides is the ``minizinc`` function, which
 executes the entire workflow for solving a CSP problem encoded in MiniZinc.
-Solving a MiniZinc problem with PyMzn is as simple as:::
+Solving a MiniZinc problem with PyMzn is as simple as::
 
     import pymzn
     pymzn.minizinc('test.mzn')
 
 The ``minizinc`` function is probably the way to go for most of the problems,
-but the ``mzn2fzn`` and ``solns2out`` functions are in the public API to allow
-for maximum flexibility. The latter two functions are wrappers of the two
-homonym MiniZinc tools for, respectively, converting a MiniZinc model into a
-FlatZinc one and getting custom output from the solution stream of a solver.
+but the ``mzn2fzn`` and ``solns2out`` functions are also included in the public
+API to allow for maximum flexibility. The latter two functions are wrappers of
+the two homonym MiniZinc tools for, respectively, converting a MiniZinc model
+into a FlatZinc one and getting custom output from the solution stream of a
+solver.
 """
 
 import os
@@ -37,6 +38,17 @@ from pymzn.dzn import dict2dzn, dzn2dict
 
 
 class SolnStream:
+    """Represents a solution stream from the `minizinc` function.
+
+    This class can be referenced and iterated as a list.
+
+    Arguments
+    ---------
+    complete : bool
+        Whether the stream includes the complete set of solutions. This means
+        the stream contains all solutions in a satisfiability problem, or it
+        contains the global optimum for maximization/minimization problems.
+    """
 
     def __init__(self, solns, complete):
         self._solns = solns
@@ -89,24 +101,36 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     solver : Solver
         An instance of Solver to use to solve the minizinc problem. The default
         is pymzn.gecode.
+    output_mode : 'dzn', 'json', 'item', 'dict'
+        The desired output format. The default is 'dict' which returns a stream
+        of solutions decoded as python dictionaries. The 'item' format outputs a
+        stream of strings as returned by the solns2out tool, formatted according
+        to the output statement of the MiniZinc model. The 'dzn' and 'json'
+        formats output a stream of strings formatted in dzn of json
+        respectively. The latter two formats are only available if the solver
+        supports them.
     all_solutions : bool
-        Whether all the solutions must be returned. Notice that this is only
-        used if the solver supports returning all solutions, otherwise it is
-        ignored. Default is False.
+        Whether all the solutions must be returned. Notice that this can only
+        be used if the solver supports returning all solutions. Default is False.
+    timeout : int
+        Number of seconds after which the solver should stop the computation and
+        return the best solution found. This is only available if the solver has
+        support for a timeout.
+    force_flatten : bool
+        Wheter the function should be forced to produce a flat model. Whenever
+        possible, this function feeds the mzn file to the solver without passing
+        through the flattener, force_flatten=True prevents this behavior and
+        always produces a fzn file which is in turn passed to the solver.
     **solver_args
         Additional arguments to pass to the solver, provided as additional
-        keyword arguments to this function check the solver documentation for
+        keyword arguments to this function. Check the solver documentation for
         the available arguments.
 
     Returns
     -------
     SolnStream
-        Returns a list of solutions. If eval_output is True, the solutions are
-        returned as dictionaries of variable assignments, otherwise they are
-        solution strings as returned from the solns2out function. If
-        ``check_complete=True`` the result is a tuple containing the solution
-        list as first argument and a boolean value indicating the completion
-        status of the problem as second argument.
+        Returns a list of solutions as a SolnStream instance. The actual content
+        of the stream depends on the output_mode chosen.
     """
     log = logging.getLogger(__name__)
 
@@ -231,23 +255,19 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
 
     Parameters
     ----------
-    mzn : str or MiniZincModel
-        The minizinc problem to be solved.  It can be either a string or an
-        instance of MiniZincModel.  If it is a string, it can be either the path
-        to the mzn file or the content of the model.
+    mzn_file : str
+        The path to the minizinc problem file.
     *dzn_files
         A list of paths to dzn files to attach to the mzn2fzn execution,
         provided as positional arguments; by default no data file is attached.
-        Data files are meant to be used when there is data that is static across
-        several minizinc executions.
     data : dict
         Additional data as a dictionary of variables assignments to supply to
         the mzn2fnz function. The dictionary is then automatically converted to
-        dzn format by the pymzn.dzn function. This property is meant to include
-        data that dynamically changes across several minizinc executions.
+        dzn format by the ``pymzn.dict2dzn`` function. Notice that if the data
+        provided is too large, a temporary dzn file will be produced.
     keep_data : bool
-        Whether to write the dzn inline data provided in the ``data`` parameter
-        into a file and keep it. Default is False.
+        Whether to write the inline data into a dzn file and keep it.
+        Default is False.
     include : str or list
         One or more additional paths to search for included mzn files when
         running ``mzn2fzn``.
@@ -336,7 +356,7 @@ def process_data(mzn_file, data, keep_data=False):
 
 def solns2out(soln_stream, ozn_file):
     """Wraps the solns2out utility, executes it on the solution stream, and
-    then returns the output.
+    then returns the output stream.
 
     Parameters
     ----------
@@ -347,11 +367,9 @@ def solns2out(soln_stream, ozn_file):
 
     Returns
     -------
-    list or tuple
-        Returns a list of solution strings. If ``check_complete=True`` the
-        result is a tuple containing the solution list as first argument and a
-        boolean value indicating the completion status of the problem as second
-        argument.
+    str
+        Returns the output stream encoding the solution stream according to the
+        provided ozn file.
     """
     log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]

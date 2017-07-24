@@ -6,10 +6,11 @@ import logging
 import subprocess
 
 
-""" Binary utilities """
-
 def run(args, stdin=None):
     """Executes a command and waits for the result.
+
+    It is also possible to interrupt the execution of the command with CTRL+C on
+    the shell terminal.
 
     Parameters
     ----------

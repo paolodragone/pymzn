@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
-modelling and solving. It is built on top of the libminizinc library (version
-2.0) and provides a number of off-the-shelf functions to readily solve problems
-encoded in MiniZinc and evaluate the solutions into Python objects.
+modelling and solving. It is built on top of the MiniZinc toolkit and provides a
+number of off-the-shelf functions to readily solve problems encoded in MiniZinc
+and parse the solutions into Python objects.
 """
 
 import ast
@@ -28,6 +28,7 @@ _pymzn_logger = logging.getLogger(__name__)
 _pymzn_logger.addHandler(logging.NullHandler())
 
 def debug(dbg=True):
+    """Enables or disables debugging messages on the standard output."""
     global _debug_handler
     if dbg and _debug_handler is None:
         _debug_handler = logging.StreamHandler()

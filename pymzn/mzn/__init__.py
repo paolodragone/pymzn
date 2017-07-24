@@ -4,7 +4,7 @@ from .model import *
 from .solvers import *
 from .minizinc import *
 
-__all__ = ['minizinc', 'mzn2fzn', 'solns2out', 'MiniZincError',
+__all__ = ['SolnStream', 'minizinc', 'mzn2fzn', 'solns2out', 'MiniZincError',
            'MiniZincUnsatisfiableError', 'MiniZincUnknownError',
            'MiniZincUnboundedError', 'MiniZincModel', 'Statement', 'Constraint',
            'Variable', 'ArrayVariable', 'OutputStatement', 'SolveStatement',

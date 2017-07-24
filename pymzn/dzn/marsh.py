@@ -205,7 +205,7 @@ def val2dzn(val, wrap=True):
     Returns
     -------
     str
-        The serialized dzn representation of the value.
+        The serialized dzn representation of the given value.
     """
     if _is_value(val):
         dzn_val = _dzn_val(val)
@@ -305,7 +305,7 @@ def dict2dzn(objs, declare=False, assign=True, wrap=True, fout=None):
 
 
 def rebase_array(d, recursive=False):
-    """Transform an indexed dictionary (such as those returned by the parse_dzn
+    """Transform an indexed dictionary (such as those returned by the dzn2dict
     function when parsing arrays) into an multi-dimensional list.
 
     Parameters
