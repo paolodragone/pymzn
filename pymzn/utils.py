@@ -41,16 +41,17 @@ def run(args, stdin=None):
                           stderr=subprocess.PIPE) as process:
         try:
             out, err = process.communicate(stdin)
-        except (KeyboardInterrupt, SystemExit):
+            ret = process.poll()
+        except KeyboardInterrupt:
             process.kill()
             os.killpg(os.getpgid(process.pid), signal.SIGTERM)
             out, err = process.communicate(stdin)
+            ret = 0
         finally:
-            ret = process.poll()
             signal.signal(signal.SIGINT, sigint)
     elapsed = time.time() - start
     log.debug('Done. Running time: {0:.2f} seconds'.format(elapsed))
     process = subprocess.CompletedProcess(args, ret, out, err)
-    #process.check_returncode()
+    process.check_returncode()
     return process
 
