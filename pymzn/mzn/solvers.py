@@ -39,9 +39,7 @@ Then one can run the ``minizinc`` function with the custom solver:::
 
 import pymzn.config as config
 
-from pymzn.bin import run
-from pymzn._utils import get_logger
-
+from pymzn.utils import get_logger, run
 from subprocess import CalledProcessError
 
 

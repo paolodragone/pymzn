@@ -19,8 +19,7 @@ import re
 import os.path
 
 from pymzn.utils import get_logger
-from pymzn.dzn.marsh import dzn_statement, dzn_value
-from pymzn.mzn.parse import *
+from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 
 class Statement(object):
@@ -95,7 +94,7 @@ class Parameter(Statement):
         if self.type:
             stmt = '{}: {};'.format(self.type, self.name)
         else:
-            stmt = dzn_statement(self.name, self.value, assign=assign)
+            stmt = stmt2dzn(self.name, self.value, assign=assign)
         super().__init__(stmt)
 
 
@@ -289,7 +288,7 @@ class MiniZincModel(object):
         output : bool
             Whether the variable is an output variable.
         """
-        value = dzn_value(value) if value is not None else None
+        value = val2dzn(value) if value is not None else None
         array_type_m = array_type_p.match(vartype)
         if array_type_m:
             indexset = array_type_m.group(1)
@@ -322,7 +321,7 @@ class MiniZincModel(object):
         output : bool
             Whether the array variable is an output array.
         """
-        value = dzn_value(value) if value is not None else None
+        value = val2dzn(value) if value is not None else None
         var = ArrayVariable(name, indexset, domain, value, output)
         self._statements.append(var)
         if output or var_type_p.match(domain) and value is None:

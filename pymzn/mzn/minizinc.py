@@ -33,7 +33,7 @@ from . import solvers
 from .solvers import gecode
 from .model import MiniZincModel
 from pymzn.utils import get_logger, run
-from pymzn.dzn import dzn_eval, dzn
+from pymzn.dzn import dict2dzn, dzn2dict
 
 
 class SolnStream:
@@ -164,7 +164,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                 if solver.support_json:
                     solns = list(map(json.loads, solns))
                 else:
-                    solns = list(map(dzn_eval, solns))
+                    solns = list(map(dzn2dict, solns))
                 stream = SolnsStream(solns, complete)
         elif output_mode in ['dzn', 'json', 'item']:
             out = solver.solve(mzn_file, *dzn_files, data=data, include=include,
@@ -180,7 +180,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
             if solver.support_json:
                 solns = list(map(json.loads, solns))
             else:
-                solns = list(map(dzn_eval, solns))
+                solns = list(map(dzn2dict, solns))
             stream = SolnsStream(solns, complete)
     except (MiniZincUnsatisfiableError, MiniZincUnknownError,
             MiniZincUnboundedError) as err:
@@ -256,7 +256,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
     data_file = None
     if data:
         if isinstance(data, dict):
-            data = dzn(data)
+            data = dict2dzn(data)
         elif isinstance(data, str):
             data = [data]
         elif not isinstance(data, list):
