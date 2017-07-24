@@ -83,19 +83,8 @@ def main():
                             help='arguments to pass to the solver')
     mzn_parser.add_argument('-k', '--keep', action='store_true',
                             help='whether to keep generated files')
-    mzn_parser.add_argument('-o', '--output-base',
-                            help='base name for generated files if keeped')
-    mzn_parser.add_argument('-G', '--globals-dir',
-                            help=('directory of global files in the standard '
-                                  'library'))
     mzn_parser.add_argument('-I', '--include', dest='path', action='append',
                             help='directory the standard library')
-    mzn_parser.add_argument('--stdlib-dir',
-                            help='directory the standard library')
-    mzn_parser.add_argument('--no-eval', dest='eval_output',
-                            action='store_false',
-                            help=('return the content of the original output '
-                                  'statement'))
     mzn_parser.set_defaults(func=_minizinc)
 
     config_parser = subparsers.add_parser('config',
