@@ -47,9 +47,6 @@ The configurable properties used by PyMzn are the following:
 
  * **mzn2fzn**: Path to the *mzn2fzn* executable;
  * **solns2out**: Path to the *solns2out* executable;
- * **gecode**: Path to the Gecode *fzn-gecode* executable;
- * **optimathsat**: Path to the OptiMathSat *optimathsat* executable;
- * **opturion**: Path to the Opturion *fzn-cpx* executable;
  * **dzn_width**: The horizontal character limit for dzn files;
    This property is used to wrap long dzn statements when writing dzn files.
    This property is also used in the ``pymzn.minizinc`` function as a limit to
@@ -84,10 +81,6 @@ _config = None
 _defaults = {
         'mzn2fzn': 'mzn2fzn',
         'solns2out': 'solns2out',
-        'gecode': 'fzn-gecode',
-        'optimathsat': 'optimathsat',
-        'opturion': 'fzn-cpx',
-        'gurobi': 'mzn-gurobi',
         'dzn_width': 70
     }
 
