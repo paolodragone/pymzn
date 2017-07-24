@@ -216,10 +216,7 @@ class MiniZincModel(object):
         self._statements = []
         self._solve_stmt = None
         self._output_stmt = None
-        self._free_vars = set()
-        self._array_dims = {}
         self._modified = False
-        self._parsed = False
 
         self.mzn_file = None
         self.model = None
@@ -411,67 +408,6 @@ class MiniZincModel(object):
             else:
                 self.model = ''
         return self.model
-
-    def _parse_model_stmts(self):
-        if self._parsed:
-            return
-        model = self._load_model()
-        _, variables, *_ = parse(model)
-        for var in variables:
-            name, vartype, value = var
-            if var_type_p.match(vartype) and value is None:
-                self._free_vars.add(name)
-            array_type_m = array_type_p.match(vartype)
-            if array_type_m:
-                dim = len(array_type_m.group(1).split(','))
-                self._array_dims[name] = dim
-        self._parsed = True
-
-    def dzn_output_stmt(self, output_vars=None, comment=None):
-        """Sets the output statement to be a dzn representation of output_vars.
-
-        If output_var is not provided (= None) then the free variables of the
-        model are used i.e. those variables that are declared but not defined in
-        the model (not depending on other variables).
-
-        Parameters
-        ----------
-        output_vars : list of str
-            The list of output variables.
-        comment : str
-            A comment to attach to the output statement.
-        """
-
-        # Look for free variables and array dimensions in the model statements
-        self._parse_model_stmts()
-
-        # Set output vars to the free variables if None provided
-        if output_vars is None:
-            output_vars = list(self._free_vars)
-
-        if not output_vars:
-            return
-
-        # Build the output statement from the output variables
-        out_var = '"{0} = ", show({0}), ";\\n"'
-        out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
-        out_list = []
-        for var in output_vars:
-            if var in self._array_dims:
-                dim = self._array_dims[var]
-                if dim == 1:
-                    show_idx_sets = 'show(index_set({}))'.format(var)
-                else:
-                    show_idx_sets = []
-                    for d in range(1, dim + 1):
-                        show_idx_sets.append('show(index_set_{}of{}'
-                                             '({}))'.format(d, dim, var))
-                    show_idx_sets = ', ", ", '.join(show_idx_sets)
-                out_list.append(out_array.format(var, dim, show_idx_sets))
-            else:
-                out_list.append(out_var.format(var))
-        out_list = ', '.join(out_list)
-        self.output(out_list)
 
     def compile(self, output_file=None):
         """Compiles the model and writes it to file.
