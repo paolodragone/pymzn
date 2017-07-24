@@ -41,6 +41,7 @@ import logging
 import pymzn.config as config
 
 from pymzn.utils import run
+from abc import ABC, abstractmethod
 from subprocess import CalledProcessError
 
 
@@ -54,41 +55,41 @@ class Solver(ABC):
         self.globals_dir = globals_dir
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_mzn(self):
         """Whether the solver supports direct mzn input"""
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_dzn(self):
         """Whether the solver supports dzn output"""
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_json(self):
         """Whether the solver supports json output"""
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_item(self):
         """Whether the solver supports item output"""
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_dict(self):
         """Whether the solver supports dict output"""
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_all(self):
         """Whether the solver supports collecting all solutions"""
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def support_timeout(self):
         """Whether the solver supports a timeout"""
 
-    @abc.abstractmethod
+    @abstractmethod
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='dzn', **kwargs):
         """Solve a problem encoded with MiniZinc/FlatZinc.
@@ -159,21 +160,22 @@ class Gecode(Solver):
     @property
     def support_item(self):
         """Whether the solver supports item output"""
+        return True
 
     @property
-    @abc.abstractmethod
     def support_dict(self):
         """Whether the solver supports dict output"""
+        return False
 
     @property
-    @abc.abstractmethod
     def support_all(self):
         """Whether the solver supports collecting all solutions"""
+        return True
 
     @property
-    @abc.abstractmethod
     def support_timeout(self):
         """Whether the solver supports a timeout"""
+        return True
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', parallel=1, seed=0,
@@ -264,7 +266,7 @@ class Gecode(Solver):
                 raise RuntimeError(err.stderr) from err
         return out
 
-
+'''
 class Optimathsat(Solver):
     """Simple wrapper for the OptiMathSat solver.
 
@@ -430,11 +432,12 @@ class Gurobi(Solver):
         if check_complete:
             return out, complete
         return out
-
+'''
 
 #: Default Gecode instance.
-gecode = Gecode(path=config.get('gecode'))
+gecode = Gecode()
 
+'''
 #: Default Optimathsat instance.
 optimathsat = Optimathsat(path=config.get('optimathsat'))
 
@@ -443,4 +446,5 @@ opturion = Opturion(path=config.get('opturion'))
 
 #: Default Gurobi instance.
 gurobi = Opturion(path=config.get('gurobi'))
+'''
 
