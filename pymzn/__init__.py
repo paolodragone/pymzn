@@ -53,8 +53,12 @@ def main():
             config.set(key, value)
             config.dump()
 
-    #TODO: finish description
-    desc = dedent('''PyMzn is a wrapper for the MiniZinc tool pipeline.
+    desc = dedent('''\
+        PyMzn is a Python library that wraps and enhances the MiniZinc tools for
+        CSP modelling and solving. It is built on top of the MiniZinc toolkit
+        and provides a number of off-the-shelf functions to readily solve
+        problems encoded in MiniZinc and parse the solutions into Python
+        objects.
     ''')
 
     fmt = argparse.ArgumentDefaultsHelpFormatter
