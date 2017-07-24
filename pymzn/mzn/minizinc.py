@@ -139,6 +139,9 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                                      buffering=1)
     mzn_model.compile(output_file)
     mzn_file = output_file.name
+    data_file = None
+    fzn_file = None
+    ozn_file = None
 
     try:
         if force_flatten or not solver.support_mzn or \
@@ -167,15 +170,24 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                     solns = list(map(dzn2dict, solns))
                 stream = SolnsStream(solns, complete)
         elif output_mode in ['dzn', 'json', 'item']:
-            out = solver.solve(mzn_file, *dzn_files, data=data, include=include,
-                            timeout=timeout, all_solutions=all_solutions,
-                            output_mode=output_mode, **solver_args)
-            stream = SolnsStream(*split_solns(out))
+            dzn_files = list(dzn_files)
+            data, data_file = process_data(mzn_file, data, keep)
+            if data_file:
+                dzn_files.append(data_file)
+            out = solver.solve(mzn_file, *dzn_files, data=data,
+                               include=include, timeout=timeout,
+                               all_solutions=all_solutions,
+                               output_mode=output_mode, **solver_args)
+            stream = SolnStream(*split_solns(out))
         else:
-            out = solver.solve(mzn_file, *dzn_files, data=data, include=include,
-                        timeout=timeout, all_solutions=all_solutions,
+            dzn_files = list(dzn_files)
+            data, data_file = process_data(mzn_file, data, keep)
+            if data_file:
+                dzn_files.append(data_file)
+            out = solver.solve(mzn_file, *dzn_files, data=data,
+                        include=include, timeout=timeout,
                         output_mode='json' if solver.support_json else 'item',
-                        **solver_args)
+                        all_solutions=all_solutions, **solver_args)
             solns, complete = split_solns(out)
             if solver.support_json:
                 solns = list(map(json.loads, solns))
@@ -189,6 +201,9 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
 
     if not keep:
         with contextlib.suppress(FileNotFoundError):
+            if data_file:
+                os.remove(data_file)
+                log.debug('Deleting file: {}'.format(data_file))
             if mzn_file:
                 os.remove(mzn_file)
                 log.debug('Deleting file: {}'.format(mzn_file))
@@ -253,27 +268,12 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
             args.append(path)
 
     dzn_files = list(dzn_files)
-    data_file = None
+    data, data_file = process_data(mzn_file, data, keep_data)
     if data:
-        if isinstance(data, dict):
-            data = dict2dzn(data)
-        elif isinstance(data, str):
-            data = [data]
-        elif not isinstance(data, list):
-            raise TypeError('The additional data provided is not valid.')
-
-        if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
-            mzn_base, __ = os.path.splitext(mzn_file)
-            data_file = mzn_base + '_data.dzn'
-            with open(data_file, 'w') as f:
-                f.write('\n'.join(data))
-            dzn_files.append(data_file)
-            log.debug('Generated file: {}'.format(data_file))
-        else:
-            data = ' '.join(data)
-            args.append('-D')
-            args.append(data)
-
+        args.append('-D')
+        args.append(data)
+    elif data_file:
+        dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
 
     try:
@@ -300,6 +300,31 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
         log.debug('Generated file: {}'.format(ozn_file))
 
     return fzn_file, ozn_file
+
+
+def process_data(mzn_file, data, keep_data=False):
+    if not data:
+        return None, None
+
+    log = logging.getLogger(__name__)
+    if isinstance(data, dict):
+        data = dict2dzn(data)
+    elif isinstance(data, str):
+        data = [data]
+    elif not isinstance(data, list):
+        raise TypeError('The additional data provided is not valid.')
+
+    if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
+        mzn_base, __ = os.path.splitext(mzn_file)
+        data_file = mzn_base + '_data.dzn'
+        with open(data_file, 'w') as f:
+            f.write('\n'.join(data))
+        log.debug('Generated file: {}'.format(data_file))
+        data = None
+    else:
+        data = ' '.join(data)
+        data_file = None
+    return data, data_file
 
 
 def solns2out(soln_stream, ozn_file):
