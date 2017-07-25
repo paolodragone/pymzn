@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Solvers &mdash; PyMzn 0.14.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Manual" href="../index.html"/>
+        <link rel="next" title="pymzn.Solver" href="generated/pymzn.Solver.html"/>
+        <link rel="prev" title="pymzn.rebase_array" href="../dzn/generated/pymzn.rebase_array.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PyMzn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.14.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../minizinc/index.html">MiniZinc tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/index.html">Modelling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Solver.html">pymzn.Solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Gecode.html">pymzn.Gecode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Chuffed.html">pymzn.Chuffed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Optimathsat.html">pymzn.Optimathsat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Opturion.html">pymzn.Opturion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MIPSolver.html">pymzn.MIPSolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Gurobi.html">pymzn.Gurobi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.CBC.html">pymzn.CBC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.G12Solver.html">pymzn.G12Solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.G12Fd.html">pymzn.G12Fd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.G12Lazy.html">pymzn.G12Lazy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.G12MIP.html">pymzn.G12MIP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.gecode.html">pymzn.gecode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.chuffed.html">pymzn.chuffed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.optimathsat.html">pymzn.optimathsat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.opturion.html">pymzn.opturion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.gurobi.html">pymzn.gurobi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.cbc.html">pymzn.cbc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.g12fd.html">pymzn.g12fd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.g12lazy.html">pymzn.g12lazy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.g12mip.html">pymzn.g12mip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../internal.html">Implementation details</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyMzn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Manual</a> &raquo;</li>
+        
+      <li>Solvers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/reference/solvers/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="solvers">
+<h1>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Solver.html#pymzn.Solver" title="pymzn.Solver"><code class="xref py py-obj docutils literal"><span class="pre">Solver</span></code></a>([globals_dir])</td>
+<td>Abstract solver class.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Gecode.html#pymzn.Gecode" title="pymzn.Gecode"><code class="xref py py-obj docutils literal"><span class="pre">Gecode</span></code></a>([mzn_path,&nbsp;fzn_path,&nbsp;globals_dir])</td>
+<td>Interface to the Gecode solver.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Chuffed.html#pymzn.Chuffed" title="pymzn.Chuffed"><code class="xref py py-obj docutils literal"><span class="pre">Chuffed</span></code></a>([mzn_path,&nbsp;fzn_path,&nbsp;globals_dir])</td>
+<td>Interface to the Chuffed solver.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Optimathsat.html#pymzn.Optimathsat" title="pymzn.Optimathsat"><code class="xref py py-obj docutils literal"><span class="pre">Optimathsat</span></code></a>([path,&nbsp;globals_dir])</td>
+<td>Interface to the Optimathsat solver.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Opturion.html#pymzn.Opturion" title="pymzn.Opturion"><code class="xref py py-obj docutils literal"><span class="pre">Opturion</span></code></a>([path,&nbsp;globals_dir])</td>
+<td>Interface to the Opturion CPX solver.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MIPSolver.html#pymzn.MIPSolver" title="pymzn.MIPSolver"><code class="xref py py-obj docutils literal"><span class="pre">MIPSolver</span></code></a>([path,&nbsp;globals_dir])</td>
+<td>Interface to the MIP solver.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Gurobi.html#pymzn.Gurobi" title="pymzn.Gurobi"><code class="xref py py-obj docutils literal"><span class="pre">Gurobi</span></code></a>([path,&nbsp;globals_dir])</td>
+<td>Interface to the Gurobi solver.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.CBC.html#pymzn.CBC" title="pymzn.CBC"><code class="xref py py-obj docutils literal"><span class="pre">CBC</span></code></a>([path,&nbsp;globals_dir])</td>
+<td>Interface to the COIN-OR CBC solver.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.G12Solver.html#pymzn.G12Solver" title="pymzn.G12Solver"><code class="xref py py-obj docutils literal"><span class="pre">G12Solver</span></code></a>([mzn_path,&nbsp;fzn_path,&nbsp;globals_dir,&nbsp;…])</td>
+<td>Interface to a generic G12 solver.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.G12Fd.html#pymzn.G12Fd" title="pymzn.G12Fd"><code class="xref py py-obj docutils literal"><span class="pre">G12Fd</span></code></a>([mzn_path,&nbsp;fzn_path,&nbsp;globals_dir])</td>
+<td>Interface to the G12Fd solver.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.G12Lazy.html#pymzn.G12Lazy" title="pymzn.G12Lazy"><code class="xref py py-obj docutils literal"><span class="pre">G12Lazy</span></code></a>([mzn_path,&nbsp;fzn_path,&nbsp;globals_dir])</td>
+<td>Interface to the G12Lazy solver.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.G12MIP.html#pymzn.G12MIP" title="pymzn.G12MIP"><code class="xref py py-obj docutils literal"><span class="pre">G12MIP</span></code></a>([mzn_path,&nbsp;fzn_path,&nbsp;globals_dir])</td>
+<td>Interface to the G12MIP solver.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.gecode.html#pymzn.gecode" title="pymzn.gecode"><code class="xref py py-obj docutils literal"><span class="pre">gecode</span></code></a></td>
+<td>Default Gecode instance.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.chuffed.html#pymzn.chuffed" title="pymzn.chuffed"><code class="xref py py-obj docutils literal"><span class="pre">chuffed</span></code></a></td>
+<td>Default Chuffed instance.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.optimathsat.html#pymzn.optimathsat" title="pymzn.optimathsat"><code class="xref py py-obj docutils literal"><span class="pre">optimathsat</span></code></a></td>
+<td>Default Optimathsat instance.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.opturion.html#pymzn.opturion" title="pymzn.opturion"><code class="xref py py-obj docutils literal"><span class="pre">opturion</span></code></a></td>
+<td>Default Opturion instance.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.gurobi.html#pymzn.gurobi" title="pymzn.gurobi"><code class="xref py py-obj docutils literal"><span class="pre">gurobi</span></code></a></td>
+<td>Default Gurobi instance.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.cbc.html#pymzn.cbc" title="pymzn.cbc"><code class="xref py py-obj docutils literal"><span class="pre">cbc</span></code></a></td>
+<td>Default CBC instance.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.g12fd.html#pymzn.g12fd" title="pymzn.g12fd"><code class="xref py py-obj docutils literal"><span class="pre">g12fd</span></code></a></td>
+<td>Default G12Fd instance.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.g12lazy.html#pymzn.g12lazy" title="pymzn.g12lazy"><code class="xref py py-obj docutils literal"><span class="pre">g12lazy</span></code></a></td>
+<td>Default G12Lazy instance.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.g12mip.html#pymzn.g12mip" title="pymzn.g12mip"><code class="xref py py-obj docutils literal"><span class="pre">g12mip</span></code></a></td>
+<td>Default G12Lazy instance.</td>
+</tr>
+</tbody>
+</table>
+<span class="target" id="module-pymzn.mzn.solvers"></span><p>Provides classes to interface solvers with PyMzn.</p>
+<p>PyMzn interfaces with solvers through the <code class="docutils literal"><span class="pre">Solver</span></code> class. This class includes
+the necessary infomation for PyMzn to setup the solver. This class also includes
+the <code class="docutils literal"><span class="pre">solve</span></code> method which takes care of the actual solving of a
+MiniZinc/FlatZinc model. The solvers classes are subclasses of the <code class="docutils literal"><span class="pre">Solver</span></code>
+class, providing implementations of the <code class="docutils literal"><span class="pre">solve</span></code> method.
+PyMzn provides a number of solver implementations out-of-the-box.
+PyMzn’s default solver is Gecode, which class is <a class="reference internal" href="generated/pymzn.Gecode.html#pymzn.Gecode" title="pymzn.Gecode"><code class="xref py py-obj docutils literal"><span class="pre">pymzn.Gecode</span></code></a> and the default
+instance is <code class="docutils literal"><span class="pre">pymzn.gecode</span></code>.</p>
+<p>To use a different solver or to exend an existing one, one has to subclass the
+Solver class and implement the <code class="docutils literal"><span class="pre">solve</span></code> method.</p>
+<p>For instance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymzn</span> <span class="k">import</span> <span class="n">Solver</span>
+<span class="kn">from</span> <span class="nn">pymzn.utils</span> <span class="k">import</span> <span class="n">run</span>
+
+<span class="k">class</span> <span class="nc">MySolver</span><span class="p">(</span><span class="n">Solver</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;/path/to/solver&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_mzn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_dzn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">support_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># You can ignore the dzn_files, data and include if the solver does not</span>
+    <span class="c1"># support mzn inputs. Similarly, you can ignore timeout and</span>
+    <span class="c1"># all_solutions if the solver does not support the timeout and returning</span>
+    <span class="c1"># all solutions respectively. Check out the Gecode implementation for</span>
+    <span class="c1"># an example of how to handle these parameters if needed.</span>
+    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mzn_file</span><span class="p">,</span> <span class="o">*</span><span class="n">dzn_files</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">all_solutions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_mode</span><span class="o">=</span><span class="s1">&#39;dzn&#39;</span><span class="p">,</span>
+              <span class="n">arg1</span><span class="o">=</span><span class="n">def_val1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="n">def_val2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># mzn_file contains a fzn if the solver does not support mzn inputs</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;-arg1&#39;</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="s1">&#39;-arg2&#39;</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">mzn_file</span><span class="p">]</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span>    <span class="c1"># assuming the solver returns dzn solutions</span>
+</pre></div>
+</div>
+<p>Then one can run the <code class="docutils literal"><span class="pre">minizinc</span></code> function with the custom solver:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">my_solver</span> <span class="o">=</span> <span class="n">MySolver</span><span class="p">()</span>
+<span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">my_solver</span><span class="p">(),</span> <span class="n">arg1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="n">val2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/pymzn.Solver.html" class="btn btn-neutral float-right" title="pymzn.Solver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../dzn/generated/pymzn.rebase_array.html" class="btn btn-neutral" title="pymzn.rebase_array" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.14.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

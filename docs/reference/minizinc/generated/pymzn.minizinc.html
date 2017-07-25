@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymzn.minizinc &mdash; PyMzn 0.14.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MiniZinc tools" href="../index.html"/>
+        <link rel="next" title="pymzn.mzn2fzn" href="pymzn.mzn2fzn.html"/>
+        <link rel="prev" title="pymzn.SolnStream" href="pymzn.SolnStream.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> PyMzn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.14.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">MiniZinc tools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pymzn.SolnStream.html">pymzn.SolnStream</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.minizinc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.solns2out.html">pymzn.solns2out</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnsatisfiableError.html">pymzn.MiniZincUnsatisfiableError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnknownError.html">pymzn.MiniZincUnknownError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnboundedError.html">pymzn.MiniZincUnboundedError</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyMzn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Manual</a> &raquo;</li>
+        
+          <li><a href="../index.html">MiniZinc tools</a> &raquo;</li>
+        
+      <li>pymzn.minizinc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/reference/minizinc/generated/pymzn.minizinc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pymzn-minizinc">
+<h1>pymzn.minizinc<a class="headerlink" href="#pymzn-minizinc" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pymzn.minizinc">
+<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep=False</em>, <em>include=None</em>, <em>solver=&lt;pymzn.mzn.solvers.Gecode object&gt;</em>, <em>output_mode='dict'</em>, <em>all_solutions=False</em>, <em>timeout=None</em>, <em>force_flatten=False</em>, <em>**solver_args</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the workflow to solve a CSP problem encoded with MiniZinc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mzn</strong> (<em>str</em><em> or </em><a class="reference internal" href="../../model/generated/pymzn.MiniZincModel.html#pymzn.MiniZincModel" title="pymzn.MiniZincModel"><em>MiniZincModel</em></a>) – The minizinc problem to be solved.  It can be either a string or an
+instance of MiniZincModel.  If it is a string, it can be either the path
+to the mzn file or the content of the model.</li>
+<li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the mzn2fzn execution,
+provided as positional arguments; by default no data file is attached.
+Data files are meant to be used when there is data that is static across
+several minizinc executions.</li>
+<li><strong>data</strong> (<em>dict</em>) – Additional data as a dictionary of variables assignments to supply to
+the mzn2fnz function. The dictionary is then automatically converted to
+dzn format by the pymzn.dzn function. This property is meant to include
+data that dynamically changes across several minizinc executions.</li>
+<li><strong>keep</strong> (<em>bool</em>) – Whether to keep the generated mzn, dzn, fzn and ozn files or not. If
+False, the generated files are created as temporary files which will be
+deleted right after the problem is solved. Though pymzn generated files
+are not originally intended to be kept, this property can be used for
+debugging purpose. Notice that in case of error the files are not
+deleted even if this parameter is False.  Default is False.</li>
+<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included mzn files.</li>
+<li><strong>solver</strong> (<a class="reference internal" href="../../solvers/generated/pymzn.Solver.html#pymzn.Solver" title="pymzn.Solver"><em>Solver</em></a>) – An instance of Solver to use to solve the minizinc problem. The default
+is pymzn.gecode.</li>
+<li><strong>output_mode</strong> (<em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'item'</em><em>, </em><em>'dict'</em>) – The desired output format. The default is ‘dict’ which returns a stream
+of solutions decoded as python dictionaries. The ‘item’ format outputs a
+stream of strings as returned by the solns2out tool, formatted according
+to the output statement of the MiniZinc model. The ‘dzn’ and ‘json’
+formats output a stream of strings formatted in dzn of json
+respectively. The latter two formats are only available if the solver
+supports them.</li>
+<li><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned. Notice that this can only
+be used if the solver supports returning all solutions. Default is False.</li>
+<li><strong>timeout</strong> (<em>int</em>) – Number of seconds after which the solver should stop the computation and
+return the best solution found. This is only available if the solver has
+support for a timeout.</li>
+<li><strong>force_flatten</strong> (<em>bool</em>) – Wheter the function should be forced to produce a flat model. Whenever
+possible, this function feeds the mzn file to the solver without passing
+through the flattener, force_flatten=True prevents this behavior and
+always produces a fzn file which is in turn passed to the solver.</li>
+<li><strong>**solver_args</strong> – Additional arguments to pass to the solver, provided as additional
+keyword arguments to this function. Check the solver documentation for
+the available arguments.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Returns a list of solutions as a SolnStream instance. The actual content
+of the stream depends on the output_mode chosen.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pymzn.SolnStream.html#pymzn.SolnStream" title="pymzn.SolnStream">SolnStream</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pymzn.mzn2fzn.html" class="btn btn-neutral float-right" title="pymzn.mzn2fzn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pymzn.SolnStream.html" class="btn btn-neutral" title="pymzn.SolnStream" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.14.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

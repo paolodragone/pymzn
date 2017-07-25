@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quick Start &mdash; PyMzn 0.14.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="index.html"/>
+        <link rel="next" title="Manual" href="reference/index.html"/>
+        <link rel="prev" title="Install" href="install.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PyMzn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.14.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solver-s-arguments">Solver’s arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyMzn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Quick Start</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/quick_start.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<p>First, you need a MiniZinc model encoding the problem you want to solve.
+Here is a simple 0-1 knapsack problem encoded with MiniZinc:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">test</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
+<span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
+<span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
+<span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
+<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">profit</span><span class="p">;</span>  <span class="o">%</span> <span class="n">the</span> <span class="n">profit</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
+<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">size</span><span class="p">;</span>    <span class="o">%</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
+
+<span class="n">var</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">OBJ</span><span class="p">:</span> <span class="n">x</span><span class="p">;</span>
+<span class="n">constraint</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">capacity</span><span class="p">;</span>
+<span class="n">var</span> <span class="nb">int</span><span class="p">:</span> <span class="n">obj</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">profit</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="n">solve</span> <span class="n">maximize</span> <span class="n">obj</span><span class="p">;</span>
+
+
+<span class="o">%%</span> <span class="n">test</span><span class="o">.</span><span class="n">dzn</span> <span class="o">%%</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="n">profit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
+<span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">];</span>
+</pre></div>
+</div>
+<p>You can solve the above problem using the <code class="docutils literal"><span class="pre">pymzn.minizinc</span></code> function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
+<span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;test.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The result will be:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SolnStream</span><span class="p">(</span><span class="n">solns</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}],</span> <span class="n">complete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The returned object represent a solution stream, which can be directly
+referenced and iterated as a list. The default behavior is to evaluate the
+solutions into python objects. Solutions are dictionaries containing variable
+assignments. The solution evaluation by PyMzn uses either json (when available)
+or dzn as intermediate format from the solver. More details on how PyMzn works
+internally are available in the <a class="reference external" href="reference/internal">Implementation details</a>
+section).</p>
+<p>If you wish to override the default behavior and get a different output format
+you can specify the <code class="docutils literal"><span class="pre">output_mode</span></code> argument. Possible formats are: <code class="docutils literal"><span class="pre">dict</span></code>,
+<code class="docutils literal"><span class="pre">item</span></code>, <code class="docutils literal"><span class="pre">dzn</span></code> and <code class="docutils literal"><span class="pre">json</span></code>. The first is the default one. The <code class="docutils literal"><span class="pre">item</span></code>
+format will return strings formatted according to the output statement in the
+input model. The <code class="docutils literal"><span class="pre">dzn</span></code> and <code class="docutils literal"><span class="pre">json</span></code> formats return strings formatted in dzn or
+json respectively. The latter two formats are only available if the solver used
+supports them.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">output_mode</span><span class="o">=</span><span class="s1">&#39;dzn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to specify data (.dzn) files to the <code class="docutils literal"><span class="pre">minizinc</span></code> function as
+additional positional arguments:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is also possible to specify additional data inline with the <code class="docutils literal"><span class="pre">minizinc</span></code>
+function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]})</span>
+</pre></div>
+</div>
+<p>With the <code class="docutils literal"><span class="pre">data</span></code> argument you can specify an assignment of variables that will
+be automatically converted to dzn format with the <code class="docutils literal"><span class="pre">pymzn.dict2dzn</span></code> function
+(more details in the <a class="reference external" href="reference/dzn/">Dzn files</a> section).</p>
+</div>
+<div class="section" id="solver-s-arguments">
+<h2>Solver’s arguments<a class="headerlink" href="#solver-s-arguments" title="Permalink to this headline">¶</a></h2>
+<p>Usually, solvers provide arguments that can be used to modify their behavior.
+You can specify arguments to pass to the solver as additional keyword arguments
+in the <code class="docutils literal"><span class="pre">minizinc</span></code> function. For instance, using the argument <code class="docutils literal"><span class="pre">timeout</span></code> for
+Gecode, it will set a time cut-off (in seconds) for the problem solving:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># 30 seconds cut-off</span>
+</pre></div>
+</div>
+<p>Adding the <code class="docutils literal"><span class="pre">parallel</span></code> argument, you can specify how many threads
+should Gecode use for the problem solving:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>More details on available options are in the <a class="reference external" href="reference/solvers/">Solvers</a>
+section.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="reference/index.html" class="btn btn-neutral float-right" title="Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.14.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+pymzn\.Opturion
+===============
+
+.. currentmodule:: pymzn
+
+.. autoclass:: Opturion
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~Opturion.solve
+   
+   
+
+   
+   
+   
