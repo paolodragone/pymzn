@@ -246,6 +246,8 @@ class Gecode(Solver):
         parallel : int
             The number of threads to use to solve the problem
             (0 = #processing units); default is 1.
+        seed : int
+            Random seed.
         suppress_segfault : bool
             Whether to accept or not a solution returned when a segmentation
             fault has happened (this is unfortunately necessary sometimes due to
@@ -279,17 +281,23 @@ class Gecode(Solver):
                 args.append('-D')
                 args.append(data)
 
+        fzn_flags = []
         if all_solutions:
             args.append('-a')
         if parallel != 1:
-            args.append('-p')
-            args.append(str(parallel))
+            fzn_flags.append('-p')
+            fzn_flags.append(str(parallel))
         if timeout and timeout > 0:
-            args.append('-time')
-            args.append(str(timeout * 1000)) # Gecode takes milliseconds
+            fzn_flags.append('-time')
+            fzn_flags.append(str(timeout * 1000)) # Gecode takes milliseconds
         if seed != 0:
-            args.append('-r')
-            args.append(str(seed))
+            fzn_flags.append('-r')
+            fzn_flags.append(str(seed))
+        if mzn:
+            args.append('--fzn-flags')
+            args.append('"{}"'.format(' '.join(fzn_flags)))
+        else:
+            args += fzn_flags
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
@@ -307,6 +315,138 @@ class Gecode(Solver):
             else:
                 log.exception(err.stderr)
                 raise RuntimeError(err.stderr) from err
+        return out
+
+
+class Chuffed(Solver):
+    """Interface to the Chuffed solver.
+
+    Parameters
+    ----------
+    mzn_path : str
+        The path to the mzn-chuffed executable.
+    fzn_path : str
+        The path to the fzn-chuffed executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    """
+    def __init__(self, mzn_path='mzn-chuffed', fzn_path='fzn-chuffed',
+                 globals_dir='chuffed'):
+        super().__init__(globals_dir)
+        self.mzn_cmd = mzn_path
+        self.fzn_cmd = fzn_path
+
+    @property
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+        return True
+
+    @property
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+        return True
+
+    @property
+    def support_json(self):
+        """Whether the solver supports json output"""
+        return False
+
+    @property
+    def support_item(self):
+        """Whether the solver supports item output"""
+        return True
+
+    @property
+    def support_dict(self):
+        """Whether the solver supports dict output"""
+        return False
+
+    @property
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+        return True
+
+    @property
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+        return True
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', seed=0, **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with Chuffed.
+
+        Parameters
+        ----------
+        mzn_file : str
+            The path to the mzn file to solve.
+        dzn_files
+            A list of paths to dzn files.
+        data : str
+            A dzn string containing additional inline data to pass to the solver.
+        include : str or [str]
+            A path or a list of paths to included files.
+        timeout : int
+            The timeout for the solver. If None, no timeout given.
+        all_solutions : bool
+            Whether to return all solutions.
+        output_mode : 'dzn', 'json', 'item', 'dict'
+            The output mode required.
+        seed : int
+            Random seed.
+        Returns
+        -------
+        str
+            The output of the solver.
+        """
+        log = logging.getLogger(__name__)
+
+        args = []
+        if mzn_file.endswith('fzn'):
+            if output_mode != 'dzn':
+                raise ValueError('Only dzn output available with fzn input.')
+            args.append(self.fzn_cmd)
+        else:
+            if output_mode != 'item':
+                raise ValueError('Only item output available with mzn input.')
+            mzn = True
+            args.append(self.mzn_cmd)
+            args.append('-G')
+            args.append(self.globals_dir)
+            if include:
+                if isinstance(include, str):
+                    include = [include]
+                for path in include:
+                    args.append('-I')
+                    args.append(path)
+            if data:
+                args.append('-D')
+                args.append(data)
+
+        fzn_flags = []
+        if all_solutions:
+            args.append('-a')
+        if timeout and timeout > 0:
+            fzn_flags.append('--time-out')
+            fzn_flags.append(str(timeout)) # Gecode takes milliseconds
+        if seed != 0:
+            fzn_flags.append('--rnd-seed')
+            fzn_flags.append(str(seed))
+        if mzn:
+            args.append('--fzn-flags')
+            args.append('"{}"'.format(' '.join(fzn_flags)))
+        else:
+            args += fzn_flags
+        args.append(mzn_file)
+        if mzn and dzn_files:
+            for dzn_file in dzn_files:
+                args.append(dzn_file)
+
+        try:
+            process = run(args)
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
         return out
 
 
@@ -809,6 +949,9 @@ class G12MIP(G12Solver):
 #: Default Gecode instance.
 gecode = Gecode()
 
+#: Default Chuffed instance.
+chuffed = Chuffed()
+
 #: Default Optimathsat instance.
 optimathsat = Optimathsat()
 
@@ -819,7 +962,7 @@ opturion = Opturion()
 gurobi = Gurobi()
 
 #: Default CBC instance.
-gurobi = CBC()
+cbc = CBC()
 
 #: Default G12Fd instance.
 g12_fd = G12Fd()
