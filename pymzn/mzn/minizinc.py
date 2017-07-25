@@ -21,7 +21,6 @@ solver.
 """
 
 import os
-import json
 import logging
 import contextlib
 
@@ -190,15 +189,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                 else:
                     stream = SolnStream(*split_solns(out))
             else:
-                out = solver.solve(fzn_file, timeout=timeout,
-                        all_solutions=all_solutions,
-                        output_mode='json' if solver.support_json else 'item',
-                        **solver_args)
+                out = solver.solve(fzn_file, timeout=timeout, output_mode='item',
+                                   all_solutions=all_solutions, **solver_args)
                 solns, complete = split_solns(out)
-                if solver.support_json:
-                    solns = list(map(json.loads, solns))
-                else:
-                    solns = list(map(dzn2dict, solns))
+                solns = list(map(dzn2dict, solns))
                 stream = SolnStream(solns, complete)
         elif output_mode in ['dzn', 'json', 'item']:
             dzn_files = list(dzn_files)
@@ -216,14 +210,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
             if data_file:
                 dzn_files.append(data_file)
             out = solver.solve(mzn_file, *dzn_files, data=data,
-                        include=include, timeout=timeout,
-                        output_mode='json' if solver.support_json else 'item',
+                        include=include, timeout=timeout, output_mode='item',
                         all_solutions=all_solutions, **solver_args)
             solns, complete = split_solns(out)
-            if solver.support_json:
-                solns = list(map(json.loads, solns))
-            else:
-                solns = list(map(dzn2dict, solns))
+            solns = list(map(dzn2dict, solns))
             stream = SolnStream(solns, complete)
     except (MiniZincUnsatisfiableError, MiniZincUnknownError,
             MiniZincUnboundedError) as err:
