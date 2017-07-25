@@ -1,0 +1,20 @@
+pymzn\.Statement
+================
+
+.. currentmodule:: pymzn
+
+.. autoclass:: Statement
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+   
+   
+
+   
+   
+   

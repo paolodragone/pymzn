@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.Optimathsat &mdash; PyMzn 0.11.2 documentation</title>
+  <title>pymzn.Optimathsat &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Solvers" href="../index.html"/>
         <link rel="next" title="pymzn.Optimathsat.solve" href="pymzn.Optimathsat.solve.html"/>
         <link rel="prev" title="pymzn.Gecode.solve" href="pymzn.Gecode.solve.html"/> 
@@ -45,6 +47,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -85,7 +88,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
@@ -100,12 +106,14 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.Opturion.html">pymzn.Opturion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Gurobi.html">pymzn.Gurobi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.gecode.html">pymzn.gecode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.optimathsat.html">pymzn.optimathsat</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.opturion.html">pymzn.opturion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.gurobi.html">pymzn.gurobi</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../bin/index.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -123,8 +131,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -133,27 +143,44 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../../index.html">Manual</a> &raquo;</li>
-      
+        
           <li><a href="../index.html">Solvers</a> &raquo;</li>
-      
-    <li>pymzn.Optimathsat</li>
+        
+      <li>pymzn.Optimathsat</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../../../_sources/reference/solvers/generated/pymzn.Optimathsat.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../../../_sources/reference/solvers/generated/pymzn.Optimathsat.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -163,15 +190,17 @@
 <h1>pymzn.Optimathsat<a class="headerlink" href="#pymzn-optimathsat" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pymzn.Optimathsat">
-<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Optimathsat</code><span class="sig-paren">(</span><em>path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Optimathsat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple wrapper for the OptiMathSat solver.</p>
-<p>This is a simple interface to OptiMathSat which only specifies the input
-format as a FlatZinc model, without providing any additional arguments.</p>
+<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Optimathsat</code><span class="sig-paren">(</span><em>path='optimathsat'</em>, <em>globals_dir='std'</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Optimathsat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface to the Optimathsat solver.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; The path to the OptiMathSat executable. If None, <code class="docutils literal"><span class="pre">optimathsat</span></code> is used.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>str</em>) – The path to the optimathsat executable.</li>
+<li><strong>globals_dir</strong> (<em>str</em>) – The path to the directory for global included files.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -182,8 +211,8 @@ format as a FlatZinc model, without providing any additional arguments.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.Optimathsat.solve.html#pymzn.Optimathsat.solve" title="pymzn.Optimathsat.solve"><code class="xref py py-obj docutils literal"><span class="pre">solve</span></code></a>(fzn_file,&nbsp;\*[,&nbsp;all_solutions,&nbsp;...])</td>
-<td>Solves a problem with the OptiMathSat solver.</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.Optimathsat.solve.html#pymzn.Optimathsat.solve" title="pymzn.Optimathsat.solve"><code class="xref py py-obj docutils literal"><span class="pre">solve</span></code></a>(mzn_file,&nbsp;*dzn_files[,&nbsp;data,&nbsp;include,&nbsp;…])</td>
+<td>Solve a MiniZinc/FlatZinc problem with Optimathsat.</td>
 </tr>
 </tbody>
 </table>
@@ -193,15 +222,18 @@ format as a FlatZinc model, without providing any additional arguments.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pymzn.Optimathsat.solve.html" class="btn btn-neutral float-right" title="pymzn.Optimathsat.solve" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pymzn.Optimathsat.solve.html" class="btn btn-neutral float-right" title="pymzn.Optimathsat.solve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.Gecode.solve.html" class="btn btn-neutral" title="pymzn.Gecode.solve" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pymzn.Gecode.solve.html" class="btn btn-neutral" title="pymzn.Gecode.solve" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -210,7 +242,7 @@ format as a FlatZinc model, without providing any additional arguments.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -232,10 +264,11 @@ format as a FlatZinc model, without providing any additional arguments.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../../_static/jquery.js"></script>

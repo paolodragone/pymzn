@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.config.get &mdash; PyMzn 0.11.2 documentation</title>
+  <title>pymzn.config.get &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="../../index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../index.html"/>
         <link rel="up" title="Configuration" href="../config.html"/>
         <link rel="next" title="pymzn.config.set" href="pymzn.config.set.html"/>
         <link rel="prev" title="Configuration" href="../config.html"/> 
@@ -45,6 +47,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -85,7 +88,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
@@ -93,7 +99,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../bin/index.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html">Binary execution</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.config.get</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.config.set.html">pymzn.config.set</a></li>
@@ -117,8 +123,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -127,27 +135,44 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Manual</a> &raquo;</li>
-      
+        
           <li><a href="../config.html">Configuration</a> &raquo;</li>
-      
-    <li>pymzn.config.get</li>
+        
+      <li>pymzn.config.get</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../../_sources/reference/generated/pymzn.config.get.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../../_sources/reference/generated/pymzn.config.get.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -164,8 +189,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>str</em>) &#8211; The key of the variable to retrieve.</li>
-<li><strong>default</strong> &#8211; The default value to return if the key does not exist.</li>
+<li><strong>key</strong> (<em>str</em>) – The key of the variable to retrieve.</li>
+<li><strong>default</strong> – The default value to return if the key does not exist.</li>
 </ul>
 </td>
 </tr>
@@ -184,15 +209,18 @@
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pymzn.config.set.html" class="btn btn-neutral float-right" title="pymzn.config.set" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pymzn.config.set.html" class="btn btn-neutral float-right" title="pymzn.config.set" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../config.html" class="btn btn-neutral" title="Configuration" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../config.html" class="btn btn-neutral" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -201,7 +229,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -223,10 +251,11 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>

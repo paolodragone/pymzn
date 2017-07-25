@@ -1,6 +1,0 @@
-pymzn.Variable.compile
-======================
-
-.. currentmodule:: pymzn
-
-.. automethod:: Variable.compile

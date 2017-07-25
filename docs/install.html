@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Install &mdash; PyMzn 0.11.2 documentation</title>
+  <title>Install &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="index.html"/>
         <link rel="next" title="Quick Start" href="quick_start.html"/>
         <link rel="prev" title="PyMzn" href="index.html"/> 
 
@@ -44,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -63,7 +66,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -84,7 +87,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Install</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-libminizinc">Install libminizinc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-gecode">Install Gecode</a></li>
@@ -105,8 +111,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -115,23 +123,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Install</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Install</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/install.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -139,40 +164,41 @@
             
   <div class="section" id="install">
 <h1>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h1>
-<p>PyMzn can be installed via Pip::</p>
+<p>PyMzn can be installed via Pip:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">pymzn</span>
 </pre></div>
 </div>
-<p>or from the source code::</p>
+<p>or from the source code:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
 <p>Currently, PyMzn is developed and maintained in Python v3.5 with a
-porting to Python v2.7 at every release (the python2 branch does not contain
-the most recent changes).</p>
+porting to Python v2.7 at every release (the python2 branch does not always
+contain the most recent changes).</p>
 <p>PyMzn requires some additional software to be installed on your system
 before you can use it properly, namely:</p>
 <ul class="simple">
-<li>The <a class="reference external" href="https://github.com/MiniZinc/libminizinc">libminizinc library</a>;</li>
+<li>The <a class="reference external" href="https://github.com/MiniZinc/MiniZincIDE">MiniZinc toolkit</a>;</li>
 <li>A CSP solver compatible with the FlatZinc encoding, e.g. <a class="reference external" href="http://www.gecode.org">Gecode</a>.</li>
 </ul>
 <div class="section" id="install-libminizinc">
 <h2>Install libminizinc<a class="headerlink" href="#install-libminizinc" title="Permalink to this headline">¶</a></h2>
-<p>The latest release of libminizinc can be found here:</p>
+<p>The latest release of the MiniZinc toolkit can be found here:</p>
 <blockquote>
-<div><a class="reference external" href="https://github.com/MiniZinc/libminizinc/releases/latest">https://github.com/MiniZinc/libminizinc/releases/latest</a></div></blockquote>
+<div><a class="reference external" href="https://github.com/MiniZinc/MiniZincIDE/releases/latest">https://github.com/MiniZinc/MiniZincIDE/releases/latest</a></div></blockquote>
 <p>Download and install the package on your system. After that you should insert
-the libminizinc binary path into the PATH environment variable, or alternatively
-you can tell PyMzn&#8217;s where to find the MiniZinc binaries
+the MiniZinc binary path into the PATH environment variable, or alternatively
+you can configure PyMzn to find the MiniZinc binaries
 (see <a class="reference external" href="config.html">Configuration</a>).</p>
 </div>
 <div class="section" id="install-gecode">
 <h2>Install Gecode<a class="headerlink" href="#install-gecode" title="Permalink to this headline">¶</a></h2>
-<p>The next step is to install a CSP solver compatible with FlatZinc. You
-can use any solver you like, but the default one for PyMzn is
-<a class="reference external" href="http://www.gecode.org">Gecode</a>. If you use the Gecode solver, PyMzn will
-work out-of-the-box, otherwise it will need some little configuration (see the
-<a class="reference external" href="reference/solvers/">Solvers</a> section).</p>
+<p>The next step is to install a CSP solver compatible with FlatZinc. You can use
+any solver you like, but the default one for PyMzn is <a class="reference external" href="http://www.gecode.org">Gecode</a>. If you use the Gecode solver, PyMzn will work
+out-of-the-box. PyMzn also supports most of the solvers included in the MiniZinc
+toolkit. If the solver you are looking for is not supported by PyMzn you can
+implement your own interface and use it with little configuration (see the
+<a class="reference external" href="reference/solvers/">Solvers section</a>).</p>
 <p>To install Gecode, we recommend you to download and compile the source code,
 since binary packages are usually less frequently updated.
 The Gecode source code can be downloaded from:</p>
@@ -186,15 +212,18 @@ variable, or configure PyMzn accordingly.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="quick_start.html" class="btn btn-neutral float-right" title="Quick Start" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="quick_start.html" class="btn btn-neutral float-right" title="Quick Start" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="PyMzn" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="PyMzn" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -203,7 +232,7 @@ variable, or configure PyMzn accordingly.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -225,10 +254,11 @@ variable, or configure PyMzn accordingly.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
