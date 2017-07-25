@@ -177,19 +177,20 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         if force_flatten or not solver.support_mzn or \
                 (output_mode == 'item' and not solver.support_item):
             fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
-                                        keep_data=keep, include=include,
-                                        no_ozn=(output_mode != 'item'))
+                                         keep_data=keep, include=include,
+                                         no_ozn=(output_mode != 'item'))
             if output_mode in ['item', 'dzn', 'json']:
                 out = solver.solve(fzn_file, timeout=timeout,
-                                all_solutions=all_solutions,
-                                output_mode=output_mode, **solver_args)
+                                   output_mode=('dzn' if output_mode == 'item'
+                                                else output_mode),
+                                   all_solutions=all_solutions, **solver_args)
                 if ozn_file:
                     out = solns2out(out, ozn_file)
                     stream = SolnStream(*split_solns(out))
                 else:
                     stream = SolnStream(*split_solns(out))
             else:
-                out = solver.solve(fzn_file, timeout=timeout, output_mode='item',
+                out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
                                    all_solutions=all_solutions, **solver_args)
                 solns, complete = split_solns(out)
                 solns = list(map(dzn2dict, solns))

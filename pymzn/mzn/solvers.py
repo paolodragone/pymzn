@@ -259,6 +259,7 @@ class Gecode(Solver):
         """
         log = logging.getLogger(__name__)
 
+        mzn = True
         args = []
         if mzn_file.endswith('fzn'):
             if output_mode != 'dzn':
@@ -295,7 +296,7 @@ class Gecode(Solver):
             fzn_flags.append(str(seed))
         if mzn and fzn_flags:
             args.append('--fzn-flags')
-            args.append('"{}"'.format(' '.join(fzn_flags)))
+            args.append('{}'.format(' '.join(fzn_flags)))
         else:
             args += fzn_flags
         args.append(mzn_file)
@@ -400,6 +401,7 @@ class Chuffed(Solver):
         """
         log = logging.getLogger(__name__)
 
+        mzn = False
         args = []
         if mzn_file.endswith('fzn'):
             if output_mode != 'dzn':
@@ -696,6 +698,7 @@ class MIPSolver(Solver):
         """
         log = logging.getLogger(__name__)
 
+        mzn = False
         args = [self.cmd]
         if mzn_file.endswith('fzn') and output_mode not in ['dzn', 'json']:
             raise ValueError('Only dzn or json output available with fzn input.')
@@ -720,7 +723,7 @@ class MIPSolver(Solver):
             args.append('-p')
             args.append(str(parallel))
         if timeout and timeout > 0:
-            args.append('-time')
+            args.append('--timeout')
             args.append(str(timeout)) # Gurobi takes seconds
 
         args.append('--output-mode')
@@ -733,6 +736,7 @@ class MIPSolver(Solver):
         try:
             process = run(args)
             out = process.stdout
+            print(out)
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
@@ -851,6 +855,7 @@ class G12Solver(Solver):
         """
         log = logging.getLogger(__name__)
 
+        mzn = False
         args = []
         if mzn_file.endswith('fzn'):
             if output_mode != 'dzn':
