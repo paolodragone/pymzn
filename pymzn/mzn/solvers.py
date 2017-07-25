@@ -475,8 +475,8 @@ class Opturion:
         return out
 
 
-class Gurobi(Solver):
-    """Interface to the Gurobi solver.
+class MIPSolver(Solver):
+    """Interface to the MIP solver.
 
     Parameters
     ----------
@@ -527,7 +527,7 @@ class Gurobi(Solver):
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', parallel=1, **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with Gurobi.
+        """Solve a MiniZinc/FlatZinc problem with a MIP Solver.
 
         Parameters
         ----------
@@ -599,6 +599,36 @@ class Gurobi(Solver):
         return out
 
 
+class Gurobi(MIPSolver):
+    """Interface to the Gurobi solver.
+
+    Parameters
+    ----------
+    path : str
+        The path to the mzn-cbc executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    """
+
+    def __init__(self, path='mzn-gurobi', globals_dir='linear'):
+        super().__init__(path, globals_dir)
+
+
+class CBC(MIPSolver):
+    """Interface to the COIN-OR CBC solver.
+
+    Parameters
+    ----------
+    path : str
+        The path to the mzn-cbc executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    """
+
+    def __init__(self, path='mzn-cbc', globals_dir='linear'):
+        super().__init__(path, globals_dir)
+
+
 class G12Solver(Solver):
     """Interface to a generic G12 solver.
 
@@ -658,7 +688,7 @@ class G12Solver(Solver):
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with the G12Fd solver.
+        """Solve a MiniZinc/FlatZinc problem with the G12 solver.
 
         Parameters
         ----------
@@ -787,6 +817,9 @@ opturion = Opturion()
 
 #: Default Gurobi instance.
 gurobi = Gurobi()
+
+#: Default CBC instance.
+gurobi = CBC()
 
 #: Default G12Fd instance.
 g12_fd = G12Fd()
