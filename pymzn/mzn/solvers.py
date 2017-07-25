@@ -444,6 +444,8 @@ class Chuffed(Solver):
         try:
             process = run(args)
             out = process.stdout
+            if process.stderr:
+                raise RuntimeError(process.stderr)
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
@@ -698,8 +700,6 @@ class MIPSolver(Solver):
         if mzn_file.endswith('fzn') and output_mode not in ['dzn', 'json']:
             raise ValueError('Only dzn or json output available with fzn input.')
         else:
-            if output_mode != 'item':
-                raise ValueError('Only item output available with mzn input.')
             mzn = True
             args.append('-G')
             args.append(self.globals_dir)
@@ -965,11 +965,11 @@ gurobi = Gurobi()
 cbc = CBC()
 
 #: Default G12Fd instance.
-g12_fd = G12Fd()
+g12fd = G12Fd()
 
 #: Default G12Lazy instance.
-g12_lazy = G12Lazy()
+g12lazy = G12Lazy()
 
 #: Default G12Lazy instance.
-g12_mip = G12MIP()
+g12mip = G12MIP()
 
