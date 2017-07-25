@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MiniZinc tools &mdash; PyMzn 0.11.2 documentation</title>
+  <title>MiniZinc tools &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,9 +35,9 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="../../index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../index.html"/>
         <link rel="up" title="Manual" href="../index.html"/>
-        <link rel="next" title="pymzn.minizinc" href="generated/pymzn.minizinc.html"/>
+        <link rel="next" title="pymzn.SolnStream" href="generated/pymzn.SolnStream.html"/>
         <link rel="prev" title="Manual" href="../index.html"/> 
 
   
@@ -45,6 +47,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -85,11 +88,15 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MiniZinc tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.SolnStream.html">pymzn.SolnStream</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.minizinc.html">pymzn.minizinc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.solns2out.html">pymzn.solns2out</a></li>
@@ -102,7 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../bin/index.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html">Binary execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../internal.html">Implementation details</a></li>
 </ul>
@@ -120,8 +127,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -130,25 +139,42 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Manual</a> &raquo;</li>
-      
-    <li>MiniZinc tools</li>
+        
+      <li>MiniZinc tools</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../../_sources/reference/minizinc/index.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../../_sources/reference/minizinc/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -162,58 +188,65 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;\*dzn_files,&nbsp;\*[,&nbsp;data,&nbsp;keep,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.SolnStream.html#pymzn.SolnStream" title="pymzn.SolnStream"><code class="xref py py-obj docutils literal"><span class="pre">SolnStream</span></code></a>(solns,&nbsp;complete)</td>
+<td>Represents a solution stream from the <a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal"><span class="pre">minizinc</span></code></a> function.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;data,&nbsp;keep,&nbsp;…])</td>
 <td>Implements the workflow to solve a CSP problem encoded with MiniZinc.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.mzn2fzn.html#pymzn.mzn2fzn" title="pymzn.mzn2fzn"><code class="xref py py-obj docutils literal"><span class="pre">mzn2fzn</span></code></a>(mzn_file,&nbsp;\*dzn_files,&nbsp;\*[,&nbsp;data,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.mzn2fzn.html#pymzn.mzn2fzn" title="pymzn.mzn2fzn"><code class="xref py py-obj docutils literal"><span class="pre">mzn2fzn</span></code></a>(mzn_file,&nbsp;*dzn_files[,&nbsp;data,&nbsp;…])</td>
 <td>Flatten a MiniZinc model into a FlatZinc one.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.solns2out.html#pymzn.solns2out" title="pymzn.solns2out"><code class="xref py py-obj docutils literal"><span class="pre">solns2out</span></code></a>(soln_stream,&nbsp;ozn_file[,&nbsp;...])</td>
-<td>Wraps the solns2out utility, executes it on the solution stream, and then returns the output.</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.solns2out.html#pymzn.solns2out" title="pymzn.solns2out"><code class="xref py py-obj docutils literal"><span class="pre">solns2out</span></code></a>(soln_stream,&nbsp;ozn_file)</td>
+<td>Wraps the solns2out utility, executes it on the solution stream, and then returns the output stream.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincError.html#pymzn.MiniZincError" title="pymzn.MiniZincError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincError</span></code></a>([msg])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincError.html#pymzn.MiniZincError" title="pymzn.MiniZincError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincError</span></code></a>([msg])</td>
 <td>Generic error for the MiniZinc functions.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincUnsatisfiableError.html#pymzn.MiniZincUnsatisfiableError" title="pymzn.MiniZincUnsatisfiableError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincUnsatisfiableError</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincUnsatisfiableError.html#pymzn.MiniZincUnsatisfiableError" title="pymzn.MiniZincUnsatisfiableError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincUnsatisfiableError</span></code></a>()</td>
 <td>Error raised when a minizinc problem is found to be unsatisfiable.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincUnknownError.html#pymzn.MiniZincUnknownError" title="pymzn.MiniZincUnknownError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincUnknownError</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincUnknownError.html#pymzn.MiniZincUnknownError" title="pymzn.MiniZincUnknownError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincUnknownError</span></code></a>()</td>
 <td>Error raised when minizinc returns no solution (unknown).</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincUnboundedError.html#pymzn.MiniZincUnboundedError" title="pymzn.MiniZincUnboundedError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincUnboundedError</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincUnboundedError.html#pymzn.MiniZincUnboundedError" title="pymzn.MiniZincUnboundedError"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincUnboundedError</span></code></a>()</td>
 <td>Error raised when a minizinc problem is found to be unbounded.</td>
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pymzn._mzn._minizinc"></span><p>PyMzn provides functions that mimic and enhance the tools from the libminizinc
+<span class="target" id="module-pymzn.mzn.minizinc"></span><p>PyMzn provides functions that mimic and enhance the tools from the libminizinc
 library. With these tools, it is possible to compile a MiniZinc model into
 FlatZinc, solve a given problem and get the output solutions directly into the
 python code.</p>
 <p>The main function that PyMzn provides is the <code class="docutils literal"><span class="pre">minizinc</span></code> function, which
 executes the entire workflow for solving a CSP problem encoded in MiniZinc.
-Solving a MiniZinc problem with PyMzn is as simple as::</p>
+Solving a MiniZinc problem with PyMzn is as simple as:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
 <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal"><span class="pre">minizinc</span></code> function is probably the way to go for most of the problems,
-but the <code class="docutils literal"><span class="pre">mzn2fzn</span></code> and <code class="docutils literal"><span class="pre">solns2out</span></code> functions are in the public API to allow
-for maximum flexibility. The latter two functions are wrappers of the two
-homonym MiniZinc tools for, respectively, converting a MiniZinc model into a
-FlatZinc one and getting custom output from the solution stream of a solver.</p>
+but the <code class="docutils literal"><span class="pre">mzn2fzn</span></code> and <code class="docutils literal"><span class="pre">solns2out</span></code> functions are also included in the public
+API to allow for maximum flexibility. The latter two functions are wrappers of
+the two homonym MiniZinc tools for, respectively, converting a MiniZinc model
+into a FlatZinc one and getting custom output from the solution stream of a
+solver.</p>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/pymzn.minizinc.html" class="btn btn-neutral float-right" title="pymzn.minizinc" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="generated/pymzn.SolnStream.html" class="btn btn-neutral float-right" title="pymzn.SolnStream" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral" title="Manual" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral" title="Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -222,7 +255,7 @@ FlatZinc one and getting custom output from the solution stream of a solver.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -244,10 +277,11 @@ FlatZinc one and getting custom output from the solution stream of a solver.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>

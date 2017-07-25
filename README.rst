@@ -3,9 +3,9 @@ PyMzn
 
 PyMzn is a Python library that wraps and enhances the `MiniZinc
 <http://minzinc.org>`__ tools for CSP modelling and solving.  It is built on top
-of the libminizinc library and provides a number of off-the-shelf functions to
-readily solve problems encoded in MiniZinc and parse the solutions into Python
-objects.
+of the `minizinc <https://github.com/MiniZinc/MiniZincIDE>`__ toolkit and
+provides a number of off-the-shelf functions to readily solve problems encoded
+in MiniZinc and parse the solutions into Python objects.
 
 Usage
 -----
@@ -30,18 +30,19 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:::
     profit = [10, 3, 9, 4, 8];
     size = [14, 4, 10, 6, 9];
 
-You can solve the above problem using the ``pymzn.minizinc`` function:::
+You can solve the above problem using the ``pymzn.minizinc`` function::
 
     import pymzn
     pymzn.minizinc('test.mzn', 'test.dzn', data={'capacity': 20})
 
-The result will be:::
+The result will be::
 
-    [{'x': {3, 5}}]
+    SolnStream(solns=[{'x': {3, 5}}], complete=True)
 
-The ``minizinc`` function automatically flattens the MiniZinc model, using the
-provided mzn and dzn files, and the inline data provided. It executes the
-solver on the flattened model and parses the solution stream to get the
+The returned object represent a solution stream, which can be directly
+referenced and iterated as a list. The ``minizinc`` function automatically
+flattens the MiniZinc model, using the provided mzn and dzn files. It executes
+the solver on the flattened model and parses the solution stream to get the
 solutions as Python dictionaries.
 
 PyMzn is also able to:
@@ -62,18 +63,18 @@ For more information on the PyMzn functions read the
 Install
 -------
 
-PyMzn can be installed via Pip:::
+PyMzn can be installed via Pip::
 
     pip3 install pymzn
 
 or from the source code available
-on `GitHub <https://github.com/paolodragone/pymzn>`__:::
+on `GitHub <https://github.com/paolodragone/pymzn>`__::
 
     python3 setup.py install
 
 Currently, PyMzn is developed and maintained in Python v3.5 with a
-porting to Python v2.7 at every release (the python2 branch does not contain
-the most recent changes).
+porting to Python v2.7 at every release (the python2 branch does not always
+contain the most recent changes).
 
 
 Requirements
@@ -81,17 +82,19 @@ Requirements
 PyMzn requires some additional software to be installed on your system
 before you can use it properly, namely:
 
-* The `libminizinc library <https://github.com/MiniZinc/libminizinc>`__;
+* The `MiniZinc toolkit <https://github.com/MiniZinc/MiniZincIDE>`__;
 * A CSP solver compatible with the FlatZinc encoding, e.g. `Gecode <http://www.gecode.org>`__.
 
-You can use any solver you like, but the default one for PyMzn is
-`Gecode <http://www.gecode.org>`__. If you use the Gecode solver, PyMzn will
-work out-of-the-box, otherwise it will need some little configuration (see the
+You can use any solver you like, but the default one for PyMzn is `Gecode
+<http://www.gecode.org>`__. If you use the Gecode solver, PyMzn will work
+out-of-the-box. PyMzn also supports most of the solvers included in the MiniZinc
+toolkit. If the solver you are looking for is not supported by PyMzn you can
+implement your own interface and use it with little configuration (see the
 `Solvers section <reference/solvers/>`__).
 
-Detailed instructions on how to install *libminizinc* and *Gecode* can be
-found in the `Install section <http://paolodragone.com/pymzn/install.html>`__
-of the documentation.
+Detailed instructions on how to install *MiniZinc* and *Gecode* can be found in
+the `Install section <http://paolodragone.com/pymzn/install.html>`__ of the
+documentation.
 
 
 Contribute

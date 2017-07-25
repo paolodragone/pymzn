@@ -119,5 +119,5 @@ class MinizincTest(unittest.TestCase):
                              data={'N': 5, 'profit': [10, 3, 9, 4, 8],
                                    'size': [14, 4, 10, 6, 9],
                                    'capacity': 20})
-        self.assertEqual(out, [{'x': {3, 5}}])
+        self.assertEqual(list(out), [{'x': {3, 5}}])
 

@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.MiniZincModel.solve &mdash; PyMzn 0.11.2 documentation</title>
+  <title>pymzn.MiniZincModel.solve &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,10 +35,10 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../../index.html"/>
         <link rel="up" title="pymzn.MiniZincModel" href="pymzn.MiniZincModel.html"/>
-        <link rel="next" title="pymzn.MiniZincModel.var" href="pymzn.MiniZincModel.var.html"/>
-        <link rel="prev" title="pymzn.MiniZincModel.output" href="pymzn.MiniZincModel.output.html"/> 
+        <link rel="next" title="pymzn.MiniZincModel.variable" href="pymzn.MiniZincModel.variable.html"/>
+        <link rel="prev" title="pymzn.MiniZincModel.satisfy" href="pymzn.MiniZincModel.satisfy.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
@@ -45,6 +47,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -85,19 +88,29 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">Modelling</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="pymzn.MiniZincModel.html">pymzn.MiniZincModel</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.array_variable.html">pymzn.MiniZincModel.array_variable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.comment.html">pymzn.MiniZincModel.comment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.compile.html">pymzn.MiniZincModel.compile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraint.html">pymzn.MiniZincModel.constraint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.dzn_output_stmt.html">pymzn.MiniZincModel.dzn_output_stmt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraints.html">pymzn.MiniZincModel.constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.maximize.html">pymzn.MiniZincModel.maximize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.minimize.html">pymzn.MiniZincModel.minimize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.output.html">pymzn.MiniZincModel.output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.parameter.html">pymzn.MiniZincModel.parameter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.parameters.html">pymzn.MiniZincModel.parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.satisfy.html">pymzn.MiniZincModel.satisfy</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pymzn.MiniZincModel.solve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.var.html">pymzn.MiniZincModel.var</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.variable.html">pymzn.MiniZincModel.variable</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.Statement.html">pymzn.Statement</a></li>
@@ -110,7 +123,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../bin/index.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -128,8 +141,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -138,29 +153,46 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../../index.html">Manual</a> &raquo;</li>
-      
+        
           <li><a href="../index.html">Modelling</a> &raquo;</li>
-      
+        
           <li><a href="pymzn.MiniZincModel.html">pymzn.MiniZincModel</a> &raquo;</li>
-      
-    <li>pymzn.MiniZincModel.solve</li>
+        
+      <li>pymzn.MiniZincModel.solve</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../../../_sources/reference/model/generated/pymzn.MiniZincModel.solve.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../../../_sources/reference/model/generated/pymzn.MiniZincModel.solve.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -170,18 +202,14 @@
 <h1>pymzn.MiniZincModel.solve<a class="headerlink" href="#pymzn-minizincmodel-solve" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="pymzn.MiniZincModel.solve">
-<code class="descclassname">MiniZincModel.</code><code class="descname">solve</code><span class="sig-paren">(</span><em>solve_stmt</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.MiniZincModel.solve" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">MiniZincModel.</code><code class="descname">solve</code><span class="sig-paren">(</span><em>solve_stmt</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.MiniZincModel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the solve statement of the model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>solve_stmt</strong> (<em>str</em>) &#8211; The content of the solve statement, i.e. only the actual solve
-without the starting &#8216;solve&#8217; and the ending semicolon.</li>
-<li><strong>comment</strong> (<em>str</em>) &#8211; A comment to attach to the solve statement.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>solve_stmt</strong> (<em>str</em>) – The content of the solve statement, i.e. only the actual solve
+without the starting ‘solve’ and the ending semicolon.</td>
 </tr>
 </tbody>
 </table>
@@ -191,15 +219,18 @@ without the starting &#8216;solve&#8217; and the ending semicolon.</li>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pymzn.MiniZincModel.var.html" class="btn btn-neutral float-right" title="pymzn.MiniZincModel.var" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pymzn.MiniZincModel.variable.html" class="btn btn-neutral float-right" title="pymzn.MiniZincModel.variable" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.MiniZincModel.output.html" class="btn btn-neutral" title="pymzn.MiniZincModel.output" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pymzn.MiniZincModel.satisfy.html" class="btn btn-neutral" title="pymzn.MiniZincModel.satisfy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -208,7 +239,7 @@ without the starting &#8216;solve&#8217; and the ending semicolon.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -230,10 +261,11 @@ without the starting &#8216;solve&#8217; and the ending semicolon.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../../_static/jquery.js"></script>

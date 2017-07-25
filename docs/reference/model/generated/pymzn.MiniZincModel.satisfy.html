@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymzn.MiniZincModel.satisfy &mdash; PyMzn 0.14.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="pymzn.MiniZincModel" href="pymzn.MiniZincModel.html"/>
+        <link rel="next" title="pymzn.MiniZincModel.solve" href="pymzn.MiniZincModel.solve.html"/>
+        <link rel="prev" title="pymzn.MiniZincModel.parameters" href="pymzn.MiniZincModel.parameters.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> PyMzn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.14.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Modelling</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pymzn.MiniZincModel.html">pymzn.MiniZincModel</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.array_variable.html">pymzn.MiniZincModel.array_variable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.comment.html">pymzn.MiniZincModel.comment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.compile.html">pymzn.MiniZincModel.compile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraint.html">pymzn.MiniZincModel.constraint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraints.html">pymzn.MiniZincModel.constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.maximize.html">pymzn.MiniZincModel.maximize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.minimize.html">pymzn.MiniZincModel.minimize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.output.html">pymzn.MiniZincModel.output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.parameter.html">pymzn.MiniZincModel.parameter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.parameters.html">pymzn.MiniZincModel.parameters</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pymzn.MiniZincModel.satisfy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.solve.html">pymzn.MiniZincModel.solve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.variable.html">pymzn.MiniZincModel.variable</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Statement.html">pymzn.Statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Constraint.html">pymzn.Constraint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Variable.html">pymzn.Variable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.ArrayVariable.html">pymzn.ArrayVariable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.OutputStatement.html">pymzn.OutputStatement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.SolveStatement.html">pymzn.SolveStatement</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyMzn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Manual</a> &raquo;</li>
+        
+          <li><a href="../index.html">Modelling</a> &raquo;</li>
+        
+          <li><a href="pymzn.MiniZincModel.html">pymzn.MiniZincModel</a> &raquo;</li>
+        
+      <li>pymzn.MiniZincModel.satisfy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/reference/model/generated/pymzn.MiniZincModel.satisfy.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pymzn-minizincmodel-satisfy">
+<h1>pymzn.MiniZincModel.satisfy<a class="headerlink" href="#pymzn-minizincmodel-satisfy" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="pymzn.MiniZincModel.satisfy">
+<code class="descclassname">MiniZincModel.</code><code class="descname">satisfy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.MiniZincModel.satisfy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for solve(‘satisfy’)</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pymzn.MiniZincModel.solve.html" class="btn btn-neutral float-right" title="pymzn.MiniZincModel.solve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pymzn.MiniZincModel.parameters.html" class="btn btn-neutral" title="pymzn.MiniZincModel.parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.14.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

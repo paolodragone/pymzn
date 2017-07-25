@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Manual &mdash; PyMzn 0.11.2 documentation</title>
+  <title>Manual &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="../index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../index.html"/>
         <link rel="next" title="MiniZinc tools" href="minizinc/index.html"/>
         <link rel="prev" title="Quick Start" href="../quick_start.html"/> 
 
@@ -44,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -63,7 +66,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -84,7 +87,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Manual</a><ul>
@@ -92,7 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bin/index.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Binary execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="internal.html">Implementation details</a></li>
 </ul>
@@ -110,8 +116,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -120,23 +128,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
-      
-    <li>Manual</li>
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Manual</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../_sources/reference/index.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../_sources/reference/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -148,6 +173,7 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="minizinc/index.html">MiniZinc tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="minizinc/generated/pymzn.SolnStream.html">pymzn.SolnStream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minizinc/generated/pymzn.minizinc.html">pymzn.minizinc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minizinc/generated/pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minizinc/generated/pymzn.solns2out.html">pymzn.solns2out</a></li>
@@ -168,25 +194,39 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dzn/index.html">Dzn files</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.dzn.html">pymzn.dzn</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.dzn_value.html">pymzn.dzn_value</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.dzn_eval.html">pymzn.dzn_eval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.dict2dzn.html">pymzn.dict2dzn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.dzn2dict.html">pymzn.dzn2dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.stmt2dzn.html">pymzn.stmt2dzn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.val2dzn.html">pymzn.val2dzn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dzn/generated/pymzn.rebase_array.html">pymzn.rebase_array</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="solvers/index.html">Solvers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.Solver.html">pymzn.Solver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.Gecode.html">pymzn.Gecode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.Chuffed.html">pymzn.Chuffed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.Optimathsat.html">pymzn.Optimathsat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.Opturion.html">pymzn.Opturion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.MIPSolver.html">pymzn.MIPSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.Gurobi.html">pymzn.Gurobi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.CBC.html">pymzn.CBC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.G12Solver.html">pymzn.G12Solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.G12Fd.html">pymzn.G12Fd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.G12Lazy.html">pymzn.G12Lazy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.G12MIP.html">pymzn.G12MIP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.gecode.html">pymzn.gecode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.chuffed.html">pymzn.chuffed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.optimathsat.html">pymzn.optimathsat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.opturion.html">pymzn.opturion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.gurobi.html">pymzn.gurobi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.cbc.html">pymzn.cbc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.g12fd.html">pymzn.g12fd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.g12lazy.html">pymzn.g12lazy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/generated/pymzn.g12mip.html">pymzn.g12mip</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bin/index.html">Binary execution</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bin/generated/pymzn.bin.run.html">pymzn.bin.run</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bin/generated/pymzn.bin.TimedCompletedProcess.html">pymzn.bin.TimedCompletedProcess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Binary execution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/pymzn.utils.run.html">pymzn.utils.run</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a><ul>
@@ -210,15 +250,18 @@
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="minizinc/index.html" class="btn btn-neutral float-right" title="MiniZinc tools" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="minizinc/index.html" class="btn btn-neutral float-right" title="MiniZinc tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../quick_start.html" class="btn btn-neutral" title="Quick Start" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../quick_start.html" class="btn btn-neutral" title="Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -227,7 +270,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -249,10 +292,11 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../_static/jquery.js"></script>

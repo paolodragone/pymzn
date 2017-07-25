@@ -1,35 +1,34 @@
 # -*- coding: utf-8 -*-
 """PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
-modelling and solving. It is built on top of the libminizinc library (version
-2.0) and provides a number of off-the-shelf functions to readily solve problems
-encoded in MiniZinc and evaluate the solutions into Python objects.
+modelling and solving. It is built on top of the MiniZinc toolkit and provides a
+number of off-the-shelf functions to readily solve problems encoded in MiniZinc
+and parse the solutions into Python objects.
 """
 
 import ast
 import logging
 
 from . import config
-from . import _utils
-from . import bin
-from . import _dzn
-from ._dzn import *
-from . import _mzn
-from ._mzn import *
+from . import utils
+from . import dzn
+from .dzn import *
+from . import mzn
+from .mzn import *
 
-__version__ = '0.13.1'
-__all__ = ['debug', 'config', 'bin']
-__all__.extend(_dzn.__all__)
-__all__.extend(_mzn.__all__)
+__version__ = '0.14.0'
+__all__ = ['debug', 'config']
+__all__.extend(dzn.__all__)
+__all__.extend(mzn.__all__)
 
 # TODO: update python2 branch
 # TODO: make it work on windows
-# TODO: check the ctrl+C thing which seems not to work anymore
 
 _debug_handler = None
 _pymzn_logger = logging.getLogger(__name__)
 _pymzn_logger.addHandler(logging.NullHandler())
 
 def debug(dbg=True):
+    """Enables or disables debugging messages on the standard output."""
     global _debug_handler
     if dbg and _debug_handler is None:
         _debug_handler = logging.StreamHandler()
@@ -55,8 +54,12 @@ def main():
             config.set(key, value)
             config.dump()
 
-    #TODO: finish description
-    desc = dedent('''PyMzn is a wrapper for the MiniZinc tool pipeline.
+    desc = dedent('''\
+        PyMzn is a Python library that wraps and enhances the MiniZinc tools for
+        CSP modelling and solving. It is built on top of the MiniZinc toolkit
+        and provides a number of off-the-shelf functions to readily solve
+        problems encoded in MiniZinc and parse the solutions into Python
+        objects.
     ''')
 
     fmt = argparse.ArgumentDefaultsHelpFormatter
@@ -85,19 +88,8 @@ def main():
                             help='arguments to pass to the solver')
     mzn_parser.add_argument('-k', '--keep', action='store_true',
                             help='whether to keep generated files')
-    mzn_parser.add_argument('-o', '--output-base',
-                            help='base name for generated files if keeped')
-    mzn_parser.add_argument('-G', '--globals-dir',
-                            help=('directory of global files in the standard '
-                                  'library'))
     mzn_parser.add_argument('-I', '--include', dest='path', action='append',
                             help='directory the standard library')
-    mzn_parser.add_argument('--stdlib-dir',
-                            help='directory the standard library')
-    mzn_parser.add_argument('--no-eval', dest='eval_output',
-                            action='store_false',
-                            help=('return the content of the original output '
-                                  'statement'))
     mzn_parser.set_defaults(func=_minizinc)
 
     config_parser = subparsers.add_parser('config',

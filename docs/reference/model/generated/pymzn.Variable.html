@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.Variable &mdash; PyMzn 0.11.2 documentation</title>
+  <title>pymzn.Variable &mdash; PyMzn 0.14.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,10 +35,10 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.11.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Modelling" href="../index.html"/>
-        <link rel="next" title="pymzn.Variable.compile" href="pymzn.Variable.compile.html"/>
-        <link rel="prev" title="pymzn.Constraint.compile" href="pymzn.Constraint.compile.html"/> 
+        <link rel="next" title="pymzn.ArrayVariable" href="pymzn.ArrayVariable.html"/>
+        <link rel="prev" title="pymzn.Constraint" href="pymzn.Constraint.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
@@ -45,6 +47,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.11.2
+                0.14.0
               </div>
             
           
@@ -85,7 +88,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
@@ -94,8 +100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincModel.html">pymzn.MiniZincModel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.Statement.html">pymzn.Statement</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.Constraint.html">pymzn.Constraint</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.Variable</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pymzn.Variable.compile.html">pymzn.Variable.compile</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.Variable</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.ArrayVariable.html">pymzn.ArrayVariable</a></li>
@@ -105,7 +110,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../bin/index.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -123,8 +128,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../index.html">PyMzn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyMzn</a>
+        
       </nav>
 
 
@@ -133,27 +140,44 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../../index.html">Manual</a> &raquo;</li>
-      
+        
           <li><a href="../index.html">Modelling</a> &raquo;</li>
-      
-    <li>pymzn.Variable</li>
+        
+      <li>pymzn.Variable</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../../../_sources/reference/model/generated/pymzn.Variable.txt" rel="nofollow"> View page source</a>
+            
+            <a href="../../../_sources/reference/model/generated/pymzn.Variable.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -163,30 +187,30 @@
 <h1>pymzn.Variable<a class="headerlink" href="#pymzn-variable" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pymzn.Variable">
-<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Variable</code><span class="sig-paren">(</span><em>vartype</em>, <em>var</em>, <em>val=None</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Variable" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Variable</code><span class="sig-paren">(</span><em>name</em>, <em>vartype</em>, <em>value=None</em>, <em>output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Variable" title="Permalink to this definition">¶</a></dt>
 <dd><p>A variable statement.</p>
+<dl class="attribute">
+<dt id="pymzn.Variable.name">
+<code class="descname">name</code><a class="headerlink" href="#pymzn.Variable.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The name of the variable.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="pymzn.Variable.vartype">
 <code class="descname">vartype</code><a class="headerlink" href="#pymzn.Variable.vartype" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; The type of the variable.</p>
+<dd><p><em>str</em> – The type of the variable.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pymzn.Variable.var">
-<code class="descname">var</code><a class="headerlink" href="#pymzn.Variable.var" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; The name of the variable.</p>
+<dt id="pymzn.Variable.value">
+<code class="descname">value</code><a class="headerlink" href="#pymzn.Variable.value" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The optional value of the variable statement.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pymzn.Variable.val">
-<code class="descname">val</code><a class="headerlink" href="#pymzn.Variable.val" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; The optional value of the variable statement.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pymzn.Variable.comment">
-<code class="descname">comment</code><a class="headerlink" href="#pymzn.Variable.comment" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; A comment to attach to the variable statement.</p>
+<dt id="pymzn.Variable.output">
+<code class="descname">output</code><a class="headerlink" href="#pymzn.Variable.output" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – Whether the variable is an output variable.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -196,9 +220,6 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.Variable.compile.html#pymzn.Variable.compile" title="pymzn.Variable.compile"><code class="xref py py-obj docutils literal"><span class="pre">compile</span></code></a>()</td>
-<td>Compiles the statement.</td>
-</tr>
 </tbody>
 </table>
 </dd></dl>
@@ -207,15 +228,18 @@
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pymzn.Variable.compile.html" class="btn btn-neutral float-right" title="pymzn.Variable.compile" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pymzn.ArrayVariable.html" class="btn btn-neutral float-right" title="pymzn.ArrayVariable" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.Constraint.compile.html" class="btn btn-neutral" title="pymzn.Constraint.compile" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pymzn.Constraint.html" class="btn btn-neutral" title="pymzn.Constraint" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -224,7 +248,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
 
     </p>
   </div>
@@ -246,10 +270,11 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.11.2',
+            VERSION:'0.14.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
