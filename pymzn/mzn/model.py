@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PyMzn can also be used to dynamically change a model during runtime. For
+u"""PyMzn can also be used to dynamically change a model during runtime. For
 example, it can be useful to add constraints incrementally or change the solving
 statement dynamically. To dynamically modify a model, you can use the class
 ``MiniZincModel``, providing a template model file as input which can then
@@ -15,21 +15,24 @@ to the ``minizinc`` function to be solved.
         pymzn.minizinc(model)
 """
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import re
 import os.path
 
 from pymzn.dzn.marsh import stmt2dzn, val2dzn
+from io import open
 
 
-type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
-var_type_p = re.compile('\s*.*?var.+\s*')
-array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
-output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
-solve_stmt_p = re.compile('\s*solve\s*([^;]+)\s*(?:;)?\s*')
+type_p = re.compile(u'\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
+var_type_p = re.compile(u'\s*.*?var.+\s*')
+array_type_p = re.compile(u'\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
+output_stmt_p = re.compile(u'\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
+solve_stmt_p = re.compile(u'\s*solve\s*([^;]+)\s*(?:;)?\s*')
 
 
 class Statement(object):
-    """A statement of a MiniZincModel.
+    u"""A statement of a MiniZincModel.
 
     Attributes
     ----------
@@ -44,7 +47,7 @@ class Statement(object):
 
 
 class Comment(Statement):
-    """A comment statement.
+    u"""A comment statement.
 
     Attributes
     ----------
@@ -53,12 +56,12 @@ class Comment(Statement):
     """
     def __init__(self, comment):
         self.comment = comment
-        stmt = '% {}\n'.format(comment)
-        super().__init__(stmt)
+        stmt = u'% {}\n'.format(comment)
+        super(Comment, self).__init__(stmt)
 
 
 class Constraint(Statement):
-    """A constraint statement.
+    u"""A constraint statement.
 
     Attributes
     ----------
@@ -68,12 +71,12 @@ class Constraint(Statement):
     """
     def __init__(self, constr, comment=None):
         self.constr = constr
-        stmt = 'constraint {};'.format(constr)
-        super().__init__(stmt)
+        stmt = u'constraint {};'.format(constr)
+        super(Constraint, self).__init__(stmt)
 
 
 class Parameter(Statement):
-    """A parameter statement.
+    u"""A parameter statement.
 
     Attributes
     ----------
@@ -85,27 +88,29 @@ class Parameter(Statement):
         otherwise it will only be declared in the model and then it will have to
         be assigned in the data.
     """
-    def __init__(self, *par, assign=True):
+    def __init__(self, *par, **_3to2kwargs):
+        if 'assign' in _3to2kwargs: assign = _3to2kwargs['assign']; del _3to2kwargs['assign']
+        else: assign = True
         name, par = par
         self.name = name
         self.type = None
         self.value = None
         self.assign = assign
-        if isinstance(par, str):
+        if isinstance(par, unicode):
             type_m = type_p.match(par)
             if type_m:
                 self.type = par
         if not self.type:
             self.value = par
         if self.type:
-            stmt = '{}: {};'.format(self.type, self.name)
+            stmt = u'{}: {};'.format(self.type, self.name)
         else:
             stmt = stmt2dzn(self.name, self.value, assign=assign)
-        super().__init__(stmt)
+        super(Parameter, self).__init__(stmt)
 
 
 class Variable(Statement):
-    """A variable statement.
+    u"""A variable statement.
 
     Attributes
     ----------
@@ -127,27 +132,27 @@ class Variable(Statement):
         if array_type_m:
             indexset = array_type_m.group(1)
             domain = array_type_m.group(2)
-            if 'var' not in domain:
-                vartype = 'array[{}] of var {}'.format(indexset, domain)
-        elif 'var' not in vartype:
-            vartype = 'var ' + vartype
+            if u'var' not in domain:
+                vartype = u'array[{}] of var {}'.format(indexset, domain)
+        elif u'var' not in vartype:
+            vartype = u'var ' + vartype
         self.vartype = vartype
 
-        stmt = '{}: {}'.format(vartype, name)
+        stmt = u'{}: {}'.format(vartype, name)
         if output:
             if array_type_m:
-                stmt += ' :: output_array([{}])'.format(indexset)
+                stmt += u' :: output_array([{}])'.format(indexset)
             else:
-                stmt += ' :: output_var'
+                stmt += u' :: output_var'
         if value:
-            stmt += ' = {}'.format(value)
-        stmt += ';'
+            stmt += u' = {}'.format(value)
+        stmt += u';'
 
-        super().__init__(stmt)
+        super(Variable, self).__init__(stmt)
 
 
 class ArrayVariable(Variable):
-    """An array variable statement.
+    u"""An array variable statement.
 
     Attributes
     ----------
@@ -165,12 +170,12 @@ class ArrayVariable(Variable):
     def __init__(self, name, indexset, domain, value=None, output=False):
         self.indexset = indexset
         self.domain = domain
-        vartype = 'array[{}] of var {}'.format(indexset, domain)
-        super().__init__(name, vartype, value, output)
+        vartype = u'array[{}] of var {}'.format(indexset, domain)
+        super(ArrayVariable, self).__init__(name, vartype, value, output)
 
 
 class OutputStatement(Statement):
-    """An output statement.
+    u"""An output statement.
 
     Attributes
     ----------
@@ -181,14 +186,14 @@ class OutputStatement(Statement):
     def __init__(self, output):
         self.output = output
         if output:
-            stmt = 'output [{}];'.format(output)
+            stmt = u'output [{}];'.format(output)
         else:
-            stmt = ''
-        super().__init__(stmt)
+            stmt = u''
+        super(OutputStatement, self).__init__(stmt)
 
 
 class SolveStatement(Statement):
-    """A solve statement.
+    u"""A solve statement.
 
     Attributes
     ----------
@@ -199,12 +204,12 @@ class SolveStatement(Statement):
 
     def __init__(self, solve):
         self.solve = solve
-        stmt = 'solve {};'.format(solve)
-        super().__init__(stmt)
+        stmt = u'solve {};'.format(solve)
+        super(SolveStatement, self).__init__(stmt)
 
 
 class MiniZincModel(object):
-    """Mutable class representing a MiniZinc model.
+    u"""Mutable class representing a MiniZinc model.
 
     It can use a mzn file as template, add variables and constraints,
     modify the solve and output statements. The output statement can also be
@@ -225,14 +230,14 @@ class MiniZincModel(object):
 
         self.mzn_file = None
         self.model = None
-        if mzn and isinstance(mzn, str):
+        if mzn and isinstance(mzn, unicode):
             if os.path.isfile(mzn):
                 self.mzn_file = mzn
             else:
                 self.model = mzn
 
     def comment(self, comment):
-        """Add a comment to the model.
+        u"""Add a comment to the model.
 
         Parameters
         ----------
@@ -244,8 +249,10 @@ class MiniZincModel(object):
         self._statements.append(comment)
         self._modified = True
 
-    def parameter(self, *par, assign=True):
-        """Adds a parameter to the model.
+    def parameter(self, *par, **_3to2kwargs):
+        if 'assign' in _3to2kwargs: assign = _3to2kwargs['assign']; del _3to2kwargs['assign']
+        else: assign = True
+        u"""Adds a parameter to the model.
 
         Parameters
         ----------
@@ -265,7 +272,7 @@ class MiniZincModel(object):
         self._modified = True
 
     def parameters(self, pars, assign=True):
-        """Add a list of parameters.
+        u"""Add a list of parameters.
 
         Parameters
         ----------
@@ -281,7 +288,7 @@ class MiniZincModel(object):
         self._modified = True
 
     def variable(self, name, vartype, value=None, output=False):
-        """Adds a variable to the model.
+        u"""Adds a variable to the model.
 
         Parameters
         ----------
@@ -299,7 +306,7 @@ class MiniZincModel(object):
         if array_type_m:
             indexset = array_type_m.group(1)
             domain = array_type_m.group(2)
-            dim = len(indexset.split(','))
+            dim = len(indexset.split(u','))
             self._array_dims[name] = dim
             var = ArrayVariable(name, indexset, domain, value, output)
         else:
@@ -312,7 +319,7 @@ class MiniZincModel(object):
         self._modified = True
 
     def array_variable(self, name, indexset, domain, value=None, output=False):
-        """Adds an array variable to the model.
+        u"""Adds an array variable to the model.
 
         Parameters
         ----------
@@ -332,11 +339,11 @@ class MiniZincModel(object):
         self._statements.append(var)
         if output or var_type_p.match(domain) and value is None:
             self._free_vars.add(name)
-        self._array_dims[var] = len(indexset.split(','))
+        self._array_dims[var] = len(indexset.split(u','))
         self._modified = True
 
     def constraint(self, constr):
-        """Adds a constraint to the current model.
+        u"""Adds a constraint to the current model.
 
         Parameters
         ----------
@@ -351,7 +358,7 @@ class MiniZincModel(object):
         self._modified = True
 
     def constraints(self, constrs):
-        """Add a list of constraints.
+        u"""Add a list of constraints.
 
         Parameters
         ----------
@@ -362,7 +369,7 @@ class MiniZincModel(object):
             self.constraint(constr)
 
     def solve(self, solve_stmt):
-        """Updates the solve statement of the model.
+        u"""Updates the solve statement of the model.
 
         Parameters
         ----------
@@ -376,22 +383,22 @@ class MiniZincModel(object):
         self._modified = True
 
     def satisfy(self):
-        """Shorthand for solve('satisfy')"""
-        self._solve_stmt = SolveStatement('satisfy')
+        u"""Shorthand for solve('satisfy')"""
+        self._solve_stmt = SolveStatement(u'satisfy')
         self._modified = True
 
     def maximize(self, expr):
-        """Shorthand for solve('maximize ' + expr)"""
-        self._solve_stmt = SolveStatement('maximize ' + expr)
+        u"""Shorthand for solve('maximize ' + expr)"""
+        self._solve_stmt = SolveStatement(u'maximize ' + expr)
         self._modified = True
 
     def minimize(self, expr):
-        """Shorthand for solve('minimize ' + expr)"""
-        self._solve_stmt = SolveStatement('minimize ' + expr)
+        u"""Shorthand for solve('minimize ' + expr)"""
+        self._solve_stmt = SolveStatement(u'minimize ' + expr)
         self._modified = True
 
     def output(self, output_stmt):
-        """Updates the output statement of the model.
+        u"""Updates the output statement of the model.
 
         Parameters
         ----------
@@ -411,11 +418,11 @@ class MiniZincModel(object):
                 with open(self.mzn_file) as f:
                     self.model = f.read()
             else:
-                self.model = ''
+                self.model = u''
         return self.model
 
     def compile(self, output_file=None):
-        """Compiles the model and writes it to file.
+        u"""Compiles the model and writes it to file.
 
         The compiled model contains the content of the template (if provided)
         plus the added variables and constraints. The solve and output
@@ -434,20 +441,20 @@ class MiniZincModel(object):
         model = self._load_model()
 
         if self._modified:
-            lines = ['\n\n\n%%% GENERATED BY PYMZN %%%\n\n']
+            lines = [u'\n\n\n%%% GENERATED BY PYMZN %%%\n\n']
 
             for stmt in self._statements:
-                lines.append(str(stmt))
+                lines.append(unicode(stmt))
 
             if self._solve_stmt:
-                model = solve_stmt_p.sub('', model)
-                lines.append(str(self._solve_stmt) + '\n')
+                model = solve_stmt_p.sub(u'', model)
+                lines.append(unicode(self._solve_stmt) + u'\n')
 
             if self._output_stmt:
-                model = output_stmt_p.sub('', model)
-                lines.append(str(self._output_stmt) + '\n')
+                model = output_stmt_p.sub(u'', model)
+                lines.append(unicode(self._output_stmt) + u'\n')
 
-            model += '\n'.join(lines)
+            model += u'\n'.join(lines)
 
         if output_file:
             output_file.write(model)

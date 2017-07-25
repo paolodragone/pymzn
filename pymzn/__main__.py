@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
 import pymzn
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     pymzn.main()

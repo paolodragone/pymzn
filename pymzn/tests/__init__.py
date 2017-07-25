@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from . import test_marsh
 from .test_marsh import *
 from . import test_parse

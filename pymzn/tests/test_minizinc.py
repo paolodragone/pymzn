@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import re
 import os
 import pymzn
@@ -10,7 +11,7 @@ from textwrap import dedent
 
 class MinizincTest(unittest.TestCase):
 
-    model = dedent('''\
+    model = dedent(u'''\
         int: N;
         set of int: OBJ = 1..N;
         int: capacity;
@@ -23,20 +24,20 @@ class MinizincTest(unittest.TestCase):
         solve maximize obj;
         ''')
 
-    data1 = dedent('''\
+    data1 = dedent(u'''\
         N = 5;
         profit = [10, 3, 9, 4, 8];
         size = [14, 4, 10, 6, 9];
         ''')
-    data2 = 'capacity = 20;'
-    data3 = '\n'.join([data1, data2])
+    data2 = u'capacity = 20;'
+    data3 = u'\n'.join([data1, data2])
 
     def test_mzn2fzn(self):
 
         self.assertRaises(TypeError, pymzn.mzn2fzn, 0)
-        self.assertRaises(TypeError, pymzn.mzn2fzn, {1, 2, 3})
+        self.assertRaises(TypeError, pymzn.mzn2fzn, set([1, 2, 3]))
 
-        mzn_file = NamedTemporaryFile(prefix='pymzn_', suffix='.mzn', mode='w',
+        mzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.mzn', mode=u'w',
                                       delete=False)
         mzn_file.write(self.model)
         mzn_file.close()
@@ -45,28 +46,28 @@ class MinizincTest(unittest.TestCase):
 
         self.assertRaises(RuntimeError, pymzn.mzn2fzn, mzn)
 
-        dzn_file = NamedTemporaryFile(prefix='pymzn_', suffix='.dzn', mode='w',
+        dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
                                       buffering=1)
         dzn_file.write(self.data1)
         dzn = dzn_file.name
         self.assertRaises(RuntimeError, pymzn.mzn2fzn, mzn, dzn)
         dzn_file.close()
 
-        dzn_file = NamedTemporaryFile(prefix='pymzn_', suffix='.dzn', mode='w',
+        dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
                                       buffering=1)
         dzn_file.write(self.data2)
         dzn = dzn_file.name
         self.assertRaises(RuntimeError, pymzn.mzn2fzn, mzn, dzn)
         dzn_file.close()
 
-        dzn_file = NamedTemporaryFile(prefix='pymzn_', suffix='.dzn', mode='w',
+        dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
                                       buffering=1)
         dzn_file.write(self.data1)
         dzn_file.flush()
         dzn = dzn_file.name
-        fzn = mzn_base + '.fzn'
-        ozn = mzn_base + '.ozn'
-        self.assertEqual(pymzn.mzn2fzn(mzn, dzn, data={'capacity': 20}),
+        fzn = mzn_base + u'.fzn'
+        ozn = mzn_base + u'.ozn'
+        self.assertEqual(pymzn.mzn2fzn(mzn, dzn, data={u'capacity': 20}),
                          (fzn, ozn))
         dzn_file.close()
         self.assertTrue(os.path.isfile(fzn))
@@ -74,13 +75,13 @@ class MinizincTest(unittest.TestCase):
         os.remove(fzn)
         os.remove(ozn)
 
-        dzn_file = NamedTemporaryFile(prefix='pymzn_', suffix='.dzn', mode='w',
+        dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
                                       buffering=1)
         dzn_file.write(self.data3)
         dzn_file.flush()
         dzn = dzn_file.name
-        fzn = mzn_base + '.fzn'
-        ozn = mzn_base + '.ozn'
+        fzn = mzn_base + u'.fzn'
+        ozn = mzn_base + u'.ozn'
         self.assertEqual(pymzn.mzn2fzn(mzn, dzn), (fzn, ozn))
         dzn_file.close()
         self.assertTrue(os.path.isfile(fzn))
@@ -88,24 +89,24 @@ class MinizincTest(unittest.TestCase):
         os.remove(fzn)
         os.remove(ozn)
 
-        dzn_file = NamedTemporaryFile(prefix='pymzn_', suffix='.dzn', mode='w',
+        dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
                                       buffering=1)
         dzn_file.write(self.data3)
         dzn = dzn_file.name
-        fzn = mzn_base + '.fzn'
-        ozn = mzn_base + '.ozn'
+        fzn = mzn_base + u'.fzn'
+        ozn = mzn_base + u'.ozn'
         self.assertEqual(pymzn.mzn2fzn(mzn, dzn, no_ozn=True), (fzn, None))
         dzn_file.close()
         self.assertTrue(os.path.isfile(fzn))
         self.assertFalse(os.path.isfile(ozn))
         os.remove(fzn)
 
-        fzn, ozn = pymzn.mzn2fzn(mzn, data={'N': 5, 'profit': [10, 3, 9, 4, 8],
-                                 'size': [14, 4, 10, 6, 9], 'capacity': 20},
+        fzn, ozn = pymzn.mzn2fzn(mzn, data={u'N': 5, u'profit': [10, 3, 9, 4, 8],
+                                 u'size': [14, 4, 10, 6, 9], u'capacity': 20},
                                  keep_data=True)
-        dzn = mzn_base + '_data.dzn'
-        self.assertEqual(fzn, mzn_base + '.fzn')
-        self.assertEqual(ozn, mzn_base + '.ozn')
+        dzn = mzn_base + u'_data.dzn'
+        self.assertEqual(fzn, mzn_base + u'.fzn')
+        self.assertEqual(ozn, mzn_base + u'.ozn')
         self.assertTrue(os.path.isfile(dzn))
         os.remove(fzn)
         os.remove(ozn)
@@ -116,8 +117,8 @@ class MinizincTest(unittest.TestCase):
 
     def test_minizinc(self):
         out = pymzn.minizinc(self.model,
-                             data={'N': 5, 'profit': [10, 3, 9, 4, 8],
-                                   'size': [14, 4, 10, 6, 9],
-                                   'capacity': 20})
-        self.assertEqual(list(out), [{'x': {3, 5}}])
+                             data={u'N': 5, u'profit': [10, 3, 9, 4, 8],
+                                   u'size': [14, 4, 10, 6, 9],
+                                   u'capacity': 20})
+        self.assertEqual(list(out), [{u'x': set([3, 5])}])
 

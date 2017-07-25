@@ -1,4 +1,6 @@
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import os
 import time
 import signal
@@ -7,7 +9,7 @@ import subprocess
 
 
 def run(args, stdin=None):
-    """Executes a command and waits for the result.
+    u"""Executes a command and waits for the result.
 
     It is also possible to interrupt the execution of the command with CTRL+C on
     the shell terminal.
@@ -32,7 +34,7 @@ def run(args, stdin=None):
         When the process returns an error.
     """
     log = logging.getLogger(__name__)
-    log.debug('Executing command with args: {}'.format(args))
+    log.debug(u'Executing command with args: {}'.format(args))
     start = time.time()
     sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGINT, lambda *args: None)
@@ -51,7 +53,7 @@ def run(args, stdin=None):
         finally:
             signal.signal(signal.SIGINT, sigint)
     elapsed = time.time() - start
-    log.debug('Done. Running time: {0:.2f} seconds'.format(elapsed))
+    log.debug(u'Done. Running time: {0:.2f} seconds'.format(elapsed))
     process = subprocess.CompletedProcess(args, ret, out, err)
     process.check_returncode()
     return process

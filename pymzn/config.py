@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+u"""
 
 PyMzn can be configured with custom executable paths and other variables.
 
@@ -70,26 +70,29 @@ messages you can then call::
     pymzn.debug(False)
 
 """
+from __future__ import with_statement
+from __future__ import absolute_import
 import os
 import yaml
 import appdirs
+from io import open
 
 
 _modified = False
 _config = None
 _defaults = {
-        'mzn2fzn': 'mzn2fzn',
-        'solns2out': 'solns2out',
-        'dzn_width': 70
+        u'mzn2fzn': u'mzn2fzn',
+        u'solns2out': u'solns2out',
+        u'dzn_width': 70
     }
 
 
 def _cfg_file():
-    return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
+    return os.path.join(appdirs.user_config_dir(__name__), u'config.yml')
 
 
 def get(key, default=None):
-    """Get the value of a configuration variable.
+    u"""Get the value of a configuration variable.
 
     Parameters
     ----------
@@ -116,7 +119,7 @@ def get(key, default=None):
 
 
 def set(key, value):
-    """Set the value of configuration variable.
+    u"""Set the value of configuration variable.
 
     Parameters
     ----------
@@ -132,14 +135,14 @@ def set(key, value):
 
 
 def dump():
-    """Writes the changes to the configuration file."""
+    u"""Writes the changes to the configuration file."""
     global _config
     global _modified
     if _modified:
         cfg_file = _cfg_file()
         cfg_dir, __ = os.path.split(cfg_file)
         os.makedirs(cfg_dir, exist_ok=True)
-        with open(cfg_file, 'w') as f:
+        with open(cfg_file, u'w') as f:
             yaml.dump(_config, f)
         _modified = False
 
