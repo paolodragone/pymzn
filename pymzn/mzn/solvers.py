@@ -320,8 +320,8 @@ class Optimathsat(Solver):
     globals_dir : str
         The path to the directory for global included files.
     """
-    def __init__(self, path='optimathsat'):
-        super().__init__()
+    def __init__(self, path='optimathsat', globals_dir='std'):
+        super().__init__(globals_dir)
         self.cmd = path
         self._line_comm_p = re.compile('%.*\n')
         self._rational_p = re.compile('(\d+)\/(\d+)')
@@ -402,10 +402,12 @@ class Opturion:
     ----------
     path : str
         The path to the fzn-cpx executable.
+    globals_dir : str
+        The path to the directory for global included files.
     """
 
-    def __init__(self, path='fzn-cpx'):
-        super().__init__()
+    def __init__(self, path='fzn-cpx', globals_dir='opturion-cpx'):
+        super().__init__(globals_dir)
         self.cmd = path
 
     @property
@@ -480,10 +482,12 @@ class Gurobi(Solver):
     ----------
     path : str
         The path to the mzn-gurobi executable.
+    globals_dir : str
+        The path to the directory for global included files.
     """
 
-    def __init__(self, path='mzn-gurobi'):
-        super().__init__()
+    def __init__(self, path='mzn-gurobi', globals_dir='linear'):
+        super().__init__(globals_dir)
         self.cmd = path
 
     @property
@@ -557,6 +561,8 @@ class Gurobi(Solver):
             if output_mode != 'item':
                 raise ValueError('Only item output available with mzn input.')
             mzn = True
+            args.append('-G')
+            args.append(self.globals_dir)
             if include:
                 if isinstance(include, str):
                     include = [include]
@@ -593,6 +599,183 @@ class Gurobi(Solver):
         return out
 
 
+class G12Solver(Solver):
+    """Interface to a generic G12 solver.
+
+    Parameters
+    ----------
+    mzn_path : str
+        The path to the mzn executable.
+    fzn_path : str
+        The path to the flatzinc executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    backend : str
+        The backend code of the specific solver used.
+    """
+
+    def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
+                 globals_dir='g12_fd', backend=None):
+        super().__init__(globals_dir)
+        self.fzn_cmd = fzn_path
+        self.mzn_cmd = mzn_path
+        self.backend = backend
+
+    @property
+    def support_mzn(self):
+        """Whether the solver supports direct mzn input"""
+        return True
+
+    @property
+    def support_dzn(self):
+        """Whether the solver supports dzn output"""
+        return True
+
+    @property
+    def support_json(self):
+        """Whether the solver supports json output"""
+        return False
+
+    @property
+    def support_item(self):
+        """Whether the solver supports item output"""
+        return True
+
+    @property
+    def support_dict(self):
+        """Whether the solver supports dict output"""
+        return False
+
+    @property
+    def support_all(self):
+        """Whether the solver supports collecting all solutions"""
+        return True
+
+    @property
+    def support_timeout(self):
+        """Whether the solver supports a timeout"""
+        return False
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with the G12Fd solver.
+
+        Parameters
+        ----------
+        mzn_file : str
+            The path to the mzn file to solve.
+        dzn_files
+            A list of paths to dzn files.
+        data : str
+            A dzn string containing additional inline data to pass to the solver.
+        include : str or [str]
+            A path or a list of paths to included files.
+        all_solutions : bool
+            Whether to return all solutions.
+        output_mode : 'dzn', 'json', 'item', 'dict'
+            The output mode required.
+        Returns
+        -------
+        str
+            The output of the solver.
+        """
+        log = logging.getLogger(__name__)
+
+        args = []
+        if mzn_file.endswith('fzn'):
+            if output_mode != 'dzn':
+                raise ValueError('Only dzn output available with fzn input.')
+            args.append(self.fzn_cmd)
+            if self.backend:
+                args.append('-b')
+                args.append(self.backend)
+        else:
+            if output_mode != 'item':
+                raise ValueError('Only item output available with mzn input.')
+            mzn = True
+            args.append(self.mzn_cmd)
+            args.append('-G')
+            args.append(self.globals_dir)
+            if include:
+                if isinstance(include, str):
+                    include = [include]
+                for path in include:
+                    args.append('-I')
+                    args.append(path)
+            if data:
+                args.append('-D')
+                args.append(data)
+
+        if all_solutions:
+            args.append('-a')
+        args.append(mzn_file)
+        if mzn and dzn_files:
+            for dzn_file in dzn_files:
+                args.append(dzn_file)
+
+        try:
+            process = run(args)
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+        return out
+
+
+class G12Fd(G12Solver):
+    """Interface to the G12Fd solver.
+
+    Parameters
+    ----------
+    mzn_path : str
+        The path to the mzn executable.
+    fzn_path : str
+        The path to the flatzinc executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    """
+
+    def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
+                 globals_dir='g12_fd')
+        super().__init__(mzn_path, fzn_path, globals_dir)
+
+
+class G12Lazy(G12Solver):
+    """Interface to the G12Lazy solver.
+
+    Parameters
+    ----------
+    mzn_path : str
+        The path to the mzn executable.
+    fzn_path : str
+        The path to the flatzinc executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    """
+
+    def __init__(self, mzn_path='mzn-g12lazy', fzn_path='flatzinc',
+                 globals_dir='g12_lazyfd')
+        super().__init__(mzn_path, fzn_path, globals_dir, 'lazy')
+
+
+class G12MIP(G12Solver):
+    """Interface to the G12MIP solver.
+
+    Parameters
+    ----------
+    mzn_path : str
+        The path to the mzn executable.
+    fzn_path : str
+        The path to the flatzinc executable.
+    globals_dir : str
+        The path to the directory for global included files.
+    """
+
+    def __init__(self, mzn_path='mzn-g12mip', fzn_path='flatzinc',
+                 globals_dir='linear')
+        super().__init__(mzn_path, fzn_path, globals_dir, 'mip')
+
+
 #: Default Gecode instance.
 gecode = Gecode()
 
@@ -605,4 +788,12 @@ opturion = Opturion()
 #: Default Gurobi instance.
 gurobi = Gurobi()
 
+#: Default G12Fd instance.
+g12_fd = G12Fd()
+
+#: Default G12Lazy instance.
+g12_lazy = G12Lazy()
+
+#: Default G12Lazy instance.
+g12_mip = G12MIP()
 
