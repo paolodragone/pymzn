@@ -161,7 +161,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     if keep:
         if mzn_model.mzn_file:
             output_dir, mzn_name = os.path.split(mzn_model.mzn_file)
-            output_prefix, _ = os.path.split(mzn_name)
+            output_prefix, _ = os.path.splitext(mzn_name)
         else:
             output_dir = os.getcwd()
     output_prefix += '_'

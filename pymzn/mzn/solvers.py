@@ -293,7 +293,7 @@ class Gecode(Solver):
         if seed != 0:
             fzn_flags.append('-r')
             fzn_flags.append(str(seed))
-        if mzn:
+        if mzn and fzn_flags:
             args.append('--fzn-flags')
             args.append('"{}"'.format(' '.join(fzn_flags)))
         else:
@@ -431,7 +431,7 @@ class Chuffed(Solver):
         if seed != 0:
             fzn_flags.append('--rnd-seed')
             fzn_flags.append(str(seed))
-        if mzn:
+        if mzn and fzn_flags:
             args.append('--fzn-flags')
             args.append('"{}"'.format(' '.join(fzn_flags)))
         else:
@@ -535,7 +535,7 @@ class Optimathsat(Solver):
         return self._parse_out(out)
 
 
-class Opturion:
+class Opturion(Solver):
     """Interface to the Opturion CPX solver.
 
     Parameters
@@ -906,7 +906,7 @@ class G12Fd(G12Solver):
     """
 
     def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
-                 globals_dir='g12_fd')
+                 globals_dir='g12_fd'):
         super().__init__(mzn_path, fzn_path, globals_dir)
 
 
@@ -924,7 +924,7 @@ class G12Lazy(G12Solver):
     """
 
     def __init__(self, mzn_path='mzn-g12lazy', fzn_path='flatzinc',
-                 globals_dir='g12_lazyfd')
+                 globals_dir='g12_lazyfd'):
         super().__init__(mzn_path, fzn_path, globals_dir, 'lazy')
 
 
@@ -942,7 +942,7 @@ class G12MIP(G12Solver):
     """
 
     def __init__(self, mzn_path='mzn-g12mip', fzn_path='flatzinc',
-                 globals_dir='linear')
+                 globals_dir='linear'):
         super().__init__(mzn_path, fzn_path, globals_dir, 'mip')
 
 

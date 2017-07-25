@@ -32,7 +32,7 @@ def run(args, stdin=None):
         When the process returns an error.
     """
     log = logging.getLogger(__name__)
-    log.debug('Executing command with args: {}', args)
+    log.debug('Executing command with args: {}'.format(args))
     start = time.time()
     sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGINT, lambda *args: None)
