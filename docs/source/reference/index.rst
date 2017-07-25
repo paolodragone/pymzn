@@ -10,6 +10,6 @@ This is the reference manual of PyMzn.
    model/index
    dzn/index
    solvers/index
-   bin/index
+   utils
    config
    internal

@@ -44,10 +44,9 @@ you can specify the ``output_mode`` argument. Possible formats are: ``dict``,
 format will return strings formatted according to the output statement in the
 input model. The ``dzn`` and ``json`` formats return strings formatted in dzn or
 json respectively. The latter two formats are only available if the solver used
-supports them.
+supports them. ::
 
-::
-    pymzn.minizinc('test.mzn', eval_output=False)
+    pymzn.minizinc('test.mzn', output_mode='dzn')
 
 
 Data

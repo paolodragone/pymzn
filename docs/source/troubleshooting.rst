@@ -22,7 +22,8 @@ Troubleshooting
 
    To solve this problem you need to copy (or create links of) the files
    in the directory ``/usr/local/share/gecode/mznlib`` into the
-   directory ``/usr/local/share/minizinc/gecode``.::
+   directory ``/usr/local/share/minizinc/gecode`` (or wherever the MiniZinc
+   standard library is located on your machine).::
 
        cd /usr/local/share
        sudo mkdir minizinc/gecode
