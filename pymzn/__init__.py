@@ -1,27 +1,24 @@
-# -*- coding: utf-8 -*-
 u"""PyMzn is a Python library that wraps and enhances the MiniZinc tools for CSP
 modelling and solving. It is built on top of the MiniZinc toolkit and provides a
 number of off-the-shelf functions to readily solve problems encoded in MiniZinc
 and parse the solutions into Python objects.
 """
 
-from __future__ import absolute_import
 import ast
 import logging
 
-from . import config
-from . import utils
-from . import dzn
-from .dzn import *
-from . import mzn
-from .mzn import *
+import config
+import utils
+import dzn
+from dzn import *
+import mzn
+from mzn import *
 
-__version__ = u'0.14.0'
-__all__ = [u'debug', u'config']
+__version__ = '0.14.0'
+__all__ = ['debug', 'config']
 __all__.extend(dzn.__all__)
 __all__.extend(mzn.__all__)
 
-# TODO: update python2 branch
 # TODO: make it work on windows
 
 _debug_handler = None
@@ -104,7 +101,8 @@ def main():
     args = parser.parse_args()
 
     debug(args.verbose)
-    args.func(**set([**vars(args), **args.solver_args]))
+    args.update(args.solver_args)
+    args.func(**args)
 
 
 if __name__ == u'__main__':

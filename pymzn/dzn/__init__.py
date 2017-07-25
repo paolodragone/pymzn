@@ -82,5 +82,5 @@ from __future__ import absolute_import
 from .marsh import *
 from .eval import *
 
-__all__ = [u'dict2dzn', u'stmt2dzn', u'val2dzn', u'rebase_array', u'dzn2dict']
+__all__ = ['dict2dzn', 'stmt2dzn', 'val2dzn', 'rebase_array', 'dzn2dict']
 

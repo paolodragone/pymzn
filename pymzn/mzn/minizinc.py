@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 u"""
 PyMzn provides functions that mimic and enhance the tools from the libminizinc
 library. With these tools, it is possible to compile a MiniZinc model into
@@ -184,7 +183,7 @@ def minizinc(mzn, *dzn_files, **solver_args):
     output_prefix += u'_'
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix=u'.mzn', delete=False, mode=u'w+',
-                                     buffering=1)
+                                     bufsize=1)
     mzn_model.compile(output_file)
     mzn_file = output_file.name
     data_file = None
@@ -240,7 +239,7 @@ def minizinc(mzn, *dzn_files, **solver_args):
         raise err
 
     if not keep:
-        with contextlib.suppress(FileNotFoundError):
+        try:
             if data_file:
                 os.remove(data_file)
                 log.debug(u'Deleting file: {}'.format(data_file))
@@ -253,7 +252,8 @@ def minizinc(mzn, *dzn_files, **solver_args):
             if ozn_file:
                 os.remove(ozn_file)
                 log.debug(u'Deleting file: {}'.format(ozn_file))
-
+        except FileNotFoundError:
+            pass
     return stream
 
 
@@ -322,14 +322,16 @@ def mzn2fzn(mzn_file, *dzn_files, **_3to2kwargs):
     try:
         run(args)
     except CalledProcessError, err:
-        log.exception(err.stderr)
-        raise RuntimeError(err.stderr)
+        log.exception(err.output)
+        raise RuntimeError(err.output)
 
     if not keep_data:
-        with contextlib.suppress(FileNotFoundError):
+        try:
             if data_file:
                 os.remove(data_file)
                 log.debug(u'Deleting file: {}'.format(data_file))
+        except FileNotFoundError:
+            pass
 
     mzn_base = os.path.splitext(mzn_file)[0]
     fzn_file = u'.'.join([mzn_base, u'fzn'])
@@ -393,8 +395,8 @@ def solns2out(soln_stream, ozn_file):
         process = run(args, stdin=soln_stream)
         out = process.stdout
     except CalledProcessError, err:
-        log.exception(err.stderr)
-        raise RuntimeError(err.stderr)
+        log.exception(err.output)
+        raise RuntimeError(err.output)
     return out
 
 

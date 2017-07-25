@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 u"""
 
 PyMzn can be configured with custom executable paths and other variables.

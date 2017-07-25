@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 u"""Provides classes to interface solvers with PyMzn.
 
 PyMzn interfaces with solvers through the ``Solver`` class. This class includes
@@ -79,11 +78,11 @@ import logging
 import pymzn.config as config
 
 from pymzn.utils import run
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from subprocess import CalledProcessError
 
 
-class Solver(ABC):
+class Solver:
     u"""Abstract solver class.
 
     All the solvers inherit from this base class.
@@ -93,6 +92,7 @@ class Solver(ABC):
     globals_dir : str
         The path to the directory for global included files.
     """
+    __metaclass__ = ABCMeta
 
     def __init__(self, globals_dir=u'std'):
         self.globals_dir = globals_dir

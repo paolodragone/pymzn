@@ -47,21 +47,21 @@ class MinizincTest(unittest.TestCase):
         self.assertRaises(RuntimeError, pymzn.mzn2fzn, mzn)
 
         dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
-                                      buffering=1)
+                                      bufsize=1)
         dzn_file.write(self.data1)
         dzn = dzn_file.name
         self.assertRaises(RuntimeError, pymzn.mzn2fzn, mzn, dzn)
         dzn_file.close()
 
         dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
-                                      buffering=1)
+                                      bufsize=1)
         dzn_file.write(self.data2)
         dzn = dzn_file.name
         self.assertRaises(RuntimeError, pymzn.mzn2fzn, mzn, dzn)
         dzn_file.close()
 
         dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
-                                      buffering=1)
+                                      bufsize=1)
         dzn_file.write(self.data1)
         dzn_file.flush()
         dzn = dzn_file.name
@@ -76,7 +76,7 @@ class MinizincTest(unittest.TestCase):
         os.remove(ozn)
 
         dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
-                                      buffering=1)
+                                      bufsize=1)
         dzn_file.write(self.data3)
         dzn_file.flush()
         dzn = dzn_file.name
@@ -90,8 +90,9 @@ class MinizincTest(unittest.TestCase):
         os.remove(ozn)
 
         dzn_file = NamedTemporaryFile(prefix=u'pymzn_', suffix=u'.dzn', mode=u'w',
-                                      buffering=1)
+                                      bufsize=1)
         dzn_file.write(self.data3)
+        dzn_file.flush()
         dzn = dzn_file.name
         fzn = mzn_base + u'.fzn'
         ozn = mzn_base + u'.ozn'
