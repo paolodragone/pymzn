@@ -21,6 +21,7 @@ import os.path
 from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 
+stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
 line_comm_p = re.compile('%.*\n')
 var_p = re.compile('\s*([\s\w,\.\(\)\[\]\{\}\+\-\*/]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
