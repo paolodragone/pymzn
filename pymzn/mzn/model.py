@@ -21,6 +21,9 @@ import os.path
 from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 
+block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
+line_comm_p = re.compile('%.*\n')
+var_p = re.compile('\s*([\s\w,\.\(\)\[\]\{\}\+\-\*/]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
 type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
 var_type_p = re.compile('\s*.*?var.+\s*')
 array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
@@ -413,6 +416,59 @@ class MiniZincModel(object):
             else:
                 self.model = ''
         return self.model
+
+    def _parse_arrays(self):
+        model = self._load_model()
+        model = block_comm_p.sub('', model)
+        model = line_comm_p.sub('', model)
+        stmts = stmt_p.findall(model)
+        arrays = []
+        for stmt in stmts:
+            if not stmt.strip():
+                continue
+            var_m = var_p.match(stmt)
+            if var_m and not ('function' in stmt or 'predicate' in stmt):
+                vartype = var_m.group(1)
+                name = var_m.group(2)
+                array_type_m = array_type_p.match(vartype)
+                if array_type_m:
+                    dim = len(array_type_m.group(1).split(','))
+                    arrays.append((name, dim))
+            return arrays
+
+    def dzn_output(self, output_vars):
+        """Sets the output statement to be a dzn representation of output_vars.
+
+        Parameters
+        ----------
+        output_vars : list of str
+            The list of output variables.
+        """
+        if not output_vars:
+            return
+
+        # Parse the model to look for array declarations
+        arrays = self._parse_arrays()
+
+        # Build the output statement from the output variables
+        out_var = '"{0} = ", show({0}), ";\\n"'
+        out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
+        out_list = []
+        for var in output_vars:
+            if var in arrays:
+                name, dim = var
+                if dim == 1:
+                    show_idx_sets = 'show(index_set({}))'.format(var)
+                else:
+                    show_idx_sets = []
+                    for d in range(1, dim + 1):
+                        show_idx_sets.append('show(index_set_{}of{}'
+                                             '({}))'.format(d, dim, name))
+                    show_idx_sets = ', ", ", '.join(show_idx_sets)
+                out_list.append(out_array.format(name, dim, show_idx_sets))
+            else:
+                out_list.append(out_var.format(var))
+        self.output(', '.join(out_list))
 
     def compile(self, output_file=None):
         """Compiles the model and writes it to file.
