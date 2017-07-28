@@ -68,8 +68,8 @@ class SolnStream:
 
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode,
-             output_mode='dict', all_solutions=False, timeout=None,
-             force_flatten=False, **solver_args):
+             output_mode='dict', output_vars=None, all_solutions=False,
+             timeout=None, force_flatten=False, **solver_args):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     Parameters
@@ -108,6 +108,9 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         formats output a stream of strings formatted in dzn of json
         respectively. The latter two formats are only available if the solver
         supports them.
+    output_vars : [str]
+        A list of output variables. These variables will be the ones included in
+        the output dictionary. Only available if ouptut_mode='dict'.
     all_solutions : bool
         Whether all the solutions must be returned. Notice that this can only
         be used if the solver supports returning all solutions. Default is False.
@@ -138,9 +141,6 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     else:
         mzn_model = MiniZincModel(mzn)
 
-    if output_mode != 'item':
-        mzn_model.output(None)
-
     if not solver:
         solver = gecode
     elif isinstance(solver, str):
@@ -154,6 +154,14 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         raise ValueError('The solver does not support dzn output.')
     if output_mode == 'json' and not solver.support_json:
         raise ValueError('The solver does not support json output.')
+    if output_mode != 'dict' and output_vars:
+        raise ValueError('Output vars only available in `dict` output mode')
+
+    if output_mode != 'item':
+        if output_mode == 'dict' and output_vars:
+            mzn_model.dzn_output(output_vars)
+        else:
+            mzn_model.output(None)
 
     output_dir = None
     output_prefix = 'pymzn'
