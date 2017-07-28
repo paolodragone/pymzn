@@ -736,7 +736,6 @@ class MIPSolver(Solver):
         try:
             process = run(args)
             out = process.stdout
-            print(out)
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
