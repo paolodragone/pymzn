@@ -26,7 +26,6 @@ block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
 line_comm_p = re.compile('%.*\n')
 var_p = re.compile('\s*([\s\w,\.\(\)\[\]\{\}\+\-\*/]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
 type_p = re.compile('\s*(?:int|float|set\s+of\s+[\s\w\.]+|array\[[\s\w\.]+\]\s*of\s*[\s\w\.]+)\s*')
-var_type_p = re.compile('\s*.*?var.+\s*')
 array_type_p = re.compile('\s*array\[([\s\w\.]+(?:\s*,\s*[\s\w\.]+)*)\]\s+of\s+(.+)\s*')
 output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
 solve_stmt_p = re.compile('\s*solve\s*([^;]+)\s*(?:;)?\s*')
@@ -225,6 +224,7 @@ class MiniZincModel(object):
         self._statements = []
         self._solve_stmt = None
         self._output_stmt = None
+        self._arrays = []
         self._modified = False
 
         self.mzn_file = None
@@ -296,7 +296,9 @@ class MiniZincModel(object):
         value : str
             The optional value of the variable statement.
         output : bool
-            Whether the variable is an output variable.
+            Whether the variable is an output variable. This option is only used
+            to force the compiled minizinc model to include the output_var or
+            output_array annotation for this variable.
         """
         value = val2dzn(value) if value is not None else None
         array_type_m = array_type_p.match(vartype)
@@ -304,15 +306,11 @@ class MiniZincModel(object):
             indexset = array_type_m.group(1)
             domain = array_type_m.group(2)
             dim = len(indexset.split(','))
-            self._array_dims[name] = dim
+            self._arrays.append((name, dim))
             var = ArrayVariable(name, indexset, domain, value, output)
         else:
             var = Variable(name, vartype, value, output)
         self._statements.append(var)
-
-        var_type_m = var_type_p.match(vartype)
-        if output or var_type_m and value is None:
-            self._free_vars.add(name)
         self._modified = True
 
     def array_variable(self, name, indexset, domain, value=None, output=False):
@@ -329,14 +327,14 @@ class MiniZincModel(object):
         value : str
             The optional value of the array variable statement.
         output : bool
-            Whether the array variable is an output array.
+            Whether the array variable is an output array. This option is only
+            used to force the compiled minizinc model to include the
+            output_array annotation for this variable.
         """
         value = val2dzn(value) if value is not None else None
         var = ArrayVariable(name, indexset, domain, value, output)
         self._statements.append(var)
-        if output or var_type_p.match(domain) and value is None:
-            self._free_vars.add(name)
-        self._array_dims[var] = len(indexset.split(','))
+        self._arrays.append((var, len(indexset.split(','))))
         self._modified = True
 
     def constraint(self, constr):
@@ -449,7 +447,7 @@ class MiniZincModel(object):
             return
 
         # Parse the model to look for array declarations
-        arrays = self._parse_arrays()
+        arrays = self._parse_arrays() + self._arrays
 
         # Build the output statement from the output variables
         out_var = '"{0} = ", show({0}), ";\\n"'
