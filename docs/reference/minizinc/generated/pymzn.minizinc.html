@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.minizinc &mdash; PyMzn 0.14.0 documentation</title>
+  <title>pymzn.minizinc &mdash; PyMzn 0.14.2 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.14.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.14.2 documentation" href="../../../index.html"/>
         <link rel="up" title="MiniZinc tools" href="../index.html"/>
         <link rel="next" title="pymzn.mzn2fzn" href="pymzn.mzn2fzn.html"/>
         <link rel="prev" title="pymzn.SolnStream" href="pymzn.SolnStream.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.0
+                0.14.2
               </div>
             
           
@@ -186,7 +186,7 @@
 <h1>pymzn.minizinc<a class="headerlink" href="#pymzn-minizinc" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.minizinc">
-<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep=False</em>, <em>include=None</em>, <em>solver=&lt;pymzn.mzn.solvers.Gecode object&gt;</em>, <em>output_mode='dict'</em>, <em>all_solutions=False</em>, <em>timeout=None</em>, <em>force_flatten=False</em>, <em>**solver_args</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep=False</em>, <em>include=None</em>, <em>solver=&lt;pymzn.mzn.solvers.Gecode object&gt;</em>, <em>output_mode='dict'</em>, <em>output_vars=None</em>, <em>all_solutions=False</em>, <em>timeout=None</em>, <em>force_flatten=False</em>, <em>**solver_args</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the workflow to solve a CSP problem encoded with MiniZinc.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -220,6 +220,8 @@ to the output statement of the MiniZinc model. The ‘dzn’ and ‘json’
 formats output a stream of strings formatted in dzn of json
 respectively. The latter two formats are only available if the solver
 supports them.</li>
+<li><strong>output_vars</strong> (<em>[</em><em>str</em><em>]</em>) – A list of output variables. These variables will be the ones included in
+the output dictionary. Only available if ouptut_mode=’dict’.</li>
 <li><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned. Notice that this can only
 be used if the solver supports returning all solutions. Default is False.</li>
 <li><strong>timeout</strong> (<em>int</em>) – Number of seconds after which the solver should stop the computation and
@@ -292,7 +294,7 @@ of the stream depends on the output_mode chosen.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.14.0',
+            VERSION:'0.14.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
