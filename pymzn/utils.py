@@ -10,7 +10,7 @@ def run(args, stdin=None):
     """Executes a command and waits for the result.
 
     It is also possible to interrupt the execution of the command with CTRL+C on
-    the shell terminal.
+    the shell terminal (only in single thread).
 
     Parameters
     ----------
@@ -33,9 +33,17 @@ def run(args, stdin=None):
     """
     log = logging.getLogger(__name__)
     log.debug('Executing command with args: {}'.format(args))
+
+    sighdl = False
+    try:
+        sigint = signal.getsignal(signal.SIGINT)
+        signal.signal(signal.SIGINT, lambda *args: None)
+        sighdl = True
+    except ValueError:
+        # Happens in multi-threading, in which case ignore
+        pass
+
     start = time.time()
-    sigint = signal.getsignal(signal.SIGINT)
-    signal.signal(signal.SIGINT, lambda *args: None)
     with subprocess.Popen(args, bufsize=1, universal_newlines=True,
                           stdin=subprocess.PIPE,
                           stdout=subprocess.PIPE,
@@ -49,9 +57,12 @@ def run(args, stdin=None):
             out, err = process.communicate(stdin)
             ret = 0
         finally:
-            signal.signal(signal.SIGINT, sigint)
+            if sighdl:
+                signal.signal(signal.SIGINT, sigint)
+
     elapsed = time.time() - start
     log.debug('Done. Running time: {0:.2f} seconds'.format(elapsed))
+
     process = subprocess.CompletedProcess(args, ret, out, err)
     process.check_returncode()
     return process
