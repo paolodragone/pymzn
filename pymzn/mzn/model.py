@@ -433,7 +433,7 @@ class MiniZincModel(object):
                 if array_type_m:
                     dim = len(array_type_m.group(1).split(','))
                     arrays.append((name, dim))
-            return arrays
+        return arrays
 
     def dzn_output(self, output_vars):
         """Sets the output statement to be a dzn representation of output_vars.
