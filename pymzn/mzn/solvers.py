@@ -73,48 +73,13 @@ class Solver(ABC):
                  support_json=False, support_item=False, support_dict=False,
                  support_all=False, support_timeout=False):
         self.globals_dir = globals_dir
-        self._support_mzn = support_mzn
-        self._support_dzn = support_dzn
-        self._support_json = support_json
-        self._support_item = support_item
-        self._support_dict = support_dict
-        self._support_all = support_all
-        self._support_timeout = support_timeout
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return self._support_mzn
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return self._support_dzn
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return self._support_json
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return self._support_item
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return self._support_dict
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return self._support_all
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return self._support_timeout
+        self.support_mzn = support_mzn
+        self.support_dzn = support_dzn
+        self.support_json = support_json
+        self.support_item = support_item
+        self.support_dict = support_dict
+        self.support_all = support_all
+        self.support_timeout = support_timeout
 
     @abstractmethod
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
