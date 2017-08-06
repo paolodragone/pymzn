@@ -222,36 +222,30 @@ class Gecode(Solver):
             if output_mode != 'item':
                 raise ValueError('Only item output available with mzn input.')
             mzn = True
-            args.append(self.mzn_cmd)
-            args.append('-G')
-            args.append(self.globals_dir)
+            args += [self.mzn_cmd, '-G', self.globals_dir]
             if include:
                 if isinstance(include, str):
                     include = [include]
                 for path in include:
-                    args.append('-I')
-                    args.append(path)
+                    args += ['-I', path]
             if data:
-                args.append('-D')
-                args.append(data)
+                args += ['-D', data]
 
         fzn_flags = []
         if all_solutions:
             args.append('-a')
         if parallel != 1:
-            fzn_flags.append('-p')
-            fzn_flags.append(str(parallel))
+            fzn_flags += ['-p', str(parallel)]
         if timeout and timeout > 0:
-            fzn_flags.append('-time')
-            fzn_flags.append(str(timeout * 1000)) # Gecode takes milliseconds
+            timeout = timeout * 1000 # Gecode takes milliseconds
+            fzn_flags += ['-time', str(timeout)]
         if seed != 0:
-            fzn_flags.append('-r')
-            fzn_flags.append(str(seed))
+            fzn_flags += ['-r', str(seed)]
         if mzn and fzn_flags:
-            args.append('--fzn-flags')
-            args.append('{}'.format(' '.join(fzn_flags)))
+            args += ['--fzn-flags', '{}'.format(' '.join(fzn_flags))]
         else:
             args += fzn_flags
+
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
@@ -332,33 +326,27 @@ class Chuffed(Solver):
             if output_mode != 'item':
                 raise ValueError('Only item output available with mzn input.')
             mzn = True
-            args.append(self.mzn_cmd)
-            args.append('-G')
-            args.append(self.globals_dir)
+            args += [self.mzn_cmd, '-G', self.globals_dir]
             if include:
                 if isinstance(include, str):
                     include = [include]
                 for path in include:
-                    args.append('-I')
-                    args.append(path)
+                    args += ['-I', path]
             if data:
-                args.append('-D')
-                args.append(data)
+                args += ['-D', data]
 
         fzn_flags = []
         if all_solutions:
             args.append('-a')
         if timeout and timeout > 0:
-            fzn_flags.append('--time-out')
-            fzn_flags.append(str(timeout)) # Gecode takes milliseconds
+            fzn_flags += ['--time-out', str(timeout)]
         if seed != 0:
-            fzn_flags.append('--rnd-seed')
-            fzn_flags.append(str(seed))
+            fzn_flags += ['--rnd-seed', str(seed)]
         if mzn and fzn_flags:
-            args.append('--fzn-flags')
-            args.append('"{}"'.format(' '.join(fzn_flags)))
+            args += ['--fzn-flags', '"{}"'.format(' '.join(fzn_flags))]
         else:
             args += fzn_flags
+
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
@@ -526,31 +514,23 @@ class MIPSolver(Solver):
             raise ValueError('Only dzn or json output available with fzn input.')
         else:
             mzn = True
-            args.append('-G')
-            args.append(self.globals_dir)
+            args += ['-G', self.globals_dir]
             if include:
                 if isinstance(include, str):
                     include = [include]
                 for path in include:
-                    args.append('-I')
-                    args.append(path)
+                    args += ['-I', path]
             if data:
-                args.append('-D')
-                args.append(data)
+                args += ['-D', data]
 
         if all_solutions:
-            args.append('-a')
-            args.append('--unique')
+            args += ['-a', '--unique']
         if parallel != 1:
-            args.append('-p')
-            args.append(str(parallel))
+            args += ['-p', str(parallel)]
         if timeout and timeout > 0:
-            args.append('--timeout')
-            args.append(str(timeout)) # Gurobi takes seconds
+            args += ['--timeout', str(timeout)]
 
-        args.append('--output-mode')
-        args.append(output_mode)
-        args.append(mzn_file)
+        args += ['--output-mode', output_mode, mzn_file]
         if mzn and dzn_files:
             for dzn_file in dzn_files:
                 args.append(dzn_file)
@@ -650,24 +630,19 @@ class G12Solver(Solver):
                 raise ValueError('Only dzn output available with fzn input.')
             args.append(self.fzn_cmd)
             if self.backend:
-                args.append('-b')
-                args.append(self.backend)
+                args += ['-b', self.backend]
         else:
             if output_mode != 'item':
                 raise ValueError('Only item output available with mzn input.')
             mzn = True
-            args.append(self.mzn_cmd)
-            args.append('-G')
-            args.append(self.globals_dir)
+            args += [self.mzn_cmd, '-G', self.globals_dir]
             if include:
                 if isinstance(include, str):
                     include = [include]
                 for path in include:
-                    args.append('-I')
-                    args.append(path)
+                    args += ['-I', path]
             if data:
-                args.append('-D')
-                args.append(data)
+                args += ['-D', data]
 
         if all_solutions:
             args.append('-a')
