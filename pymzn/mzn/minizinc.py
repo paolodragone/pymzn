@@ -293,14 +293,12 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
         elif not isinstance(include, list):
             raise TypeError('The path provided is not valid.')
         for path in include:
-            args.append('-I')
-            args.append(path)
+            args += ['-I', path]
 
     dzn_files = list(dzn_files)
     data, data_file = process_data(mzn_file, data, keep_data)
     if data:
-        args.append('-D')
-        args.append(data)
+        args =+ ['-D', data]
     elif data_file:
         dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
