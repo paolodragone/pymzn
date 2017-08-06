@@ -186,7 +186,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                 (output_mode == 'item' and not solver.support_item):
             fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
                                          keep_data=keep, include=include,
-                                         no_ozn=(output_mode != 'item'))
+                                         no_ozn=(output_mode != 'item'),
+                                         globals_dir=solver.globals_dir)
             if output_mode in ['item', 'dzn', 'json']:
                 out = solver.solve(fzn_file, timeout=timeout,
                                    output_mode=('dzn' if output_mode == 'item'
@@ -248,7 +249,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
-            no_ozn=False):
+            no_ozn=False, globals_dir=None):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
 
@@ -282,6 +283,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
     log = logging.getLogger(__name__)
 
     args = [config.get('mzn2fzn', 'mzn2fzn')]
+    if globals_dir:
+        args += ['-G', globals_dir]
     if no_ozn:
         args.append('--no-output-ozn')
     if include:
