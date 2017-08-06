@@ -19,43 +19,19 @@ For instance::
     from pymzn.utils import run
 
     class MySolver(Solver):
-        def __init__(self, path='/path/to/solver'):
-            super().__init__()
+        def __init__(self, path='path/to/solver', globals_dir='path/to/gobals'):
+            super().__init__(globals_dir, support_mzn=False, support_dzn=True,
+                 support_json=False, support_item=False, support_dict=False,
+                 support_all=False, support_timeout=False)
             self.cmd = path
 
-        @property
-        def support_mzn(self):
-            return False
-
-        @property
-        def support_dzn(self):
-            return True
-
-        @property
-        def support_json(self):
-            return False
-
-        @property
-        def support_item(self):
-            return False
-
-        @property
-        def support_dict(self):
-            return False
-
-        @property
-        def support_all(self):
-            return False
-
-        @property
-        def support_timeout(self):
-            return False
-
-        # You can ignore the dzn_files, data and include if the solver does not
-        # support mzn inputs. Similarly, you can ignore timeout and
-        # all_solutions if the solver does not support the timeout and returning
-        # all solutions respectively. Check out the Gecode implementation for
-        # an example of how to handle these parameters if needed.
+        \"\"\"
+        You can ignore the dzn_files, data and include if the solver does not
+        support mzn inputs. Similarly, you can ignore timeout and
+        all_solutions if the solver does not support the timeout and returning
+        all solutions respectively. Check out the Gecode implementation for
+        an example of how to handle these parameters if needed.
+        \"\"\"
         def solve(self, mzn_file, *dzn_files, data=None, include=None,
                   timeout=None, all_solutions=False, output_mode='dzn',
                   arg1=def_val1, arg2=def_val2, **kwargs):
@@ -68,7 +44,7 @@ For instance::
 Then one can run the ``minizinc`` function with the custom solver::
 
     my_solver = MySolver()
-    pymzn.minizinc('test.mzn', solver=my_solver(), arg1=val1, arg2=val2)
+    pymzn.minizinc('test.mzn', solver=my_solver, arg1=val1, arg2=val2)
 """
 
 import re
@@ -92,43 +68,52 @@ class Solver(ABC):
         The path to the directory for global included files.
     """
 
-    def __init__(self, globals_dir='std'):
+    def __init__(self, globals_dir='std', support_mzn=False, support_dzn=True,
+                 support_json=False, support_item=False, support_dict=False,
+                 support_all=False, support_timeout=False):
         self.globals_dir = globals_dir
+        self._support_mzn = support_mzn
+        self._support_dzn = support_dzn
+        self._support_json = support_json
+        self._support_item = support_item
+        self._support_dict = support_dict
+        self._support_all = support_all
+        self._support_timeout = support_timeout
 
     @property
-    @abstractmethod
     def support_mzn(self):
         """Whether the solver supports direct mzn input"""
+        return self._support_mzn
 
     @property
-    @abstractmethod
     def support_dzn(self):
         """Whether the solver supports dzn output"""
+        return self._support_dzn
 
     @property
-    @abstractmethod
     def support_json(self):
         """Whether the solver supports json output"""
+        return self._support_json
 
     @property
-    @abstractmethod
     def support_item(self):
         """Whether the solver supports item output"""
+        return self._support_item
 
     @property
-    @abstractmethod
     def support_dict(self):
         """Whether the solver supports dict output"""
+        return self._support_dict
 
     @property
-    @abstractmethod
     def support_all(self):
         """Whether the solver supports collecting all solutions"""
+        return self._support_all
 
     @property
-    @abstractmethod
     def support_timeout(self):
         """Whether the solver supports a timeout"""
+        return self._support_timeout
 
     @abstractmethod
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
@@ -183,44 +168,11 @@ class Gecode(Solver):
     """
     def __init__(self, mzn_path='mzn-gecode', fzn_path='fzn-gecode',
                  globals_dir='gecode'):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
+                support_json=False, support_item=True, support_dict=False,
+                support_all=True, support_timeout=True)
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return True
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return True
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return False
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return True
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return False
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return True
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return True
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', parallel=1, seed=0,
@@ -334,44 +286,11 @@ class Chuffed(Solver):
     """
     def __init__(self, mzn_path='mzn-chuffed', fzn_path='fzn-chuffed',
                  globals_dir='chuffed'):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
+                support_json=False, support_item=True, support_dict=False,
+                support_all=True, support_timeout=True)
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return True
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return True
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return False
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return True
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return False
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return True
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return True
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', seed=0, **kwargs):
@@ -466,45 +385,12 @@ class Optimathsat(Solver):
         The path to the directory for global included files.
     """
     def __init__(self, path='optimathsat', globals_dir='std'):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
+                support_json=False, support_item=False, support_dict=False,
+                support_all=False, support_timeout=False)
         self.cmd = path
         self._line_comm_p = re.compile('%.*\n')
         self._rational_p = re.compile('(\d+)\/(\d+)')
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return False
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return True
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return False
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return False
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return False
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return False
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return False
 
     def _parse_out(self, out):
         out = self._line_comm_p.sub(out, '')
@@ -552,43 +438,10 @@ class Opturion(Solver):
     """
 
     def __init__(self, path='fzn-cpx', globals_dir='opturion-cpx'):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
+                support_json=False, support_item=False, support_dict=False,
+                support_all=True, support_timeout=False)
         self.cmd = path
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return False
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return True
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return False
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return False
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return False
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return True
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return False
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', **kwargs):
@@ -632,43 +485,10 @@ class MIPSolver(Solver):
     """
 
     def __init__(self, path='mzn-gurobi', globals_dir='linear'):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
+                support_json=True, support_item=True, support_dict=False,
+                support_all=True, support_timeout=True)
         self.cmd = path
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return True
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return True
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return True
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return True
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return False
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return True
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return True
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', parallel=1, **kwargs):
@@ -790,45 +610,12 @@ class G12Solver(Solver):
 
     def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
                  globals_dir='g12_fd', backend=None):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
+                support_json=False, support_item=True, support_dict=False,
+                support_all=True, support_timeout=False)
         self.fzn_cmd = fzn_path
         self.mzn_cmd = mzn_path
         self.backend = backend
-
-    @property
-    def support_mzn(self):
-        """Whether the solver supports direct mzn input"""
-        return True
-
-    @property
-    def support_dzn(self):
-        """Whether the solver supports dzn output"""
-        return True
-
-    @property
-    def support_json(self):
-        """Whether the solver supports json output"""
-        return False
-
-    @property
-    def support_item(self):
-        """Whether the solver supports item output"""
-        return True
-
-    @property
-    def support_dict(self):
-        """Whether the solver supports dict output"""
-        return False
-
-    @property
-    def support_all(self):
-        """Whether the solver supports collecting all solutions"""
-        return True
-
-    @property
-    def support_timeout(self):
-        """Whether the solver supports a timeout"""
-        return False
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
               all_solutions=False, output_mode='item', **kwargs):
