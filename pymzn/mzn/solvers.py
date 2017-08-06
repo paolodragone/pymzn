@@ -48,6 +48,7 @@ Then one can run the ``minizinc`` function with the custom solver::
 """
 
 import re
+import os
 import logging
 
 import pymzn.config as config
@@ -738,6 +739,59 @@ class G12MIP(G12Solver):
         super().__init__(mzn_path, fzn_path, globals_dir, 'mip')
 
 
+class OscarCBLS(Solver):
+    """Interface to the Oscar/CBLS solver.
+
+    Parameters
+    ----------
+    path : str
+        The path to the fzn-oscar-cbls executable.
+    globals_dir : str
+        The path to the directory for global included files.
+        By default PyMzn will try to look for the libraries in the 'mznlib'
+        folder in the directory pointed by the OSCAR_CBLS_HOME environment
+        variable.
+    """
+
+    def __init__(self, path='fzn-oscar-cbls', globals_dir=None):
+        if not globals_dir and 'OSCAR_CBLS_HOME' in os.environ:
+            globals_dir = os.path.join(os.environ['OSCAR_CBLS_HOME'], 'mznlib')
+        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
+                support_json=False, support_item=False, support_dict=False,
+                support_all=True, support_timeout=True)
+        self.cmd = path
+
+    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+              all_solutions=False, output_mode='item', **kwargs):
+        """Solve a FlatZinc problem with Oscar/CBLS.
+
+        Parameters
+        ----------
+        mzn_file : str
+            The path to the fzn file to solve.
+        Returns
+        -------
+        str
+            The output of the solver in dzn format.
+        """
+        log = logging.getLogger(__name__)
+
+        args = [self.cmd]
+        if all_solutions:
+            args.append('-a')
+        if timeout:
+            args += ['-t', str(timeout)]
+        args.append(mzn_file)
+
+        try:
+            process = run(args)
+            out = process.stdout
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+
+        return out
+
 #: Default Gecode instance.
 gecode = Gecode()
 
@@ -764,4 +818,7 @@ g12lazy = G12Lazy()
 
 #: Default G12Lazy instance.
 g12mip = G12MIP()
+
+#: Default Oscar/CBLS instance.
+oscar_cbls = OscarCBLS()
 
