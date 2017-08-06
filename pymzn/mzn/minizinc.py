@@ -106,8 +106,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         stream of strings as returned by the solns2out tool, formatted according
         to the output statement of the MiniZinc model. The 'dzn' and 'json'
         formats output a stream of strings formatted in dzn of json
-        respectively. The latter two formats are only available if the solver
-        supports them.
+        respectively.
     output_vars : [str]
         A list of output variables. These variables will be the ones included in
         the output dictionary. Only available if ouptut_mode='dict'.
@@ -150,18 +149,22 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         raise ValueError('The solver cannot return all solutions.')
     if timeout and not solver.support_timeout:
         raise ValueError('The solver does not support the timeout.')
-    if output_mode == 'dzn' and not solver.support_dzn:
-        raise ValueError('The solver does not support dzn output.')
-    if output_mode == 'json' and not solver.support_json:
-        raise ValueError('The solver does not support json output.')
     if output_mode != 'dict' and output_vars:
         raise ValueError('Output vars only available in `dict` output mode')
 
-    if output_mode != 'item':
-        if output_mode == 'dict' and output_vars:
+    if (output_mode == 'dzn' and not solver.support_dzn) or \
+       (output_mode == 'json' and not solver.support_json) or \
+       (output_mode == 'item' and not solver.support_item):
+        force_flatten = True
+
+    if output_mode == 'dict':
+        if output_vars:
             mzn_model.dzn_output(output_vars)
+            _output_mode = 'item'
         else:
-            mzn_model.output(None)
+            _output_mode = 'dzn'
+    else:
+        _output_mode = output_mode
 
     output_dir = None
     output_prefix = 'pymzn'
@@ -182,29 +185,15 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     ozn_file = None
 
     try:
-        if force_flatten or not solver.support_mzn or \
-                (output_mode == 'item' and not solver.support_item):
+        if force_flatten or not solver.support_mzn:
             fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
                                          keep_data=keep, include=include,
-                                         no_ozn=(output_mode != 'item'),
-                                         globals_dir=solver.globals_dir)
-            if output_mode in ['item', 'dzn', 'json']:
-                out = solver.solve(fzn_file, timeout=timeout,
-                                   output_mode=('dzn' if output_mode == 'item'
-                                                else output_mode),
-                                   all_solutions=all_solutions, **solver_args)
-                if ozn_file:
-                    out = solns2out(out, ozn_file)
-                    stream = SolnStream(*split_solns(out))
-                else:
-                    stream = SolnStream(*split_solns(out))
-            else:
-                out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
-                                   all_solutions=all_solutions, **solver_args)
-                solns, complete = split_solns(out)
-                solns = list(map(dzn2dict, solns))
-                stream = SolnStream(solns, complete)
-        elif output_mode in ['dzn', 'json', 'item']:
+                                         globals_dir=solver.globals_dir
+                                         output_mode=_output_mode)
+            out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
+                               all_solutions=all_solutions, **solver_args)
+            out = solns2out(out, ozn_file)
+        else:
             dzn_files = list(dzn_files)
             data, data_file = process_data(mzn_file, data, keep)
             if data_file:
@@ -212,19 +201,11 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
             out = solver.solve(mzn_file, *dzn_files, data=data,
                                include=include, timeout=timeout,
                                all_solutions=all_solutions,
-                               output_mode=output_mode, **solver_args)
-            stream = SolnStream(*split_solns(out))
-        else:
-            dzn_files = list(dzn_files)
-            data, data_file = process_data(mzn_file, data, keep)
-            if data_file:
-                dzn_files.append(data_file)
-            out = solver.solve(mzn_file, *dzn_files, data=data,
-                        include=include, timeout=timeout, output_mode='item',
-                        all_solutions=all_solutions, **solver_args)
-            solns, complete = split_solns(out)
+                               output_mode=_output_mode, **solver_args)
+        solns, complete = split_solns(out)
+        if output_mode == 'dict':
             solns = list(map(dzn2dict, solns))
-            stream = SolnStream(solns, complete)
+        stream = SolnStream(solns, complete)
     except (MiniZincUnsatisfiableError, MiniZincUnknownError,
             MiniZincUnboundedError) as err:
         err.mzn_file = mzn_file
@@ -248,8 +229,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     return stream
 
 
-def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
-            no_ozn=False, globals_dir=None):
+def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
+            include=None, output_mode='item', no_ozn=False):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
 
@@ -268,9 +249,17 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
     keep_data : bool
         Whether to write the inline data into a dzn file and keep it.
         Default is False.
+    globals_dir : str
+        The path to the directory for global included files.
     include : str or list
         One or more additional paths to search for included mzn files when
         running ``mzn2fzn``.
+    output_mode : 'dzn', 'json', 'item'
+        The desired output format. The default is 'item' which outputs a
+        stream of strings as returned by the solns2out tool, formatted according
+        to the output statement of the MiniZinc model. The 'dzn' and 'json'
+        formats output a stream of strings formatted in dzn of json
+        respectively.
     no_ozn : bool
         If True, the ozn file is not produced, False otherwise.
 
@@ -287,6 +276,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, include=None,
         args += ['-G', globals_dir]
     if no_ozn:
         args.append('--no-output-ozn')
+    if output_mode and output_mode in ['dzn', 'json', 'item']:
+        args += ['--output-mode', output_mode]
     if include:
         if isinstance(include, str):
             include = [include]
