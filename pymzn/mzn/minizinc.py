@@ -291,7 +291,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     dzn_files = list(dzn_files)
     data, data_file = process_data(mzn_file, data, keep_data)
     if data:
-        args =+ ['-D', data]
+        args += ['-D', data]
     elif data_file:
         dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
