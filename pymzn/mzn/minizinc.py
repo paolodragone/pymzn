@@ -181,6 +181,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
     mzn_model.compile(output_file)
+    output_file.close()
+    
     mzn_file = output_file.name
     data_file = None
     fzn_file = None

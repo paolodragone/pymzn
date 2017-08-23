@@ -121,3 +121,8 @@ class MinizincTest(unittest.TestCase):
                                    'capacity': 20})
         self.assertEqual(list(out), [{'x': {3, 5}}])
 
+    def test_minizinc2(self):
+        # test that the temp file is flushed or closed
+        # somehow the file is flushed if there is a \n in the string written
+        out = list(pymzn.minizinc("var 1 .. 1: x; solve maximize x;"))
+        self.assertEqual(list(out), [{'x': 1}])
