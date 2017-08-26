@@ -126,3 +126,98 @@ class MinizincTest(unittest.TestCase):
         # somehow the file is flushed if there is a \n in the string written
         out = list(pymzn.minizinc("var 1 .. 1: x; solve maximize x;"))
         self.assertEqual(list(out), [{'x': 1}])
+
+
+class MinizincTestCalls(unittest.TestCase):
+    # check that cbc and gecode solver work with diferent combinations
+    # of model and data
+    model = '''
+     include "globals.mzn";
+     array[1..5] of var 1 .. 5: x;
+     constraint all_different(x);
+     constraint x[1]>x[2];
+     constraint x[2]>x[3];
+     constraint x[3]>x[4];
+     constraint x[3]>x[5];
+     int: k;
+     constraint x[5] = k;
+     solve maximize x[4]*x[1];
+'''
+    data = {'k':2}
+    solution = [{'x': [5,4,3,1,2]}]
+
+    # test with data as object
+    def _test_data_obj(self, solver):
+        out = list(pymzn.minizinc(solver=solver, mzn=self.model, data=self.data))
+        self.assertEqual(out, self.solution)
+
+    def test_data_obj_gecode(self):
+        self._test_data_obj('gecode')
+
+    def test_data_obj_cbc(self):
+        self._test_data_obj('cbc')
+
+    # test with data as string
+    def _test_data_str(self, solver):
+        out = list(pymzn.minizinc(solver=solver, mzn=self.model, data='k=2;'))
+        self.assertEqual(out, self.solution)
+
+    def test_data_str_gecode(self):
+        self._test_data_str('gecode')
+
+    def test_data_str_cbc(self):
+        self._test_data_str('cbc')
+
+
+    def save_as_temp_file(self, contents, suffix):
+        import tempfile
+        f = tempfile.NamedTemporaryFile(mode='w', suffix=suffix, delete=False)
+        file_name = f.name
+        f.write(contents)
+        f.close()
+        return file_name
+
+    # test with model as file
+    def _test_model_file(self, solver):
+        import os
+        fn = self.save_as_temp_file(self.model +'\nk=2;', '.mzn')
+        out = list(pymzn.minizinc(solver=solver, mzn=fn))
+        os.remove(fn)
+        self.assertEqual(out, self.solution)
+
+    def test_model_file_gecode(self):
+        self._test_model_file('gecode')
+
+    def test_model_file_cbc(self):
+        self._test_model_file('cbc')
+
+    # test with model and data as file
+    def _test_model_data_file(self, solver):
+        import os
+        fn = self.save_as_temp_file(self.model, '.mzn')
+        dn = self.save_as_temp_file('k=2;', '.dzn')
+        out = list(pymzn.minizinc(fn, dn, solver=solver))
+        os.remove(fn)
+        self.assertEqual(out, self.solution)
+
+    def test_model_data_file_gecode(self):
+        self._test_model_data_file('gecode')
+
+    def test_model_data_file_cbc(self):
+        self._test_model_data_file('cbc')
+
+
+class MinizincTestAllSolutions(unittest.TestCase):
+    # check that gecode solver returns all solutions
+    # this does not work with cbc, we get:
+    #  WARNING. --all-solutions for SAT problems not implemented.
+    # we get only one solution in that case
+    model  = '''
+     include "globals.mzn";
+     array[1..5] of var 1 .. 5: x;
+     constraint all_different(x);
+     solve satisfy;
+'''
+    def test_gecode(self):
+        out = list(pymzn.minizinc(solver='gecode', mzn=self.model, all_solutions=True))
+        self.assertEqual(len(out), 120)
