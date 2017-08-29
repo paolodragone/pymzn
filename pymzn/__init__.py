@@ -45,7 +45,8 @@ def main():
     from textwrap import dedent
 
     def _minizinc(**_args):
-        print(minizinc(**_args))
+        print(minizinc(_args['mzn'], *_args['dzn_files'],
+            **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}))
 
     def _config(key, value=None, **__):
         if value is None:
