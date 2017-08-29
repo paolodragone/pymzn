@@ -164,7 +164,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     if output_mode == 'dict':
         if output_vars:
             mzn_model.dzn_output(output_vars)
-        _output_mode = 'item'
+            _output_mode = 'item'
+        else:
+            _output_mode = 'dzn'
+            force_flatten = True
     else:
         _output_mode = output_mode
 
