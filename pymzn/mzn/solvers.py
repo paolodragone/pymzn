@@ -177,7 +177,7 @@ class Gecode(Solver):
         """
         log = logging.getLogger(__name__)
 
-        mzn = True
+        mzn = False
         args = []
         if mzn_file.endswith('fzn'):
             if output_mode != 'dzn':
@@ -687,15 +687,12 @@ class OscarCBLS(Solver):
     path : str
         The path to the fzn-oscar-cbls executable.
     globals_dir : str
-        The path to the directory for global included files.
-        By default PyMzn will try to look for the libraries in the 'mznlib'
-        folder in the directory pointed by the OSCAR_CBLS_HOME environment
-        variable.
+        The path to the directory for global included files.  You should either
+        copy or link the 'mznlib' folder from the oscar-cbls-flatzinc
+        distribution into the minizinc library directory.
     """
 
-    def __init__(self, path='fzn-oscar-cbls', globals_dir=None):
-        if not globals_dir and 'OSCAR_CBLS_HOME' in os.environ:
-            globals_dir = os.path.join(os.environ['OSCAR_CBLS_HOME'], 'mznlib')
+    def __init__(self, path='fzn-oscar-cbls', globals_dir='oscar-cbls'):
         super().__init__(globals_dir, support_mzn=False, support_dzn=True,
                 support_json=False, support_item=False, support_dict=False,
                 support_all=True, support_timeout=True)
