@@ -53,6 +53,9 @@ class SolnStream:
         self._solns = solns
         self.complete = complete
 
+    def __len__(self):
+        return len(self._solns)
+
     def __iter__(self):
         return iter(self._solns)
 
