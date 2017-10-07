@@ -307,6 +307,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     for path in include:
         args += ['-I', path]
 
+    keep_data = config.get('keep', keep_data)
+
     dzn_files = list(dzn_files)
     data, data_file = process_data(mzn_file, data, keep_data)
     if data:
