@@ -70,7 +70,7 @@ class SolnStream:
         return str(self._solns)
 
 
-def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode,
+def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
              output_mode='dict', output_vars=None, output_dir=None, timeout=None,
              all_solutions=False, force_flatten=False, **solver_args):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
@@ -148,9 +148,20 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
         mzn_model = MiniZincModel(mzn)
 
     if not solver:
-        solver = gecode
+        solver = config.get('solver', gecode)
     elif isinstance(solver, str):
         solver = getattr(solvers, solver)
+
+    keep = config.get('keep', keep)
+
+    if include is None:
+        include = []
+    include += config.get('include', [])
+
+    if not output_dir:
+        output_dir = config.get('output_dir', None)
+
+    force_flatten = config.get('force_flatten', force_flatten)
 
     if all_solutions and not solver.support_all:
         raise ValueError('The solver cannot return all solutions.')
