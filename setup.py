@@ -40,6 +40,7 @@ setup(
     packages = find_packages(exclude=['*tests*']),
     test_suite = "pymzn.tests",
     install_requires = [
+        'jinja2'
     ],
     platforms = 'any',
     classifiers = [
