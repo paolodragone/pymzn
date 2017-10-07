@@ -154,10 +154,6 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
 
     keep = config.get('keep', keep)
 
-    if include is None:
-        include = []
-    include += config.get('include', [])
-
     if not output_dir:
         output_dir = config.get('output_dir', None)
 
@@ -304,8 +300,12 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
             include = [include]
         elif not isinstance(include, list):
             raise TypeError('The path provided is not valid.')
-        for path in include:
-            args += ['-I', path]
+    else:
+        include = []
+
+    include += config.get('include', [])
+    for path in include:
+        args += ['-I', path]
 
     dzn_files = list(dzn_files)
     data, data_file = process_data(mzn_file, data, keep_data)
