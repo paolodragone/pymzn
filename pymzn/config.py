@@ -2,56 +2,27 @@
 """
 
 PyMzn can be configured with custom executable paths and other variables.
-
-To inspect the current value of a variable one can use the PyMzn executable, if
-installed::
-
-    $ pymzn config mzn2fzn
-
-or equivalently::
-
-    $ python3.5 -m pymzn config mzn2fzn
-
-Similarly, to configure a variable::
-
-    $ pymzn config mzn2fzn /path/to/mzn2fzn
-
-or::
-
-    $ python3.5 -m pymzn config mzn2fzn /path/to/mzn2fzn
-
-The configuration of PyMzn is contained into a configuration file located in
-the home directory of the current user. The exact path of the configuration file
-is dependent on the operating system:
-
-    * Linux: ~/.local/share/pymzn/config.yml
-    * MacOS: ~/Library/Application Support/pymzn/config.yml
-    * Windows: %APPDATA%\\Local\\pymzn\\config.yml
-
-This is a YAML configuration file, which can be also manually modified.
-
-PyMzn can also be configured programmatically using the module ``pymzn.config``.
-For instance::
+Configuration is done via the module ``pymzn.config``. For instance::
 
     import pymzn.config
 
-    # config.set sets the variable only for the current execution
     pymzn.config.set('mzn2fzn', 'path/to/mzn2fzn')
     pymzn.config.set('solns2out', 'path/to/solns2out')
-
-    # to make the changes persistent
-    pymzn.dump()
 
 The configurable properties used by PyMzn are the following:
 
  * **mzn2fzn**: Path to the *mzn2fzn* executable;
  * **solns2out**: Path to the *solns2out* executable;
+ * **solver**: Solver instance to use when calling pymzn.minizinc;
+ * **keep**: Overrides the keep flag of all minizinc and mzn2fzn calls;
+ * **output_dir**: Set a default output directory for generated files;
+ * **force_flatten**: Overrides the force_flatten flag of all minizinc calls;
  * **dzn_width**: The horizontal character limit for dzn files;
    This property is used to wrap long dzn statements when writing dzn files.
    This property is also used in the ``pymzn.minizinc`` function as a limit to
    decide whether to write the inline data into a file.
 
-One can also configure custom properties to be used for custom solvers.
+One can also set custom properties to be used for custom solvers.
 
 
 Debug
