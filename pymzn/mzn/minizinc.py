@@ -72,7 +72,7 @@ class SolnStream:
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
              output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-             all_solutions=False, force_flatten=False, **solver_args):
+             all_solutions=False, force_flatten=False, **kwargs):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     Parameters
@@ -129,10 +129,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         possible, this function feeds the mzn file to the solver without passing
         through the flattener, force_flatten=True prevents this behavior and
         always produces a fzn file which is in turn passed to the solver.
-    **solver_args
-        Additional arguments to pass to the solver, provided as additional
-        keyword arguments to this function. Check the solver documentation for
-        the available arguments.
+    **kwargs
+        Additional arguments to pass to the solver and/or the template engine,
+        provided as additional keyword arguments to this function. Check the
+        solver documentation for the available arguments.
 
     Returns
     -------
@@ -193,7 +193,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
-    mzn_model.compile(output_file)
+    mzn_model.compile(output_file, **kwargs)
     output_file.close()
 
     mzn_file = output_file.name
@@ -208,7 +208,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
                                          globals_dir=solver.globals_dir,
                                          output_mode=_output_mode)
             out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
-                               all_solutions=all_solutions, **solver_args)
+                               all_solutions=all_solutions, **kwargs)
             out = solns2out(out, ozn_file)
         else:
             dzn_files = list(dzn_files)
@@ -218,7 +218,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
             out = solver.solve(mzn_file, *dzn_files, data=data,
                                include=include, timeout=timeout,
                                all_solutions=all_solutions,
-                               output_mode=_output_mode, **solver_args)
+                               output_mode=_output_mode, **kwargs)
         solns, complete = split_solns(out)
         if output_mode == 'dict':
             solns = list(map(dzn2dict, solns))
