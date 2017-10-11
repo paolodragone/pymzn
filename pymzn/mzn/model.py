@@ -18,11 +18,25 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from pymzn.dzn.marsh import stmt2dzn, val2dzn
+from collections import Collection
 from jinja2 import Environment, Template
+from pymzn.dzn.marsh import stmt2dzn, val2dzn
+
+
+def discretize(value, factor=100):
+    if not isinstance(val, Collection):
+        return int(value * factor)
+    from copy import deepcopy
+    int_value = deepcopy(value)
+    for i in range(len(int_value)):
+        int_value[i] = int(int_value[i] * factor)
+    return int_value
+
 
 _jenv = Environment()
 _jenv.filters['dzn'] = val2dzn
+_jenv.filters['int'] = discretize
+
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
