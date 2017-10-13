@@ -33,7 +33,7 @@ def discretize(value, factor=100):
     return int_value
 
 
-_jenv = Environment()
+_jenv = Environment(trim_bloks=True, lstrip_blocks=True)
 _jenv.filters['dzn'] = val2dzn
 _jenv.filters['int'] = discretize
 
