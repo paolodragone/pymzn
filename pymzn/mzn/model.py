@@ -39,6 +39,7 @@ _jenv.filters['int'] = discretize
 
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
+stmts_p = re.compile('(?:^|;)([^;]+)')
 block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
 line_comm_p = re.compile('%.*\n')
 var_p = re.compile('\s*([\s\w,\.\(\)\[\]\{\}\+\-\*/]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
@@ -489,7 +490,25 @@ class MiniZincModel(object):
                 out_list.append(out_var.format(var))
         self.output(', '.join(out_list))
 
-    def compile(self, output_file=None, **kwargs):
+    @staticmethod
+    def _rewrap(s):
+        S = {' ', '\t', '\n', '\r', '\f', '\v'}
+        stmts = []
+        for stmt in stmts_p.findall(s):
+            spaces = 0
+            while spaces < len(stmt) and stmt[spaces] in S:
+                spaces += 1
+            spaces -= stmt[0] == '\n'
+            lines = []
+            for line in stmt.splitlines():
+                start = 0
+                while start < len(line) and j < spaces and line[start] in S:
+                    start += 1
+                lines.append(line[start:])
+            stmts.append('\n'.join(lines))
+        return ';\n'.join(stmts)
+
+    def compile(self, output_file=None, rewrap=False, **kwargs):
         """Compiles the model and writes it to file.
 
         The compiled model contains the content of the template (if provided)
@@ -508,6 +527,9 @@ class MiniZincModel(object):
         """
         model = self._load_model()
         model = _jenv.from_string(model).render(kwargs)
+
+        if rewrap:
+            model = self._rewrap(model)
 
         if self._output_vars is not None:
             self._make_dzn_output()
