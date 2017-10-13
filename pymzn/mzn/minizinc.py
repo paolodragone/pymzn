@@ -193,7 +193,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
-    mzn_model.compile(output_file, **kwargs)
+    mzn_model.compile(output_file, rewrap=keep, **kwargs)
     output_file.close()
 
     mzn_file = output_file.name
