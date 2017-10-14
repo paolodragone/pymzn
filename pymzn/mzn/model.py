@@ -508,7 +508,7 @@ class MiniZincModel(object):
             stmts.append('\n'.join(lines))
         return ';\n'.join(stmts)
 
-    def compile(self, output_file=None, rewrap=False, **kwargs):
+    def compile(self, output_file=None, rewrap=False, args=None):
         """Compiles the model and writes it to file.
 
         The compiled model contains the content of the template (if provided)
@@ -526,7 +526,7 @@ class MiniZincModel(object):
             A string containing the generated model.
         """
         model = self._load_model()
-        model = _jenv.from_string(model).render(kwargs)
+        model = _jenv.from_string(model).render(args or {})
 
         if rewrap:
             model = self._rewrap(model)

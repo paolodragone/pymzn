@@ -72,7 +72,7 @@ class SolnStream:
 
 def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
              output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-             all_solutions=False, force_flatten=False, **kwargs):
+             all_solutions=False, force_flatten=False, args=None, **kwargs):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     Parameters
@@ -129,10 +129,12 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         possible, this function feeds the mzn file to the solver without passing
         through the flattener, force_flatten=True prevents this behavior and
         always produces a fzn file which is in turn passed to the solver.
+    args : dict
+        Arguments for the template engine.
     **kwargs
-        Additional arguments to pass to the solver and/or the template engine,
-        provided as additional keyword arguments to this function. Check the
-        solver documentation for the available arguments.
+        Additional arguments to pass to the solver, provided as additional
+        keyword arguments to this function. Check the solver documentation for
+        the available arguments.
 
     Returns
     -------
@@ -193,7 +195,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
-    mzn_model.compile(output_file, rewrap=keep, **kwargs)
+    mzn_model.compile(output_file, rewrap=keep, args=args)
     output_file.close()
 
     mzn_file = output_file.name
