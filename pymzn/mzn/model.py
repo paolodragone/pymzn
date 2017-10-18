@@ -33,7 +33,7 @@ def discretize(value, factor=100):
     return int_value
 
 
-_jenv = Environment(trim_bloks=True, lstrip_blocks=True)
+_jenv = Environment(trim_blocks=True, lstrip_blocks=True)
 _jenv.filters['dzn'] = val2dzn
 _jenv.filters['int'] = discretize
 
@@ -249,8 +249,11 @@ class MiniZincModel(object):
         self.mzn_file = None
         self.model = None
         if mzn and isinstance(mzn, str):
-            if os.path.isfile(mzn):
-                self.mzn_file = mzn
+            if mzn.endswith('mzn'):
+                if os.path.isfile(mzn):
+                    self.mzn_file = mzn
+                else:
+                    raise ValueError('The provided file does not exsist.')
             else:
                 self.model = mzn
 
@@ -502,7 +505,7 @@ class MiniZincModel(object):
             lines = []
             for line in stmt.splitlines():
                 start = 0
-                while start < len(line) and j < spaces and line[start] in S:
+                while start < len(line) and start < spaces and line[start] in S:
                     start += 1
                 lines.append(line[start:])
             stmts.append('\n'.join(lines))
