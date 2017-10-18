@@ -24,10 +24,10 @@ from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 
 def discretize(value, factor=100):
-    if not isinstance(val, Collection):
+    if not isinstance(value, Collection):
         return int(value * factor)
     from copy import deepcopy
-    int_value = deepcopy(value)
+    int_value = list(deepcopy(value))
     for i in range(len(int_value)):
         int_value[i] = int(int_value[i] * factor)
     return int_value
