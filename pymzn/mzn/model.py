@@ -18,13 +18,13 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from collections import Collection
+from collections.abc import Iterable
 from jinja2 import Environment, Template
 from pymzn.dzn.marsh import stmt2dzn, val2dzn
 
 
 def discretize(value, factor=100):
-    if not isinstance(value, Collection):
+    if not isinstance(value, Iterable):
         return int(value * factor)
     from copy import deepcopy
     int_value = list(deepcopy(value))
