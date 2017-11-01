@@ -203,6 +203,8 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
     fzn_file = None
     ozn_file = None
 
+    solver_args = {**config.get('solver_args', {}), **kwargs}
+
     try:
         if force_flatten or not solver.support_mzn:
             fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
@@ -210,7 +212,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
                                          globals_dir=solver.globals_dir,
                                          output_mode=_output_mode)
             out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
-                               all_solutions=all_solutions, **kwargs)
+                               all_solutions=all_solutions, **solver_args)
             out = solns2out(out, ozn_file)
         else:
             dzn_files = list(dzn_files)
@@ -220,7 +222,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
             out = solver.solve(mzn_file, *dzn_files, data=data,
                                include=include, timeout=timeout,
                                all_solutions=all_solutions,
-                               output_mode=_output_mode, **kwargs)
+                               output_mode=_output_mode, **solver_args)
         solns, complete = split_solns(out)
         if output_mode == 'dict':
             solns = list(map(dzn2dict, solns))

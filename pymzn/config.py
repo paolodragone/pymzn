@@ -14,6 +14,7 @@ The configurable properties used by PyMzn are the following:
  * **mzn2fzn**: Path to the *mzn2fzn* executable;
  * **solns2out**: Path to the *solns2out* executable;
  * **solver**: Solver instance to use when calling pymzn.minizinc;
+ * **solver_args**: Arguments to pass to the solver when calling pymzn.minizinc;
  * **keep**: Overrides the keep flag of all minizinc and mzn2fzn calls;
  * **output_dir**: Set a default output directory for generated files;
  * **force_flatten**: Overrides the force_flatten flag of all minizinc calls;
