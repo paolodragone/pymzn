@@ -18,24 +18,8 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from collections.abc import Iterable
-from jinja2 import Environment, Template
-from pymzn.dzn.marsh import stmt2dzn, val2dzn
-
-
-def discretize(value, factor=100):
-    if not isinstance(value, Iterable):
-        return int(value * factor)
-    from copy import deepcopy
-    int_value = list(deepcopy(value))
-    for i in range(len(int_value)):
-        int_value[i] = int(int_value[i] * factor)
-    return int_value
-
-
-_jenv = Environment(trim_blocks=True, lstrip_blocks=True)
-_jenv.filters['dzn'] = val2dzn
-_jenv.filters['int'] = discretize
+from .templates import from_string
+from ..dzn.marsh import stmt2dzn, val2dzn
 
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
@@ -556,7 +540,7 @@ class MiniZincModel(object):
             A string containing the generated model.
         """
         model = self._load_model()
-        model = _jenv.from_string(model).render(args or {})
+        model = from_string(model, ags)
 
         if rewrap:
             model = self._rewrap(model)
