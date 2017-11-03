@@ -70,9 +70,11 @@ class SolnStream:
         return str(self._solns)
 
 
-def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
-             output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-             all_solutions=False, force_flatten=False, args=None, **kwargs):
+def minizinc(
+        mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
+        output_mode='dict', output_vars=None, output_dir=None, timeout=None,
+        all_solutions=False, num_solutions=None, force_flatten=False, args=None,
+        **kwargs):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     Parameters
@@ -124,6 +126,10 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
     all_solutions : bool
         Whether all the solutions must be returned. Notice that this can only
         be used if the solver supports returning all solutions. Default is False.
+    num_solutions : int
+        The upper bound on the number of solutions to be returned. Can only be
+        used if the solver supports returning a fixed number of solutions.
+        Default is 1.
     force_flatten : bool
         Wheter the function should be forced to produce a flat model. Whenever
         possible, this function feeds the mzn file to the solver without passing
@@ -207,22 +213,28 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
 
     try:
         if force_flatten or not solver.support_mzn:
-            fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
-                                         keep_data=keep, include=include,
-                                         globals_dir=solver.globals_dir,
-                                         output_mode=_output_mode)
-            out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
-                               all_solutions=all_solutions, **solver_args)
+            fzn_file, ozn_file = mzn2fzn(
+                mzn_file, *dzn_files, data=data, keep_data=keep,
+                include=include, globals_dir=solver.globals_dir,
+                output_mode=_output_mode
+            )
+            out = solver.solve(
+                fzn_file, timeout=timeout, output_mode='dzn',
+                all_solutions=all_solutions, num_solutions=num_solutions,
+                **solver_args
+            )
             out = solns2out(out, ozn_file)
         else:
             dzn_files = list(dzn_files)
             data, data_file = process_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
-            out = solver.solve(mzn_file, *dzn_files, data=data,
-                               include=include, timeout=timeout,
-                               all_solutions=all_solutions,
-                               output_mode=_output_mode, **solver_args)
+            out = solver.solve(
+                mzn_file, *dzn_files, data=data, include=include,
+                timeout=timeout, all_solutions=all_solutions,
+                num_solutions=num_solutions, output_mode=_output_mode,
+                **solver_args
+            )
         solns, complete = split_solns(out)
         if output_mode == 'dict':
             solns = list(map(dzn2dict, solns))

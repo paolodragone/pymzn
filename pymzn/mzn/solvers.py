@@ -69,9 +69,11 @@ class Solver(ABC):
         The path to the directory for global included files.
     """
 
-    def __init__(self, globals_dir='std', support_mzn=False, support_dzn=True,
-                 support_json=False, support_item=False, support_dict=False,
-                 support_all=False, support_timeout=False):
+    def __init__(
+        self, globals_dir='std', support_mzn=False, support_dzn=True,
+        support_json=False, support_item=False, support_dict=False,
+        support_all=False, support_num=False, support_timeout=False
+    ):
         self.globals_dir = globals_dir
         self.support_mzn = support_mzn
         self.support_dzn = support_dzn
@@ -79,11 +81,14 @@ class Solver(ABC):
         self.support_item = support_item
         self.support_dict = support_dict
         self.support_all = support_all
+        self.support_num = support_num
         self.support_timeout = support_timeout
 
     @abstractmethod
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='dzn', **kwargs):
+    def solve(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='dzn', **kwargs
+    ):
         """Solve a problem encoded with MiniZinc/FlatZinc.
 
         This method should call an external solver, wait for the solution and
@@ -109,6 +114,8 @@ class Solver(ABC):
             The timeout for the solver. If None, no timeout given.
         all_solutions : bool
             Whether to return all solutions.
+        num_solutions : bool
+            Upper bound to the number of solutions.
         output_mode : 'dzn', 'json', 'item', 'dict'
             The output mode required.
 
@@ -136,13 +143,15 @@ class Gecode(Solver):
                  globals_dir='gecode'):
         super().__init__(globals_dir, support_mzn=True, support_dzn=True,
                 support_json=False, support_item=True, support_dict=False,
-                support_all=True, support_timeout=True)
+                support_all=True, support_num=True, support_timeout=True)
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', parallel=1, seed=0,
-              suppress_segfault=False, **kwargs):
+    def solve(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
+        seed=0, suppress_segfault=False, **kwargs
+        ):
         """Solve a MiniZinc/FlatZinc problem with Gecode.
 
         Parameters
@@ -159,6 +168,8 @@ class Gecode(Solver):
             The timeout for the solver. If None, no timeout given.
         all_solutions : bool
             Whether to return all solutions.
+        num_solutions : bool
+            Upper bound to the number of solutions.
         output_mode : 'dzn', 'json', 'item', 'dict'
             The output mode required.
         parallel : int
@@ -199,6 +210,8 @@ class Gecode(Solver):
         fzn_flags = []
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', num_solutions]
         if parallel != 1:
             fzn_flags += ['-p', str(parallel)]
         if timeout and timeout > 0:
@@ -244,16 +257,23 @@ class Chuffed(Solver):
     globals_dir : str
         The path to the directory for global included files.
     """
-    def __init__(self, mzn_path='mzn-chuffed', fzn_path='fzn-chuffed',
-                 globals_dir='chuffed'):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=False, support_item=True, support_dict=False,
-                support_all=True, support_timeout=True)
+    def __init__(
+        self, mzn_path='mzn-chuffed', fzn_path='fzn-chuffed',
+        globals_dir='chuffed'
+    ):
+        super().__init__(
+            globals_dir, support_mzn=True, support_dzn=True, support_json=False,
+            support_item=True, support_dict=False, support_all=True,
+            support_num=True, support_timeout=True
+        )
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', seed=0, **kwargs):
+    def solve(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', seed=0,
+        **kwargs
+        ):
         """Solve a MiniZinc/FlatZinc problem with Chuffed.
 
         Parameters
@@ -270,6 +290,8 @@ class Chuffed(Solver):
             The timeout for the solver. If None, no timeout given.
         all_solutions : bool
             Whether to return all solutions.
+        num_solutions : bool
+            Upper bound to the number of solutions.
         output_mode : 'dzn', 'json', 'item', 'dict'
             The output mode required.
         seed : int
@@ -303,6 +325,8 @@ class Chuffed(Solver):
         fzn_flags = []
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', num_solutions]
         if timeout and timeout > 0:
             fzn_flags += ['--time-out', str(timeout)]
         if seed != 0:
@@ -339,9 +363,11 @@ class Optimathsat(Solver):
         The path to the directory for global included files.
     """
     def __init__(self, path='optimathsat', globals_dir='std'):
-        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                support_json=False, support_item=False, support_dict=False,
-                support_all=False, support_timeout=False)
+        super().__init__(
+            globals_dir, support_mzn=False, support_dzn=True,
+            support_json=False, support_item=False, support_dict=False,
+            support_all=False, support_num=False, support_timeout=False
+        )
         self.cmd = path
         self._line_comm_p = re.compile('%.*\n')
         self._rational_p = re.compile('(\d+)\/(\d+)')
@@ -392,9 +418,11 @@ class Opturion(Solver):
     """
 
     def __init__(self, path='fzn-cpx', globals_dir='opturion-cpx'):
-        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                support_json=False, support_item=False, support_dict=False,
-                support_all=True, support_timeout=False)
+        super().__init__(
+            globals_dir, support_mzn=False, support_dzn=True,
+            support_json=False, support_item=False, support_dict=False,
+            support_all=True, support_num=False, support_timeout=False
+        )
         self.cmd = path
 
     def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
@@ -439,13 +467,18 @@ class MIPSolver(Solver):
     """
 
     def __init__(self, path='mzn-gurobi', globals_dir='linear'):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=True, support_item=True, support_dict=False,
-                support_all=True, support_timeout=True)
+        super().__init__(
+            globals_dir, support_mzn=True, support_dzn=True, support_json=True,
+            support_item=True, support_dict=False, support_all=True,
+            support_num=True, support_timeout=True
+        )
         self.cmd = path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', parallel=1, **kwargs):
+    def solve(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
+        **kwargs
+    ):
         """Solve a MiniZinc/FlatZinc problem with a MIP Solver.
 
         Parameters
@@ -462,6 +495,8 @@ class MIPSolver(Solver):
             The timeout for the solver. If None, no timeout given.
         all_solutions : bool
             Whether to return all solutions.
+        num_solutions : bool
+            Upper bound to the number of solutions.
         output_mode : 'dzn', 'json', 'item', 'dict'
             The output mode required.
         parallel : int
@@ -490,6 +525,8 @@ class MIPSolver(Solver):
 
         if all_solutions:
             args += ['-a', '--unique']
+        if num_solutions is not None:
+            args += ['-n', num_solutions]
         if parallel != 1:
             args += ['-p', str(parallel)]
         if timeout and timeout > 0:
@@ -556,15 +593,19 @@ class G12Solver(Solver):
 
     def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
                  globals_dir='g12_fd', backend=None):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=False, support_item=True, support_dict=False,
-                support_all=True, support_timeout=False)
+        super().__init__(
+            globals_dir, support_mzn=True, support_dzn=True, support_json=False,
+            support_item=True, support_dict=False, support_all=True,
+            support_num=True, support_timeout=False
+        )
         self.fzn_cmd = fzn_path
         self.mzn_cmd = mzn_path
         self.backend = backend
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', **kwargs):
+    def solve(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', **kwargs
+    ):
         """Solve a MiniZinc/FlatZinc problem with the G12 solver.
 
         Parameters
@@ -579,6 +620,8 @@ class G12Solver(Solver):
             A path or a list of paths to included files.
         all_solutions : bool
             Whether to return all solutions.
+        num_solutions : bool
+            Upper bound to the number of solutions.
         output_mode : 'dzn', 'json', 'item', 'dict'
             The output mode required.
         Returns
@@ -611,6 +654,8 @@ class G12Solver(Solver):
 
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', num_solutions]
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
@@ -693,13 +738,17 @@ class OscarCBLS(Solver):
     """
 
     def __init__(self, path='fzn-oscar-cbls', globals_dir='oscar-cbls'):
-        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                support_json=False, support_item=False, support_dict=False,
-                support_all=True, support_timeout=True)
+        super().__init__(
+            globals_dir, support_mzn=False, support_dzn=True,
+            support_json=False, support_item=False, support_dict=False,
+            support_all=True, support_num=True, support_timeout=True
+        )
         self.cmd = path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', **kwargs):
+    def solve(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', **kwargs
+        ):
         """Solve a FlatZinc problem with Oscar/CBLS.
 
         Parameters
@@ -716,6 +765,8 @@ class OscarCBLS(Solver):
         args = [self.cmd]
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', num_solutions]
         if timeout:
             args += ['-t', str(timeout)]
         args.append(mzn_file)
