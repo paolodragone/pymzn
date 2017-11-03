@@ -169,10 +169,12 @@ def minizinc(
 
     if all_solutions and not solver.support_all:
         raise ValueError('The solver cannot return all solutions.')
+    if num_solutions is not None and not solver.support_num:
+        raise ValueError('The solver cannot return a given number of solutions.')
     if timeout and not solver.support_timeout:
         raise ValueError('The solver does not support the timeout.')
     if output_mode != 'dict' and output_vars:
-        raise ValueError('Output vars only available in `dict` output mode')
+        raise ValueError('Output vars only available in `dict` output mode.')
 
     if (output_mode == 'dzn' and not solver.support_dzn) or \
        (output_mode == 'json' and not solver.support_json) or \
