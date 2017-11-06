@@ -540,7 +540,7 @@ class MiniZincModel(object):
             A string containing the generated model.
         """
         model = self._load_model()
-        model = from_string(model, ags)
+        model = from_string(model, args)
 
         if rewrap:
             model = self._rewrap(model)
