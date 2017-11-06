@@ -211,7 +211,7 @@ class Gecode(Solver):
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
-            args += ['-n', num_solutions]
+            args += ['-n', str(num_solutions)]
         if parallel != 1:
             fzn_flags += ['-p', str(parallel)]
         if timeout and timeout > 0:
@@ -326,7 +326,7 @@ class Chuffed(Solver):
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
-            args += ['-n', num_solutions]
+            args += ['-n', str(num_solutions)]
         if timeout and timeout > 0:
             fzn_flags += ['--time-out', str(timeout)]
         if seed != 0:
@@ -526,7 +526,7 @@ class MIPSolver(Solver):
         if all_solutions:
             args += ['-a', '--unique']
         if num_solutions is not None:
-            args += ['-n', num_solutions]
+            args += ['-n', str(num_solutions)]
         if parallel != 1:
             args += ['-p', str(parallel)]
         if timeout and timeout > 0:
@@ -655,7 +655,7 @@ class G12Solver(Solver):
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
-            args += ['-n', num_solutions]
+            args += ['-n', str(num_solutions)]
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
@@ -766,7 +766,7 @@ class OscarCBLS(Solver):
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
-            args += ['-n', num_solutions]
+            args += ['-n', str(num_solutions)]
         if timeout:
             args += ['-t', str(timeout)]
         args.append(mzn_file)
