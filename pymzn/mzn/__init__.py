@@ -3,6 +3,7 @@
 from .model import *
 from .solvers import *
 from .minizinc import *
+from . import templates
 
 __all__ = ['SolnStream', 'minizinc', 'mzn2fzn', 'solns2out', 'MiniZincError',
         'MiniZincUnsatisfiableError', 'MiniZincUnknownError',

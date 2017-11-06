@@ -14,6 +14,7 @@ from . import dzn
 from .dzn import *
 from . import mzn
 from .mzn import *
+from .mzn import templates
 
 __version__ = '0.14.8'
 __all__ = ['debug', 'config']

@@ -3,7 +3,8 @@ from copy import deepcopy
 from collections.abc import Iterable
 from pymzn.dzn.marsh import val2dzn
 from jinja2 import (
-    Environment, Template, BaseLoader, PackageLoader, FileSystemLoader
+    Environment, Template, BaseLoader, PackageLoader, FileSystemLoader,
+    TemplateNotFound
 )
 
 
