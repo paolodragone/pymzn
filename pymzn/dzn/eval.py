@@ -29,7 +29,7 @@ _val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]+)\}'
 # multi-dimensional array pattern
 _array_p = re.compile('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
                       '(?P<indices>([\d\.+\-]+|\{\})'
-                      '(?:\s*,\s*([\d\.+\-]+|\{\}))?)\s*,\s*)?'
+                      '(?:\s*,\s*([\d\.+\-]+|\{\}))*)\s*,\s*)?'
                       '\[(?P<vals>[\w\s\.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$')
 
 # ratio pattern (used in OptiMathSat)
