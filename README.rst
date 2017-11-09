@@ -1,18 +1,18 @@
 PyMzn
 =====
 
-PyMzn is a Python library that wraps and enhances the `MiniZinc
-<http://minzinc.org>`__ tools for CSP modelling and solving.  It is built on top
+**PyMzn** is a Python library that wraps and enhances the `MiniZinc
+<http://minzinc.org>`__ tools for constratin programming.  It is built on top
 of the `minizinc <https://github.com/MiniZinc/MiniZincIDE>`__ toolkit and
 provides a number of off-the-shelf functions to readily solve problems encoded
 in MiniZinc and parse the solutions into Python objects.
 
 Usage
 -----
-First, you need a MiniZinc model encoding the problem you want to solve.
-Here is a simple 0-1 knapsack problem encoded with MiniZinc:::
+First, we need a MiniZinc model encoding the problem to solve.
+Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 
-    %% test.mzn %%
+    %% knapsack.mzn %%
     int: n;                     % number of objects
     set of int: OBJ = 1..n;
     int: capacity;              % the capacity of the knapsack
@@ -25,7 +25,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:::
     solve maximize obj;
 
 
-    %% test.dzn %%
+    %% knapsack.dzn %%
     n = 5;
     profit = [10, 3, 9, 4, 8];
     size = [14, 4, 10, 6, 9];
@@ -33,7 +33,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:::
 You can solve the above problem using the ``pymzn.minizinc`` function::
 
     import pymzn
-    pymzn.minizinc('test.mzn', 'test.dzn', data={'capacity': 20})
+    pymzn.minizinc('knapsack.mzn', 'knapsack.dzn', data={'capacity': 20})
 
 The result will be::
 
