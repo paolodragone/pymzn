@@ -24,6 +24,7 @@ import os
 import logging
 import contextlib
 
+from io import BufferedReader
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
@@ -32,7 +33,7 @@ import pymzn.config as config
 from . import solvers
 from .solvers import gecode
 from .model import MiniZincModel
-from pymzn.utils import run
+from ..utils import Process
 from pymzn.dzn import dict2dzn, dzn2dict
 
 
@@ -202,8 +203,6 @@ def minizinc(
         raise ValueError('The solver cannot return all solutions.')
     if num_solutions is not None and not solver.support_num:
         raise ValueError('The solver cannot return a given number of solutions.')
-    if timeout and not solver.support_timeout:
-        raise ValueError('The solver does not support the timeout.')
     if output_mode != 'dict' and output_vars:
         raise ValueError('Output vars only available in `dict` output mode.')
 
@@ -268,31 +267,29 @@ def minizinc(
                 num_solutions=num_solutions, output_mode=_output_mode,
                 **solver_args
             )
-        solns, complete = split_solns(out)
+        solns = split_solns(out)
         if output_mode == 'dict':
-            solns = list(map(dzn2dict, solns))
-        stream = SolnStream(solns, complete)
+            solns = map(dzn2dict, solns)
+        stream = solns
     except (MiniZincUnsatisfiableError, MiniZincUnknownError,
             MiniZincUnboundedError) as err:
         err.mzn_file = mzn_file
         raise err
 
     if not keep:
-        with contextlib.suppress(FileNotFoundError):
-            if data_file:
-                os.remove(data_file)
-                log.debug('Deleting file: {}'.format(data_file))
-            if mzn_file:
-                os.remove(mzn_file)
-                log.debug('Deleting file: {}'.format(mzn_file))
-            if fzn_file:
-                os.remove(fzn_file)
-                log.debug('Deleting file: {}'.format(fzn_file))
-            if ozn_file:
-                os.remove(ozn_file)
-                log.debug('Deleting file: {}'.format(ozn_file))
+        stream = _cleanup(stream, [data_file, mzn_file, fzn_file, ozn_file])
 
-    return stream
+    return Solutions(stream)
+
+
+def _cleanup(stream, files):
+    yield from stream
+    log = logging.getLogger(__name__)
+    with contextlib.suppress(FileNotFoundError):
+        for _file in files:
+            if _file:
+                os.remove(_file)
+                log.debug('Deleting file: {}'.format(_file))
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
