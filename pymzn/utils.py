@@ -5,65 +5,116 @@ import signal
 import logging
 import subprocess
 
+from subprocess import Popen, PIPE, TimeoutExpired, CalledProcessError
 
-def run(args, stdin=None):
-    """Executes a command and waits for the result.
 
-    It is also possible to interrupt the execution of the command with CTRL+C on
-    the shell terminal (only in single thread).
+class Process:
 
-    Parameters
-    ----------
-    args : list
-        The list of arguments for the program to execute. Arguments should be
-        formatted as for the ``subprocess.Popen`` constructor.
-    stdin : str or bytes
-        String or bytes containing the input stream for the process.
+    def __init__(self, args):
+        self.args = args
+        self._process = None
+        self.start_time = None
+        self.end_time = None
+        self.timeout = None
+        self.stdout_data = None
+        self.stderr_data = None
+        self.expired = False
 
-    Returns
-    -------
-    CompletedProcess
-        An instance of CompletedProcess containing the information about
-        the executed process, including stdout, stderr and running time.
+    @property
+    def running_time(self):
+        end = self.end_time or time.time()
+        return end - self.start_time
 
-    Raises
-    ------
-    CalledProcessError
-        When the process returns an error.
-    """
-    log = logging.getLogger(__name__)
-    log.debug('Executing command with args: {}'.format(args))
+    @property
+    def stdout(self):
+        return self._process.stdout
 
-    sighdl = False
-    try:
-        sigint = signal.getsignal(signal.SIGINT)
-        signal.signal(signal.SIGINT, lambda *args: None)
-        sighdl = True
-    except ValueError:
-        # Happens in multi-threading, in which case ignore
-        pass
+    def _check_alive(self):
+        self.returncode = retcode = self._process.poll()
+        if retcode is None:
+            return
+        self.end_time = time.time()
+        if retcode:
+            if self._process.stderr.closed:
+                stderr = self.stderr_data
+            else:
+                self.stderr_data = stderr = self._process.stderr.read()
+            raise CalledProcessError(retcode, self.args, None, stderr)
+        self.complete = True
 
-    start = time.time()
-    with subprocess.Popen(args, bufsize=1, universal_newlines=True,
-                          stdin=subprocess.PIPE,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE) as process:
-        try:
-            out, err = process.communicate(stdin)
-            ret = process.poll()
-        except KeyboardInterrupt:
-            process.kill()
-            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-            out, err = process.communicate(stdin)
-            ret = 0
-        finally:
-            if sighdl:
-                signal.signal(signal.SIGINT, sigint)
+    def _check_timeout(self):
+        if not self.timeout:
+            return
+        if self.running_time > self.timeout:
+            self.end_time = time.time()
+            self.stderr_data = stderr = self._process.stderr.read()
+            self.kill()
+            self.expired = True
+            raise TimeoutExpired(self.args, self.timeout, None, stderr)
 
-    elapsed = time.time() - start
-    log.debug('Done. Running time: {0:.2f} seconds'.format(elapsed))
+    def kill(self):
+        if not self._process:
+            raise RuntimeError('The process has not started yet')
+        self._process.kill()
+        self._process.stdout.close()
+        self._process.stderr.close()
 
-    process = subprocess.CompletedProcess(args, ret, out, err)
-    process.check_returncode()
-    return process
+    def lines(self):
+        if not self._process:
+            raise RuntimeError('The process has not started yet')
+        stdout = self._process.stdout
+        while not stdout.closed:
+            self._check_alive()
+            self._check_timeout()
+            line = stdout.readline()
+            if line == '':
+                break
+            yield line
+        return
+
+    def __iter__(self):
+        return self.lines()
+
+    def run_async(self, stdin=None, timeout=None):
+        if self._process:
+            raise RuntimeError('Process already started')
+        self.timeout = timeout
+        self.start_time = time.time()
+        self._process = subprocess.Popen(
+            self.args, bufsize=0, universal_newlines=True, stdin=stdin,
+            stdout=PIPE, stderr=PIPE
+        )
+        return self
+
+    def run(self, input=None, timeout=None):
+        if self._process:
+            raise RuntimeError('Process already started')
+
+        self.start_time = time.time()
+        self.timeout = timeout
+        with subprocess.Popen(
+                self.args, bufsize=1, universal_newlines=True,
+                stdin=PIPE, stdout=PIPE, stderr=PIPE
+        ) as self._process:
+            try:
+                self.stdout_data, self.stderr_data = \
+                        self._process.communicate(input, timeout)
+                self._check_alive()
+            except KeyboardInterrupt:
+                self.kill()
+                self.returncode = 0
+            except TimeoutExpired:
+                self.stdout_data, self.stderr_data = self._process.communicate()
+                self.kill()
+                self._check_alive()
+                raise TimeoutExpired(
+                    self.args, self.timeout, self.stdout_data, self.stderr_data
+                )
+            finally:
+                self.end_time = time.time()
+        return self
+
+    def close(self):
+        self._check_alive()
+        self.kill()
 
