@@ -24,7 +24,7 @@ import os
 import logging
 import contextlib
 
-from io import BufferedReader
+from io import BufferedReader, TextIOWrapper
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
@@ -242,7 +242,7 @@ def minizinc(
     ozn_file = None
 
     solver_args = {**config.get('solver_args', {}), **kwargs}
-
+    solver_process = None
     try:
         if force_flatten or not solver.support_mzn:
             fzn_file, ozn_file = mzn2fzn(
@@ -250,46 +250,58 @@ def minizinc(
                 include=include, globals_dir=solver.globals_dir,
                 output_mode=_output_mode
             )
-            out = solver.solve(
+            solver_process = solver.solve_async(
                 fzn_file, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 **solver_args
             )
-            out = solns2out(out, ozn_file)
+            out = solns2out(solver_process.stdout, ozn_file)
         else:
             dzn_files = list(dzn_files)
             data, data_file = process_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
-            out = solver.solve(
+            solver_process = solver.solve_async(
                 mzn_file, *dzn_files, data=data, include=include,
                 timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
                 **solver_args
             )
+            out = solver_process.lines()
         solns = split_solns(out)
         if output_mode == 'dict':
             solns = map(dzn2dict, solns)
         stream = solns
-    except (MiniZincUnsatisfiableError, MiniZincUnknownError,
-            MiniZincUnboundedError) as err:
+    except (
+        MiniZincUnsatisfiableError, MiniZincUnknownError, MiniZincUnboundedError
+    ) as err:
+        if solver_process:
+            solver_process.close()
         err.mzn_file = mzn_file
         raise err
+    except:
+        if solver_process:
+            solver_process.close()
+        raise
 
-    if not keep:
-        stream = _cleanup(stream, [data_file, mzn_file, fzn_file, ozn_file])
-
+    cleanup_files = [] if keep else [data_file, mzn_file, fzn_file, ozn_file]
+    stream = _cleanup(stream, cleanup_files, [solver_process])
     return Solutions(stream)
 
 
-def _cleanup(stream, files):
-    yield from stream
-    log = logging.getLogger(__name__)
-    with contextlib.suppress(FileNotFoundError):
-        for _file in files:
-            if _file:
-                os.remove(_file)
-                log.debug('Deleting file: {}'.format(_file))
+def _cleanup(stream, files, processes):
+    try:
+        yield from stream
+    finally:
+        log = logging.getLogger(__name__)
+        with contextlib.suppress(FileNotFoundError):
+            for _file in files:
+                if _file:
+                    os.remove(_file)
+                    log.debug('Deleting file: {}'.format(_file))
+        for process in processes:
+            if process:
+                process.close()
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -439,7 +451,7 @@ def solns2out(stream, ozn_file):
     args = [config.get('solns2out', 'solns2out'), ozn_file]
     process = None
     try:
-        if isinstance(stream, BufferedReader):
+        if isinstance(stream, (BufferedReader, TextIOWrapper)):
             process = Process(args).run_async(stdin=stream)
             yield from process.lines()
         else:
