@@ -49,24 +49,55 @@ class Solutions:
         contains the global optimum for maximization/minimization problems.
     """
 
-    def __init__(self, solns, complete):
-        self._solns = solns
-        self.complete = complete
+    def __init__(self, stream):
+        self._stream = stream
+        self._solns = []
+        self.complete = False
+
+    def _fetch(self):
+        if self._stream:
+            try:
+                solution = next(self._stream)
+                if not self.complete:
+                    self._solns.append(solution)
+                    return solution
+                else:
+                    # Stats (maybe)
+                    pass
+            except StreamComplete:
+                self.complete = True
+            except StopIteration:
+                self._stream = None
+        return None
+
+    def _exhaust(self):
+        while self._stream:
+            self._fetch()
 
     def __len__(self):
+        self._exhaust()
         return len(self._solns)
 
+    def __next__(self):
+        solution = self._fetch()
+        if solution:
+            return solution
+        raise StopIteration
+
     def __iter__(self):
+        self._exhaust()
         return iter(self._solns)
 
     def __getitem__(self, key):
+        self._exhaust()
         return self._solns[key]
 
     def __repr__(self):
-        return 'SolnStream(solns={}, complete={})' \
-                    .format(repr(self._solns), repr(self.complete))
+        self._exhaust()
+        return 'Solutions({})'.format(repr(self._solns))
 
     def __str__(self):
+        self._exhaust()
         return str(self._solns)
 
 
