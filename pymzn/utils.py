@@ -19,6 +19,8 @@ class Process:
         self.stdout_data = None
         self.stderr_data = None
         self.expired = False
+        self.completed = False
+        self.async = False
 
     @property
     def running_time(self):
@@ -70,7 +72,6 @@ class Process:
             if line == '':
                 break
             yield line
-        return
 
     def __iter__(self):
         return self.lines()
@@ -79,6 +80,7 @@ class Process:
         if self._process:
             raise RuntimeError('Process already started')
         self.timeout = timeout
+        self.async = True
         self.start_time = time.time()
         self._process = subprocess.Popen(
             self.args, bufsize=0, universal_newlines=True, stdin=stdin,
@@ -105,8 +107,8 @@ class Process:
                 self.returncode = 0
             except TimeoutExpired:
                 self.stdout_data, self.stderr_data = self._process.communicate()
-                self.kill()
                 self._check_alive()
+                self.kill()
                 raise TimeoutExpired(
                     self.args, self.timeout, self.stdout_data, self.stderr_data
                 )
@@ -115,6 +117,7 @@ class Process:
         return self
 
     def close(self):
+        self._process.wait()
         self._check_alive()
         self.kill()
 
