@@ -363,11 +363,15 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
 
+    process = None
     try:
-        run(args)
+        process = Process(args).run()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
+    finally:
+        if process:
+            process.close()
 
     if not keep_data:
         with contextlib.suppress(FileNotFoundError):
@@ -414,13 +418,13 @@ def process_data(mzn_file, data, keep_data=False):
     return data, data_file
 
 
-def solns2out(soln_stream, ozn_file):
+def solns2out(stream, ozn_file):
     """Wraps the solns2out utility, executes it on the solution stream, and
     then returns the output stream.
 
     Parameters
     ----------
-    soln_stream : str
+    stream : str or BufferedReader
         The solution stream returned by the solver.
     ozn_file : str
         The ozn file path produced by the mzn2fzn function.
@@ -433,14 +437,20 @@ def solns2out(soln_stream, ozn_file):
     """
     log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]
+    process = None
     try:
-        process = run(args, stdin=soln_stream)
-        out = process.stdout
+        if isinstance(stream, BufferedReader):
+            process = Process(args).run_async(stdin=stream)
+            yield from process.lines()
+        else:
+            process = Process(args).run(input=stream)
+            yield from process.stdout_data.splitlines()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
-    return out
-
+    finally:
+        if process:
+            process.close()
 
 soln_sep = '----------'
 search_complete_msg = '=========='
@@ -449,20 +459,15 @@ unkn_msg = '=====UNKNOWN====='
 unbnd_msg = '=====UNBOUNDED====='
 
 
-def split_solns(out):
-    lines = out.splitlines()
-    solns = []
-    curr_out = []
-    complete = False
+def split_solns(lines):
+    _buffer = []
     for line in lines:
         line = line.strip()
         if line == soln_sep:
-            soln = '\n'.join(curr_out)
-            solns.append(soln)
-            curr_out = []
+            yield '\n'.join(_buffer)
+            _buffer = []
         elif line == search_complete_msg:
-            complete = True
-            break
+            raise StreamComplete
         elif line == unkn_msg:
             raise MiniZincUnknownError()
         elif line == unsat_msg:
@@ -470,8 +475,11 @@ def split_solns(out):
         elif line == unbnd_msg:
             raise MiniZincUnboundedError()
         else:
-            curr_out.append(line)
-    return solns, complete
+            _buffer.append(line)
+
+
+class StreamComplete(Exception):
+    pass
 
 
 class MiniZincError(RuntimeError):
