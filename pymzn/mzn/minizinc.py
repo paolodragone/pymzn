@@ -36,7 +36,7 @@ from pymzn.utils import run
 from pymzn.dzn import dict2dzn, dzn2dict
 
 
-class SolnStream:
+class Solutions:
     """Represents a solution stream from the `minizinc` function.
 
     This class can be referenced and iterated as a list.

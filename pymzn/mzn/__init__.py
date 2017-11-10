@@ -5,7 +5,7 @@ from .solvers import *
 from .minizinc import *
 from . import templates
 
-__all__ = ['SolnStream', 'minizinc', 'mzn2fzn', 'solns2out', 'MiniZincError',
+__all__ = ['Solutions', 'minizinc', 'mzn2fzn', 'solns2out', 'MiniZincError',
         'MiniZincUnsatisfiableError', 'MiniZincUnknownError',
         'MiniZincUnboundedError', 'MiniZincModel', 'Statement', 'Constraint',
         'Variable', 'ArrayVariable', 'OutputStatement', 'SolveStatement',
