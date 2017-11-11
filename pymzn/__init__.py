@@ -9,7 +9,6 @@ import ast
 import logging
 
 from . import config
-from . import utils
 from . import dzn
 from .dzn import *
 from . import mzn
