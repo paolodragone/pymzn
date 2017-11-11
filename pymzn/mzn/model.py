@@ -9,10 +9,12 @@ to the ``minizinc`` function to be solved.
 ::
 
     model = pymzn.MiniZinModel('test.mzn')
-
+    solutions = []
     for i in range(10):
-        model.constraint('arr_1[i] <= arr_2[i]')
-        pymzn.minizinc(model)
+        # add a new constraint and solve again
+        model.constraint('arr_1[{0}] <= arr_2[{0}]'.format(i))
+        solution = pymzn.minizinc(model)
+        solutions.append(solution)
 """
 
 import re
@@ -522,7 +524,7 @@ class MiniZincModel(object):
             stmts.append('\n'.join(lines))
         return ';\n'.join(stmts)
 
-    def compile(self, output_file=None, rewrap=False, args=None):
+    def compile(self, output_file=None, args=None, rewrap=False):
         """Compiles the model and writes it to file.
 
         The compiled model contains the content of the template (if provided)
@@ -533,6 +535,12 @@ class MiniZincModel(object):
         ----------
         output_file : file-like
             The file where to write the compiled model.
+        args : dict
+            The argumets to pass to the template engine.
+        rewrap : bool
+            Whether to 'prettify' the model by adjusting the indentation of the
+            statements. Use only if you want to actually look at the compiled
+            model.
 
         Returns
         -------
