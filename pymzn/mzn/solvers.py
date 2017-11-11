@@ -98,7 +98,7 @@ class Solver(ABC):
         self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
         all_solutions=False, num_solutions=None, output_mode='dzn', **kwargs
     ):
-        """Like solve, but returns a running Process"""
+        """Like `solve`, but returns a started Process"""
         log = logging.getLogger(__name__)
 
         args = self._args(
