@@ -40,10 +40,10 @@ from ..dzn import dict2dzn, dzn2dict
 class Solutions:
     """Represents a solution stream from the `minizinc` function.
 
-    This class can be referenced and iterated as a list.
+    This class populates lazily but can be referenced and iterated as a list.
 
-    Arguments
-    ---------
+    Attributes
+    ----------
     complete : bool
         Whether the stream includes the complete set of solutions. This means
         the stream contains all solutions in a satisfiability problem, or it
@@ -61,7 +61,7 @@ class Solutions:
             solution = next(self._stream)
             self._solns.append(solution)
             return solution
-        except StreamComplete:
+        except SearchComplete:
             self.complete = True
             # Stats (maybe)
             self._stream = None
@@ -182,8 +182,8 @@ def minizinc(
 
     Returns
     -------
-    SolnStream
-        Returns a list of solutions as a SolnStream instance. The actual content
+    Solutions
+        Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
     log = logging.getLogger(__name__)
@@ -268,7 +268,7 @@ def minizinc(
             out = solns2out_process.readlines()
         else:
             dzn_files = list(dzn_files)
-            data, data_file = process_data(mzn_file, data, keep)
+            data, data_file = _prepare_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
             solver_process = solver.solve_start(
@@ -369,7 +369,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     keep_data = config.get('keep', keep_data)
 
     dzn_files = list(dzn_files)
-    data, data_file = process_data(mzn_file, data, keep_data)
+    data, data_file = _prepare_data(mzn_file, data, keep_data)
     if data:
         args += ['-D', data]
     elif data_file:
@@ -403,7 +403,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def process_data(mzn_file, data, keep_data=False):
+def _prepare_data(mzn_file, data, keep_data=False):
     if not data:
         return None, None
 
@@ -447,9 +447,9 @@ def solns2out(stream, ozn_file):
 
     Returns
     -------
-    str
-        Returns the output stream encoding the solution stream according to the
-        provided ozn file.
+    generator of str
+        The output stream of solns2out encoding the solution stream according to
+        the provided ozn file.
     """
     log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]
@@ -466,33 +466,35 @@ def solns2out(stream, ozn_file):
         raise RuntimeError(err.stderr) from err
 
 
-soln_sep = '----------'
-search_complete_msg = '=========='
-unsat_msg = '=====UNSATISFIABLE====='
-unkn_msg = '=====UNKNOWN====='
-unbnd_msg = '=====UNBOUNDED====='
+SOLN_SEP = '----------'
+SEARCH_COMPLETE = '=========='
+UNSATISFIABLE = '=====UNSATISFIABLE====='
+UNKNOWN = '=====UNKNOWN====='
+UNBOUNDED = '=====UNBOUNDED====='
 
 
 def split_solns(lines):
+    """Split the solutions from the output stream of a solver or solns2out"""
     _buffer = []
     for line in lines:
         line = line.strip()
-        if line == soln_sep:
+        if line == SOLN_SEP:
             yield '\n'.join(_buffer)
             _buffer = []
-        elif line == search_complete_msg:
-            raise StreamComplete
-        elif line == unkn_msg:
+        elif line == SEARCH_COMPLETE:
+            raise SearchComplete
+        elif line == UNKNOWN:
             raise MiniZincUnknownError()
-        elif line == unsat_msg:
+        elif line == UNSATISFIABLE:
             raise MiniZincUnsatisfiableError()
-        elif line == unbnd_msg:
+        elif line == UNBOUNDED:
             raise MiniZincUnboundedError()
         else:
             _buffer.append(line)
 
 
-class StreamComplete(Exception):
+class SearchComplete(Exception):
+    """Raised by split_solns when SEARCH_COMPLETE is found."""
     pass
 
 
