@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 PyMzn provides functions that mimic and enhance the tools from the libminizinc
-library. With these tools, it is possible to compile a MiniZinc model into
-FlatZinc, solve a given problem and get the output solutions directly into the
-python code.
+library. With these tools, it is possible to compile a MiniZinc model into a
+FlatZinc one, solve a given problem and get the output solutions directly into
+the python code.
 
 The main function that PyMzn provides is the ``minizinc`` function, which
-executes the entire workflow for solving a CSP problem encoded in MiniZinc.
-Solving a MiniZinc problem with PyMzn is as simple as::
+executes the entire workflow for solving a constranint program encoded in
+MiniZinc.  Solving a MiniZinc problem with PyMzn is as simple as::
 
     import pymzn
     pymzn.minizinc('test.mzn')
