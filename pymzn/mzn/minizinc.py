@@ -33,8 +33,8 @@ import pymzn.config as config
 from . import solvers
 from .solvers import gecode
 from .model import MiniZincModel
-from ..utils import Process
-from pymzn.dzn import dict2dzn, dzn2dict
+from ..process import Process
+from ..dzn import dict2dzn, dzn2dict
 
 
 class Solutions:
@@ -54,51 +54,56 @@ class Solutions:
         self._stream = stream
         self._solns = []
         self.complete = False
+        self._iter = None
 
     def _fetch(self):
-        if self._stream:
-            try:
-                solution = next(self._stream)
-                if not self.complete:
-                    self._solns.append(solution)
-                    return solution
-                else:
-                    # Stats (maybe)
-                    pass
-            except StreamComplete:
-                self.complete = True
-            except StopIteration:
-                self._stream = None
+        try:
+            solution = next(self._stream)
+            self._solns.append(solution)
+            return solution
+        except StreamComplete:
+            self.complete = True
+            # Stats (maybe)
+            self._stream = None
+        except StopIteration:
+            self._stream = None
         return None
 
-    def _exhaust(self):
+    def _fetch_all(self):
         while self._stream:
             self._fetch()
 
     def __len__(self):
-        self._exhaust()
+        self._fetch_all()
         return len(self._solns)
 
     def __next__(self):
-        solution = self._fetch()
-        if solution:
-            return solution
-        raise StopIteration
+        if self._stream:
+            return self._fetch()
+        else:
+            if not self._iter:
+                self._iter = iter(self._solns)
+            try:
+                return next(self._iter)
+            except StopIteration:
+                self._iter = iter(self._solns)
+                raise
 
     def __iter__(self):
-        self._exhaust()
-        return iter(self._solns)
+        if not self._stream:
+            self._iter = iter(self._solns)
+        return self
 
     def __getitem__(self, key):
-        self._exhaust()
+        self._fetch_all()
         return self._solns[key]
 
     def __repr__(self):
-        self._exhaust()
+        self._fetch_all()
         return 'Solutions({})'.format(repr(self._solns))
 
     def __str__(self):
-        self._exhaust()
+        self._fetch_all()
         return str(self._solns)
 
 
@@ -106,7 +111,8 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        **kwargs):
+        **kwargs
+    ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     Parameters
@@ -243,6 +249,7 @@ def minizinc(
 
     solver_args = {**config.get('solver_args', {}), **kwargs}
     solver_process = None
+    solns2out_process = None
     try:
         if force_flatten or not solver.support_mzn:
             fzn_file, ozn_file = mzn2fzn(
@@ -250,24 +257,27 @@ def minizinc(
                 include=include, globals_dir=solver.globals_dir,
                 output_mode=_output_mode
             )
-            solver_process = solver.solve_async(
+            solver_process = solver.solve_start(
                 fzn_file, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 **solver_args
             )
-            out = solns2out(solver_process.stdout, ozn_file)
+            solver_stream = solver_process.stdout
+            solns2out_process = _solns2out_process(ozn_file)
+            solns2out_process.start(solver_stream)
+            out = solns2out_process.readlines()
         else:
             dzn_files = list(dzn_files)
             data, data_file = process_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
-            solver_process = solver.solve_async(
+            solver_process = solver.solve_start(
                 mzn_file, *dzn_files, data=data, include=include,
                 timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
                 **solver_args
             )
-            out = solver_process.lines()
+            out = solver_process.readlines()
         solns = split_solns(out)
         if output_mode == 'dict':
             solns = map(dzn2dict, solns)
@@ -275,21 +285,15 @@ def minizinc(
     except (
         MiniZincUnsatisfiableError, MiniZincUnknownError, MiniZincUnboundedError
     ) as err:
-        if solver_process:
-            solver_process.close()
         err.mzn_file = mzn_file
         raise err
-    except:
-        if solver_process:
-            solver_process.close()
-        raise
 
     cleanup_files = [] if keep else [data_file, mzn_file, fzn_file, ozn_file]
-    stream = _cleanup(stream, cleanup_files, [solver_process])
+    stream = _cleanup(stream, cleanup_files)
     return Solutions(stream)
 
 
-def _cleanup(stream, files, processes):
+def _cleanup(stream, files):
     try:
         yield from stream
     finally:
@@ -299,9 +303,6 @@ def _cleanup(stream, files, processes):
                 if _file:
                     os.remove(_file)
                     log.debug('Deleting file: {}'.format(_file))
-        for process in processes:
-            if process:
-                process.close()
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -381,9 +382,6 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
-    finally:
-        if process:
-            process.close()
 
     if not keep_data:
         with contextlib.suppress(FileNotFoundError):
@@ -430,6 +428,12 @@ def process_data(mzn_file, data, keep_data=False):
     return data, data_file
 
 
+def _solns2out_process(ozn_file):
+    args = [config.get('solns2out', 'solns2out'), ozn_file]
+    process = Process(args)
+    return process
+
+
 def solns2out(stream, ozn_file):
     """Wraps the solns2out utility, executes it on the solution stream, and
     then returns the output stream.
@@ -449,20 +453,18 @@ def solns2out(stream, ozn_file):
     """
     log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]
-    process = None
+    process = _solns2out_process(ozn_file)
     try:
         if isinstance(stream, (BufferedReader, TextIOWrapper)):
-            process = Process(args).run_async(stdin=stream)
-            yield from process.lines()
+            process.start(stream)
+            yield from process.readlines()
         else:
-            process = Process(args).run(input=stream)
+            process.run(stream)
             yield from process.stdout_data.splitlines()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
-    finally:
-        if process:
-            process.close()
+
 
 soln_sep = '----------'
 search_complete_msg = '=========='
