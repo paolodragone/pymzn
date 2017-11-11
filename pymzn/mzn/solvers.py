@@ -53,7 +53,7 @@ import logging
 
 import pymzn.config as config
 
-from ..utils import Process
+from ..process import Process
 from abc import ABC, abstractmethod
 from subprocess import CalledProcessError
 
@@ -94,7 +94,7 @@ class Solver(ABC):
     ):
         """Return args"""
 
-    def solve_async(
+    def solve_start(
         self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
         all_solutions=False, num_solutions=None, output_mode='dzn', **kwargs
     ):
@@ -429,7 +429,7 @@ class Optimathsat(Solver):
             all_solutions=all_solutions, output_mode=output_mode, **kwargs
         ))
 
-    def solve_async(
+    def solve_start(
         self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
         all_solutions=False, output_mode='item', **kwargs
     ):
