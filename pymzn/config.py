@@ -42,8 +42,22 @@ messages you can then call::
     pymzn.debug(False)
 
 """
+import os
+import yaml
+import appdirs
 
-_config = {}
+
+_modified = False
+_config = None
+_defaults = {
+        'mzn2fzn': 'mzn2fzn',
+        'solns2out': 'solns2out',
+        'dzn_width': 70
+    }
+
+
+def _cfg_file():
+    return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
 
 
 def get(key, default=None):
@@ -62,6 +76,14 @@ def get(key, default=None):
         if provided.
     """
     global _config
+    if _config is None:
+        _config = {}
+        cfg_file = _cfg_file()
+        if os.path.isfile(cfg_file):
+            with open(cfg_file) as f:
+                _config = yaml.load(f)
+    if not default:
+        default = _defaults.get(key)
     return _config.get(key, default)
 
 
@@ -76,5 +98,20 @@ def set(key, value):
         The value to assign to the variable.
     """
     global _config
+    global _modified
     _config[key] = value
+    _modified = True
+
+
+def dump():
+    """Writes the changes to the configuration file."""
+    global _config
+    global _modified
+    if _modified:
+        cfg_file = _cfg_file()
+        cfg_dir, __ = os.path.split(cfg_file)
+        os.makedirs(cfg_dir, exist_ok=True)
+        with open(cfg_file, 'w') as f:
+            yaml.dump(_config, f)
+        _modified = False
 
