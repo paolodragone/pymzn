@@ -50,10 +50,10 @@ import appdirs
 _modified = False
 _config = None
 _defaults = {
-        'mzn2fzn': 'mzn2fzn',
-        'solns2out': 'solns2out',
-        'dzn_width': 70
-    }
+    'mzn2fzn': 'mzn2fzn',
+    'solns2out': 'solns2out',
+    'dzn_width': 70
+}
 
 
 def _cfg_file():
@@ -82,7 +82,7 @@ def get(key, default=None):
         if os.path.isfile(cfg_file):
             with open(cfg_file) as f:
                 _config = yaml.load(f)
-    if not default:
+    if default is None:
         default = _defaults.get(key)
     return _config.get(key, default)
 
