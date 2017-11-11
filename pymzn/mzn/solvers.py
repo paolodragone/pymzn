@@ -110,7 +110,7 @@ class Solver(ABC):
         timeout = None if self.support_timeout else timeout
 
         try:
-            return Process(args).run_async(timeout)
+            return Process(args).start(timeout=timeout)
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
