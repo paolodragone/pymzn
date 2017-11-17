@@ -23,6 +23,7 @@ import os.path
 from .templates import from_string
 from ..dzn.marsh import stmt2dzn, val2dzn
 
+from copy import deepcopy
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 stmts_p = re.compile('(?:^|;)([^;]+)')
@@ -221,27 +222,32 @@ class MiniZincModel(object):
 
     Parameters
     ----------
-    mzn : str
-        The content or the path to the template mzn file.
+    mzn : str or MiniZincModel
+        A string with the content or the path to the template mzn file. If mzn
+        is instead a MiniZincModel it is cloned.
     """
     def __init__(self, mzn=None):
-        self._statements = []
-        self._solve_stmt = None
-        self._output_stmt = None
-        self._arrays = []
-        self._modified = False
-        self._output_vars = None
+        if mzn and isinstance(mzn, MiniZincModel):
+            # if mzn is a MiniZincModel, clone it
+            self.__dict__ = deepcopy(mzn.__dict__)
+        else:
+            self._statements = []
+            self._solve_stmt = None
+            self._output_stmt = None
+            self._arrays = []
+            self._modified = False
+            self._output_vars = None
 
-        self.mzn_file = None
-        self.model = None
-        if mzn and isinstance(mzn, str):
-            if mzn.endswith('mzn'):
-                if os.path.isfile(mzn):
-                    self.mzn_file = mzn
+            self.mzn_file = None
+            self.model = None
+            if mzn and isinstance(mzn, str):
+                if mzn.endswith('mzn'):
+                    if os.path.isfile(mzn):
+                        self.mzn_file = mzn
+                    else:
+                        raise ValueError('The provided file does not exsist.')
                 else:
-                    raise ValueError('The provided file does not exsist.')
-            else:
-                self.model = mzn
+                    self.model = mzn
 
     def comment(self, comment):
         """Add a comment to the model.
