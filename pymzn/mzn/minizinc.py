@@ -100,7 +100,7 @@ class Solutions:
 
     def __repr__(self):
         self._fetch_all()
-        return 'Solutions({})'.format(repr(self._solns))
+        return repr(self._solns)
 
     def __str__(self):
         self._fetch_all()
