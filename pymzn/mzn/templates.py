@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Handles MiniZinc template files.
 
 PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
@@ -54,6 +55,7 @@ it with the `data` argument as usual.
 As mentioned, PyMzn employs Jinja2 under the hood, so anything you can do with
 Jinja2 is also possible in PyMzn, including variables, control structured,
 template inheritance, and filters. PyMzn implements few custom filters as well:
+
 - `int(value, factor=100)` : discretizes the given input or array,
   pre-multiplying by the given factor.
 - `dzn(value)` : transform the input into its equivalent dzn string.
@@ -66,9 +68,6 @@ from jinja2 import (
     Environment, Template, BaseLoader, PackageLoader, FileSystemLoader,
     TemplateNotFound
 )
-
-
-__all__ = ['discretize', 'from_string', 'add_package', 'add_path']
 
 
 def discretize(value, factor=100):
