@@ -190,7 +190,12 @@ def minizinc(
         Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
-    log = logging.getLogger(__name__)
+    if all_solutions and not solver.support_all:
+        raise ValueError('The solver cannot return all solutions')
+    if num_solutions is not None and not solver.support_num:
+        raise ValueError('The solver cannot return a given number of solutions')
+    if output_mode != 'dict' and output_vars:
+        raise ValueError('Output vars only available in `dict` output mode')
 
     if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
@@ -202,32 +207,10 @@ def minizinc(
     elif isinstance(solver, str):
         solver = getattr(solvers, solver)
 
-    keep = config.get('keep', keep)
-
     if not output_dir:
         output_dir = config.get('output_dir', None)
 
-    force_flatten = config.get('force_flatten', force_flatten)
-
-    if all_solutions and not solver.support_all:
-        raise ValueError('The solver cannot return all solutions.')
-    if num_solutions is not None and not solver.support_num:
-        raise ValueError('The solver cannot return a given number of solutions.')
-    if output_mode != 'dict' and output_vars:
-        raise ValueError('Output vars only available in `dict` output mode.')
-
-    if output_mode == 'dict':
-        if output_vars:
-            mzn_model.dzn_output(output_vars)
-            _output_mode = 'item'
-        else:
-            _output_mode = 'dzn'
-            force_flatten = True
-    else:
-        _output_mode = output_mode
-
-    if _output_mode in ['json', 'item'] and not solver.support_output_mode:
-        force_flatten = True
+    keep = config.get('keep', keep)
 
     output_prefix = 'pymzn'
     if keep:
@@ -251,11 +234,24 @@ def minizinc(
 
     wait = wait or os.name == 'nt'
 
+    if output_mode == 'dict':
+        if output_vars:
+            mzn_model.dzn_output(output_vars)
+            _output_mode = 'item'
+        else:
+            _output_mode = 'dzn'
+    else:
+        _output_mode = output_mode
+
+    force_flatten = (
+           config.get('force_flatten', force_flatten)
+        or not solver.support_mzn
+        or (_output_mode in ['dzn', 'json'] and not solver.support_output_mode)
+    )
+
     solver_args = {**config.get('solver_args', {}), **kwargs}
-    solver_process = None
-    solns2out_process = None
     try:
-        if force_flatten or not solver.support_mzn:
+        if force_flatten:
             fzn_file, ozn_file = mzn2fzn(
                 mzn_file, *dzn_files, data=data, keep_data=keep,
                 include=include, globals_dir=solver.globals_dir,
@@ -358,8 +354,6 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         The paths to the generated fzn and ozn files. If ``no_ozn=True``, the
         second argument is None.
     """
-    log = logging.getLogger(__name__)
-
     args = [config.get('mzn2fzn', 'mzn2fzn')]
     if globals_dir:
         args += ['-G', globals_dir]
@@ -388,6 +382,8 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     elif data_file:
         dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
+
+    log = logging.getLogger(__name__)
 
     process = None
     try:
@@ -420,13 +416,14 @@ def _prepare_data(mzn_file, data, keep_data=False):
     if not data:
         return None, None
 
-    log = logging.getLogger(__name__)
     if isinstance(data, dict):
         data = dict2dzn(data)
     elif isinstance(data, str):
         data = [data]
     elif not isinstance(data, list):
         raise TypeError('The additional data provided is not valid.')
+
+    log = logging.getLogger(__name__)
 
     if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
         mzn_base, __ = os.path.splitext(mzn_file)
