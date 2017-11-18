@@ -264,7 +264,7 @@ def minizinc(
                 output_mode=_output_mode
             )
             solver_stream = _solve(
-                fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
+                solver, fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 **solver_args
             )
@@ -275,7 +275,7 @@ def minizinc(
             if data_file:
                 dzn_files.append(data_file)
             out = _solve(
-                mzn_file, *dzn_files, wait=wait, lines=True, data=data,
+                solver, mzn_file, *dzn_files, wait=wait, lines=True, data=data,
                 include=include, timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
                 **solver_args
@@ -307,7 +307,7 @@ def _cleanup(stream, files):
                     log.debug('Deleting file: {}'.format(_file))
 
 
-def _solve(*args, lines=False, wait=False, **kwargs):
+def _solve(solver, *args, lines=False, wait=False, **kwargs):
     if wait:
         solver_process = solver.solve_start(*args, **kwargs)
         if lines:
