@@ -12,7 +12,7 @@ Usage
 First, we need to define a constraint program via MiniZinc.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 
-    %% knapsack.mzn %%
+    %% knapsack01.mzn %%
     int: n;                     % number of objects
     set of int: OBJ = 1..n;
     int: capacity;              % the capacity of the knapsack
@@ -25,7 +25,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc::
     solve maximize obj;
 
 
-    %% knapsack.dzn %%
+    %% knapsack01.dzn %%
     n = 5;
     profit = [10, 3, 9, 4, 8];
     size = [14, 4, 10, 6, 9];
@@ -33,7 +33,8 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 You can solve the above problem using the ``pymzn.minizinc`` function::
 
     import pymzn
-    pymzn.minizinc('knapsack.mzn', 'knapsack.dzn', data={'capacity': 20})
+    s = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
+    print(s)
 
 The result will be::
 
