@@ -190,13 +190,6 @@ def minizinc(
         Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
-    if all_solutions and not solver.support_all:
-        raise ValueError('The solver cannot return all solutions')
-    if num_solutions is not None and not solver.support_num:
-        raise ValueError('The solver cannot return a given number of solutions')
-    if output_mode != 'dict' and output_vars:
-        raise ValueError('Output vars only available in `dict` output mode')
-
     if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
     else:
@@ -206,6 +199,13 @@ def minizinc(
         solver = config.get('solver', gecode)
     elif isinstance(solver, str):
         solver = getattr(solvers, solver)
+
+    if all_solutions and not solver.support_all:
+        raise ValueError('The solver cannot return all solutions')
+    if num_solutions is not None and not solver.support_num:
+        raise ValueError('The solver cannot return a given number of solutions')
+    if output_mode != 'dict' and output_vars:
+        raise ValueError('Output vars only available in `dict` output mode')
 
     if not output_dir:
         output_dir = config.get('output_dir', None)
