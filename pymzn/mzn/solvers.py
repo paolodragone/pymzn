@@ -77,7 +77,9 @@ class Solver:
                 raise ValueError('Timeout not supported')
             all_solutions = True
 
-        solver_args = self.args(*args, timeout=timeout, **kwargs)
+        solver_args = self.args(
+            *args, timeout=timeout, all_solutions=all_solutions, **kwargs
+        )
         timeout = None if self.support_timeout else timeout
 
         try:
@@ -198,7 +200,7 @@ class Gecode(Solver):
         """
         log = logging.getLogger(__name__)
 
-        solver_args = self.args(*args, *kwargs)
+        solver_args = self.args(*args, **kwargs)
 
         try:
             log.debug('Running solver with arguments {}'.format(solver_args))
@@ -309,7 +311,7 @@ class Optimathsat(Solver):
         return [self.cmd, '-input=fzn', fzn_file]
 
     def solve(fzn_file, *args, **kwargs):
-        return self._parse_out(super().solve(fzn_file, *args, *kwargs))
+        return self._parse_out(super().solve(fzn_file, *args, **kwargs))
 
     def solve_start(self, *args, **kwargs):
         raise NotImplementedError()
