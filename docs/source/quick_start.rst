@@ -1,9 +1,9 @@
 Quick Start
 ===========
-First, you need a MiniZinc model encoding the problem you want to solve.
+First, we need to define a constraint program via MiniZinc.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 
-    %% test.mzn %%
+    %% knapsack01.mzn %%
     int: n;                     % number of objects
     set of int: OBJ = 1..n;
     int: capacity;              % the capacity of the knapsack
@@ -16,7 +16,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc::
     solve maximize obj;
 
 
-    %% test.dzn %%
+    %% knapsack01.dzn %%
     n = 5;
     profit = [10, 3, 9, 4, 8];
     size = [14, 4, 10, 6, 9];
@@ -24,19 +24,19 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 You can solve the above problem using the ``pymzn.minizinc`` function::
 
     import pymzn
-    pymzn.minizinc('test.mzn', 'test.dzn', data={'capacity': 20})
+    s = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
+    print(s)
 
 The result will be::
 
-    SolnStream(solns=[{'x': {3, 5}}], complete=True)
+    [{'x': {3, 5}}]
 
-The returned object represent a solution stream, which can be directly
-referenced and iterated as a list. The default behavior is to evaluate the
-solutions into python objects. Solutions are dictionaries containing variable
-assignments. The solution evaluation by PyMzn uses either json (when available)
-or dzn as intermediate format from the solver. More details on how PyMzn works
-internally are available in the `Implementation details <reference/internal>`__
-section).
+The returned object is a lazy solution stream, which can however be directly
+referenced as a list. The default behavior is to evaluate the solutions into
+python objects. Solutions are dictionaries containing variable assignments. The
+solution evaluation by PyMzn uses dzn as intermediate format from the solver.
+More details on how PyMzn works internally are available in the `Implementation
+details <reference/internal>`__ section).
 
 If you wish to override the default behavior and get a different output format
 you can specify the ``output_mode`` argument. Possible formats are: ``dict``,
@@ -57,13 +57,13 @@ additional positional arguments::
 
     pymzn.minizinc('test.mzn', 'data1.dzn', 'data2.dzn')
 
-It is also possible to specify additional data inline with the ``minizinc``
-function::
+It is also possible to specify additional data inline along with the
+``minizinc`` function::
 
     pymzn.minizinc('test.mzn', 'data1.dzn', 'data2.dzn', data={'n': 10, 'm': [1,3,5]})
 
 With the ``data`` argument you can specify an assignment of variables that will
-be automatically converted to dzn format with the ``pymzn.dict2dzn`` function
+be automatically converted into dzn format with the ``pymzn.dict2dzn`` function
 (more details in the `Dzn files <reference/dzn/>`__ section).
 
 Solver's arguments
