@@ -49,7 +49,17 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/*
+	rm $(BUILDDIR)/*.html
+	rm $(BUILDDIR)/*.inv
+	rm $(BUILDDIR)/*.js
+	rm -rf $(BUILDDIR)/doctrees
+	rm -rf $(BUILDDIR)/_sources
+	rm -rf $(BUILDDIR)/source/reference/generated
+	rm -rf $(BUILDDIR)/source/reference/model/generated
+	rm -rf $(BUILDDIR)/source/reference/solvers/generated
+	rm -rf $(BUILDDIR)/source/reference/dzn/generated
+	rm -rf $(BUILDDIR)/source/reference/minizinc/generated
+	rm -rf $(BUILDDIR)/source/reference/templates/generated
 
 .PHONY: html
 html:

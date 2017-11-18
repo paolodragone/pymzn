@@ -55,4 +55,5 @@ author = 'Paolo Dragone'
 
 version = find_version('..', '..', 'pymzn', '__init__.py')
 release = find_version('..', '..', 'pymzn', '__init__.py')
+print(version)
 
