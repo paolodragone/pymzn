@@ -1,64 +1,48 @@
 # -*- coding: utf-8 -*-
 """Provides classes to interface solvers with PyMzn.
 
-PyMzn interfaces with solvers through the ``Solver`` class. This class includes
-the necessary infomation for PyMzn to setup the solver. This class also includes
-the ``solve`` method which takes care of the actual solving of a
-MiniZinc/FlatZinc model. The solvers classes are subclasses of the ``Solver``
-class, providing implementations of the ``solve`` method.
-PyMzn provides a number of solver implementations out-of-the-box.
-PyMzn's default solver is Gecode, which class is `pymzn.Gecode` and the default
-instance is ``pymzn.gecode``.
+PyMzn interfaces with solvers through the ``Solver`` base class. This class
+includes the necessary infomation for PyMzn to setup the solver, together with
+the ``solve`` and ``solve_start`` methods, which respectively take care of the
+running or asynchronously starting a process that solves the MiniZinc/FlatZinc
+model. PyMzn provides a number of solver implementations out-of-the-box.
+PyMzn's default solver is ``pymzn.gecode``, an instance of `pymzn.Gecode`.
 
-To use a different solver or to exend an existing one, one has to subclass the
-Solver class and implement the ``solve`` method.
+To use a solver that is not provided by PyMzn or to exend an existing one, one
+has to subclass the `Solver` class and implement the ``args`` method, which
+returns a list of command line arguments for executing the process. This is
+generally enough for most solvers, but you can also directly reimplement the
+``solve`` and ``solve_start`` methods for extra flexibility.
 
 For instance::
 
     from pymzn import Solver
-    from pymzn.utils import run
+    from pymzn.process import Process
 
     class MySolver(Solver):
         def __init__(self, path='path/to/solver', globals_dir='path/to/gobals'):
-            super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                 support_json=False, support_item=False, support_dict=False,
-                 support_all=False, support_timeout=False)
+            super().__init__(globals_dir)
             self.cmd = path
 
-        \"\"\"
-        You can ignore the dzn_files, data and include if the solver does not
-        support mzn inputs. Similarly, you can ignore timeout and
-        all_solutions if the solver does not support the timeout and returning
-        all solutions respectively. Check out the Gecode implementation for
-        an example of how to handle these parameters if needed.
-        \"\"\"
-        def solve(self, mzn_file, *dzn_files, data=None, include=None,
-                  timeout=None, all_solutions=False, output_mode='dzn',
-                  arg1=def_val1, arg2=def_val2, **kwargs):
-        # mzn_file contains a fzn if the solver does not support mzn inputs
-        args = [self.path, '-arg1', arg1, '-arg2', arg2, mzn_file]
-        process = run(args)
-        return process.stdout    # assuming the solver returns dzn solutions
+        def args(self, fzn_file, *args, arg1=val1, arg2=val2, **kwargs):
+            return [self.cmd, '-arg1', arg1, '-arg2', arg2, fzn_file]
 
-
-Then one can run the ``minizinc`` function with the custom solver::
+Then it is possible to run the ``minizinc`` function with the custom solver::
 
     my_solver = MySolver()
     pymzn.minizinc('test.mzn', solver=my_solver, arg1=val1, arg2=val2)
 """
 
 import re
-import os
 import logging
 
 import pymzn.config as config
 
-from pymzn.utils import run
-from abc import ABC, abstractmethod
+from ..process import Process
 from subprocess import CalledProcessError
 
 
-class Solver(ABC):
+class Solver:
     """Abstract solver class.
 
     All the solvers inherit from this base class.
@@ -69,55 +53,76 @@ class Solver(ABC):
         The path to the directory for global included files.
     """
 
-    def __init__(self, globals_dir='std', support_mzn=False, support_dzn=True,
-                 support_json=False, support_item=False, support_dict=False,
-                 support_all=False, support_timeout=False):
+    def __init__(
+        self, globals_dir='std', support_mzn=False, support_all=False,
+        support_num=False, support_timeout=False, support_output_mode=False,
+        support_stats=False
+    ):
         self.globals_dir = globals_dir
         self.support_mzn = support_mzn
-        self.support_dzn = support_dzn
-        self.support_json = support_json
-        self.support_item = support_item
-        self.support_dict = support_dict
         self.support_all = support_all
+        self.support_num = support_num
         self.support_timeout = support_timeout
+        self.support_output_mode = support_output_mode
+        self.support_stats = support_stats
 
-    @abstractmethod
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='dzn', **kwargs):
+    def args(*args, **kwargs):
+        """Returns the command line arguments to start the solver"""
+        raise NotImplementedError()
+
+    def solve_start(self, *args, timeout=None, all_solutions=False, **kwargs):
+        """Like `solve`, but returns a started Process"""
+        log = logging.getLogger(__name__)
+
+        if timeout and not self.support_timeout:
+            if not self.support_all:
+                raise ValueError('Timeout not supported')
+            all_solutions = True
+
+        solver_args = self.args(
+            *args, timeout=timeout, all_solutions=all_solutions, **kwargs
+        )
+        timeout = None if self.support_timeout else timeout
+
+        try:
+            log.debug('Starting solver with arguments {}'.format(solver_args))
+            return Process(solver_args).start(timeout=timeout)
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+
+    def solve(self, *args, timeout=None, all_solutions=False, **kwargs):
         """Solve a problem encoded with MiniZinc/FlatZinc.
 
         This method should call an external solver, wait for the solution and
         provide the output of the solver. If the solver does not have a Python
-        interface, the ``pymzn.util.run`` module can be used to run external
+        interface, the ``pymzn.process`` module can be used to run external
         executables.
 
-        If a solver supports neither dzn nor json output, then its PyMzn
-        implementation should take care of parsing the solver output and return
-        a SolnsStream with solutions evaluated as dictionaries.
-
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the mzn file to solve.
-        dzn_files
-            A list of paths to dzn files.
-        data : str
-            A dzn string containing additional inline data to pass to the solver.
-        include : str or [str]
-            A path or a list of paths to included files.
-        timeout : int
-            The timeout for the solver. If None, no timeout given.
-        all_solutions : bool
-            Whether to return all solutions.
-        output_mode : 'dzn', 'json', 'item', 'dict'
-            The output mode required.
-
-        Returns
-        -------
-        str or SolnsStream
-            The output of the solver if output_mode in ['dzn', 'json', 'item']
-            or a SolnsStream of evaluated solutions if output_mode == 'dict'.
+        If a solver does not support dzn output, then its PyMzn implementation
+        should take care of parsing the solver output and return a dzn
+        equivalent.
         """
+        log = logging.getLogger(__name__)
+
+        if timeout and not self.support_timeout:
+            if not self.support_all:
+                raise ValueError('Timeout not supported')
+            all_solutions = True
+
+        solver_args = self.args(
+            *args, timeout=timeout, all_solutions=all_solutions, **kwargs
+        )
+        timeout = None if self.support_timeout else timeout
+
+        try:
+            log.debug('Running solver with arguments {}'.format(solver_args))
+            process = Process(solver_args).run(timeout=timeout)
+            out = process.stdout_data
+        except CalledProcessError as err:
+            log.exception(err.stderr)
+            raise RuntimeError(err.stderr) from err
+        return out
 
 
 class Gecode(Solver):
@@ -132,60 +137,26 @@ class Gecode(Solver):
     globals_dir : str
         The path to the directory for global included files.
     """
-    def __init__(self, mzn_path='mzn-gecode', fzn_path='fzn-gecode',
-                 globals_dir='gecode'):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=False, support_item=True, support_dict=False,
-                support_all=True, support_timeout=True)
+    def __init__(
+        self, mzn_path='mzn-gecode', fzn_path='fzn-gecode', globals_dir='gecode'
+    ):
+        super().__init__(
+            globals_dir, support_mzn=True, support_all=True, support_num=True,
+            support_timeout=True, support_stats=True
+        )
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', parallel=1, seed=0,
-              suppress_segfault=False, **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with Gecode.
-
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the mzn file to solve.
-        dzn_files
-            A list of paths to dzn files.
-        data : str
-            A dzn string containing additional inline data to pass to the solver.
-        include : str or [str]
-            A path or a list of paths to included files.
-        timeout : int
-            The timeout for the solver. If None, no timeout given.
-        all_solutions : bool
-            Whether to return all solutions.
-        output_mode : 'dzn', 'json', 'item', 'dict'
-            The output mode required.
-        parallel : int
-            The number of threads to use to solve the problem
-            (0 = #processing units); default is 1.
-        seed : int
-            Random seed.
-        suppress_segfault : bool
-            Whether to accept or not a solution returned when a segmentation
-            fault has happened (this is unfortunately necessary sometimes due to
-            some bugs in Gecode).
-        Returns
-        -------
-        str
-            The output of the solver.
-        """
-        log = logging.getLogger(__name__)
-
+    def args(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
+        seed=0, statistics=False, **kwargs
+    ):
         mzn = False
         args = []
         if mzn_file.endswith('fzn'):
-            if output_mode != 'dzn':
-                raise ValueError('Only dzn output available with fzn input.')
             args.append(self.fzn_cmd)
         else:
-            if output_mode != 'item':
-                raise ValueError('Only item output available with mzn input.')
             mzn = True
             args += [self.mzn_cmd, '-G', self.globals_dir]
             if include:
@@ -197,8 +168,12 @@ class Gecode(Solver):
                 args += ['-D', data]
 
         fzn_flags = []
+        if statistics:
+            args.append('-s')
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', str(num_solutions)]
         if parallel != 1:
             fzn_flags += ['-p', str(parallel)]
         if timeout and timeout > 0:
@@ -215,10 +190,26 @@ class Gecode(Solver):
         if mzn and dzn_files:
             for dzn_file in dzn_files:
                 args.append(dzn_file)
+        return args
+
+    def solve(self, *args, suppress_segfault=False, **kwargs):
+        """Solve a MiniZinc/FlatZinc problem with Gecode.
+
+        Parameters
+        ----------
+        suppress_segfault : bool
+            Whether to accept or not a solution returned when a segmentation
+            fault has happened (this is unfortunately necessary sometimes due to
+            some bugs in Gecode).
+        """
+        log = logging.getLogger(__name__)
+
+        solver_args = self.args(*args, **kwargs)
 
         try:
-            process = run(args)
-            out = process.stdout
+            log.debug('Running solver with arguments {}'.format(solver_args))
+            process = Process(solver_args).run()
+            out = process.stdout_data
         except CalledProcessError as err:
             if suppress_segfault and len(err.stdout) > 0 \
                     and err.stderr.startswith('Segmentation fault'):
@@ -244,52 +235,27 @@ class Chuffed(Solver):
     globals_dir : str
         The path to the directory for global included files.
     """
-    def __init__(self, mzn_path='mzn-chuffed', fzn_path='fzn-chuffed',
-                 globals_dir='chuffed'):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=False, support_item=True, support_dict=False,
-                support_all=True, support_timeout=True)
+    def __init__(
+        self, mzn_path='mzn-chuffed', fzn_path='fzn-chuffed',
+        globals_dir='chuffed'
+    ):
+        super().__init__(
+             globals_dir, support_mzn=True, support_all=True, support_num=True,
+             support_timeout=True
+        )
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', seed=0, **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with Chuffed.
-
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the mzn file to solve.
-        dzn_files
-            A list of paths to dzn files.
-        data : str
-            A dzn string containing additional inline data to pass to the solver.
-        include : str or [str]
-            A path or a list of paths to included files.
-        timeout : int
-            The timeout for the solver. If None, no timeout given.
-        all_solutions : bool
-            Whether to return all solutions.
-        output_mode : 'dzn', 'json', 'item', 'dict'
-            The output mode required.
-        seed : int
-            Random seed.
-        Returns
-        -------
-        str
-            The output of the solver.
-        """
-        log = logging.getLogger(__name__)
-
+    def args(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', seed=0,
+        **kwargs
+    ):
         mzn = False
         args = []
         if mzn_file.endswith('fzn'):
-            if output_mode != 'dzn':
-                raise ValueError('Only dzn output available with fzn input.')
             args.append(self.fzn_cmd)
         else:
-            if output_mode != 'item':
-                raise ValueError('Only item output available with mzn input.')
             mzn = True
             args += [self.mzn_cmd, '-G', self.globals_dir]
             if include:
@@ -303,6 +269,8 @@ class Chuffed(Solver):
         fzn_flags = []
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', str(num_solutions)]
         if timeout and timeout > 0:
             fzn_flags += ['--time-out', str(timeout)]
         if seed != 0:
@@ -316,16 +284,7 @@ class Chuffed(Solver):
         if mzn and dzn_files:
             for dzn_file in dzn_files:
                 args.append(dzn_file)
-
-        try:
-            process = run(args)
-            out = process.stdout
-            if process.stderr:
-                raise RuntimeError(process.stderr)
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-        return out
+        return args
 
 
 class Optimathsat(Solver):
@@ -339,45 +298,32 @@ class Optimathsat(Solver):
         The path to the directory for global included files.
     """
     def __init__(self, path='optimathsat', globals_dir='std'):
-        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                support_json=False, support_item=False, support_dict=False,
-                support_all=False, support_timeout=False)
+        super().__init__(globals_dir, support_stats=True)
         self.cmd = path
         self._line_comm_p = re.compile('%.*\n')
         self._rational_p = re.compile('(\d+)\/(\d+)')
 
-    def _parse_out(self, out):
+    def _parse_out(self, out, statistics=False):
+        stats = ''.join(self._line_comm_p.findall(out))
         out = self._line_comm_p.sub(out, '')
         for m in self._rational_p.finditer(out):
             n, d = m.groups()
             val = float(n) / float(d)
             out = re.sub('{}/{}'.format(n, d), str(val), out)
+        if statistics:
+            return '\n'.join([out, stats])
         return out
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with Optimathsat.
+    def args(self, fzn_file, *args, **kwargs):
+        return [self.cmd, '-input=fzn', fzn_file]
 
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the fzn file to solve.
-        Returns
-        -------
-        str
-            The output of the solver in dzn format.
-        """
-        log = logging.getLogger(__name__)
+    def solve(fzn_file, *args, statistics=False, **kwargs):
+        return self._parse_out(
+            super().solve(fzn_file, *args, **kwargs), statistics
+        )
 
-        args = [self.cmd, '-input=fzn', mzn_file]
-        try:
-            process = run(args)
-            out = process.stdout
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-
-        return self._parse_out(out)
+    def solve_start(self, *args, **kwargs):
+        raise NotImplementedError()
 
 
 class Opturion(Solver):
@@ -392,39 +338,19 @@ class Opturion(Solver):
     """
 
     def __init__(self, path='fzn-cpx', globals_dir='opturion-cpx'):
-        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                support_json=False, support_item=False, support_dict=False,
-                support_all=True, support_timeout=False)
+        super().__init__(globals_dir, support_all=True, support_stats=True)
         self.cmd = path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with Opturion CPX.
-
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the fzn file to solve.
-        Returns
-        -------
-        str
-            The output of the solver in dzn format.
-        """
-        log = logging.getLogger(__name__)
-
+    def args(
+        self, fzn_file, *args, all_solutions=False, statistics=False, **kwargs
+    ):
         args = [self.cmd]
         if all_solutions:
             args.append('-a')
+        if statistics:
+            args.append('-s')
         args.append(mzn_file)
-
-        try:
-            process = run(args)
-            out = process.stdout
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-
-        return out
+        return args
 
 
 class MIPSolver(Solver):
@@ -439,44 +365,21 @@ class MIPSolver(Solver):
     """
 
     def __init__(self, path='mzn-gurobi', globals_dir='linear'):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=True, support_item=True, support_dict=False,
-                support_all=True, support_timeout=True)
+        super().__init__(
+            globals_dir, support_mzn=True, support_all=True, support_num=True,
+            support_timeout=True, support_output_mode=True, support_stats=True
+        )
         self.cmd = path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', parallel=1, **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with a MIP Solver.
-
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the mzn file to solve.
-        dzn_files
-            A list of paths to dzn files.
-        data : str
-            A dzn string containing additional inline data to pass to the solver.
-        include : str or [str]
-            A path or a list of paths to included files.
-        timeout : int
-            The timeout for the solver. If None, no timeout given.
-        all_solutions : bool
-            Whether to return all solutions.
-        output_mode : 'dzn', 'json', 'item', 'dict'
-            The output mode required.
-        parallel : int
-            The number of threads to use to solve the problem; default is 1.
-        Returns
-        -------
-        str
-            The output of the solver.
-        """
-        log = logging.getLogger(__name__)
-
+    def args(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
+        statistics=False, **kwargs
+    ):
         mzn = False
         args = [self.cmd]
         if mzn_file.endswith('fzn') and output_mode not in ['dzn', 'json']:
-            raise ValueError('Only dzn or json output available with fzn input.')
+            raise ValueError('Only dzn or json output available with fzn input')
         else:
             mzn = True
             args += ['-G', self.globals_dir]
@@ -488,8 +391,12 @@ class MIPSolver(Solver):
             if data:
                 args += ['-D', data]
 
+        if statistics:
+            args.append('-s')
         if all_solutions:
             args += ['-a', '--unique']
+        if num_solutions is not None:
+            args += ['-n', str(num_solutions)]
         if parallel != 1:
             args += ['-p', str(parallel)]
         if timeout and timeout > 0:
@@ -499,14 +406,7 @@ class MIPSolver(Solver):
         if mzn and dzn_files:
             for dzn_file in dzn_files:
                 args.append(dzn_file)
-
-        try:
-            process = run(args)
-            out = process.stdout
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-        return out
+        return args
 
 
 class Gurobi(MIPSolver):
@@ -554,51 +454,29 @@ class G12Solver(Solver):
         The backend code of the specific solver used.
     """
 
-    def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
-                 globals_dir='g12_fd', backend=None):
-        super().__init__(globals_dir, support_mzn=True, support_dzn=True,
-                support_json=False, support_item=True, support_dict=False,
-                support_all=True, support_timeout=False)
+    def __init__(
+        self, mzn_path='mzn-g12fd', fzn_path='flatzinc', globals_dir='g12_fd',
+        backend=None
+    ):
+        super().__init__(
+            globals_dir, support_mzn=True, support_all=True, support_num=True,
+            support_stats=True
+        )
         self.fzn_cmd = fzn_path
         self.mzn_cmd = mzn_path
         self.backend = backend
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', **kwargs):
-        """Solve a MiniZinc/FlatZinc problem with the G12 solver.
-
-        Parameters
-        ----------
-        mzn_file : str
-            The path to the mzn file to solve.
-        dzn_files
-            A list of paths to dzn files.
-        data : str
-            A dzn string containing additional inline data to pass to the solver.
-        include : str or [str]
-            A path or a list of paths to included files.
-        all_solutions : bool
-            Whether to return all solutions.
-        output_mode : 'dzn', 'json', 'item', 'dict'
-            The output mode required.
-        Returns
-        -------
-        str
-            The output of the solver.
-        """
-        log = logging.getLogger(__name__)
-
+    def args(
+        self, mzn_file, *dzn_files, data=None, include=None, statistics=False,
+        all_solutions=False, num_solutions=None, **kwargs
+    ):
         mzn = False
         args = []
         if mzn_file.endswith('fzn'):
-            if output_mode != 'dzn':
-                raise ValueError('Only dzn output available with fzn input.')
             args.append(self.fzn_cmd)
             if self.backend:
                 args += ['-b', self.backend]
         else:
-            if output_mode != 'item':
-                raise ValueError('Only item output available with mzn input.')
             mzn = True
             args += [self.mzn_cmd, '-G', self.globals_dir]
             if include:
@@ -609,20 +487,17 @@ class G12Solver(Solver):
             if data:
                 args += ['-D', data]
 
+        if statistics:
+            args.append('-s')
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', str(num_solutions)]
         args.append(mzn_file)
         if mzn and dzn_files:
             for dzn_file in dzn_files:
                 args.append(dzn_file)
-
-        try:
-            process = run(args)
-            out = process.stdout
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-        return out
+        return args
 
 
 class G12Fd(G12Solver):
@@ -638,8 +513,9 @@ class G12Fd(G12Solver):
         The path to the directory for global included files.
     """
 
-    def __init__(self, mzn_path='mzn-g12fd', fzn_path='flatzinc',
-                 globals_dir='g12_fd'):
+    def __init__(
+        self, mzn_path='mzn-g12fd', fzn_path='flatzinc', globals_dir='g12_fd'
+    ):
         super().__init__(mzn_path, fzn_path, globals_dir)
 
 
@@ -656,8 +532,10 @@ class G12Lazy(G12Solver):
         The path to the directory for global included files.
     """
 
-    def __init__(self, mzn_path='mzn-g12lazy', fzn_path='flatzinc',
-                 globals_dir='g12_lazyfd'):
+    def __init__(
+        self, mzn_path='mzn-g12lazy', fzn_path='flatzinc',
+        globals_dir='g12_lazyfd'
+    ):
         super().__init__(mzn_path, fzn_path, globals_dir, 'lazy')
 
 
@@ -674,8 +552,9 @@ class G12MIP(G12Solver):
         The path to the directory for global included files.
     """
 
-    def __init__(self, mzn_path='mzn-g12mip', fzn_path='flatzinc',
-                 globals_dir='linear'):
+    def __init__(
+        self, mzn_path='mzn-g12mip', fzn_path='flatzinc', globals_dir='linear'
+    ):
         super().__init__(mzn_path, fzn_path, globals_dir, 'mip')
 
 
@@ -693,13 +572,16 @@ class OscarCBLS(Solver):
     """
 
     def __init__(self, path='fzn-oscar-cbls', globals_dir='oscar-cbls'):
-        super().__init__(globals_dir, support_mzn=False, support_dzn=True,
-                support_json=False, support_item=False, support_dict=False,
-                support_all=True, support_timeout=True)
+        super().__init__(
+            globals_dir, support_all=True, support_num=True,
+            support_timeout=True, support_stats=True
+        )
         self.cmd = path
 
-    def solve(self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-              all_solutions=False, output_mode='item', **kwargs):
+    def args(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, statistics=False, **kwargs
+    ):
         """Solve a FlatZinc problem with Oscar/CBLS.
 
         Parameters
@@ -714,20 +596,16 @@ class OscarCBLS(Solver):
         log = logging.getLogger(__name__)
 
         args = [self.cmd]
+        if statistics:
+            args += ['-s', '-v']
         if all_solutions:
             args.append('-a')
+        if num_solutions is not None:
+            args += ['-n', str(num_solutions)]
         if timeout:
             args += ['-t', str(timeout)]
         args.append(mzn_file)
-
-        try:
-            process = run(args)
-            out = process.stdout
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
-
-        return out
+        return args
 
 #: Default Gecode instance.
 gecode = Gecode()

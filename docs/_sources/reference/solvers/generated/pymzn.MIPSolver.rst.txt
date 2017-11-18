@@ -12,7 +12,9 @@ pymzn\.MIPSolver
    .. autosummary::
       :toctree:
    
+      ~MIPSolver.args
       ~MIPSolver.solve
+      ~MIPSolver.solve_start
    
    
 

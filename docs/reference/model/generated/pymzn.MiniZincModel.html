@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.MiniZincModel &mdash; PyMzn 0.14.2 documentation</title>
+  <title>pymzn.MiniZincModel &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Modelling" href="../index.html"/>
         <link rel="next" title="pymzn.MiniZincModel.array_variable" href="pymzn.MiniZincModel.array_variable.html"/>
         <link rel="prev" title="Modelling" href="../index.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,6 +96,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">Modelling</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.MiniZincModel</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.array_variable.html">pymzn.MiniZincModel.array_variable</a></li>
@@ -103,6 +105,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.compile.html">pymzn.MiniZincModel.compile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraint.html">pymzn.MiniZincModel.constraint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraints.html">pymzn.MiniZincModel.constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.dzn_output.html">pymzn.MiniZincModel.dzn_output</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.maximize.html">pymzn.MiniZincModel.maximize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.minimize.html">pymzn.MiniZincModel.minimize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.output.html">pymzn.MiniZincModel.output</a></li>
@@ -121,9 +124,8 @@
 <li class="toctree-l3"><a class="reference internal" href="pymzn.SolveStatement.html">pymzn.SolveStatement</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -211,7 +213,8 @@ and the updates performed on the MiniZincModel instance.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mzn</strong> (<em>str</em>) – The content or the path to the template mzn file.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mzn</strong> (<em>str</em><em> or </em><a class="reference internal" href="#pymzn.MiniZincModel" title="pymzn.MiniZincModel"><em>MiniZincModel</em></a>) &#8211; A string with the content or the path to the template mzn file. If mzn
+is instead a MiniZincModel it is cloned.</td>
 </tr>
 </tbody>
 </table>
@@ -222,13 +225,13 @@ and the updates performed on the MiniZincModel instance.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.array_variable.html#pymzn.MiniZincModel.array_variable" title="pymzn.MiniZincModel.array_variable"><code class="xref py py-obj docutils literal"><span class="pre">array_variable</span></code></a>(name,&nbsp;indexset,&nbsp;domain[,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.array_variable.html#pymzn.MiniZincModel.array_variable" title="pymzn.MiniZincModel.array_variable"><code class="xref py py-obj docutils literal"><span class="pre">array_variable</span></code></a>(name,&nbsp;indexset,&nbsp;domain[,&nbsp;...])</td>
 <td>Adds an array variable to the model.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.comment.html#pymzn.MiniZincModel.comment" title="pymzn.MiniZincModel.comment"><code class="xref py py-obj docutils literal"><span class="pre">comment</span></code></a>(comment)</td>
 <td>Add a comment to the model.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.compile.html#pymzn.MiniZincModel.compile" title="pymzn.MiniZincModel.compile"><code class="xref py py-obj docutils literal"><span class="pre">compile</span></code></a>([output_file])</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.compile.html#pymzn.MiniZincModel.compile" title="pymzn.MiniZincModel.compile"><code class="xref py py-obj docutils literal"><span class="pre">compile</span></code></a>([output_file,&nbsp;args,&nbsp;rewrap])</td>
 <td>Compiles the model and writes it to file.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.constraint.html#pymzn.MiniZincModel.constraint" title="pymzn.MiniZincModel.constraint"><code class="xref py py-obj docutils literal"><span class="pre">constraint</span></code></a>(constr)</td>
@@ -237,28 +240,31 @@ and the updates performed on the MiniZincModel instance.</p>
 <tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.constraints.html#pymzn.MiniZincModel.constraints" title="pymzn.MiniZincModel.constraints"><code class="xref py py-obj docutils literal"><span class="pre">constraints</span></code></a>(constrs)</td>
 <td>Add a list of constraints.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.maximize.html#pymzn.MiniZincModel.maximize" title="pymzn.MiniZincModel.maximize"><code class="xref py py-obj docutils literal"><span class="pre">maximize</span></code></a>(expr)</td>
-<td>Shorthand for solve(‘maximize ‘ + expr)</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.dzn_output.html#pymzn.MiniZincModel.dzn_output" title="pymzn.MiniZincModel.dzn_output"><code class="xref py py-obj docutils literal"><span class="pre">dzn_output</span></code></a>(output_vars)</td>
+<td>Sets the output statement to be a dzn representation of output_vars.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.minimize.html#pymzn.MiniZincModel.minimize" title="pymzn.MiniZincModel.minimize"><code class="xref py py-obj docutils literal"><span class="pre">minimize</span></code></a>(expr)</td>
-<td>Shorthand for solve(‘minimize ‘ + expr)</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.maximize.html#pymzn.MiniZincModel.maximize" title="pymzn.MiniZincModel.maximize"><code class="xref py py-obj docutils literal"><span class="pre">maximize</span></code></a>(expr)</td>
+<td>Shorthand for solve(&#8216;maximize &#8216; + expr)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.output.html#pymzn.MiniZincModel.output" title="pymzn.MiniZincModel.output"><code class="xref py py-obj docutils literal"><span class="pre">output</span></code></a>(output_stmt)</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.minimize.html#pymzn.MiniZincModel.minimize" title="pymzn.MiniZincModel.minimize"><code class="xref py py-obj docutils literal"><span class="pre">minimize</span></code></a>(expr)</td>
+<td>Shorthand for solve(&#8216;minimize &#8216; + expr)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.output.html#pymzn.MiniZincModel.output" title="pymzn.MiniZincModel.output"><code class="xref py py-obj docutils literal"><span class="pre">output</span></code></a>(output_stmt)</td>
 <td>Updates the output statement of the model.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.parameter.html#pymzn.MiniZincModel.parameter" title="pymzn.MiniZincModel.parameter"><code class="xref py py-obj docutils literal"><span class="pre">parameter</span></code></a>(*par[,&nbsp;assign])</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.parameter.html#pymzn.MiniZincModel.parameter" title="pymzn.MiniZincModel.parameter"><code class="xref py py-obj docutils literal"><span class="pre">parameter</span></code></a>(*par[,&nbsp;assign])</td>
 <td>Adds a parameter to the model.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.parameters.html#pymzn.MiniZincModel.parameters" title="pymzn.MiniZincModel.parameters"><code class="xref py py-obj docutils literal"><span class="pre">parameters</span></code></a>(pars[,&nbsp;assign])</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.parameters.html#pymzn.MiniZincModel.parameters" title="pymzn.MiniZincModel.parameters"><code class="xref py py-obj docutils literal"><span class="pre">parameters</span></code></a>(pars[,&nbsp;assign])</td>
 <td>Add a list of parameters.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.satisfy.html#pymzn.MiniZincModel.satisfy" title="pymzn.MiniZincModel.satisfy"><code class="xref py py-obj docutils literal"><span class="pre">satisfy</span></code></a>()</td>
-<td>Shorthand for solve(‘satisfy’)</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.satisfy.html#pymzn.MiniZincModel.satisfy" title="pymzn.MiniZincModel.satisfy"><code class="xref py py-obj docutils literal"><span class="pre">satisfy</span></code></a>()</td>
+<td>Shorthand for solve(&#8216;satisfy&#8217;)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.solve.html#pymzn.MiniZincModel.solve" title="pymzn.MiniZincModel.solve"><code class="xref py py-obj docutils literal"><span class="pre">solve</span></code></a>(solve_stmt)</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.solve.html#pymzn.MiniZincModel.solve" title="pymzn.MiniZincModel.solve"><code class="xref py py-obj docutils literal"><span class="pre">solve</span></code></a>(solve_stmt)</td>
 <td>Updates the solve statement of the model.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.MiniZincModel.variable.html#pymzn.MiniZincModel.variable" title="pymzn.MiniZincModel.variable"><code class="xref py py-obj docutils literal"><span class="pre">variable</span></code></a>(name,&nbsp;vartype[,&nbsp;value,&nbsp;output])</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.MiniZincModel.variable.html#pymzn.MiniZincModel.variable" title="pymzn.MiniZincModel.variable"><code class="xref py py-obj docutils literal"><span class="pre">variable</span></code></a>(name,&nbsp;vartype[,&nbsp;value,&nbsp;output])</td>
 <td>Adds a variable to the model.</td>
 </tr>
 </tbody>
@@ -311,7 +317,7 @@ and the updates performed on the MiniZincModel instance.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

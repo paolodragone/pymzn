@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Modelling &mdash; PyMzn 0.14.2 documentation</title>
+  <title>Modelling &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,10 +35,10 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../../index.html"/>
         <link rel="up" title="Manual" href="../index.html"/>
         <link rel="next" title="pymzn.MiniZincModel" href="generated/pymzn.MiniZincModel.html"/>
-        <link rel="prev" title="pymzn.MiniZincUnboundedError" href="../minizinc/generated/pymzn.MiniZincUnboundedError.html"/> 
+        <link rel="prev" title="pymzn.g12mip" href="../solvers/generated/pymzn.g12mip.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,6 +96,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../minizinc/index.html">MiniZinc tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Modelling</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MiniZincModel.html">pymzn.MiniZincModel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Statement.html">pymzn.Statement</a></li>
@@ -106,9 +108,8 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.SolveStatement.html">pymzn.SolveStatement</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../internal.html">Implementation details</a></li>
 </ul>
@@ -199,7 +200,7 @@
 <tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Variable.html#pymzn.Variable" title="pymzn.Variable"><code class="xref py py-obj docutils literal"><span class="pre">Variable</span></code></a>(name,&nbsp;vartype[,&nbsp;value,&nbsp;output])</td>
 <td>A variable statement.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.ArrayVariable.html#pymzn.ArrayVariable" title="pymzn.ArrayVariable"><code class="xref py py-obj docutils literal"><span class="pre">ArrayVariable</span></code></a>(name,&nbsp;indexset,&nbsp;domain[,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.ArrayVariable.html#pymzn.ArrayVariable" title="pymzn.ArrayVariable"><code class="xref py py-obj docutils literal"><span class="pre">ArrayVariable</span></code></a>(name,&nbsp;indexset,&nbsp;domain[,&nbsp;...])</td>
 <td>An array variable statement.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/pymzn.OutputStatement.html#pymzn.OutputStatement" title="pymzn.OutputStatement"><code class="xref py py-obj docutils literal"><span class="pre">OutputStatement</span></code></a>(output)</td>
@@ -218,10 +219,12 @@ be modified by adding variables and constraints, and by modifying the solve or
 output statements. An instance of <code class="docutils literal"><span class="pre">MiniZincModel</span></code> can then be passed directly
 to the <code class="docutils literal"><span class="pre">minizinc</span></code> function to be solved.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">MiniZinModel</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">)</span>
-
+<span class="n">solutions</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">constraint</span><span class="p">(</span><span class="s1">&#39;arr_1[i] &lt;= arr_2[i]&#39;</span><span class="p">)</span>
-    <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="c1"># add a new constraint and solve again</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">constraint</span><span class="p">(</span><span class="s1">&#39;arr_1[</span><span class="si">{0}</span><span class="s1">] &lt;= arr_2[</span><span class="si">{0}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">solutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -239,7 +242,7 @@ to the <code class="docutils literal"><span class="pre">minizinc</span></code> f
         <a href="generated/pymzn.MiniZincModel.html" class="btn btn-neutral float-right" title="pymzn.MiniZincModel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../minizinc/generated/pymzn.MiniZincUnboundedError.html" class="btn btn-neutral" title="pymzn.MiniZincUnboundedError" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../solvers/generated/pymzn.g12mip.html" class="btn btn-neutral" title="pymzn.g12mip" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -270,7 +273,7 @@ to the <code class="docutils literal"><span class="pre">minizinc</span></code> f
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

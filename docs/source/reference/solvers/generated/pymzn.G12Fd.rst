@@ -12,7 +12,9 @@ pymzn\.G12Fd
    .. autosummary::
       :toctree:
    
+      ~G12Fd.args
       ~G12Fd.solve
+      ~G12Fd.solve_start
    
    
 

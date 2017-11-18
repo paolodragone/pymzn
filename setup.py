@@ -34,14 +34,15 @@ setup(
     url = 'https://github.com/paolodragone/pymzn',
     license = 'MIT',
     author = 'Paolo Dragone',
-    author_email = 'paolo.dragone@unitn.it',
+    author_email = 'dragone.paolo@gmail.com',
     description = 'A Python wrapper for the MiniZinc tool pipeline.',
     long_description = read('README.rst'),
     packages = find_packages(exclude=['*tests*']),
     test_suite = "pymzn.tests",
     install_requires = [
         'appdirs',
-        'pyyaml'
+        'pyyaml',
+        'jinja2'
     ],
     platforms = 'any',
     classifiers = [

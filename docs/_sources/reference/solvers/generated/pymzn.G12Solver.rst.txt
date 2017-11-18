@@ -12,7 +12,9 @@ pymzn\.G12Solver
    .. autosummary::
       :toctree:
    
+      ~G12Solver.args
       ~G12Solver.solve
+      ~G12Solver.solve_start
    
    
 

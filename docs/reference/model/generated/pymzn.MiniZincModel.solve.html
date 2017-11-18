@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.MiniZincModel.solve &mdash; PyMzn 0.14.2 documentation</title>
+  <title>pymzn.MiniZincModel.solve &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../../../index.html"/>
         <link rel="up" title="pymzn.MiniZincModel" href="pymzn.MiniZincModel.html"/>
         <link rel="next" title="pymzn.MiniZincModel.variable" href="pymzn.MiniZincModel.variable.html"/>
         <link rel="prev" title="pymzn.MiniZincModel.satisfy" href="pymzn.MiniZincModel.satisfy.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,6 +96,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">Modelling</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="pymzn.MiniZincModel.html">pymzn.MiniZincModel</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.array_variable.html">pymzn.MiniZincModel.array_variable</a></li>
@@ -103,6 +105,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.compile.html">pymzn.MiniZincModel.compile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraint.html">pymzn.MiniZincModel.constraint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.constraints.html">pymzn.MiniZincModel.constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.dzn_output.html">pymzn.MiniZincModel.dzn_output</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.maximize.html">pymzn.MiniZincModel.maximize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.minimize.html">pymzn.MiniZincModel.minimize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pymzn.MiniZincModel.output.html">pymzn.MiniZincModel.output</a></li>
@@ -121,9 +124,8 @@
 <li class="toctree-l3"><a class="reference internal" href="pymzn.SolveStatement.html">pymzn.SolveStatement</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -208,8 +210,8 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>solve_stmt</strong> (<em>str</em>) – The content of the solve statement, i.e. only the actual solve
-without the starting ‘solve’ and the ending semicolon.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>solve_stmt</strong> (<em>str</em>) &#8211; The content of the solve statement, i.e. only the actual solve
+without the starting &#8216;solve&#8217; and the ending semicolon.</td>
 </tr>
 </tbody>
 </table>
@@ -261,7 +263,7 @@ without the starting ‘solve’ and the ending semicolon.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

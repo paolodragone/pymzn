@@ -9,19 +9,24 @@ to the ``minizinc`` function to be solved.
 ::
 
     model = pymzn.MiniZinModel('test.mzn')
-
+    solutions = []
     for i in range(10):
-        model.constraint('arr_1[i] <= arr_2[i]')
-        pymzn.minizinc(model)
+        # add a new constraint and solve again
+        model.constraint('arr_1[{0}] <= arr_2[{0}]'.format(i))
+        solution = pymzn.minizinc(model)
+        solutions.append(solution)
 """
 
 import re
 import os.path
 
-from pymzn.dzn.marsh import stmt2dzn, val2dzn
+from .templates import from_string
+from ..dzn.marsh import stmt2dzn, val2dzn
 
+from copy import deepcopy
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
+stmts_p = re.compile('(?:^|;)([^;]+)')
 block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
 line_comm_p = re.compile('%.*\n')
 var_p = re.compile('\s*([\s\w,\.\(\)\[\]\{\}\+\-\*/]+?):\s*(\w+)\s*(?:=\s*(.+))?\s*')
@@ -217,23 +222,32 @@ class MiniZincModel(object):
 
     Parameters
     ----------
-    mzn : str
-        The content or the path to the template mzn file.
+    mzn : str or MiniZincModel
+        A string with the content or the path to the template mzn file. If mzn
+        is instead a MiniZincModel it is cloned.
     """
     def __init__(self, mzn=None):
-        self._statements = []
-        self._solve_stmt = None
-        self._output_stmt = None
-        self._arrays = []
-        self._modified = False
+        if mzn and isinstance(mzn, MiniZincModel):
+            # if mzn is a MiniZincModel, clone it
+            self.__dict__ = deepcopy(mzn.__dict__)
+        else:
+            self._statements = []
+            self._solve_stmt = None
+            self._output_stmt = None
+            self._arrays = []
+            self._modified = False
+            self._output_vars = None
 
-        self.mzn_file = None
-        self.model = None
-        if mzn and isinstance(mzn, str):
-            if os.path.isfile(mzn):
-                self.mzn_file = mzn
-            else:
-                self.model = mzn
+            self.mzn_file = None
+            self.model = None
+            if mzn and isinstance(mzn, str):
+                if mzn.endswith('mzn'):
+                    if os.path.isfile(mzn):
+                        self.mzn_file = mzn
+                    else:
+                        raise ValueError('The provided file does not exsist.')
+                else:
+                    self.model = mzn
 
     def comment(self, comment):
         """Add a comment to the model.
@@ -445,7 +459,9 @@ class MiniZincModel(object):
         """
         if not output_vars:
             return
+        self._output_vars = output_vars
 
+    def _make_dzn_output(self):
         # Parse the model to look for array declarations
         arrays = self._parse_arrays() + self._arrays
 
@@ -453,7 +469,7 @@ class MiniZincModel(object):
         out_var = '"{0} = ", show({0}), ";\\n"'
         out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
         out_list = []
-        for var in output_vars:
+        for var in self._output_vars:
             if var in arrays:
                 name, dim = var
                 if dim == 1:
@@ -469,7 +485,52 @@ class MiniZincModel(object):
                 out_list.append(out_var.format(var))
         self.output(', '.join(out_list))
 
-    def compile(self, output_file=None):
+    def _redefine_output_vars(self, model):
+        model = block_comm_p.sub('', model)
+        model = line_comm_p.sub('', model)
+        stmts = stmt_p.findall(model)
+        modified = []
+        for stmt in stmts:
+            var_m = var_p.match(stmt)
+            if var_m and not ('function' in stmt or 'predicate' in stmt):
+                name = var_m.group(2)
+                if name in self._output_vars:
+                    vartype = var_m.group(1)
+                    value = var_m.group(3)
+                    mod = [vartype, ': ', name]
+                    array_type_m = array_type_p.match(vartype)
+                    if array_type_m:
+                        index_set = array_type_m.group(1)
+                        mod.append(' :: output_array([{}])'.format(index_set))
+                    else:
+                        mod.append(' :: output_var')
+                    if value:
+                        mod += [' = ', value]
+                    mod.append(';')
+                    modified.append(''.join(mod))
+                    continue
+            modified.append(stmt + (';' if stmt.strip() else ''))
+        return '\n'.join(modified)
+
+    @staticmethod
+    def _rewrap(s):
+        S = {' ', '\t', '\n', '\r', '\f', '\v'}
+        stmts = []
+        for stmt in stmts_p.findall(s):
+            spaces = 0
+            while spaces < len(stmt) and stmt[spaces] in S:
+                spaces += 1
+            spaces -= stmt[0] == '\n'
+            lines = []
+            for line in stmt.splitlines():
+                start = 0
+                while start < len(line) and start < spaces and line[start] in S:
+                    start += 1
+                lines.append(line[start:])
+            stmts.append('\n'.join(lines))
+        return ';\n'.join(stmts)
+
+    def compile(self, output_file=None, args=None, rewrap=False):
         """Compiles the model and writes it to file.
 
         The compiled model contains the content of the template (if provided)
@@ -480,6 +541,12 @@ class MiniZincModel(object):
         ----------
         output_file : file-like
             The file where to write the compiled model.
+        args : dict
+            The argumets to pass to the template engine.
+        rewrap : bool
+            Whether to 'prettify' the model by adjusting the indentation of the
+            statements. Use only if you want to actually look at the compiled
+            model.
 
         Returns
         -------
@@ -487,6 +554,14 @@ class MiniZincModel(object):
             A string containing the generated model.
         """
         model = self._load_model()
+        model = from_string(model, args)
+
+        if rewrap:
+            model = self._rewrap(model)
+
+        if self._output_vars is not None:
+            self._make_dzn_output()
+            model = self._redefine_output_vars(model)
 
         if self._modified:
             lines = ['\n\n\n%%% GENERATED BY PYMZN %%%\n\n']

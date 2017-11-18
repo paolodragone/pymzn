@@ -22,9 +22,9 @@ solver with the provided arguments and the given MiniZinc/FlatZinc model and
 returns the solution stream as output.  An example of that is the
 ``pymzn.Gecode`` class, which wraps the Gecode solver and implementes the
 `solve` function by calling the *mzn-gecode* or *fzn-gecode* commands of Gecode.
-To the time of writing, PyMzn supports Gecode, Opturion, OptiMathSat and Gurobi,
-while the definition of additional solver classes is left to the user or to
-future development.
+To the time of writing, PyMzn supports Gecode, Chuffed, Opturion, OptiMathSat,
+Gurobi, CBC, G12 (with all available backends), and Oscar-CBLS. The definition
+of additional solver classes is left to the user or to future development.
 
 Solution output stream
 ----------------------
@@ -38,10 +38,10 @@ i.e. the format from the output statement in the model.
 Solution parsing
 ----------------
 When using the ``pymzn.minizinc`` function, the solutions are automatically
-parsed into Python objects (if using ``output_mode='dict'``). This is carried out
-by dropping the output statement of the original model and parsing either the
-json or the dzn output of the solver. The original model file is isolated from
-the new model file, as specified in the next section.
+parsed into Python objects (if using ``output_mode='dict'``). This is carried
+out by dropping the output statement of the original model and parsing either
+the json or the dzn output of the solver. The original model file is isolated
+from the new model file, as specified in the next section.
 
 Thread safety
 -------------
@@ -50,11 +50,11 @@ solution parsing, isolation of the solving instances and dynamic modelling.
 These problems arise when one has a sequence of instances of a problem to
 solve, possibly in parallel. To automatically ensure isolation of
 the original problem from the solving instance, the ``pymzn.minizinc`` function
-always compiles a new model file in a temporary file that is deleated right
-after the problem has been successfully solved. If the paramenter `keep` is
+always compiles a new model file in a temporary file that is deleted right
+after the problem has been successfully solved. If the parameter `keep` is
 `True`, then the temporary file is written into the folder containing the .mzn
 file or the working directory if a model string is provided. In case of error,
-the script that caused it is not deleated, even if `keep=False`. Writing the
+the script that caused it is not deleted, even if `keep=False`. Writing the
 models to temporary files ensures isolation of the solving instances and thus
 thread safety.
 

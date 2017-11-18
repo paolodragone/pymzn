@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 PyMzn provides functions that mimic and enhance the tools from the libminizinc
-library. With these tools, it is possible to compile a MiniZinc model into
-FlatZinc, solve a given problem and get the output solutions directly into the
-python code.
+library. With these tools, it is possible to compile a MiniZinc model into a
+FlatZinc one, solve a given problem and get the output solutions directly into
+the python code.
 
 The main function that PyMzn provides is the ``minizinc`` function, which
-executes the entire workflow for solving a CSP problem encoded in MiniZinc.
-Solving a MiniZinc problem with PyMzn is as simple as::
+executes the entire workflow for solving a constranint program encoded in
+MiniZinc.  Solving a MiniZinc problem with PyMzn is as simple as::
 
     import pymzn
     pymzn.minizinc('test.mzn')
@@ -24,6 +24,7 @@ import os
 import logging
 import contextlib
 
+from io import BufferedReader, TextIOWrapper
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
@@ -32,47 +33,92 @@ import pymzn.config as config
 from . import solvers
 from .solvers import gecode
 from .model import MiniZincModel
-from pymzn.utils import run
-from pymzn.dzn import dict2dzn, dzn2dict
+from ..process import Process
+from ..dzn import dict2dzn, dzn2dict
 
 
-class SolnStream:
+class Solutions:
     """Represents a solution stream from the `minizinc` function.
 
-    This class can be referenced and iterated as a list.
+    This class populates lazily but can be referenced and iterated as a list.
 
-    Arguments
-    ---------
+    Attributes
+    ----------
     complete : bool
         Whether the stream includes the complete set of solutions. This means
         the stream contains all solutions in a satisfiability problem, or it
         contains the global optimum for maximization/minimization problems.
     """
 
-    def __init__(self, solns, complete):
-        self._solns = solns
-        self.complete = complete
+    def __init__(self, stream):
+        self._stream = stream
+        self._solns = []
+        self.complete = False
+        self._iter = None
+        self._stats = None
+
+    @property
+    def statistics(self):
+        self._fetch_all()
+        return self._stats
+
+    def _fetch(self):
+        try:
+            solution = next(self._stream)
+            self._solns.append(solution)
+            return solution
+        except StopIteration as stop:
+            complete, stats = stop.value
+            self.complete = complete
+            if stats:
+                self._stats = stats
+            self._stream = None
+        return None
+
+    def _fetch_all(self):
+        while self._stream:
+            self._fetch()
 
     def __len__(self):
+        self._fetch_all()
         return len(self._solns)
 
+    def __next__(self):
+        if self._stream:
+            return self._fetch()
+        else:
+            if not self._iter:
+                self._iter = iter(self._solns)
+            try:
+                return next(self._iter)
+            except StopIteration:
+                self._iter = iter(self._solns)
+                raise
+
     def __iter__(self):
-        return iter(self._solns)
+        if not self._stream:
+            self._iter = iter(self._solns)
+        return self
 
     def __getitem__(self, key):
+        self._fetch_all()
         return self._solns[key]
 
     def __repr__(self):
-        return 'SolnStream(solns={}, complete={})' \
-                    .format(repr(self._solns), repr(self.complete))
+        self._fetch_all()
+        return repr(self._solns)
 
     def __str__(self):
+        self._fetch_all()
         return str(self._solns)
 
 
-def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode,
-             output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-             all_solutions=False, force_flatten=False, **solver_args):
+def minizinc(
+        mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
+        output_mode='dict', output_vars=None, output_dir=None, timeout=None,
+        all_solutions=False, num_solutions=None, force_flatten=False, args=None,
+        wait=False, statistics=False, **kwargs
+    ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
     Parameters
@@ -124,55 +170,57 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     all_solutions : bool
         Whether all the solutions must be returned. Notice that this can only
         be used if the solver supports returning all solutions. Default is False.
+    num_solutions : int
+        The upper bound on the number of solutions to be returned. Can only be
+        used if the solver supports returning a fixed number of solutions.
+        Default is 1.
     force_flatten : bool
         Wheter the function should be forced to produce a flat model. Whenever
         possible, this function feeds the mzn file to the solver without passing
         through the flattener, force_flatten=True prevents this behavior and
         always produces a fzn file which is in turn passed to the solver.
-    **solver_args
+    args : dict
+        Arguments for the template engine.
+    wait : bool
+        Whether to wait for the solving process to finish before returning the
+        solution stream. This parameter is ignored on Windows systems, on which
+        the solving process is always awaited.
+    statistics : bool
+        Whether to save the statistics of the solver (if supported).
+    **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
         the available arguments.
 
     Returns
     -------
-    SolnStream
-        Returns a list of solutions as a SolnStream instance. The actual content
+    Solutions
+        Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
-    log = logging.getLogger(__name__)
-
     if isinstance(mzn, MiniZincModel):
         mzn_model = mzn
     else:
         mzn_model = MiniZincModel(mzn)
 
     if not solver:
-        solver = gecode
+        solver = config.get('solver', gecode)
     elif isinstance(solver, str):
         solver = getattr(solvers, solver)
 
     if all_solutions and not solver.support_all:
-        raise ValueError('The solver cannot return all solutions.')
-    if timeout and not solver.support_timeout:
-        raise ValueError('The solver does not support the timeout.')
+        raise ValueError('The solver cannot return all solutions')
+    if num_solutions is not None and not solver.support_num:
+        raise ValueError('The solver cannot return a given number of solutions')
     if output_mode != 'dict' and output_vars:
         raise ValueError('Output vars only available in `dict` output mode')
+    if statistics and not solver.support_stats:
+        raise ValueError('The solver does not support emitting statistics')
 
-    if (output_mode == 'dzn' and not solver.support_dzn) or \
-       (output_mode == 'json' and not solver.support_json) or \
-       (output_mode == 'item' and not solver.support_item):
-        force_flatten = True
+    if not output_dir:
+        output_dir = config.get('output_dir', None)
 
-    if output_mode == 'dict':
-        if output_vars:
-            mzn_model.dzn_output(output_vars)
-            _output_mode = 'item'
-        else:
-            _output_mode = 'dzn'
-            force_flatten = True
-    else:
-        _output_mode = output_mode
+    keep = config.get('keep', keep)
 
     output_prefix = 'pymzn'
     if keep:
@@ -186,7 +234,7 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
-    mzn_model.compile(output_file)
+    mzn_model.compile(output_file, rewrap=keep, args=args)
     output_file.close()
 
     mzn_file = output_file.name
@@ -194,49 +242,89 @@ def minizinc(mzn, *dzn_files, data=None, keep=False, include=None, solver=gecode
     fzn_file = None
     ozn_file = None
 
+    wait = wait or os.name == 'nt'
+
+    if output_mode == 'dict':
+        if output_vars:
+            mzn_model.dzn_output(output_vars)
+            _output_mode = 'item'
+        else:
+            _output_mode = 'dzn'
+    else:
+        _output_mode = output_mode
+
+    force_flatten = (
+           config.get('force_flatten', force_flatten)
+        or not solver.support_mzn
+        or (_output_mode in ['dzn', 'json'] and not solver.support_output_mode)
+    )
+
+    solver_args = {**config.get('solver_args', {}), **kwargs}
     try:
-        if force_flatten or not solver.support_mzn:
-            fzn_file, ozn_file = mzn2fzn(mzn_file, *dzn_files, data=data,
-                                         keep_data=keep, include=include,
-                                         globals_dir=solver.globals_dir,
-                                         output_mode=_output_mode)
-            out = solver.solve(fzn_file, timeout=timeout, output_mode='dzn',
-                               all_solutions=all_solutions, **solver_args)
-            out = solns2out(out, ozn_file)
+        if force_flatten:
+            fzn_file, ozn_file = mzn2fzn(
+                mzn_file, *dzn_files, data=data, keep_data=keep,
+                include=include, globals_dir=solver.globals_dir,
+                output_mode=_output_mode
+            )
+            solver_stream = _solve(
+                solver, fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
+                all_solutions=all_solutions, num_solutions=num_solutions,
+                statistics=statistics, **solver_args
+            )
+            out = solns2out(solver_stream, ozn_file)
         else:
             dzn_files = list(dzn_files)
-            data, data_file = process_data(mzn_file, data, keep)
+            data, data_file = _prepare_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
-            out = solver.solve(mzn_file, *dzn_files, data=data,
-                               include=include, timeout=timeout,
-                               all_solutions=all_solutions,
-                               output_mode=_output_mode, **solver_args)
-        solns, complete = split_solns(out)
+            out = _solve(
+                solver, mzn_file, *dzn_files, wait=wait, lines=True, data=data,
+                include=include, timeout=timeout, all_solutions=all_solutions,
+                num_solutions=num_solutions, output_mode=_output_mode,
+                statistics=statistics, **solver_args
+            )
+        solns = split_solns(out)
         if output_mode == 'dict':
-            solns = list(map(dzn2dict, solns))
-        stream = SolnStream(solns, complete)
-    except (MiniZincUnsatisfiableError, MiniZincUnknownError,
-            MiniZincUnboundedError) as err:
+            solns = _to_dict(solns)
+        stream = solns
+    except (
+        MiniZincUnsatisfiableError, MiniZincUnknownError, MiniZincUnboundedError
+    ) as err:
         err.mzn_file = mzn_file
         raise err
 
-    if not keep:
-        with contextlib.suppress(FileNotFoundError):
-            if data_file:
-                os.remove(data_file)
-                log.debug('Deleting file: {}'.format(data_file))
-            if mzn_file:
-                os.remove(mzn_file)
-                log.debug('Deleting file: {}'.format(mzn_file))
-            if fzn_file:
-                os.remove(fzn_file)
-                log.debug('Deleting file: {}'.format(fzn_file))
-            if ozn_file:
-                os.remove(ozn_file)
-                log.debug('Deleting file: {}'.format(ozn_file))
+    cleanup_files = [] if keep else [data_file, mzn_file, fzn_file, ozn_file]
+    stream = _cleanup(stream, cleanup_files)
+    return Solutions(stream)
 
-    return stream
+
+def _cleanup(stream, files):
+    try:
+        while True:
+            yield next(stream)
+    except StopIteration as stop:
+        return stop.value
+    finally:
+        log = logging.getLogger(__name__)
+        with contextlib.suppress(FileNotFoundError):
+            for _file in files:
+                if _file:
+                    os.remove(_file)
+                    log.debug('Deleting file: {}'.format(_file))
+
+
+def _solve(solver, *args, lines=False, wait=False, **kwargs):
+    if wait:
+        out = solver.solve(*args, **kwargs)
+        if lines:
+            return out.splitlines()
+        return out
+    else:
+        solver_process = solver.solve_start(*args, **kwargs)
+        if lines:
+            return solver_process.readlines()
+        return solver_process
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -279,8 +367,6 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         The paths to the generated fzn and ozn files. If ``no_ozn=True``, the
         second argument is None.
     """
-    log = logging.getLogger(__name__)
-
     args = [config.get('mzn2fzn', 'mzn2fzn')]
     if globals_dir:
         args += ['-G', globals_dir]
@@ -293,19 +379,28 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
             include = [include]
         elif not isinstance(include, list):
             raise TypeError('The path provided is not valid.')
-        for path in include:
-            args += ['-I', path]
+    else:
+        include = []
+
+    include += config.get('include', [])
+    for path in include:
+        args += ['-I', path]
+
+    keep_data = config.get('keep', keep_data)
 
     dzn_files = list(dzn_files)
-    data, data_file = process_data(mzn_file, data, keep_data)
+    data, data_file = _prepare_data(mzn_file, data, keep_data)
     if data:
         args += ['-D', data]
     elif data_file:
         dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
 
+    log = logging.getLogger(__name__)
+
+    process = None
     try:
-        run(args)
+        process = Process(args).run()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
@@ -330,17 +425,18 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def process_data(mzn_file, data, keep_data=False):
+def _prepare_data(mzn_file, data, keep_data=False):
     if not data:
         return None, None
 
-    log = logging.getLogger(__name__)
     if isinstance(data, dict):
         data = dict2dzn(data)
     elif isinstance(data, str):
         data = [data]
     elif not isinstance(data, list):
         raise TypeError('The additional data provided is not valid.')
+
+    log = logging.getLogger(__name__)
 
     if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
         mzn_base, __ = os.path.splitext(mzn_file)
@@ -355,64 +451,87 @@ def process_data(mzn_file, data, keep_data=False):
     return data, data_file
 
 
-def solns2out(soln_stream, ozn_file):
+def _solns2out_process(ozn_file):
+    args = [config.get('solns2out', 'solns2out'), ozn_file]
+    process = Process(args)
+    return process
+
+
+def solns2out(stream, ozn_file):
     """Wraps the solns2out utility, executes it on the solution stream, and
     then returns the output stream.
 
     Parameters
     ----------
-    soln_stream : str
+    stream : str or BufferedReader
         The solution stream returned by the solver.
     ozn_file : str
         The ozn file path produced by the mzn2fzn function.
 
     Returns
     -------
-    str
-        Returns the output stream encoding the solution stream according to the
-        provided ozn file.
+    generator of str
+        The output stream of solns2out encoding the solution stream according to
+        the provided ozn file.
     """
     log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]
+    process = _solns2out_process(ozn_file)
     try:
-        process = run(args, stdin=soln_stream)
-        out = process.stdout
+        if isinstance(stream, (BufferedReader, TextIOWrapper)):
+            process.start(stream)
+            yield from process.readlines()
+        elif isinstance(stream, Process):
+            if stream.alive:
+                process.start(stream.stdout)
+                yield from process.readlines()
+            else:
+                process.run(stream.stdout_data)
+                yield from process.stdout_data.splitlines()
+        else:
+            process.run(stream)
+            yield from process.stdout_data.splitlines()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
-    return out
 
 
-soln_sep = '----------'
-search_complete_msg = '=========='
-unsat_msg = '=====UNSATISFIABLE====='
-unkn_msg = '=====UNKNOWN====='
-unbnd_msg = '=====UNBOUNDED====='
+SOLN_SEP = '----------'
+SEARCH_COMPLETE = '=========='
+UNSATISFIABLE = '=====UNSATISFIABLE====='
+UNKNOWN = '=====UNKNOWN====='
+UNBOUNDED = '=====UNBOUNDED====='
 
 
-def split_solns(out):
-    lines = out.splitlines()
-    solns = []
-    curr_out = []
+def split_solns(lines):
+    """Split the solutions from the output stream of a solver or solns2out"""
+    _buffer = []
     complete = False
     for line in lines:
         line = line.strip()
-        if line == soln_sep:
-            soln = '\n'.join(curr_out)
-            solns.append(soln)
-            curr_out = []
-        elif line == search_complete_msg:
+        if line == SOLN_SEP:
+            yield '\n'.join(_buffer)
+            _buffer = []
+        elif line == SEARCH_COMPLETE:
             complete = True
-            break
-        elif line == unkn_msg:
-            raise MiniZincUnknownError()
-        elif line == unsat_msg:
-            raise MiniZincUnsatisfiableError()
-        elif line == unbnd_msg:
-            raise MiniZincUnboundedError()
+            _buffer = []
+        elif line == UNKNOWN:
+            raise MiniZincUnknownError
+        elif line == UNSATISFIABLE:
+            raise MiniZincUnsatisfiableError
+        elif line == UNBOUNDED:
+            raise MiniZincUnboundedError
         else:
-            curr_out.append(line)
-    return solns, complete
+            _buffer.append(line)
+    return (complete, '\n'.join(_buffer))
+
+
+def _to_dict(stream):
+    try:
+        while True:
+            yield dzn2dict(next(stream))
+    except StopIteration as stop:
+        return stop.value
 
 
 class MiniZincError(RuntimeError):

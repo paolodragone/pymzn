@@ -12,7 +12,9 @@ pymzn\.Gecode
    .. autosummary::
       :toctree:
    
+      ~Gecode.args
       ~Gecode.solve
+      ~Gecode.solve_start
    
    
 

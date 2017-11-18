@@ -12,7 +12,9 @@ pymzn\.Optimathsat
    .. autosummary::
       :toctree:
    
+      ~Optimathsat.args
       ~Optimathsat.solve
+      ~Optimathsat.solve_start
    
    
 
