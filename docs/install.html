@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Install &mdash; PyMzn 0.14.2 documentation</title>
+  <title>Install &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="index.html"/>
         <link rel="next" title="Quick Start" href="quick_start.html"/>
         <link rel="prev" title="PyMzn" href="index.html"/> 
 
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -93,7 +93,6 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Install</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-libminizinc">Install libminizinc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#install-gecode">Install Gecode</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
@@ -165,22 +164,24 @@
   <div class="section" id="install">
 <h1>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h1>
 <p>PyMzn can be installed via Pip:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">pymzn</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pymzn</span>
 </pre></div>
 </div>
-<p>or from the source code:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+<p>or from the source code available
+on <a class="reference external" href="https://github.com/paolodragone/pymzn/releases/latest">GitHub</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
-<p>Currently, PyMzn is developed and maintained in Python v3.5 with a
-porting to Python v2.7 at every release (the python2 branch does not always
+<p>Currently, PyMzn is developed and maintained in Python 3.5 with a
+porting to Python 2.7 at every release (the python2 branch does not always
 contain the most recent changes).</p>
-<p>PyMzn requires some additional software to be installed on your system
-before you can use it properly, namely:</p>
-<ul class="simple">
-<li>The <a class="reference external" href="https://github.com/MiniZinc/MiniZincIDE">MiniZinc toolkit</a>;</li>
-<li>A CSP solver compatible with the FlatZinc encoding, e.g. <a class="reference external" href="http://www.gecode.org">Gecode</a>.</li>
-</ul>
+<p>PyMzn requires the MiniZinc toolkit to be installed on your machine, along with
+at least one solver. The easiest way to install MiniZinc is to download the
+<a class="reference external" href="https://github.com/MiniZinc/MiniZincIDE">MiniZincIDE</a> package, which
+contains both the MiniZinc binaries and several solvers. After downloading the
+package, make sure the executables are visible to PyMzn by either setting the
+<em class="xref py py-obj">PATH</em> environment variable or by configuring it using the <a class="reference internal" href="reference/config.html#module-pymzn.config" title="pymzn.config"><code class="xref py py-obj docutils literal"><span class="pre">pymzn.config</span></code></a>
+module.</p>
 <div class="section" id="install-libminizinc">
 <h2>Install libminizinc<a class="headerlink" href="#install-libminizinc" title="Permalink to this headline">¶</a></h2>
 <p>The latest release of the MiniZinc toolkit can be found here:</p>
@@ -190,23 +191,6 @@ before you can use it properly, namely:</p>
 the MiniZinc binary path into the PATH environment variable, or alternatively
 you can configure PyMzn to find the MiniZinc binaries
 (see <a class="reference external" href="config.html">Configuration</a>).</p>
-</div>
-<div class="section" id="install-gecode">
-<h2>Install Gecode<a class="headerlink" href="#install-gecode" title="Permalink to this headline">¶</a></h2>
-<p>The next step is to install a CSP solver compatible with FlatZinc. You can use
-any solver you like, but the default one for PyMzn is <a class="reference external" href="http://www.gecode.org">Gecode</a>. If you use the Gecode solver, PyMzn will work
-out-of-the-box. PyMzn also supports most of the solvers included in the MiniZinc
-toolkit. If the solver you are looking for is not supported by PyMzn you can
-implement your own interface and use it with little configuration (see the
-<a class="reference external" href="reference/solvers/">Solvers section</a>).</p>
-<p>To install Gecode, we recommend you to download and compile the source code,
-since binary packages are usually less frequently updated.
-The Gecode source code can be downloaded from:</p>
-<blockquote>
-<div><a class="reference external" href="http://www.gecode.org/download/">http://www.gecode.org/download/</a></div></blockquote>
-<p>Instructions on how to compile and install are found in the source package.
-After installation, either put the Gecode binary directory into the PATH
-variable, or configure PyMzn accordingly.</p>
 </div>
 </div>
 
@@ -254,7 +238,7 @@ variable, or configure PyMzn accordingly.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

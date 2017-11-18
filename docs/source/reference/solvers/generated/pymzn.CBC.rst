@@ -12,7 +12,9 @@ pymzn\.CBC
    .. autosummary::
       :toctree:
    
+      ~CBC.args
       ~CBC.solve
+      ~CBC.solve_start
    
    
 

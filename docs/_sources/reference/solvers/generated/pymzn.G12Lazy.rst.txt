@@ -12,7 +12,9 @@ pymzn\.G12Lazy
    .. autosummary::
       :toctree:
    
+      ~G12Lazy.args
       ~G12Lazy.solve
+      ~G12Lazy.solve_start
    
    
 

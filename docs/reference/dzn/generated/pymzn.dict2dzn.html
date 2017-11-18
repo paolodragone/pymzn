@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.dict2dzn &mdash; PyMzn 0.14.2 documentation</title>
+  <title>pymzn.dict2dzn &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Dzn files" href="../index.html"/>
         <link rel="next" title="pymzn.dzn2dict" href="pymzn.dzn2dict.html"/>
         <link rel="prev" title="Dzn files" href="../index.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,7 +96,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">Dzn files</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.dict2dzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.dzn2dict.html">pymzn.dzn2dict</a></li>
@@ -106,7 +105,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -195,14 +196,14 @@ list is implicitly set to 1..len(list).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>objs</strong> (<em>dict</em>) – A dictionary containing the objects to serialize, the keys are the names
+<li><strong>objs</strong> (<em>dict</em>) &#8211; A dictionary containing the objects to serialize, the keys are the names
 of the variables.</li>
-<li><strong>declare</strong> (<em>bool</em>) – Whether to include the declaration of the variable in the statements or
+<li><strong>declare</strong> (<em>bool</em>) &#8211; Whether to include the declaration of the variable in the statements or
 just the assignment. (Default is False for backward compatibility)</li>
-<li><strong>assign</strong> (<em>bool</em>) – Wheter to include assignment of the value in the statements or just the
+<li><strong>assign</strong> (<em>bool</em>) &#8211; Wheter to include assignment of the value in the statements or just the
 declaration.</li>
-<li><strong>wrap</strong> (<em>bool</em>) – Whether to wrap the serialized values.</li>
-<li><strong>fout</strong> (<em>str</em>) – Path to the output file, if None no output file is written.</li>
+<li><strong>wrap</strong> (<em>bool</em>) &#8211; Whether to wrap the serialized values.</li>
+<li><strong>fout</strong> (<em>str</em>) &#8211; Path to the output file, if None no output file is written.</li>
 </ul>
 </td>
 </tr>
@@ -262,7 +263,7 @@ declaration.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

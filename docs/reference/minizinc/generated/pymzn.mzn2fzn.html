@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.mzn2fzn &mdash; PyMzn 0.14.2 documentation</title>
+  <title>pymzn.mzn2fzn &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../../../index.html"/>
         <link rel="up" title="MiniZinc tools" href="../index.html"/>
         <link rel="next" title="pymzn.solns2out" href="pymzn.solns2out.html"/>
         <link rel="prev" title="pymzn.minizinc" href="pymzn.minizinc.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">MiniZinc tools</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pymzn.SolnStream.html">pymzn.SolnStream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Solutions.html">pymzn.Solutions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.minizinc.html">pymzn.minizinc</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.solns2out.html">pymzn.solns2out</a></li>
@@ -106,10 +106,11 @@
 <li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnboundedError.html">pymzn.MiniZincUnboundedError</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
@@ -186,7 +187,7 @@
 <h1>pymzn.mzn2fzn<a class="headerlink" href="#pymzn-mzn2fzn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.mzn2fzn">
-<code class="descclassname">pymzn.</code><code class="descname">mzn2fzn</code><span class="sig-paren">(</span><em>mzn_file</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep_data=False</em>, <em>include=None</em>, <em>no_ozn=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.mzn2fzn" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pymzn.</code><code class="descname">mzn2fzn</code><span class="sig-paren">(</span><em>mzn_file</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep_data=False</em>, <em>globals_dir=None</em>, <em>include=None</em>, <em>output_mode='item'</em>, <em>no_ozn=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.mzn2fzn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
 utility from libminizinc to produce a fzn and ozn files from a mzn one.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -194,18 +195,24 @@ utility from libminizinc to produce a fzn and ozn files from a mzn one.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mzn_file</strong> (<em>str</em>) – The path to the minizinc problem file.</li>
-<li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the mzn2fzn execution,
+<li><strong>mzn_file</strong> (<em>str</em>) &#8211; The path to the minizinc problem file.</li>
+<li><strong>*dzn_files</strong> &#8211; A list of paths to dzn files to attach to the mzn2fzn execution,
 provided as positional arguments; by default no data file is attached.</li>
-<li><strong>data</strong> (<em>dict</em>) – Additional data as a dictionary of variables assignments to supply to
+<li><strong>data</strong> (<em>dict</em>) &#8211; Additional data as a dictionary of variables assignments to supply to
 the mzn2fnz function. The dictionary is then automatically converted to
 dzn format by the <code class="docutils literal"><span class="pre">pymzn.dict2dzn</span></code> function. Notice that if the data
 provided is too large, a temporary dzn file will be produced.</li>
-<li><strong>keep_data</strong> (<em>bool</em>) – Whether to write the inline data into a dzn file and keep it.
+<li><strong>keep_data</strong> (<em>bool</em>) &#8211; Whether to write the inline data into a dzn file and keep it.
 Default is False.</li>
-<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included mzn files when
+<li><strong>globals_dir</strong> (<em>str</em>) &#8211; The path to the directory for global included files.</li>
+<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) &#8211; One or more additional paths to search for included mzn files when
 running <code class="docutils literal"><span class="pre">mzn2fzn</span></code>.</li>
-<li><strong>no_ozn</strong> (<em>bool</em>) – If True, the ozn file is not produced, False otherwise.</li>
+<li><strong>output_mode</strong> (<em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'item'</em>) &#8211; The desired output format. The default is &#8216;item&#8217; which outputs a
+stream of strings as returned by the solns2out tool, formatted according
+to the output statement of the MiniZinc model. The &#8216;dzn&#8217; and &#8216;json&#8217;
+formats output a stream of strings formatted in dzn of json
+respectively.</li>
+<li><strong>no_ozn</strong> (<em>bool</em>) &#8211; If True, the ozn file is not produced, False otherwise.</li>
 </ul>
 </td>
 </tr>
@@ -266,7 +273,7 @@ second argument is None.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

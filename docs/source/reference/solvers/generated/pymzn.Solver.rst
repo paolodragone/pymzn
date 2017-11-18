@@ -12,7 +12,9 @@ pymzn\.Solver
    .. autosummary::
       :toctree:
    
+      ~Solver.args
       ~Solver.solve
+      ~Solver.solve_start
    
    
 

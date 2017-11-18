@@ -9,4 +9,4 @@ Templating
    add_package
    add_path
 
-.. automodule:: pymzn.mzn.template
+.. automodule:: pymzn.mzn.templates

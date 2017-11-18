@@ -12,7 +12,9 @@ pymzn\.G12MIP
    .. autosummary::
       :toctree:
    
+      ~G12MIP.args
       ~G12MIP.solve
+      ~G12MIP.solve_start
    
    
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Implementation details &mdash; PyMzn 0.14.2 documentation</title>
+  <title>Implementation details &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../index.html"/>
         <link rel="up" title="Manual" href="index.html"/>
         <link rel="next" title="Troubleshooting" href="../troubleshooting.html"/>
         <link rel="prev" title="pymzn.config.dump" href="generated/pymzn.config.dump.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,10 +96,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="minizinc/index.html">MiniZinc tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/index.html">Modelling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Implementation details</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#model-flattening">Model flattening</a></li>
@@ -194,14 +195,14 @@ of providing inline data and dzn files.</p>
 <div class="section" id="solver-classes">
 <h2>Solver classes<a class="headerlink" href="#solver-classes" title="Permalink to this headline">¶</a></h2>
 <p>To interface PyMzn to a solver, it needs a wrapper class that implements a
-<em class="xref py py-obj">solve</em> function, which takes the solver’s arguments as input, executes the
+<em class="xref py py-obj">solve</em> function, which takes the solver&#8217;s arguments as input, executes the
 solver with the provided arguments and the given MiniZinc/FlatZinc model and
 returns the solution stream as output.  An example of that is the
 <code class="docutils literal"><span class="pre">pymzn.Gecode</span></code> class, which wraps the Gecode solver and implementes the
 <em class="xref py py-obj">solve</em> function by calling the <em>mzn-gecode</em> or <em>fzn-gecode</em> commands of Gecode.
-To the time of writing, PyMzn supports Gecode, Opturion, OptiMathSat and Gurobi,
-while the definition of additional solver classes is left to the user or to
-future development.</p>
+To the time of writing, PyMzn supports Gecode, Chuffed, Opturion, OptiMathSat,
+Gurobi, CBC, G12 (with all available backends), and Oscar-CBLS. The definition
+of additional solver classes is left to the user or to future development.</p>
 </div>
 <div class="section" id="solution-output-stream">
 <h2>Solution output stream<a class="headerlink" href="#solution-output-stream" title="Permalink to this headline">¶</a></h2>
@@ -215,10 +216,10 @@ i.e. the format from the output statement in the model.</p>
 <div class="section" id="solution-parsing">
 <h2>Solution parsing<a class="headerlink" href="#solution-parsing" title="Permalink to this headline">¶</a></h2>
 <p>When using the <code class="docutils literal"><span class="pre">pymzn.minizinc</span></code> function, the solutions are automatically
-parsed into Python objects (if using <code class="docutils literal"><span class="pre">output_mode='dict'</span></code>). This is carried out
-by dropping the output statement of the original model and parsing either the
-json or the dzn output of the solver. The original model file is isolated from
-the new model file, as specified in the next section.</p>
+parsed into Python objects (if using <code class="docutils literal"><span class="pre">output_mode='dict'</span></code>). This is carried
+out by dropping the output statement of the original model and parsing either
+the json or the dzn output of the solver. The original model file is isolated
+from the new model file, as specified in the next section.</p>
 </div>
 <div class="section" id="thread-safety">
 <h2>Thread safety<a class="headerlink" href="#thread-safety" title="Permalink to this headline">¶</a></h2>
@@ -227,11 +228,11 @@ solution parsing, isolation of the solving instances and dynamic modelling.
 These problems arise when one has a sequence of instances of a problem to
 solve, possibly in parallel. To automatically ensure isolation of
 the original problem from the solving instance, the <code class="docutils literal"><span class="pre">pymzn.minizinc</span></code> function
-always compiles a new model file in a temporary file that is deleated right
-after the problem has been successfully solved. If the paramenter <em class="xref py py-obj">keep</em> is
+always compiles a new model file in a temporary file that is deleted right
+after the problem has been successfully solved. If the parameter <em class="xref py py-obj">keep</em> is
 <em class="xref py py-obj">True</em>, then the temporary file is written into the folder containing the .mzn
 file or the working directory if a model string is provided. In case of error,
-the script that caused it is not deleated, even if <em class="xref py py-obj">keep=False</em>. Writing the
+the script that caused it is not deleted, even if <em class="xref py py-obj">keep=False</em>. Writing the
 models to temporary files ensures isolation of the solving instances and thus
 thread safety.</p>
 </div>
@@ -281,7 +282,7 @@ thread safety.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

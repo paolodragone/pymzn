@@ -7,9 +7,10 @@ This is the reference manual of PyMzn.
    :maxdepth: 2
 
    minizinc/index
-   model/index
    dzn/index
    solvers/index
-   utils
+   model/index
+   templates/index
+   process
    config
    internal

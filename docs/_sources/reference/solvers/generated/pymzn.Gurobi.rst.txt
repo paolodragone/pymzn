@@ -12,7 +12,9 @@ pymzn\.Gurobi
    .. autosummary::
       :toctree:
    
+      ~Gurobi.args
       ~Gurobi.solve
+      ~Gurobi.solve_start
    
    
 

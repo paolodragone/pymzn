@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Quick Start &mdash; PyMzn 0.14.2 documentation</title>
+  <title>Quick Start &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="index.html"/>
         <link rel="next" title="Manual" href="reference/index.html"/>
         <link rel="prev" title="Install" href="install.html"/> 
 
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#solver-s-arguments">Solver’s arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solver-s-arguments">Solver&#8217;s arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">Manual</a></li>
@@ -164,9 +164,9 @@
             
   <div class="section" id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<p>First, you need a MiniZinc model encoding the problem you want to solve.
+<p>First, we need to define a constraint program via MiniZinc.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">test</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack01</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
 <span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
@@ -179,7 +179,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:</p>
 <span class="n">solve</span> <span class="n">maximize</span> <span class="n">obj</span><span class="p">;</span>
 
 
-<span class="o">%%</span> <span class="n">test</span><span class="o">.</span><span class="n">dzn</span> <span class="o">%%</span>
+<span class="o">%%</span> <span class="n">knapsack01</span><span class="o">.</span><span class="n">dzn</span> <span class="o">%%</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
 <span class="n">profit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
 <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">];</span>
@@ -187,20 +187,20 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:</p>
 </div>
 <p>You can solve the above problem using the <code class="docutils literal"><span class="pre">pymzn.minizinc</span></code> function:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
-<span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;test.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack01.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack01.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The result will be:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SolnStream</span><span class="p">(</span><span class="n">solns</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}],</span> <span class="n">complete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}]</span>
 </pre></div>
 </div>
-<p>The returned object represent a solution stream, which can be directly
-referenced and iterated as a list. The default behavior is to evaluate the
-solutions into python objects. Solutions are dictionaries containing variable
-assignments. The solution evaluation by PyMzn uses either json (when available)
-or dzn as intermediate format from the solver. More details on how PyMzn works
-internally are available in the <a class="reference external" href="reference/internal">Implementation details</a>
-section).</p>
+<p>The returned object is a lazy solution stream, which can however be directly
+referenced as a list. The default behavior is to evaluate the solutions into
+python objects. Solutions are dictionaries containing variable assignments. The
+solution evaluation by PyMzn uses dzn as intermediate format from the solver.
+More details on how PyMzn works internally are available in the <a class="reference external" href="reference/internal">Implementation
+details</a> section).</p>
 <p>If you wish to override the default behavior and get a different output format
 you can specify the <code class="docutils literal"><span class="pre">output_mode</span></code> argument. Possible formats are: <code class="docutils literal"><span class="pre">dict</span></code>,
 <code class="docutils literal"><span class="pre">item</span></code>, <code class="docutils literal"><span class="pre">dzn</span></code> and <code class="docutils literal"><span class="pre">json</span></code>. The first is the default one. The <code class="docutils literal"><span class="pre">item</span></code>
@@ -218,17 +218,17 @@ additional positional arguments:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>It is also possible to specify additional data inline with the <code class="docutils literal"><span class="pre">minizinc</span></code>
-function:</p>
+<p>It is also possible to specify additional data inline along with the
+<code class="docutils literal"><span class="pre">minizinc</span></code> function:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]})</span>
 </pre></div>
 </div>
 <p>With the <code class="docutils literal"><span class="pre">data</span></code> argument you can specify an assignment of variables that will
-be automatically converted to dzn format with the <code class="docutils literal"><span class="pre">pymzn.dict2dzn</span></code> function
+be automatically converted into dzn format with the <code class="docutils literal"><span class="pre">pymzn.dict2dzn</span></code> function
 (more details in the <a class="reference external" href="reference/dzn/">Dzn files</a> section).</p>
 </div>
 <div class="section" id="solver-s-arguments">
-<h2>Solver’s arguments<a class="headerlink" href="#solver-s-arguments" title="Permalink to this headline">¶</a></h2>
+<h2>Solver&#8217;s arguments<a class="headerlink" href="#solver-s-arguments" title="Permalink to this headline">¶</a></h2>
 <p>Usually, solvers provide arguments that can be used to modify their behavior.
 You can specify arguments to pass to the solver as additional keyword arguments
 in the <code class="docutils literal"><span class="pre">minizinc</span></code> function. For instance, using the argument <code class="docutils literal"><span class="pre">timeout</span></code> for
@@ -290,7 +290,7 @@ section.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

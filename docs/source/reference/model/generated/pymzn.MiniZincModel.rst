@@ -17,6 +17,7 @@ pymzn\.MiniZincModel
       ~MiniZincModel.compile
       ~MiniZincModel.constraint
       ~MiniZincModel.constraints
+      ~MiniZincModel.dzn_output
       ~MiniZincModel.maximize
       ~MiniZincModel.minimize
       ~MiniZincModel.output

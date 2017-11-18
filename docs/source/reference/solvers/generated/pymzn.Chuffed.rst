@@ -12,7 +12,9 @@ pymzn\.Chuffed
    .. autosummary::
       :toctree:
    
+      ~Chuffed.args
       ~Chuffed.solve
+      ~Chuffed.solve_start
    
    
 

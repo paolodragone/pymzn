@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; PyMzn 0.14.2 documentation</title>
+  <title>Configuration &mdash; PyMzn 0.16.0 documentation</title>
   
 
   
@@ -35,10 +35,10 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="PyMzn 0.14.2 documentation" href="../index.html"/>
+    <link rel="top" title="PyMzn 0.16.0 documentation" href="../index.html"/>
         <link rel="up" title="Manual" href="index.html"/>
         <link rel="next" title="pymzn.config.get" href="generated/pymzn.config.get.html"/>
-        <link rel="prev" title="pymzn.utils.run" href="generated/pymzn.utils.run.html"/> 
+        <link rel="prev" title="pymzn.process.Process.stop" href="generated/pymzn.process.Process.stop.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.14.2
+                0.16.0
               </div>
             
           
@@ -96,10 +96,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="minizinc/index.html">MiniZinc tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Binary execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model/index.html">Modelling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html">Process execution</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.config.get.html">pymzn.config.get</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.config.set.html">pymzn.config.set</a></li>
@@ -195,45 +196,12 @@
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pymzn.config"></span><p>PyMzn can be configured with custom executable paths and other variables.</p>
-<p>To inspect the current value of a variable one can use the PyMzn executable, if
-installed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pymzn config mzn2fzn
-</pre></div>
-</div>
-<p>or equivalently:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ python3.5 -m pymzn config mzn2fzn
-</pre></div>
-</div>
-<p>Similarly, to configure a variable:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pymzn config mzn2fzn /path/to/mzn2fzn
-</pre></div>
-</div>
-<p>or:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ python3.5 -m pymzn config mzn2fzn /path/to/mzn2fzn
-</pre></div>
-</div>
-<p>The configuration of PyMzn is contained into a configuration file located in
-the home directory of the current user. The exact path of the configuration file
-is dependent on the operating system:</p>
-<blockquote>
-<div><ul class="simple">
-<li>Linux: ~/.local/share/pymzn/config.yml</li>
-<li>MacOS: ~/Library/Application Support/pymzn/config.yml</li>
-<li>Windows: %APPDATA%Localpymznconfig.yml</li>
-</ul>
-</div></blockquote>
-<p>This is a YAML configuration file, which can be also manually modified.</p>
-<p>PyMzn can also be configured programmatically using the module <code class="docutils literal"><span class="pre">pymzn.config</span></code>.
-For instance:</p>
+<span class="target" id="module-pymzn.config"></span><p>PyMzn can be configured with custom executable paths and other variables.
+Configuration is done via the module <code class="docutils literal"><span class="pre">pymzn.config</span></code>. For instance:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn.config</span>
 
-<span class="c1"># config.set sets the variable only for the current execution</span>
 <span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mzn2fzn&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/mzn2fzn&#39;</span><span class="p">)</span>
 <span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;solns2out&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/solns2out&#39;</span><span class="p">)</span>
-
-<span class="c1"># to make the changes persistent</span>
-<span class="n">pymzn</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>The configurable properties used by PyMzn are the following:</p>
@@ -241,13 +209,18 @@ For instance:</p>
 <div><ul class="simple">
 <li><strong>mzn2fzn</strong>: Path to the <em>mzn2fzn</em> executable;</li>
 <li><strong>solns2out</strong>: Path to the <em>solns2out</em> executable;</li>
+<li><strong>solver</strong>: Solver instance to use when calling pymzn.minizinc;</li>
+<li><strong>solver_args</strong>: Arguments to pass to the solver when calling pymzn.minizinc;</li>
+<li><strong>keep</strong>: Overrides the keep flag of all minizinc and mzn2fzn calls;</li>
+<li><strong>output_dir</strong>: Set a default output directory for generated files;</li>
+<li><strong>force_flatten</strong>: Overrides the force_flatten flag of all minizinc calls;</li>
 <li><strong>dzn_width</strong>: The horizontal character limit for dzn files;
 This property is used to wrap long dzn statements when writing dzn files.
 This property is also used in the <code class="docutils literal"><span class="pre">pymzn.minizinc</span></code> function as a limit to
 decide whether to write the inline data into a file.</li>
 </ul>
 </div></blockquote>
-<p>One can also configure custom properties to be used for custom solvers.</p>
+<p>One can also set custom properties to be used for custom solvers.</p>
 <div class="section" id="debug">
 <h2>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
 <p>PyMzn can also be set to print debugging messages on standard output via:</p>
@@ -278,7 +251,7 @@ messages you can then call:</p>
         <a href="generated/pymzn.config.get.html" class="btn btn-neutral float-right" title="pymzn.config.get" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="generated/pymzn.utils.run.html" class="btn btn-neutral" title="pymzn.utils.run" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="generated/pymzn.process.Process.stop.html" class="btn btn-neutral" title="pymzn.process.Process.stop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -309,7 +282,7 @@ messages you can then call:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.14.2',
+            VERSION:'0.16.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

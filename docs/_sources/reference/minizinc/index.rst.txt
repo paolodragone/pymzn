@@ -6,7 +6,7 @@ MiniZinc tools
 .. autosummary::
    :toctree: generated/
 
-   SolnStream
+   Solutions
    minizinc
    mzn2fzn
    solns2out
