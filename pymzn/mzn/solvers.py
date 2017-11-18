@@ -55,7 +55,8 @@ class Solver:
 
     def __init__(
         self, globals_dir='std', support_mzn=False, support_all=False,
-        support_num=False, support_timeout=False, support_output_mode=False
+        support_num=False, support_timeout=False, support_output_mode=False,
+        support_stats=False
     ):
         self.globals_dir = globals_dir
         self.support_mzn = support_mzn
@@ -63,6 +64,7 @@ class Solver:
         self.support_num = support_num
         self.support_timeout = support_timeout
         self.support_output_mode = support_output_mode
+        self.support_stats = support_stats
 
     def args(*args, **kwargs):
         """Returns the command line arguments to start the solver"""
@@ -140,7 +142,7 @@ class Gecode(Solver):
     ):
         super().__init__(
             globals_dir, support_mzn=True, support_all=True, support_num=True,
-            support_timeout=True
+            support_timeout=True, support_stats=True
         )
         self.mzn_cmd = mzn_path
         self.fzn_cmd = fzn_path
@@ -148,7 +150,7 @@ class Gecode(Solver):
     def args(
         self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
         all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
-        seed=0, **kwargs
+        seed=0, statistics=False, **kwargs
     ):
         mzn = False
         args = []
@@ -166,6 +168,8 @@ class Gecode(Solver):
                 args += ['-D', data]
 
         fzn_flags = []
+        if statistics:
+            args.append('-s')
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
@@ -294,24 +298,29 @@ class Optimathsat(Solver):
         The path to the directory for global included files.
     """
     def __init__(self, path='optimathsat', globals_dir='std'):
-        super().__init__(globals_dir)
+        super().__init__(globals_dir, support_stats=True)
         self.cmd = path
         self._line_comm_p = re.compile('%.*\n')
         self._rational_p = re.compile('(\d+)\/(\d+)')
 
-    def _parse_out(self, out):
+    def _parse_out(self, out, statistics=False):
+        stats = ''.join(self._line_comm_p.findall(out))
         out = self._line_comm_p.sub(out, '')
         for m in self._rational_p.finditer(out):
             n, d = m.groups()
             val = float(n) / float(d)
             out = re.sub('{}/{}'.format(n, d), str(val), out)
+        if statistics:
+            return '\n'.join([out, stats])
         return out
 
     def args(self, fzn_file, *args, **kwargs):
         return [self.cmd, '-input=fzn', fzn_file]
 
-    def solve(fzn_file, *args, **kwargs):
-        return self._parse_out(super().solve(fzn_file, *args, **kwargs))
+    def solve(fzn_file, *args, statistics=False, **kwargs):
+        return self._parse_out(
+            super().solve(fzn_file, *args, **kwargs), statistics
+        )
 
     def solve_start(self, *args, **kwargs):
         raise NotImplementedError()
@@ -329,13 +338,17 @@ class Opturion(Solver):
     """
 
     def __init__(self, path='fzn-cpx', globals_dir='opturion-cpx'):
-        super().__init__(globals_dir, support_all=True)
+        super().__init__(globals_dir, support_all=True, support_stats=True)
         self.cmd = path
 
-    def args(self, fzn_file, *args, all_solutions=False, **kwargs):
+    def args(
+        self, fzn_file, *args, all_solutions=False, statistics=False, **kwargs
+    ):
         args = [self.cmd]
         if all_solutions:
             args.append('-a')
+        if statistics:
+            args.append('-s')
         args.append(mzn_file)
         return args
 
@@ -354,14 +367,14 @@ class MIPSolver(Solver):
     def __init__(self, path='mzn-gurobi', globals_dir='linear'):
         super().__init__(
             globals_dir, support_mzn=True, support_all=True, support_num=True,
-            support_timeout=True, support_output_mode=True
+            support_timeout=True, support_output_mode=True, support_stats=True
         )
         self.cmd = path
 
     def args(
         self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
         all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
-        **kwargs
+        statistics=False, **kwargs
     ):
         mzn = False
         args = [self.cmd]
@@ -378,6 +391,8 @@ class MIPSolver(Solver):
             if data:
                 args += ['-D', data]
 
+        if statistics:
+            args.append('-s')
         if all_solutions:
             args += ['-a', '--unique']
         if num_solutions is not None:
@@ -445,13 +460,14 @@ class G12Solver(Solver):
     ):
         super().__init__(
             globals_dir, support_mzn=True, support_all=True, support_num=True,
+            support_stats=True
         )
         self.fzn_cmd = fzn_path
         self.mzn_cmd = mzn_path
         self.backend = backend
 
     def args(
-        self, mzn_file, *dzn_files, data=None, include=None,
+        self, mzn_file, *dzn_files, data=None, include=None, statistics=False,
         all_solutions=False, num_solutions=None, **kwargs
     ):
         mzn = False
@@ -471,6 +487,8 @@ class G12Solver(Solver):
             if data:
                 args += ['-D', data]
 
+        if statistics:
+            args.append('-s')
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
@@ -556,13 +574,13 @@ class OscarCBLS(Solver):
     def __init__(self, path='fzn-oscar-cbls', globals_dir='oscar-cbls'):
         super().__init__(
             globals_dir, support_all=True, support_num=True,
-            support_timeout=True
+            support_timeout=True, support_stats=True
         )
         self.cmd = path
 
     def args(
         self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
-        all_solutions=False, num_solutions=None, **kwargs
+        all_solutions=False, num_solutions=None, statistics=False, **kwargs
     ):
         """Solve a FlatZinc problem with Oscar/CBLS.
 
@@ -578,6 +596,8 @@ class OscarCBLS(Solver):
         log = logging.getLogger(__name__)
 
         args = [self.cmd]
+        if statistics:
+            args += ['-s', '-v']
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
