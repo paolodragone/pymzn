@@ -20,7 +20,6 @@ __all__.extend(dzn.__all__)
 __all__.extend(mzn.__all__)
 
 # TODO: update python2 branch
-# TODO: make it work on windows
 
 _debug_handler = None
 _pymzn_logger = logging.getLogger(__name__)
