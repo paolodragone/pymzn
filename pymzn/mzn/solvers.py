@@ -82,7 +82,7 @@ class Solver:
 
         try:
             log.debug('Starting solver with arguments {}'.format(solver_args))
-            return Process(args).start(timeout=timeout)
+            return Process(solver_args).start(timeout=timeout)
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
@@ -113,7 +113,7 @@ class Solver:
 
         try:
             log.debug('Running solver with arguments {}'.format(solver_args))
-            process = Process(args).run(timeout=timeout)
+            process = Process(solver_args).run(timeout=timeout)
             out = process.stdout_data
         except CalledProcessError as err:
             log.exception(err.stderr)
@@ -202,7 +202,7 @@ class Gecode(Solver):
 
         try:
             log.debug('Running solver with arguments {}'.format(solver_args))
-            process = Process(args).run()
+            process = Process(solver_args).run()
             out = process.stdout_data
         except CalledProcessError as err:
             if suppress_segfault and len(err.stdout) > 0 \
