@@ -108,7 +108,7 @@ class Solver:
 
         If a solver supports neither dzn nor json output, then its PyMzn
         implementation should take care of parsing the solver output and return
-        a SolnsStream with solutions evaluated as dictionaries.
+        a dzn equivalent.
 
         Parameters
         ----------
@@ -126,14 +126,13 @@ class Solver:
             Whether to return all solutions.
         num_solutions : bool
             Upper bound to the number of solutions.
-        output_mode : 'dzn', 'json', 'item', 'dict'
+        output_mode : 'dzn', 'json', 'item'
             The output mode required.
 
         Returns
         -------
-        str or SolnsStream
-            The output of the solver if output_mode in ['dzn', 'json', 'item']
-            or a SolnsStream of evaluated solutions if output_mode == 'dict'.
+        str
+            The output of the solver.
         """
         log = logging.getLogger(__name__)
 
