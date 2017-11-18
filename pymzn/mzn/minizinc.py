@@ -55,6 +55,7 @@ class Solutions:
         self._solns = []
         self.complete = False
         self._iter = None
+        self._stats = None
 
     def _fetch(self):
         try:
@@ -63,9 +64,9 @@ class Solutions:
             return solution
         except SearchComplete:
             self.complete = True
-            # Stats (maybe)
-            self._stream = None
-        except StopIteration:
+        except StopIteration as stop:
+            if stop.value:
+                self._stats = stop.value
             self._stream = None
         return None
 
@@ -111,7 +112,7 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        wait=False, **kwargs
+        wait=False, statistics=False, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -179,6 +180,8 @@ def minizinc(
         Whether to wait for the solving process to finish before returning the
         solution stream. This parameter is ignored on Windows systems, on which
         the solving process is always awaited.
+    statistics : bool
+        Whether to save the statistics of the solver (if supported).
     **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
@@ -276,7 +279,7 @@ def minizinc(
             )
         solns = split_solns(out)
         if output_mode == 'dict':
-            solns = map(dzn2dict, solns)
+            solns = _to_dict(solns)
         stream = solns
     except (
         MiniZincUnsatisfiableError, MiniZincUnknownError, MiniZincUnboundedError
@@ -500,14 +503,31 @@ def split_solns(lines):
             _buffer = []
         elif line == SEARCH_COMPLETE:
             raise SearchComplete
+            _buffer = []
         elif line == UNKNOWN:
-            raise MiniZincUnknownError()
+            raise MiniZincUnknownError
+            _buffer = []
         elif line == UNSATISFIABLE:
-            raise MiniZincUnsatisfiableError()
+            raise MiniZincUnsatisfiableError
+            _buffer = []
         elif line == UNBOUNDED:
-            raise MiniZincUnboundedError()
+            raise MiniZincUnboundedError
+            _buffer = []
         else:
             _buffer.append(line)
+    return _buffer
+
+
+def _to_dict(stream):
+    while True:
+        try:
+            soln = next(stream)
+            yield dzn2dict(stream)
+        except StopIteration:
+            raise
+            break
+        except:
+            raise
 
 
 class SearchComplete(Exception):
