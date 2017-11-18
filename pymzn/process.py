@@ -5,6 +5,8 @@ This package implements the `Process` class, a helper class that wraps
 asynchronously.
 """
 
+import io
+
 from threading import Thread, Lock
 from time import monotonic as _time
 from subprocess import Popen, PIPE, TimeoutExpired, CalledProcessError
@@ -236,7 +238,12 @@ class Process:
         """
         if not self.started or not self.async:
             raise RuntimeError('The process has not been started.')
-        stdout = self._process.stdout
+        if self.alive:
+            stdout = self._process.stdout
+        else:
+            stdout = io.StringIO()
+            stdout.write(self.stdout_data)
+            stdout.seek(0)
         try:
             while not stdout.closed:
                 try:
@@ -253,6 +260,8 @@ class Process:
                         self._process_lock.release()
         finally:
             self._waiter_thread.join()
+            if not stdout.closed:
+                stdout.close()
 
     def __iter__(self):
         return self.readlines()
