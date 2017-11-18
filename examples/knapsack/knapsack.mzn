@@ -1,4 +1,4 @@
-%% knapsack.mzn %%
+%% knapsack01.mzn %%
 
 int: n;                     % number of objects
 set of int: OBJ = 1..n;
