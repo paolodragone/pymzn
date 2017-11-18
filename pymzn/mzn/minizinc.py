@@ -303,15 +303,15 @@ def _cleanup(stream, files):
 
 def _solve(solver, *args, lines=False, wait=False, **kwargs):
     if wait:
-        solver_process = solver.solve_start(*args, **kwargs)
-        if lines:
-            return solver_process.readlines()
-        return solver_process.stdout
-    else:
         out = solver.solve(*args, **kwargs)
         if lines:
             return out.splitlines()
         return out
+    else:
+        solver_process = solver.solve_start(*args, **kwargs)
+        if lines:
+            return solver_process.readlines()
+        return solver_process
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -468,6 +468,13 @@ def solns2out(stream, ozn_file):
         if isinstance(stream, (BufferedReader, TextIOWrapper)):
             process.start(stream)
             yield from process.readlines()
+        elif isinstance(stream, Process):
+            if stream.alive:
+                process.start(stream.stdout)
+                yield from process.readlines()
+            else:
+                process.run(stream.stdout_data)
+                yield from process.stdout_data.splitlines()
         else:
             process.run(stream)
             yield from process.stdout_data.splitlines()
