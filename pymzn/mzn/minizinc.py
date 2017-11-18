@@ -216,11 +216,6 @@ def minizinc(
     if output_mode != 'dict' and output_vars:
         raise ValueError('Output vars only available in `dict` output mode.')
 
-    if (output_mode == 'dzn' and not solver.support_dzn) or \
-       (output_mode == 'json' and not solver.support_json) or \
-       (output_mode == 'item' and not solver.support_item):
-        force_flatten = True
-
     if output_mode == 'dict':
         if output_vars:
             mzn_model.dzn_output(output_vars)
@@ -230,6 +225,9 @@ def minizinc(
             force_flatten = True
     else:
         _output_mode = output_mode
+
+    if _output_mode in ['json', 'item'] and not solver.support_output_mode:
+        force_flatten = True
 
     output_prefix = 'pymzn'
     if keep:
