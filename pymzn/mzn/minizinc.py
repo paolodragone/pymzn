@@ -57,16 +57,21 @@ class Solutions:
         self._iter = None
         self._stats = None
 
+    @property
+    def statistics(self):
+        self._fetch_all()
+        return self._stats
+
     def _fetch(self):
         try:
             solution = next(self._stream)
             self._solns.append(solution)
             return solution
-        except SearchComplete:
-            self.complete = True
         except StopIteration as stop:
-            if stop.value:
-                self._stats = stop.value
+            complete, stats = stop.value
+            self.complete = complete
+            if stats:
+                self._stats = stats
             self._stream = None
         return None
 
@@ -209,6 +214,8 @@ def minizinc(
         raise ValueError('The solver cannot return a given number of solutions')
     if output_mode != 'dict' and output_vars:
         raise ValueError('Output vars only available in `dict` output mode')
+    if statistics and not solver.support_stats:
+        raise ValueError('The solver does not support emitting statistics')
 
     if not output_dir:
         output_dir = config.get('output_dir', None)
@@ -263,7 +270,7 @@ def minizinc(
             solver_stream = _solve(
                 solver, fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
-                **solver_args
+                statistics=statistics, **solver_args
             )
             out = solns2out(solver_stream, ozn_file)
         else:
@@ -275,7 +282,7 @@ def minizinc(
                 solver, mzn_file, *dzn_files, wait=wait, lines=True, data=data,
                 include=include, timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
-                **solver_args
+                statistics=statistics, **solver_args
             )
         solns = split_solns(out)
         if output_mode == 'dict':
@@ -294,7 +301,10 @@ def minizinc(
 
 def _cleanup(stream, files):
     try:
-        yield from stream
+        while True:
+            yield next(stream)
+    except StopIteration as stop:
+        return stop.value
     finally:
         log = logging.getLogger(__name__)
         with contextlib.suppress(FileNotFoundError):
@@ -496,43 +506,32 @@ UNBOUNDED = '=====UNBOUNDED====='
 def split_solns(lines):
     """Split the solutions from the output stream of a solver or solns2out"""
     _buffer = []
+    complete = False
     for line in lines:
         line = line.strip()
         if line == SOLN_SEP:
             yield '\n'.join(_buffer)
             _buffer = []
         elif line == SEARCH_COMPLETE:
-            raise SearchComplete
+            complete = True
             _buffer = []
         elif line == UNKNOWN:
             raise MiniZincUnknownError
-            _buffer = []
         elif line == UNSATISFIABLE:
             raise MiniZincUnsatisfiableError
-            _buffer = []
         elif line == UNBOUNDED:
             raise MiniZincUnboundedError
-            _buffer = []
         else:
             _buffer.append(line)
-    return _buffer
+    return (complete, '\n'.join(_buffer))
 
 
 def _to_dict(stream):
-    while True:
-        try:
-            soln = next(stream)
-            yield dzn2dict(stream)
-        except StopIteration:
-            raise
-            break
-        except:
-            raise
-
-
-class SearchComplete(Exception):
-    """Raised by split_solns when SEARCH_COMPLETE is found."""
-    pass
+    try:
+        while True:
+            yield dzn2dict(next(stream))
+    except StopIteration as stop:
+        return stop.value
 
 
 class MiniZincError(RuntimeError):
