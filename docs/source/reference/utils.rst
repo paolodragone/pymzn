@@ -1,12 +1,12 @@
-Binary execution
-================
+Process execution
+=================
 
-.. currentmodule:: pymzn.utils
+.. currentmodule:: pymzn.process
 
 
 .. autosummary::
    :toctree: generated/
 
-   run
+   Process
 
-.. automodule:: pymzn.utils
+.. automodule:: pymzn.process
