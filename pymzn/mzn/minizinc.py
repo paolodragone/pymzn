@@ -111,7 +111,7 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        **kwargs
+        wait=False, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -175,6 +175,10 @@ def minizinc(
         always produces a fzn file which is in turn passed to the solver.
     args : dict
         Arguments for the template engine.
+    wait : bool
+        Whether to wait for the solving process to finish before returning the
+        solution stream. This parameter is ignored on Windows systems, on which
+        the solving process is always awaited.
     **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
@@ -247,6 +251,8 @@ def minizinc(
     fzn_file = None
     ozn_file = None
 
+    wait = wait or os.name == 'nt'
+
     solver_args = {**config.get('solver_args', {}), **kwargs}
     solver_process = None
     solns2out_process = None
@@ -257,27 +263,23 @@ def minizinc(
                 include=include, globals_dir=solver.globals_dir,
                 output_mode=_output_mode
             )
-            solver_process = solver.solve_start(
-                fzn_file, timeout=timeout, output_mode='dzn',
+            solver_stream = _solve(
+                fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 **solver_args
             )
-            solver_stream = solver_process.stdout
-            solns2out_process = _solns2out_process(ozn_file)
-            solns2out_process.start(solver_stream)
-            out = solns2out_process.readlines()
+            out = solns2out(solver_stream, ozn_file)
         else:
             dzn_files = list(dzn_files)
             data, data_file = _prepare_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
-            solver_process = solver.solve_start(
-                mzn_file, *dzn_files, data=data, include=include,
-                timeout=timeout, all_solutions=all_solutions,
+            out = _solve(
+                mzn_file, *dzn_files, wait=wait, lines=True, data=data,
+                include=include, timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
                 **solver_args
             )
-            out = solver_process.readlines()
         solns = split_solns(out)
         if output_mode == 'dict':
             solns = map(dzn2dict, solns)
@@ -303,6 +305,19 @@ def _cleanup(stream, files):
                 if _file:
                     os.remove(_file)
                     log.debug('Deleting file: {}'.format(_file))
+
+
+def _solve(*args, lines=False, wait=False, **kwargs):
+    if wait:
+        solver_process = solver.solve_start(*args, **kwargs)
+        if lines:
+            return solver_process.readlines()
+        return solver_process.stdout
+    else:
+        out = solver.solve(*args, **kwargs)
+        if lines:
+            return out.splitlines()
+        return out
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
