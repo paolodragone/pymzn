@@ -15,6 +15,6 @@ var int: obj = sum(i in x)(profit[i]);
 solve maximize obj;
 
 output [
-       "knapsack = " ++ show(x)
+       "knapsack = " ++ show(x) ++ "\n"
     ++ "objective = " ++ show(obj)
 ];
