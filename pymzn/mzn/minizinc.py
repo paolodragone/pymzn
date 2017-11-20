@@ -222,6 +222,15 @@ def minizinc(
 
     keep = config.get('keep', keep)
 
+    if output_mode == 'dict':
+        if output_vars:
+            mzn_model.dzn_output(output_vars)
+            _output_mode = 'item'
+        else:
+            _output_mode = 'dzn'
+    else:
+        _output_mode = output_mode
+
     output_prefix = 'pymzn'
     if keep:
         mzn_dir = os.getcwd()
@@ -243,15 +252,6 @@ def minizinc(
     ozn_file = None
 
     wait = wait or os.name == 'nt'
-
-    if output_mode == 'dict':
-        if output_vars:
-            mzn_model.dzn_output(output_vars)
-            _output_mode = 'item'
-        else:
-            _output_mode = 'dzn'
-    else:
-        _output_mode = output_mode
 
     force_flatten = (
            config.get('force_flatten', force_flatten)
