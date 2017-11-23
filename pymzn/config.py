@@ -99,8 +99,9 @@ def set(key, value):
     """
     global _config
     global _modified
-    _config[key] = value
-    _modified = True
+    if get('key') != value:
+        _config[key] = value
+        _modified = True
 
 
 def dump():
