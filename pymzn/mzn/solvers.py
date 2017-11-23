@@ -349,7 +349,7 @@ class Opturion(Solver):
             args.append('-a')
         if statistics:
             args.append('-s')
-        args.append(mzn_file)
+        args.append(fzn_file)
         return args
 
 
