@@ -99,7 +99,7 @@ def set(key, value):
     """
     global _config
     global _modified
-    if get('key') != value:
+    if get(key) != value:
         _config[key] = value
         _modified = True
 
