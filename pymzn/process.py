@@ -6,6 +6,7 @@ asynchronously.
 """
 
 import io
+import os
 
 from threading import Thread, Lock
 from time import monotonic as _time
@@ -116,6 +117,8 @@ class Process:
         self._check_started()
         popenkwargs = {'bufsize': 1, 'universal_newlines': True,
                        'stdin': PIPE, 'stdout': PIPE, 'stderr': PIPE}
+        if os.name == 'nt':
+            popenkwargs['shell'] = True
         self._process_lock.acquire()
         self.timeout = timeout
         self._start = _time()
@@ -193,6 +196,8 @@ class Process:
         self._check_started()
         popenkwargs = {'bufsize': 0, 'universal_newlines': True,
                        'stdin': stdin, 'stdout': PIPE, 'stderr': PIPE}
+        if os.name == 'nt':
+            popenkwargs['shell'] = True
         self._process_lock.acquire()
         if not self.started:
             self.async = True
