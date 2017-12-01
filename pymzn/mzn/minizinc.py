@@ -117,7 +117,7 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        wait=False, statistics=False, **kwargs
+        wait=True, statistics=False, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -183,8 +183,7 @@ def minizinc(
         Arguments for the template engine.
     wait : bool
         Whether to wait for the solving process to finish before returning the
-        solution stream. This parameter is ignored on Windows systems, on which
-        the solving process is always awaited.
+        solution stream.
     statistics : bool
         Whether to save the statistics of the solver (if supported).
     **kwargs
@@ -250,8 +249,6 @@ def minizinc(
     data_file = None
     fzn_file = None
     ozn_file = None
-
-    wait = wait or os.name == 'nt'
 
     force_flatten = (
            config.get('force_flatten', force_flatten)
