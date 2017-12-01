@@ -183,7 +183,7 @@ class Process:
                 stdout, stderr = self.stdout_data, self.stderr_data
                 raise CalledProcessError(retcode, self.args, stdout, stderr)
 
-    def start(self, stdin=None, timeout=True):
+    def start(self, stdin=None, timeout=None):
         """Starts the process asynchronously.
 
         Parameters
