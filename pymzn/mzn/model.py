@@ -8,7 +8,7 @@ output statements. An instance of ``MiniZincModel`` can then be passed directly
 to the ``minizinc`` function to be solved.
 ::
 
-    model = pymzn.MiniZinModel('test.mzn')
+    model = pymzn.MiniZincModel('test.mzn')
     solutions = []
     for i in range(10):
         # add a new constraint and solve again
