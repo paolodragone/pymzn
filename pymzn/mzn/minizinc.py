@@ -285,30 +285,30 @@ def minizinc(
         if output_mode == 'dict':
             solns = _to_dict(solns)
         stream = solns
-    except (
-        MiniZincUnsatisfiableError, MiniZincUnknownError, MiniZincUnboundedError
-    ) as err:
+    except MiniZincError as err:
         err.mzn_file = mzn_file
         raise err
 
     cleanup_files = [] if keep else [data_file, mzn_file, fzn_file, ozn_file]
-    stream = _cleanup(stream, cleanup_files)
+    stream = _cleanup(stream, mzn_file, cleanup_files)
     return Solutions(stream)
 
 
-def _cleanup(stream, files):
+def _cleanup(stream, mzn_file, files):
     try:
         while True:
             yield next(stream)
     except StopIteration as stop:
-        return stop.value
-    finally:
         log = logging.getLogger(__name__)
         with contextlib.suppress(FileNotFoundError):
             for _file in files:
                 if _file:
                     os.remove(_file)
                     log.debug('Deleting file: {}'.format(_file))
+        return stop.value
+    except MiniZincError as err:
+        err.mzn_file = mzn_file
+        raise err
 
 
 def _solve(solver, *args, lines=False, wait=False, **kwargs):
@@ -546,6 +546,7 @@ class MiniZincError(RuntimeError):
     @mzn_file.setter
     def mzn_file(self, _mzn_file):
         self._mzn_file = _mzn_file
+        self.args = ('{}: {}'.format(self._mzn_file, self.args[0]),)
 
 
 class MiniZincUnsatisfiableError(MiniZincError):
