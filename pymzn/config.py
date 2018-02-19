@@ -43,8 +43,6 @@ messages you can then call::
 
 """
 import os
-import yaml
-import appdirs
 
 
 _modified = False
@@ -78,10 +76,15 @@ def get(key, default=None):
     global _config
     if _config is None:
         _config = {}
-        cfg_file = _cfg_file()
-        if os.path.isfile(cfg_file):
-            with open(cfg_file) as f:
-                _config = yaml.load(f)
+        try:
+            import yaml
+            import appdirs
+            cfg_file = _cfg_file()
+            if os.path.isfile(cfg_file):
+                with open(cfg_file) as f:
+                    _config = yaml.load(f)
+        except ImportError:
+            pass
     if default is None:
         default = _defaults.get(key)
     return _config.get(key, default)
@@ -109,10 +112,18 @@ def dump():
     global _config
     global _modified
     if _modified:
-        cfg_file = _cfg_file()
-        cfg_dir, __ = os.path.split(cfg_file)
-        os.makedirs(cfg_dir, exist_ok=True)
-        with open(cfg_file, 'w') as f:
-            yaml.dump(_config, f)
-        _modified = False
+        try:
+            import yaml
+            import appdirs
+            cfg_file = _cfg_file()
+            cfg_dir, __ = os.path.split(cfg_file)
+            os.makedirs(cfg_dir, exist_ok=True)
+            with open(cfg_file, 'w') as f:
+                yaml.dump(_config, f)
+            _modified = False
+        except ImportError as err:
+            raise RuntimeError(
+                'Cannot dump the configuration settings to file. You need to '
+                'install the necessary dependencies (pyyaml, appdirs).'
+            ) from err
 
