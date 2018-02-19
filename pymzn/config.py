@@ -55,7 +55,11 @@ _defaults = {
 
 
 def _cfg_file():
-    return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
+    try:
+        import appdirs
+        return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
+    except ImportError:
+        return None
 
 
 def get(key, default=None):
@@ -78,7 +82,6 @@ def get(key, default=None):
         _config = {}
         try:
             import yaml
-            import appdirs
             cfg_file = _cfg_file()
             if os.path.isfile(cfg_file):
                 with open(cfg_file) as f:
@@ -114,7 +117,6 @@ def dump():
     if _modified:
         try:
             import yaml
-            import appdirs
             cfg_file = _cfg_file()
             cfg_dir, __ = os.path.split(cfg_file)
             os.makedirs(cfg_dir, exist_ok=True)
