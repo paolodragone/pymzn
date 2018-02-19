@@ -568,7 +568,8 @@ class OscarCBLS(Solver):
     globals_dir : str
         The path to the directory for global included files.  You should either
         copy or link the 'mznlib' folder from the oscar-cbls-flatzinc
-        distribution into the minizinc library directory.
+        distribution into the minizinc library directory (with name
+        'oscar-cbls') or provide the full path here.
     """
 
     def __init__(self, path='fzn-oscar-cbls', globals_dir='oscar-cbls'):
@@ -607,6 +608,64 @@ class OscarCBLS(Solver):
         args.append(mzn_file)
         return args
 
+
+class ORTools(Solver):
+    """Interface to the OR-tools solver.
+
+    Parameters
+    ----------
+    path : str
+        The path to the fzn-or-tools executable.
+    globals_dir : str
+        The path to the directory for global included files. You should either
+        copy or link the 'share/minizinc_cp' folder from the or-tools
+        distribution into the minizinc library directory (with name 'or-tools')
+        or provide the full path here.
+    """
+
+    def __init__(self, fzn_path='fzn-or-tools', globals_dir='or-tools'):
+        super().__init__(
+            globals_dir, support_all=True, support_num=True,
+            support_timeout=True, support_stats=True
+        )
+        self.fzn_cmd = fzn_path
+
+    def args(
+        self, mzn_file, *dzn_files, data=None, include=None, timeout=None,
+        all_solutions=False, num_solutions=None, output_mode='item', parallel=1,
+        seed=0, statistics=False, **kwargs
+    ):
+        """Solve a FlatZinc problem with OR-tools.
+
+        Parameters
+        ----------
+        mzn_file : str
+            The path to the fzn file to solve.
+        Returns
+        -------
+        str
+            The output of the solver in dzn format.
+        """
+        args = [self.fzn_cmd]
+
+        if statistics:
+            args.append('-statistics')
+        if all_solutions:
+            args.append('--all_solutions')
+        if num_solutions is not None:
+            args += ['--num_solutions', str(num_solutions)]
+        if parallel != 1:
+            args += ['--threads', str(parallel)]
+        if timeout and timeout > 0:
+            timeout = timeout * 1000 # OR-tools takes milliseconds
+            args += ['--time_limit', str(timeout)]
+        if seed != 0:
+            args += ['--fz_seed', str(seed)]
+
+        args.append(mzn_file)
+        return args
+
+
 #: Default Gecode instance.
 gecode = Gecode()
 
@@ -636,4 +695,7 @@ g12mip = G12MIP()
 
 #: Default Oscar/CBLS instance.
 oscar_cbls = OscarCBLS()
+
+#: Default ORTools instance.
+or_tools = ORTools()
 
