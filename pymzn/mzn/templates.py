@@ -61,13 +61,14 @@ template inheritance, and filters. PyMzn implements few custom filters as well:
 - `dzn(value)` : transform the input into its equivalent dzn string.
 """
 
-from copy import deepcopy
-from collections.abc import Iterable
-from pymzn.dzn.marsh import val2dzn
 from jinja2 import (
     Environment, Template, BaseLoader, PackageLoader, FileSystemLoader,
     TemplateNotFound
 )
+
+from copy import deepcopy
+from collections.abc import Iterable
+from pymzn.dzn.marsh import val2dzn
 
 
 def discretize(value, factor=100):

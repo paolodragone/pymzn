@@ -20,10 +20,22 @@ to the ``minizinc`` function to be solved.
 import re
 import os.path
 
-from .templates import from_string
+from copy import deepcopy
+
 from ..dzn.marsh import stmt2dzn, val2dzn
 
-from copy import deepcopy
+try:
+    from .templates import from_string
+except ImportError:
+    def from_string(model, args):
+        if args is not None:
+            raise RuntimeError(
+                'Templates are not in use, but template arguments were '
+                'provided. If you intended to use tempaltes make sure you '
+                'installed the Jinja2 templating library.'
+            )
+        return model
+
 
 stmt_p = re.compile('(?:^|;)\s*([^;]+)')
 stmts_p = re.compile('(?:^|;)([^;]+)')
