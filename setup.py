@@ -40,10 +40,11 @@ setup(
     packages = find_packages(exclude=['*tests*']),
     test_suite = "pymzn.tests",
     install_requires = [
-        'appdirs',
-        'pyyaml',
-        'jinja2'
     ],
+    extra_require = {
+        'file-config': ['appdirs', 'pyyaml'],
+        'templates': ['jinja2']
+    },
     platforms = 'any',
     classifiers = [
         'Programming Language :: Python',
