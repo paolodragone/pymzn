@@ -250,6 +250,9 @@ def minizinc(
     fzn_file = None
     ozn_file = None
 
+    log = logging.getLogger(__name__)
+    log.debug('Generated file {}'.format(mzn_file))
+
     force_flatten = (
            config.get('force_flatten', force_flatten)
         or not solver.support_mzn
@@ -289,7 +292,7 @@ def minizinc(
         err.mzn_file = mzn_file
         raise err
 
-    cleanup_files = [] if keep else [data_file, mzn_file, fzn_file, ozn_file]
+    cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
     stream = _cleanup(stream, mzn_file, cleanup_files)
     return Solutions(stream)
 
@@ -304,7 +307,7 @@ def _cleanup(stream, mzn_file, files):
             for _file in files:
                 if _file:
                     os.remove(_file)
-                    log.debug('Deleting file: {}'.format(_file))
+                    log.debug('Deleted file: {}'.format(_file))
         return stop.value
     except MiniZincError as err:
         err.mzn_file = mzn_file
@@ -406,7 +409,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         with contextlib.suppress(FileNotFoundError):
             if data_file:
                 os.remove(data_file)
-                log.debug('Deleting file: {}'.format(data_file))
+                log.debug('Deleted file: {}'.format(data_file))
 
     mzn_base = os.path.splitext(mzn_file)[0]
     fzn_file = '.'.join([mzn_base, 'fzn'])
