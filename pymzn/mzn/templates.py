@@ -61,6 +61,8 @@ template inheritance, and filters. PyMzn implements few custom filters as well:
 - `dzn(value)` : transform the input into its equivalent dzn string.
 """
 
+import logging
+
 from jinja2 import (
     Environment, Template, BaseLoader, PackageLoader, FileSystemLoader,
     TemplateNotFound
@@ -116,6 +118,8 @@ _jenv.filters['int'] = discretize
 
 def from_string(source, args=None):
     """Renders a template string"""
+    log = logging.getLogger(__name__)
+    log.debug('Compiling model with arguments {}'.format(args))
     return _jenv.from_string(source).render(args or {})
 
 
