@@ -257,7 +257,7 @@ class MiniZincModel(object):
                     if os.path.isfile(mzn):
                         self.mzn_file = mzn
                     else:
-                        raise ValueError('The provided file does not exsist.')
+                        raise ValueError('The file does not exsist.')
                 else:
                     self.model = mzn
 
