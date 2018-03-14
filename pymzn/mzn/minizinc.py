@@ -117,7 +117,7 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        wait=True, statistics=False, **kwargs
+        wait=True, statistics=False, no_output_annotations=False, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -186,6 +186,9 @@ def minizinc(
         solution stream.
     statistics : bool
         Whether to save the statistics of the solver (if supported).
+    no_output_annotations : bool
+        Whether to avoid using output annotation when handling output
+        variables.
     **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
@@ -230,6 +233,10 @@ def minizinc(
     else:
         _output_mode = output_mode
 
+    no_output_annotations = config.get(
+        'no_output_annotations', no_output_annotations
+    )
+
     output_prefix = 'pymzn'
     if keep:
         mzn_dir = os.getcwd()
@@ -242,7 +249,11 @@ def minizinc(
     output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
-    mzn_model.compile(output_file, rewrap=keep, args=args)
+
+    mzn_model.compile(
+        output_file, rewrap=keep, args=args,
+        no_output_annotations=no_output_annotations
+    )
     output_file.close()
 
     mzn_file = output_file.name

@@ -18,6 +18,8 @@ The configurable properties used by PyMzn are the following:
  * **keep**: Overrides the keep flag of all minizinc and mzn2fzn calls;
  * **output_dir**: Set a default output directory for generated files;
  * **force_flatten**: Overrides the force_flatten flag of all minizinc calls;
+ * **no_output_annotations**: Overrides the no_output_annotation flag of all
+   minizinc calls;
  * **dzn_width**: The horizontal character limit for dzn files;
    This property is used to wrap long dzn statements when writing dzn files.
    This property is also used in the ``pymzn.minizinc`` function as a limit to
