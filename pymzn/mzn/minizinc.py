@@ -50,6 +50,8 @@ class Solutions:
         contains the global optimum for maximization/minimization problems.
     """
 
+    # TODO: add option to not save solutions
+
     def __init__(self, stream):
         self._stream = stream
         self._solns = []
@@ -271,6 +273,7 @@ def minizinc(
     )
 
     solver_args = {**config.get('solver_args', {}), **kwargs}
+    stderr = None
     try:
         if force_flatten:
             fzn_file, ozn_file = mzn2fzn(
@@ -278,18 +281,18 @@ def minizinc(
                 include=include, globals_dir=solver.globals_dir,
                 output_mode=_output_mode
             )
-            solver_stream = _solve(
+            solver_stream, stderr = _solve(
                 solver, fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 statistics=statistics, **solver_args
             )
-            out = solns2out(solver_stream, ozn_file)
+            out, stderr = solns2out(solver_stream, ozn_file)
         else:
             dzn_files = list(dzn_files)
             data, data_file = _prepare_data(mzn_file, data, keep)
             if data_file:
                 dzn_files.append(data_file)
-            out = _solve(
+            out, stderr = _solve(
                 solver, mzn_file, *dzn_files, wait=wait, lines=True, data=data,
                 include=include, timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
@@ -300,15 +303,15 @@ def minizinc(
             solns = _to_dict(solns)
         stream = solns
     except MiniZincError as err:
-        err.mzn_file = mzn_file
+        err._set(mzn_file, stderr)
         raise err
 
     cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
-    stream = _cleanup(stream, mzn_file, cleanup_files)
+    stream = _cleanup(stream, mzn_file, cleanup_files, stderr)
     return Solutions(stream)
 
 
-def _cleanup(stream, mzn_file, files):
+def _cleanup(stream, mzn_file, files, stderr=None):
     try:
         while True:
             yield next(stream)
@@ -321,21 +324,21 @@ def _cleanup(stream, mzn_file, files):
                     log.debug('Deleted file: {}'.format(_file))
         return stop.value
     except MiniZincError as err:
-        err.mzn_file = mzn_file
+        err._set(mzn_file, stderr)
         raise err
 
 
 def _solve(solver, *args, lines=False, wait=False, **kwargs):
     if wait:
-        out = solver.solve(*args, **kwargs)
+        out, err = solver.solve(*args, **kwargs)
         if lines:
-            return out.splitlines()
-        return out
+            return out.splitlines(), err
+        return out, err
     else:
         solver_process = solver.solve_start(*args, **kwargs)
         if lines:
-            return solver_process.readlines()
-        return solver_process
+            return solver_process.readlines(), solver_proces.stderr
+        return solver_process, solver_proces.stderr
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -512,7 +515,8 @@ SEARCH_COMPLETE = '=========='
 UNSATISFIABLE = '=====UNSATISFIABLE====='
 UNKNOWN = '=====UNKNOWN====='
 UNBOUNDED = '=====UNBOUNDED====='
-
+UNSATorUNBOUNDED = '=====UNSATorUNBOUNDED====='
+ERROR = '=====ERROR====='
 
 def split_solns(lines):
     """Split the solutions from the output stream of a solver or solns2out"""
@@ -532,6 +536,10 @@ def split_solns(lines):
             raise MiniZincUnsatisfiableError
         elif line == UNBOUNDED:
             raise MiniZincUnboundedError
+        elif line == UNSATorUNBOUNDED:
+            raise MiniZincUnsatOrUnboundedError
+        elif line == ERROR:
+            raise MiniZincGenericError
         else:
             _buffer.append(line)
     return (complete, '\n'.join(_buffer))
@@ -551,16 +559,23 @@ class MiniZincError(RuntimeError):
     def __init__(self, msg=None):
         super().__init__(msg)
         self._mzn_file = None
+        self._stderr = None
+
+    @property
+    def stderr(self):
+        return self._stderr
 
     @property
     def mzn_file(self):
         """str: the mzn file that generated the error."""
         return self._mzn_file
 
-    @mzn_file.setter
-    def mzn_file(self, _mzn_file):
+    def _set(self, _mzn_file, _stderr):
         self._mzn_file = _mzn_file
-        self.args = ('{}: {}'.format(self._mzn_file, self.args[0]),)
+        self._stderr = _stderr
+        self.args = ('{}: {}'.format(
+            self._mzn_file, self.args[0] + '\n{}'.format(_stderr)
+        ),)
 
 
 class MiniZincUnsatisfiableError(MiniZincError):
@@ -582,4 +597,20 @@ class MiniZincUnboundedError(MiniZincError):
 
     def __init__(self):
         super().__init__('The problem is unbounded.')
+
+
+class MiniZincUnsatOrUnboundedError(MiniZincError):
+    """Error raised when a minizinc problem is found to be unsatisfiable or
+    unbounded.
+    """
+
+    def __init__(self):
+        super().__init__('The problem is unsatisfiable or unbounded.')
+
+
+class MiniZincGenericError(MiniZincError):
+    """Error raised when an error occurs but it is none of the above."""
+
+    def __init__(self):
+        super().__init__('The problem raised an error.')
 

@@ -119,10 +119,11 @@ class Solver:
             log.debug('Running solver with arguments {}'.format(solver_args))
             process = Process(solver_args).run(timeout=timeout)
             out = process.stdout_data
+            err = process.stderr_data
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
-        return out
+        return out, err
 
 
 class Gecode(Solver):
@@ -318,9 +319,8 @@ class Optimathsat(Solver):
         return [self.cmd, '-input=fzn', fzn_file]
 
     def solve(fzn_file, *args, statistics=False, **kwargs):
-        return self._parse_out(
-            super().solve(fzn_file, *args, **kwargs), statistics
-        )
+        out, err = super().solve(fzn_file, *args, **kwargs)
+        return self._parse_out(out, statistics), err
 
     def solve_start(self, *args, **kwargs):
         raise NotImplementedError()
