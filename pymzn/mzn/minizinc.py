@@ -286,7 +286,7 @@ def minizinc(
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 statistics=statistics, **solver_args
             )
-            out, stderr = solns2out(solver_stream, ozn_file)
+            out = solns2out(solver_stream, ozn_file)
         else:
             dzn_files = list(dzn_files)
             data, data_file = _prepare_data(mzn_file, data, keep)

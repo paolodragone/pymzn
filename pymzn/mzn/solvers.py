@@ -211,6 +211,7 @@ class Gecode(Solver):
             log.debug('Running solver with arguments {}'.format(solver_args))
             process = Process(solver_args).run()
             out = process.stdout_data
+            err = process.stderr_data
         except CalledProcessError as err:
             if suppress_segfault and len(err.stdout) > 0 \
                     and err.stderr.startswith('Segmentation fault'):
@@ -221,7 +222,7 @@ class Gecode(Solver):
             else:
                 log.exception(err.stderr)
                 raise RuntimeError(err.stderr) from err
-        return out
+        return out, err
 
 
 class Chuffed(Solver):
