@@ -85,7 +85,7 @@ def get(key, default=None):
         try:
             import yaml
             cfg_file = _cfg_file()
-            if os.path.isfile(cfg_file):
+            if cfg_file and os.path.isfile(cfg_file):
                 with open(cfg_file) as f:
                     _config = yaml.load(f)
         except ImportError:
