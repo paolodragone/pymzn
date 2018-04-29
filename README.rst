@@ -65,6 +65,7 @@ Install
 
 PyMzn can be installed via Pip::
 
+    pip install appdirs
     pip install pymzn
 
 or from the source code available
