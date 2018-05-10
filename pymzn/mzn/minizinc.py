@@ -252,6 +252,8 @@ def minizinc(
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
 
+    args = {**args, **config.get('args', {})}
+
     mzn_model.compile(
         output_file, rewrap=keep, args=args,
         no_output_annotations=no_output_annotations
@@ -272,7 +274,9 @@ def minizinc(
         or (_output_mode in ['dzn', 'json'] and not solver.support_output_mode)
     )
 
-    solver_args = {**config.get('solver_args', {}), **kwargs}
+    timeout = config.get('timeout', timeout)
+
+    solver_args = {**kwargs, **config.get('solver_args', {})}
     stderr = None
     try:
         if force_flatten:
