@@ -421,8 +421,15 @@ class Gurobi(MIPSolver):
         The path to the directory for global included files.
     """
 
-    def __init__(self, path='mzn-gurobi', globals_dir='linear'):
+    def __init__(self, path='mzn-gurobi', globals_dir='linear', dll=None):
         super().__init__(path, globals_dir)
+        self.dll = dll
+
+    def args(self, *args, **kwargs):
+        args = super().args(*args, **kwargs)
+        if self.dll is not None:
+            args += ['--dll', self.dll]
+        return args
 
 
 class CBC(MIPSolver):
