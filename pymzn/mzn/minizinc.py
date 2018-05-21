@@ -212,6 +212,10 @@ def minizinc(
     elif isinstance(solver, str):
         solver = getattr(solvers, solver)
 
+    all_solutions = config.get('all_solutions', all_solutions)
+    num_solutions = config.get('num_solutions', num_solutions)
+    statistics = config.get('statistics', statistics)
+
     if all_solutions and not solver.support_all:
         raise ValueError('The solver cannot return all solutions')
     if num_solutions is not None and not solver.support_num:

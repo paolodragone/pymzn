@@ -15,6 +15,9 @@ The configurable properties used by PyMzn are the following:
  * **solns2out**: Path to the *solns2out* executable;
  * **solver**: Solver instance to use when calling pymzn.minizinc;
  * **solver_args**: Arguments to pass to the solver when calling pymzn.minizinc;
+ * **all_solutions**: Overrides the all_solutions flag for minizinc calls;
+ * **num_solutions**: Overrides the num_solutions value for minizinc calls;
+ * **statistics**: Overrides the statistics flag for all calls to minizinc;
  * **timeout**: Overrides the timeout for all calls to minizinc;
  * **args**: Additional arguments to pass to the template engine;
  * **include**: List of search paths to include in all mzn2fzn calls;
