@@ -330,6 +330,8 @@ def _cleanup(stream, mzn_file, files, stderr=None):
                 if _file:
                     os.remove(_file)
                     log.debug('Deleted file: {}'.format(_file))
+            if stop.value[1]:
+                log.debug(stop.value[1])
         return stop.value
     except MiniZincError as err:
         err._set(mzn_file, stderr)
