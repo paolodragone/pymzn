@@ -24,6 +24,7 @@ import os
 import logging
 import contextlib
 
+from time import monotonic as _time
 from io import BufferedReader, TextIOWrapper
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
@@ -256,13 +257,15 @@ def minizinc(
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
 
-    args = {**args, **config.get('args', {})}
+    args = {**(args or {}), **config.get('args', {})}
 
+    t0 = _time()
     mzn_model.compile(
         output_file, rewrap=keep, args=args,
         no_output_annotations=no_output_annotations
     )
     output_file.close()
+    compile_time = _time() - t0
 
     mzn_file = output_file.name
     data_file = None
@@ -270,6 +273,7 @@ def minizinc(
     ozn_file = None
 
     log = logging.getLogger(__name__)
+    log.debug('Compilation completed in {:>3.2f} sec'.format(compile_time))
     log.debug('Generated file {}'.format(mzn_file))
 
     force_flatten = (
@@ -340,7 +344,11 @@ def _cleanup(stream, mzn_file, files, stderr=None):
 
 def _solve(solver, *args, lines=False, wait=False, **kwargs):
     if wait:
+        t0 = _time()
         out, err = solver.solve(*args, **kwargs)
+        solve_time = _time() - t0
+        log = logging.getLogger(__name__)
+        log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
         if lines:
             return out.splitlines(), err
         return out, err
@@ -422,12 +430,16 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
 
     log = logging.getLogger(__name__)
 
+    t0 = _time()
     process = None
     try:
         process = Process(args).run()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
+    flattening_time = _time() - t0
+
+    log.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
     if not keep_data:
         with contextlib.suppress(FileNotFoundError):
