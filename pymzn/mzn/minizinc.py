@@ -337,8 +337,8 @@ def _solve(solver, *args, lines=False, wait=False, **kwargs):
     else:
         solver_process = solver.solve_start(*args, **kwargs)
         if lines:
-            return solver_process.readlines(), solver_proces.stderr
-        return solver_process, solver_proces.stderr
+            return solver_process.readlines(), solver_process.stderr
+        return solver_process, solver_process.stderr
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
