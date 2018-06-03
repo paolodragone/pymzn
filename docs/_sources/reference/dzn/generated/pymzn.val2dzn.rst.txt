@@ -1,5 +1,5 @@
-pymzn\.val2dzn
-==============
+pymzn.val2dzn
+=============
 
 .. currentmodule:: pymzn
 

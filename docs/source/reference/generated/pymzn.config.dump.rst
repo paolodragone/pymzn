@@ -1,5 +1,5 @@
-pymzn\.config\.dump
-===================
+pymzn.config.dump
+=================
 
 .. currentmodule:: pymzn.config
 

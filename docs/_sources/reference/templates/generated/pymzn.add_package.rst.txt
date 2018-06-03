@@ -1,5 +1,5 @@
-pymzn\.add\_package
-===================
+pymzn.add\_package
+==================
 
 .. currentmodule:: pymzn
 

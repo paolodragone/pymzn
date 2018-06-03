@@ -1,5 +1,5 @@
-pymzn\.gurobi
-=============
+pymzn.gurobi
+============
 
 .. currentmodule:: pymzn
 

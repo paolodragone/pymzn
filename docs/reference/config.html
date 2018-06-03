@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; PyMzn 0.16.1 documentation</title>
+  <title>Configuration &mdash; PyMzn 0.17.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="PyMzn 0.16.1 documentation" href="../index.html"/>
+    <link rel="top" title="PyMzn 0.17.0 documentation" href="../index.html"/>
         <link rel="up" title="Manual" href="index.html"/>
         <link rel="next" title="pymzn.config.get" href="generated/pymzn.config.get.html"/>
         <link rel="prev" title="pymzn.process.Process.stop" href="generated/pymzn.process.Process.stop.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
             
           
@@ -185,20 +185,20 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.config.get.html#pymzn.config.get" title="pymzn.config.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key[,&nbsp;default])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.config.get.html#pymzn.config.get" title="pymzn.config.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>(key[,&nbsp;default])</td>
 <td>Get the value of a configuration variable.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.config.set.html#pymzn.config.set" title="pymzn.config.set"><code class="xref py py-obj docutils literal"><span class="pre">set</span></code></a>(key,&nbsp;value)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.config.set.html#pymzn.config.set" title="pymzn.config.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(key,&nbsp;value)</td>
 <td>Set the value of configuration variable.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.config.dump.html#pymzn.config.dump" title="pymzn.config.dump"><code class="xref py py-obj docutils literal"><span class="pre">dump</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.config.dump.html#pymzn.config.dump" title="pymzn.config.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump</span></code></a>()</td>
 <td>Writes the changes to the configuration file.</td>
 </tr>
 </tbody>
 </table>
 <span class="target" id="module-pymzn.config"></span><p>PyMzn can be configured with custom executable paths and other variables.
-Configuration is done via the module <code class="docutils literal"><span class="pre">pymzn.config</span></code>. For instance:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn.config</span>
+Configuration is done via the module <code class="docutils literal notranslate"><span class="pre">pymzn.config</span></code>. For instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn.config</span>
 
 <span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mzn2fzn&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/mzn2fzn&#39;</span><span class="p">)</span>
 <span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;solns2out&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/solns2out&#39;</span><span class="p">)</span>
@@ -211,12 +211,20 @@ Configuration is done via the module <code class="docutils literal"><span class=
 <li><strong>solns2out</strong>: Path to the <em>solns2out</em> executable;</li>
 <li><strong>solver</strong>: Solver instance to use when calling pymzn.minizinc;</li>
 <li><strong>solver_args</strong>: Arguments to pass to the solver when calling pymzn.minizinc;</li>
+<li><strong>all_solutions</strong>: Overrides the all_solutions flag for minizinc calls;</li>
+<li><strong>num_solutions</strong>: Overrides the num_solutions value for minizinc calls;</li>
+<li><strong>statistics</strong>: Overrides the statistics flag for all calls to minizinc;</li>
+<li><strong>timeout</strong>: Overrides the timeout for all calls to minizinc;</li>
+<li><strong>args</strong>: Additional arguments to pass to the template engine;</li>
+<li><strong>include</strong>: List of search paths to include in all mzn2fzn calls;</li>
 <li><strong>keep</strong>: Overrides the keep flag of all minizinc and mzn2fzn calls;</li>
 <li><strong>output_dir</strong>: Set a default output directory for generated files;</li>
 <li><strong>force_flatten</strong>: Overrides the force_flatten flag of all minizinc calls;</li>
+<li><strong>no_output_annotations</strong>: Overrides the no_output_annotation flag of all
+minizinc calls;</li>
 <li><strong>dzn_width</strong>: The horizontal character limit for dzn files;
 This property is used to wrap long dzn statements when writing dzn files.
-This property is also used in the <code class="docutils literal"><span class="pre">pymzn.minizinc</span></code> function as a limit to
+This property is also used in the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function as a limit to
 decide whether to write the inline data into a file.</li>
 </ul>
 </div></blockquote>
@@ -224,15 +232,15 @@ decide whether to write the inline data into a file.</li>
 <div class="section" id="debug">
 <h2>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
 <p>PyMzn can also be set to print debugging messages on standard output via:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>This function is meant to be used in interactive sessions or in
-applications that do not configure the <code class="docutils literal"><span class="pre">logging</span></code> library. If you configure the
-<code class="docutils literal"><span class="pre">logging</span></code> library in your application, then PyMzn will print logging messages
-as well. The logging level in PyMzn is always <code class="docutils literal"><span class="pre">DEBUG</span></code>. To disable debugging
+applications that do not configure the <code class="docutils literal notranslate"><span class="pre">logging</span></code> library. If you configure the
+<code class="docutils literal notranslate"><span class="pre">logging</span></code> library in your application, then PyMzn will print logging messages
+as well. The logging level in PyMzn is always <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>. To disable debugging
 messages you can then call:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -282,7 +290,7 @@ messages you can then call:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.16.1',
+            VERSION:'0.17.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

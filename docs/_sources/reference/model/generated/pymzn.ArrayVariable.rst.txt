@@ -1,5 +1,5 @@
-pymzn\.ArrayVariable
-====================
+pymzn.ArrayVariable
+===================
 
 .. currentmodule:: pymzn
 

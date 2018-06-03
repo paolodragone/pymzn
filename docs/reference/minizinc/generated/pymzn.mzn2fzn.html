@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.mzn2fzn &mdash; PyMzn 0.16.1 documentation</title>
+  <title>pymzn.mzn2fzn &mdash; PyMzn 0.17.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.16.1 documentation" href="../../../index.html"/>
+    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../../index.html"/>
         <link rel="up" title="MiniZinc tools" href="../index.html"/>
         <link rel="next" title="pymzn.solns2out" href="pymzn.solns2out.html"/>
         <link rel="prev" title="pymzn.minizinc" href="pymzn.minizinc.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
             
           
@@ -195,28 +195,28 @@ utility from libminizinc to produce a fzn and ozn files from a mzn one.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mzn_file</strong> (<em>str</em>) &#8211; The path to the minizinc problem file.</li>
-<li><strong>*dzn_files</strong> &#8211; A list of paths to dzn files to attach to the mzn2fzn execution,
+<li><strong>mzn_file</strong> (<em>str</em>) – The path to the minizinc problem file.</li>
+<li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the mzn2fzn execution,
 provided as positional arguments; by default no data file is attached.</li>
-<li><strong>data</strong> (<em>dict</em>) &#8211; Additional data as a dictionary of variables assignments to supply to
+<li><strong>data</strong> (<em>dict</em>) – Additional data as a dictionary of variables assignments to supply to
 the mzn2fnz function. The dictionary is then automatically converted to
-dzn format by the <code class="docutils literal"><span class="pre">pymzn.dict2dzn</span></code> function. Notice that if the data
+dzn format by the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function. Notice that if the data
 provided is too large, a temporary dzn file will be produced.</li>
-<li><strong>keep_data</strong> (<em>bool</em>) &#8211; Whether to write the inline data into a dzn file and keep it.
+<li><strong>keep_data</strong> (<em>bool</em>) – Whether to write the inline data into a dzn file and keep it.
 Default is False.</li>
-<li><strong>globals_dir</strong> (<em>str</em>) &#8211; The path to the directory for global included files.</li>
-<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) &#8211; One or more additional paths to search for included mzn files when
-running <code class="docutils literal"><span class="pre">mzn2fzn</span></code>.</li>
-<li><strong>output_mode</strong> (<em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'item'</em>) &#8211; The desired output format. The default is &#8216;item&#8217; which outputs a
+<li><strong>globals_dir</strong> (<em>str</em>) – The path to the directory for global included files.</li>
+<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included mzn files when
+running <code class="docutils literal notranslate"><span class="pre">mzn2fzn</span></code>.</li>
+<li><strong>output_mode</strong> (<em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'item'</em>) – The desired output format. The default is ‘item’ which outputs a
 stream of strings as returned by the solns2out tool, formatted according
-to the output statement of the MiniZinc model. The &#8216;dzn&#8217; and &#8216;json&#8217;
+to the output statement of the MiniZinc model. The ‘dzn’ and ‘json’
 formats output a stream of strings formatted in dzn of json
 respectively.</li>
-<li><strong>no_ozn</strong> (<em>bool</em>) &#8211; If True, the ozn file is not produced, False otherwise.</li>
+<li><strong>no_ozn</strong> (<em>bool</em>) – If True, the ozn file is not produced, False otherwise.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The paths to the generated fzn and ozn files. If <code class="docutils literal"><span class="pre">no_ozn=True</span></code>, the
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The paths to the generated fzn and ozn files. If <code class="docutils literal notranslate"><span class="pre">no_ozn=True</span></code>, the
 second argument is None.</p>
 </td>
 </tr>
@@ -273,7 +273,7 @@ second argument is None.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.16.1',
+            VERSION:'0.17.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

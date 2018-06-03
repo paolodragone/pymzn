@@ -1,5 +1,5 @@
-pymzn\.Optimathsat\.solve\_start
-================================
+pymzn.Optimathsat.solve\_start
+==============================
 
 .. currentmodule:: pymzn
 

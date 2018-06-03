@@ -1,5 +1,5 @@
-pymzn\.MIPSolver
-================
+pymzn.MIPSolver
+===============
 
 .. currentmodule:: pymzn
 

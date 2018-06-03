@@ -1,5 +1,5 @@
-pymzn\.Chuffed\.solve\_start
-============================
+pymzn.Chuffed.solve\_start
+==========================
 
 .. currentmodule:: pymzn
 

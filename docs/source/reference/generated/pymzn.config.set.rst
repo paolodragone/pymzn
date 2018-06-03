@@ -1,5 +1,5 @@
-pymzn\.config\.set
-==================
+pymzn.config.set
+================
 
 .. currentmodule:: pymzn.config
 

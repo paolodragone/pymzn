@@ -1,5 +1,5 @@
-pymzn\.G12Fd\.solve
-===================
+pymzn.G12Fd.solve
+=================
 
 .. currentmodule:: pymzn
 

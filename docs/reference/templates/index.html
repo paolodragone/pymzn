@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Templating &mdash; PyMzn 0.16.1 documentation</title>
+  <title>Templating &mdash; PyMzn 0.17.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.16.1 documentation" href="../../index.html"/>
+    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../index.html"/>
         <link rel="up" title="Manual" href="../index.html"/>
         <link rel="next" title="pymzn.add_package" href="generated/pymzn.add_package.html"/>
         <link rel="prev" title="pymzn.SolveStatement" href="../model/generated/pymzn.SolveStatement.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
             
           
@@ -183,10 +183,10 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.add_package.html#pymzn.add_package" title="pymzn.add_package"><code class="xref py py-obj docutils literal"><span class="pre">add_package</span></code></a>(package_name[,&nbsp;package_path,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.add_package.html#pymzn.add_package" title="pymzn.add_package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_package</span></code></a>(package_name[,&nbsp;package_path,&nbsp;…])</td>
 <td>Adds the given package to the template search routine</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.add_path.html#pymzn.add_path" title="pymzn.add_path"><code class="xref py py-obj docutils literal"><span class="pre">add_path</span></code></a>(searchpath[,&nbsp;encoding,&nbsp;followlinks])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.add_path.html#pymzn.add_path" title="pymzn.add_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_path</span></code></a>(searchpath[,&nbsp;encoding,&nbsp;followlinks])</td>
 <td>Adds the given path to the template search routine</td>
 </tr>
 </tbody>
@@ -196,7 +196,7 @@
 code from the <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> templating language within a
 MiniZinc model to make a PyMzn template file (usually distinguished with the
 <em class="xref py py-obj">pmzn</em> extension). An example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">pmzn</span> <span class="o">%%</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">pmzn</span> <span class="o">%%</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
 <span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
@@ -222,12 +222,12 @@ MiniZinc model to make a PyMzn template file (usually distinguished with the
 </pre></div>
 </div>
 <p>Now it is possible to pass <em class="xref py py-obj">objective</em> as a member of <em class="xref py py-obj">args</em> in the
-<a class="reference internal" href="../minizinc/generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal"><span class="pre">pymzn.minizinc</span></code></a> function:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack.pmzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cost&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]},</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="s1">&#39;cost&#39;</span><span class="p">})</span>
+<a class="reference internal" href="../minizinc/generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code></a> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack.pmzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cost&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]},</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="s1">&#39;cost&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
 <p>The compiled model that will be solved looks like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
 <span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
@@ -296,7 +296,7 @@ pre-multiplying by the given factor.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.16.1',
+            VERSION:'0.17.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

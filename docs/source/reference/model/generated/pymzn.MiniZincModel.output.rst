@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.output
-============================
+pymzn.MiniZincModel.output
+==========================
 
 .. currentmodule:: pymzn
 

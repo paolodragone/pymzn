@@ -1,5 +1,5 @@
-pymzn\.process\.Process\.readlines
-==================================
+pymzn.process.Process.readlines
+===============================
 
 .. currentmodule:: pymzn.process
 

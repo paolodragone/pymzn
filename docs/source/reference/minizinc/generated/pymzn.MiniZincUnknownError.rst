@@ -1,5 +1,5 @@
-pymzn\.MiniZincUnknownError
-===========================
+pymzn.MiniZincUnknownError
+==========================
 
 .. currentmodule:: pymzn
 

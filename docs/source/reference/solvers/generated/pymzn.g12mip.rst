@@ -1,5 +1,5 @@
-pymzn\.g12mip
-=============
+pymzn.g12mip
+============
 
 .. currentmodule:: pymzn
 

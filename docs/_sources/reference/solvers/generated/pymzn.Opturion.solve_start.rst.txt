@@ -1,5 +1,5 @@
-pymzn\.Opturion\.solve\_start
-=============================
+pymzn.Opturion.solve\_start
+===========================
 
 .. currentmodule:: pymzn
 

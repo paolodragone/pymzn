@@ -1,5 +1,5 @@
-pymzn\.Variable
-===============
+pymzn.Variable
+==============
 
 .. currentmodule:: pymzn
 

@@ -1,5 +1,5 @@
-pymzn\.add\_path
-================
+pymzn.add\_path
+===============
 
 .. currentmodule:: pymzn
 

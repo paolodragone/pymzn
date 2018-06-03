@@ -1,5 +1,5 @@
-pymzn\.process\.Process\.stop
-=============================
+pymzn.process.Process.stop
+==========================
 
 .. currentmodule:: pymzn.process
 

@@ -1,5 +1,5 @@
-pymzn\.dzn2dict
-===============
+pymzn.dzn2dict
+==============
 
 .. currentmodule:: pymzn
 

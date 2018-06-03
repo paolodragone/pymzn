@@ -1,5 +1,5 @@
-pymzn\.G12Solver\.solve
-=======================
+pymzn.G12Solver.solve
+=====================
 
 .. currentmodule:: pymzn
 

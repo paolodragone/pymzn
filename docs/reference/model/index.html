@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Modelling &mdash; PyMzn 0.16.1 documentation</title>
+  <title>Modelling &mdash; PyMzn 0.17.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.16.1 documentation" href="../../index.html"/>
+    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../index.html"/>
         <link rel="up" title="Manual" href="../index.html"/>
         <link rel="next" title="pymzn.MiniZincModel" href="generated/pymzn.MiniZincModel.html"/>
         <link rel="prev" title="pymzn.g12mip" href="../solvers/generated/pymzn.g12mip.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
             
           
@@ -188,25 +188,25 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincModel.html#pymzn.MiniZincModel" title="pymzn.MiniZincModel"><code class="xref py py-obj docutils literal"><span class="pre">MiniZincModel</span></code></a>([mzn])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincModel.html#pymzn.MiniZincModel" title="pymzn.MiniZincModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincModel</span></code></a>([mzn])</td>
 <td>Mutable class representing a MiniZinc model.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Statement.html#pymzn.Statement" title="pymzn.Statement"><code class="xref py py-obj docutils literal"><span class="pre">Statement</span></code></a>(stmt)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Statement.html#pymzn.Statement" title="pymzn.Statement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Statement</span></code></a>(stmt)</td>
 <td>A statement of a MiniZincModel.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Constraint.html#pymzn.Constraint" title="pymzn.Constraint"><code class="xref py py-obj docutils literal"><span class="pre">Constraint</span></code></a>(constr[,&nbsp;comment])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Constraint.html#pymzn.Constraint" title="pymzn.Constraint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Constraint</span></code></a>(constr[,&nbsp;comment])</td>
 <td>A constraint statement.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Variable.html#pymzn.Variable" title="pymzn.Variable"><code class="xref py py-obj docutils literal"><span class="pre">Variable</span></code></a>(name,&nbsp;vartype[,&nbsp;value,&nbsp;output])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Variable.html#pymzn.Variable" title="pymzn.Variable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Variable</span></code></a>(name,&nbsp;vartype[,&nbsp;value,&nbsp;output])</td>
 <td>A variable statement.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.ArrayVariable.html#pymzn.ArrayVariable" title="pymzn.ArrayVariable"><code class="xref py py-obj docutils literal"><span class="pre">ArrayVariable</span></code></a>(name,&nbsp;indexset,&nbsp;domain[,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.ArrayVariable.html#pymzn.ArrayVariable" title="pymzn.ArrayVariable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArrayVariable</span></code></a>(name,&nbsp;indexset,&nbsp;domain[,&nbsp;…])</td>
 <td>An array variable statement.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.OutputStatement.html#pymzn.OutputStatement" title="pymzn.OutputStatement"><code class="xref py py-obj docutils literal"><span class="pre">OutputStatement</span></code></a>(output)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.OutputStatement.html#pymzn.OutputStatement" title="pymzn.OutputStatement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputStatement</span></code></a>(output)</td>
 <td>An output statement.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.SolveStatement.html#pymzn.SolveStatement" title="pymzn.SolveStatement"><code class="xref py py-obj docutils literal"><span class="pre">SolveStatement</span></code></a>(solve)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.SolveStatement.html#pymzn.SolveStatement" title="pymzn.SolveStatement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SolveStatement</span></code></a>(solve)</td>
 <td>A solve statement.</td>
 </tr>
 </tbody>
@@ -214,11 +214,11 @@
 <span class="target" id="module-pymzn.mzn.model"></span><p>PyMzn can also be used to dynamically change a model during runtime. For
 example, it can be useful to add constraints incrementally or change the solving
 statement dynamically. To dynamically modify a model, you can use the class
-<code class="docutils literal"><span class="pre">MiniZincModel</span></code>, providing a template model file as input which can then
+<code class="docutils literal notranslate"><span class="pre">MiniZincModel</span></code>, providing a template model file as input which can then
 be modified by adding variables and constraints, and by modifying the solve or
-output statements. An instance of <code class="docutils literal"><span class="pre">MiniZincModel</span></code> can then be passed directly
-to the <code class="docutils literal"><span class="pre">minizinc</span></code> function to be solved.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">MiniZinModel</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">)</span>
+output statements. An instance of <code class="docutils literal notranslate"><span class="pre">MiniZincModel</span></code> can then be passed directly
+to the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function to be solved.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">MiniZincModel</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">)</span>
 <span class="n">solutions</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="c1"># add a new constraint and solve again</span>
@@ -273,7 +273,7 @@ to the <code class="docutils literal"><span class="pre">minizinc</span></code> f
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.16.1',
+            VERSION:'0.17.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

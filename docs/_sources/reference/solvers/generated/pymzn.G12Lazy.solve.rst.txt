@@ -1,5 +1,5 @@
-pymzn\.G12Lazy\.solve
-=====================
+pymzn.G12Lazy.solve
+===================
 
 .. currentmodule:: pymzn
 

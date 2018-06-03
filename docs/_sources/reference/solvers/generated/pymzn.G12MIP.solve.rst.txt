@@ -1,5 +1,5 @@
-pymzn\.G12MIP\.solve
-====================
+pymzn.G12MIP.solve
+==================
 
 .. currentmodule:: pymzn
 

@@ -1,5 +1,5 @@
-pymzn\.Optimathsat
-==================
+pymzn.Optimathsat
+=================
 
 .. currentmodule:: pymzn
 

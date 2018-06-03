@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.minimize
-==============================
+pymzn.MiniZincModel.minimize
+============================
 
 .. currentmodule:: pymzn
 

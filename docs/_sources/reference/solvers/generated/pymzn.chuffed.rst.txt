@@ -1,5 +1,5 @@
-pymzn\.chuffed
-==============
+pymzn.chuffed
+=============
 
 .. currentmodule:: pymzn
 

@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.comment
-=============================
+pymzn.MiniZincModel.comment
+===========================
 
 .. currentmodule:: pymzn
 

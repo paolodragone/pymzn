@@ -1,5 +1,5 @@
-pymzn\.Constraint
-=================
+pymzn.Constraint
+================
 
 .. currentmodule:: pymzn
 

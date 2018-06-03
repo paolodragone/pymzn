@@ -1,5 +1,5 @@
-pymzn\.Solutions
-================
+pymzn.Solutions
+===============
 
 .. currentmodule:: pymzn
 

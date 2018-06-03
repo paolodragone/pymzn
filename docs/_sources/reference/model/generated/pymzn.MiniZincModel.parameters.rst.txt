@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.parameters
-================================
+pymzn.MiniZincModel.parameters
+==============================
 
 .. currentmodule:: pymzn
 

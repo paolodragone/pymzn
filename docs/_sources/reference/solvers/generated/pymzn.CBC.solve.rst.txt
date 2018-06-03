@@ -1,5 +1,5 @@
-pymzn\.CBC\.solve
-=================
+pymzn.CBC.solve
+===============
 
 .. currentmodule:: pymzn
 

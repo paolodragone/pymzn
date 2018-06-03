@@ -1,5 +1,5 @@
-pymzn\.minizinc
-===============
+pymzn.minizinc
+==============
 
 .. currentmodule:: pymzn
 

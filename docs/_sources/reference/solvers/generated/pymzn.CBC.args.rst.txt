@@ -1,5 +1,5 @@
-pymzn\.CBC\.args
-================
+pymzn.CBC.args
+==============
 
 .. currentmodule:: pymzn
 

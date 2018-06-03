@@ -1,5 +1,5 @@
-pymzn\.stmt2dzn
-===============
+pymzn.stmt2dzn
+==============
 
 .. currentmodule:: pymzn
 

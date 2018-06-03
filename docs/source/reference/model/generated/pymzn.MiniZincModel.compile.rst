@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.compile
-=============================
+pymzn.MiniZincModel.compile
+===========================
 
 .. currentmodule:: pymzn
 

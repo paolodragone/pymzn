@@ -1,5 +1,5 @@
-pymzn\.G12MIP\.args
-===================
+pymzn.G12MIP.args
+=================
 
 .. currentmodule:: pymzn
 

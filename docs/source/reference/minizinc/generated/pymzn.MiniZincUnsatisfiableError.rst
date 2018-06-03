@@ -1,5 +1,5 @@
-pymzn\.MiniZincUnsatisfiableError
-=================================
+pymzn.MiniZincUnsatisfiableError
+================================
 
 .. currentmodule:: pymzn
 

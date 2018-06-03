@@ -1,5 +1,5 @@
-pymzn\.CBC
-==========
+pymzn.CBC
+=========
 
 .. currentmodule:: pymzn
 

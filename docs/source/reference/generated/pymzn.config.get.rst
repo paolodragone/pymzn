@@ -1,5 +1,5 @@
-pymzn\.config\.get
-==================
+pymzn.config.get
+================
 
 .. currentmodule:: pymzn.config
 

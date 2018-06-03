@@ -1,5 +1,5 @@
-pymzn\.Gecode\.solve\_start
-===========================
+pymzn.Gecode.solve\_start
+=========================
 
 .. currentmodule:: pymzn
 

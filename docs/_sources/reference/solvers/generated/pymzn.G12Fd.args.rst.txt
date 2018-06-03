@@ -1,5 +1,5 @@
-pymzn\.G12Fd\.args
-==================
+pymzn.G12Fd.args
+================
 
 .. currentmodule:: pymzn
 

@@ -1,5 +1,5 @@
-pymzn\.Gurobi\.args
-===================
+pymzn.Gurobi.args
+=================
 
 .. currentmodule:: pymzn
 

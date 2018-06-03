@@ -1,5 +1,5 @@
-pymzn\.process\.Process\.run
-============================
+pymzn.process.Process.run
+=========================
 
 .. currentmodule:: pymzn.process
 

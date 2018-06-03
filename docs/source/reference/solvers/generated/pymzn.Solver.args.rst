@@ -1,5 +1,5 @@
-pymzn\.Solver\.args
-===================
+pymzn.Solver.args
+=================
 
 .. currentmodule:: pymzn
 

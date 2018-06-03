@@ -1,5 +1,5 @@
-pymzn\.rebase\_array
-====================
+pymzn.rebase\_array
+===================
 
 .. currentmodule:: pymzn
 

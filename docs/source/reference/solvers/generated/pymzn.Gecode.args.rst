@@ -1,5 +1,5 @@
-pymzn\.Gecode\.args
-===================
+pymzn.Gecode.args
+=================
 
 .. currentmodule:: pymzn
 

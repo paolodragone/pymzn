@@ -1,5 +1,5 @@
-pymzn\.MiniZincUnboundedError
-=============================
+pymzn.MiniZincUnboundedError
+============================
 
 .. currentmodule:: pymzn
 

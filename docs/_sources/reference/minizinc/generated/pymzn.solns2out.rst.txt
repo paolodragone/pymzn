@@ -1,5 +1,5 @@
-pymzn\.solns2out
-================
+pymzn.solns2out
+===============
 
 .. currentmodule:: pymzn
 

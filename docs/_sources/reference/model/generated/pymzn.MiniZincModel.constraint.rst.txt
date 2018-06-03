@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.constraint
-================================
+pymzn.MiniZincModel.constraint
+==============================
 
 .. currentmodule:: pymzn
 

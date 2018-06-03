@@ -1,5 +1,5 @@
-pymzn\.Statement
-================
+pymzn.Statement
+===============
 
 .. currentmodule:: pymzn
 

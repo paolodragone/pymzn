@@ -1,5 +1,5 @@
-pymzn\.Opturion\.args
-=====================
+pymzn.Opturion.args
+===================
 
 .. currentmodule:: pymzn
 

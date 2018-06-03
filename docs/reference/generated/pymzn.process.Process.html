@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.process.Process &mdash; PyMzn 0.16.1 documentation</title>
+  <title>pymzn.process.Process &mdash; PyMzn 0.17.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.16.1 documentation" href="../../index.html"/>
+    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../index.html"/>
         <link rel="up" title="Process execution" href="../process.html"/>
         <link rel="next" title="pymzn.process.Process.readlines" href="pymzn.process.Process.readlines.html"/>
         <link rel="prev" title="Process execution" href="../process.html"/> 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
             
           
@@ -193,7 +193,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>[</em><em>str</em><em>]</em>) &#8211; The command line arguments to execute. Same as for <code class="xref py py-obj docutils literal"><span class="pre">subprocess.Popen</span></code>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>[</em><em>str</em><em>]</em>) – The command line arguments to execute. Same as for <code class="xref py py-obj docutils literal notranslate"><span class="pre">subprocess.Popen</span></code>
 (with <em class="xref py py-obj">shell=False</em>).</td>
 </tr>
 </tbody>
@@ -201,7 +201,7 @@
 <dl class="attribute">
 <dt id="pymzn.process.Process.returncode">
 <code class="descname">returncode</code><a class="headerlink" href="#pymzn.process.Process.returncode" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int or None</em> &#8211; The returncode of the process. While the process has not finished the
+<dd><p><em>int or None</em> – The returncode of the process. While the process has not finished the
 returncode is None. After the process is finished, the returncode is
 retrieved as by <em class="xref py py-obj">Popen.poll()</em>.</p>
 </dd></dl>
@@ -209,55 +209,55 @@ retrieved as by <em class="xref py py-obj">Popen.poll()</em>.</p>
 <dl class="attribute">
 <dt id="pymzn.process.Process.stdout_data">
 <code class="descname">stdout_data</code><a class="headerlink" href="#pymzn.process.Process.stdout_data" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str or bytes</em> &#8211; The content of the standard output of the process after the execution.</p>
+<dd><p><em>str or bytes</em> – The content of the standard output of the process after the execution.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.stderr_data">
 <code class="descname">stderr_data</code><a class="headerlink" href="#pymzn.process.Process.stderr_data" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str or bytes</em> &#8211; The content of the standard error of the process after the execution.</p>
+<dd><p><em>str or bytes</em> – The content of the standard error of the process after the execution.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.expired">
 <code class="descname">expired</code><a class="headerlink" href="#pymzn.process.Process.expired" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; Whether the process was terminated because the timeout expired.</p>
+<dd><p><em>bool</em> – Whether the process was terminated because the timeout expired.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.interrupted">
 <code class="descname">interrupted</code><a class="headerlink" href="#pymzn.process.Process.interrupted" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; Whether the process was interrupted by a KeyboardInterruption.</p>
+<dd><p><em>bool</em> – Whether the process was interrupted by a KeyboardInterruption.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.async">
 <code class="descname">async</code><a class="headerlink" href="#pymzn.process.Process.async" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; Whether the process was started asynchronously.</p>
+<dd><p><em>bool</em> – Whether the process was started asynchronously.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.started">
 <code class="descname">started</code><a class="headerlink" href="#pymzn.process.Process.started" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; Whether the process has started.</p>
+<dd><p><em>bool</em> – Whether the process has started.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.alive">
 <code class="descname">alive</code><a class="headerlink" href="#pymzn.process.Process.alive" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; Whether the process is still running.</p>
+<dd><p><em>bool</em> – Whether the process is still running.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.completed">
 <code class="descname">completed</code><a class="headerlink" href="#pymzn.process.Process.completed" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; Whether the process was completed without errors.</p>
+<dd><p><em>bool</em> – Whether the process was completed without errors.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pymzn.process.Process.runtime">
 <code class="descname">runtime</code><a class="headerlink" href="#pymzn.process.Process.runtime" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> &#8211; The running time in seconds. If the process is alive, it marks the
+<dd><p><em>float</em> – The running time in seconds. If the process is alive, it marks the
 running time up to now. If instead the process is terminated, it marks
 the running time of the process up to its end.</p>
 </dd></dl>
@@ -281,16 +281,16 @@ the running time of the process up to its end.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.process.Process.readlines.html#pymzn.process.Process.readlines" title="pymzn.process.Process.readlines"><code class="xref py py-obj docutils literal"><span class="pre">readlines</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.process.Process.readlines.html#pymzn.process.Process.readlines" title="pymzn.process.Process.readlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readlines</span></code></a>()</td>
 <td>Generator of lines from the standard output of the process.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.process.Process.run.html#pymzn.process.Process.run" title="pymzn.process.Process.run"><code class="xref py py-obj docutils literal"><span class="pre">run</span></code></a>([input,&nbsp;timeout])</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.process.Process.run.html#pymzn.process.Process.run" title="pymzn.process.Process.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>([input,&nbsp;timeout])</td>
 <td>Run the process synchronously.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.process.Process.start.html#pymzn.process.Process.start" title="pymzn.process.Process.start"><code class="xref py py-obj docutils literal"><span class="pre">start</span></code></a>([stdin,&nbsp;timeout])</td>
+<tr class="row-odd"><td><a class="reference internal" href="pymzn.process.Process.start.html#pymzn.process.Process.start" title="pymzn.process.Process.start"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></a>([stdin,&nbsp;timeout])</td>
 <td>Starts the process asynchronously.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.process.Process.stop.html#pymzn.process.Process.stop" title="pymzn.process.Process.stop"><code class="xref py py-obj docutils literal"><span class="pre">stop</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="pymzn.process.Process.stop.html#pymzn.process.Process.stop" title="pymzn.process.Process.stop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop</span></code></a>()</td>
 <td>Stops the process.</td>
 </tr>
 </tbody>
@@ -302,22 +302,22 @@ the running time of the process up to its end.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#pymzn.process.Process.alive" title="pymzn.process.Process.alive"><code class="xref py py-obj docutils literal"><span class="pre">alive</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#pymzn.process.Process.alive" title="pymzn.process.Process.alive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">alive</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pymzn.process.Process.completed" title="pymzn.process.Process.completed"><code class="xref py py-obj docutils literal"><span class="pre">completed</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#pymzn.process.Process.completed" title="pymzn.process.Process.completed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">completed</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pymzn.process.Process.runtime" title="pymzn.process.Process.runtime"><code class="xref py py-obj docutils literal"><span class="pre">runtime</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#pymzn.process.Process.runtime" title="pymzn.process.Process.runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pymzn.process.Process.started" title="pymzn.process.Process.started"><code class="xref py py-obj docutils literal"><span class="pre">started</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#pymzn.process.Process.started" title="pymzn.process.Process.started"><code class="xref py py-obj docutils literal notranslate"><span class="pre">started</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#pymzn.process.Process.stderr" title="pymzn.process.Process.stderr"><code class="xref py py-obj docutils literal"><span class="pre">stderr</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#pymzn.process.Process.stderr" title="pymzn.process.Process.stderr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stderr</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#pymzn.process.Process.stdout" title="pymzn.process.Process.stdout"><code class="xref py py-obj docutils literal"><span class="pre">stdout</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#pymzn.process.Process.stdout" title="pymzn.process.Process.stdout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stdout</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -370,7 +370,7 @@ the running time of the process up to its end.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.16.1',
+            VERSION:'0.17.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

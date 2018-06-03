@@ -1,5 +1,5 @@
-pymzn\.MIPSolver\.args
-======================
+pymzn.MIPSolver.args
+====================
 
 .. currentmodule:: pymzn
 

@@ -1,5 +1,5 @@
-pymzn\.G12Lazy
-==============
+pymzn.G12Lazy
+=============
 
 .. currentmodule:: pymzn
 

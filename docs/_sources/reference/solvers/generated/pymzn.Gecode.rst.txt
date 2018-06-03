@@ -1,5 +1,5 @@
-pymzn\.Gecode
-=============
+pymzn.Gecode
+============
 
 .. currentmodule:: pymzn
 

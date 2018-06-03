@@ -1,5 +1,5 @@
-pymzn\.Gurobi\.solve
-====================
+pymzn.Gurobi.solve
+==================
 
 .. currentmodule:: pymzn
 

@@ -1,5 +1,5 @@
-pymzn\.MiniZincModel\.array\_variable
-=====================================
+pymzn.MiniZincModel.array\_variable
+===================================
 
 .. currentmodule:: pymzn
 
