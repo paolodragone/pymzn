@@ -24,6 +24,7 @@ import os
 import logging
 import contextlib
 
+from time import monotonic as _time
 from io import BufferedReader, TextIOWrapper
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
@@ -119,7 +120,7 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        wait=True, statistics=False, no_output_annotations=False, **kwargs
+        wait=True, statistics=False, no_output_annotations=True, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -212,6 +213,10 @@ def minizinc(
     elif isinstance(solver, str):
         solver = getattr(solvers, solver)
 
+    all_solutions = config.get('all_solutions', all_solutions)
+    num_solutions = config.get('num_solutions', num_solutions)
+    statistics = config.get('statistics', statistics)
+
     if all_solutions and not solver.support_all:
         raise ValueError('The solver cannot return all solutions')
     if num_solutions is not None and not solver.support_num:
@@ -252,11 +257,15 @@ def minizinc(
                                      suffix='.mzn', delete=False, mode='w+',
                                      buffering=1)
 
+    args = {**(args or {}), **config.get('args', {})}
+
+    t0 = _time()
     mzn_model.compile(
         output_file, rewrap=keep, args=args,
         no_output_annotations=no_output_annotations
     )
     output_file.close()
+    compile_time = _time() - t0
 
     mzn_file = output_file.name
     data_file = None
@@ -264,6 +273,7 @@ def minizinc(
     ozn_file = None
 
     log = logging.getLogger(__name__)
+    log.debug('Compilation completed in {:>3.2f} sec'.format(compile_time))
     log.debug('Generated file {}'.format(mzn_file))
 
     force_flatten = (
@@ -272,7 +282,9 @@ def minizinc(
         or (_output_mode in ['dzn', 'json'] and not solver.support_output_mode)
     )
 
-    solver_args = {**config.get('solver_args', {}), **kwargs}
+    timeout = config.get('timeout', timeout)
+
+    solver_args = {**kwargs, **config.get('solver_args', {})}
     stderr = None
     try:
         if force_flatten:
@@ -322,6 +334,8 @@ def _cleanup(stream, mzn_file, files, stderr=None):
                 if _file:
                     os.remove(_file)
                     log.debug('Deleted file: {}'.format(_file))
+            if stop.value[1]:
+                log.debug(stop.value[1])
         return stop.value
     except MiniZincError as err:
         err._set(mzn_file, stderr)
@@ -330,7 +344,11 @@ def _cleanup(stream, mzn_file, files, stderr=None):
 
 def _solve(solver, *args, lines=False, wait=False, **kwargs):
     if wait:
+        t0 = _time()
         out, err = solver.solve(*args, **kwargs)
+        solve_time = _time() - t0
+        log = logging.getLogger(__name__)
+        log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
         if lines:
             return out.splitlines(), err
         return out, err
@@ -412,12 +430,16 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
 
     log = logging.getLogger(__name__)
 
+    t0 = _time()
     process = None
     try:
         process = Process(args).run()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
+    flattening_time = _time() - t0
+
+    log.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
     if not keep_data:
         with contextlib.suppress(FileNotFoundError):
