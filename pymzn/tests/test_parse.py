@@ -8,6 +8,7 @@ class EvalTest(unittest.TestCase):
 
     def test_eval_dzn(self):
         dzn = dedent('''\
+            % This is a comment; with a semicolon
             x1 = 1;x2 = 1.0; x3 = -1.5;
             x4 = {};
             x5 = {1, 3};
