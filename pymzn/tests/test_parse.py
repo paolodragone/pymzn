@@ -14,7 +14,7 @@ class EvalTest(unittest.TestCase):
             x6 = 1..3;
             x7 = []; x8 =
              array1d({}, []);
-            x9 = [1, 2, 3];
+            x9 = [1, 2, 3];  % Another comment
             x10 = [{1, 2}, {3, 4}];
             x11 = array1d(1..3,
              [1, 2, 3]);

@@ -146,9 +146,9 @@ def dzn2dict(dzn, *, rebase_arrays=True):
             dzn = f.read()
 
     assign = {}
+    dzn = _comm_p.sub('\n', dzn)
     stmts = _stmt_p.findall(dzn)
     for stmt in stmts:
-        stmt = _comm_p.sub('', stmt)
         var_m = _var_p.match(stmt)
         if var_m:
             var = var_m.group('var')
