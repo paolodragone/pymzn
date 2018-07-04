@@ -41,7 +41,7 @@ class Process:
         Whether the process was terminated because the timeout expired.
     interrupted : bool
         Whether the process was interrupted by a KeyboardInterruption.
-    async : bool
+    asynchronous : bool
         Whether the process was started asynchronously.
     started : bool
         Whether the process has started.
@@ -66,7 +66,7 @@ class Process:
         self.stderr_data = None
         self.expired = False
         self.interrupted = False
-        self.async = False
+        self.asynchronous = False
         self._start = None
         self._end = None
         self._process = None
@@ -200,7 +200,7 @@ class Process:
             popenkwargs['shell'] = True
         self._process_lock.acquire()
         if not self.started:
-            self.async = True
+            self.asynchronous = True
             self.timeout = timeout
             self._start = _time()
             self._process = Popen(self.args, **popenkwargs)
@@ -241,7 +241,7 @@ class Process:
 
         Usable only if the process was started asynchronously.
         """
-        if not self.started or not self.async:
+        if not self.started or not self.asynchronous:
             raise RuntimeError('The process has not been started.')
         if self.alive:
             stdout = self._process.stdout
