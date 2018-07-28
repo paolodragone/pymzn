@@ -115,7 +115,7 @@ def _eval_val(val):
     # integer set
     set_m = _int_set_p.match(val)
     if set_m:
-        vals = set_m.group('vals')
+        vals = set_m.group('vals').strip()
         if vals:
             return _eval_set(vals.split(','))
         return set()

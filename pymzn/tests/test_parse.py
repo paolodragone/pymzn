@@ -11,6 +11,7 @@ class EvalTest(unittest.TestCase):
             % This is a comment; with a semicolon
             x1 = 1;x2 = 1.0; x3 = -1.5;
             x4 = {};
+            x4a = {  };
             x5 = {1, 3};
             x6 = 1..3;
             x7 = []; x8 =
@@ -31,6 +32,7 @@ class EvalTest(unittest.TestCase):
         self.assertEqual(obj['x2'], 1.0)
         self.assertEqual(obj['x3'], -1.5)
         self.assertEqual(obj['x4'], set())
+        self.assertEqual(obj['x4a'], set())
         self.assertEqual(obj['x5'], {1, 3})
         self.assertEqual(obj['x6'], {1, 2, 3})
         self.assertEqual(obj['x7'], [])
