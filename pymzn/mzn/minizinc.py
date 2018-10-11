@@ -294,7 +294,7 @@ def minizinc(
                 output_mode=_output_mode
             )
             solver_stream, stderr = _solve(
-                solver, fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
+                solver, fzn_file or mzn_file, wait=wait, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 statistics=statistics, **solver_args
             )
