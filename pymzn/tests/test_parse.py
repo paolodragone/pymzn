@@ -22,8 +22,8 @@ class EvalTest(unittest.TestCase):
              [1, 2, 3]);
             x12 = array2d(1..2, 1..3, [1, 2, 3, 4, 5, 6]);x13 = array2d(2..3,
             2..4, [1, 2, 3, 4, 5, 6]);  x14 = array2d(2..3, 1..3, [1, 2, 3, 4,
-            5, 6]); x15 = array2d(1..2, 2..4, [1, 2, 3, 4, 5, 6])
-            ;''')
+            5, 6]); x15 = array2d(1..2, 2..4, [1, 2, 3, 4, 5, 6]);
+            x16 = [{1}, {2,3}, {}, {4}]; x17 = [ { } ];''')
 
         obj = pymzn.dzn2dict(dzn)
         for i in range(1, 11):
@@ -45,4 +45,6 @@ class EvalTest(unittest.TestCase):
                                       3: {2: 4, 3: 5, 4: 6}})
         self.assertEqual(obj['x14'], {2: [1, 2, 3], 3: [4, 5, 6]})
         self.assertEqual(obj['x15'], [{2: 1, 3: 2, 4: 3}, {2: 4, 3: 5, 4: 6}])
+        self.assertEqual(obj['x16'], [{1}, {2,3}, set(), {4}])
+        self.assertEqual(obj['x17'], [set()])
 

@@ -21,7 +21,7 @@ _cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
 _int_set_p = re.compile('^(\{(?P<vals>[\d\s,+\-]*)\})$')
 
 # matches any of the previous
-_val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]+)\}'
+_val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]*)\}'
                     '|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)'
                     '|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?'
                     '|[+\-]?\d+)')
