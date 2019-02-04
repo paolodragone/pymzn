@@ -268,8 +268,8 @@ def minizinc(
         if data_file:
             dzn_files.append(data_file)
         out, stderr = _solve(
-            solver, mzn_file, *dzn_files, lines=True, data=data,
-            include=include, timeout=timeout, all_solutions=all_solutions,
+            solver, mzn_file, *dzn_files, data=data, include=include,
+            timeout=timeout, all_solutions=all_solutions,
             num_solutions=num_solutions, output_mode=_output_mode,
             statistics=statistics, **solver_args
         )
@@ -305,15 +305,13 @@ def _cleanup(stream, mzn_file, files, stderr=None):
         raise err
 
 
-def _solve(solver, *args, lines=False, **kwargs):
+def _solve(solver, *args, **kwargs):
     t0 = _time()
     out, err = solver.solve(*args, **kwargs)
     solve_time = _time() - t0
     log = logging.getLogger(__name__)
     log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
-    if lines:
-        return out.splitlines(), err
-    return out, err
+    return out.splitlines(), err
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
