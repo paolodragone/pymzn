@@ -3,16 +3,16 @@
 
 PyMzn interfaces with solvers through the ``Solver`` base class. This class
 includes the necessary infomation for PyMzn to setup the solver, together with
-the ``solve`` and ``solve_start`` methods, which respectively take care of the
-running or asynchronously starting a process that solves the MiniZinc/FlatZinc
-model. PyMzn provides a number of solver implementations out-of-the-box.
-PyMzn's default solver is ``pymzn.gecode``, an instance of `pymzn.Gecode`.
+the ``solve`` method, which respectively take care of the running or
+asynchronously starting a process that solves the MiniZinc/FlatZinc model. PyMzn
+provides a number of solver implementations out-of-the-box.  PyMzn's default
+solver is ``pymzn.gecode``, an instance of `pymzn.Gecode`.
 
 To use a solver that is not provided by PyMzn or to exend an existing one, one
 has to subclass the `Solver` class and implement the ``args`` method, which
 returns a list of command line arguments for executing the process. This is
 generally enough for most solvers, but you can also directly reimplement the
-``solve`` and ``solve_start`` methods for extra flexibility.
+``solve`` method for extra flexibility.
 
 For instance::
 
@@ -69,27 +69,6 @@ class Solver:
     def args(*args, **kwargs):
         """Returns the command line arguments to start the solver"""
         raise NotImplementedError()
-
-    def solve_start(self, *args, timeout=None, all_solutions=False, **kwargs):
-        """Like `solve`, but returns a started Process"""
-        log = logging.getLogger(__name__)
-
-        if timeout and not self.support_timeout:
-            if not self.support_all:
-                raise ValueError('Timeout not supported')
-            all_solutions = True
-
-        solver_args = self.args(
-            *args, timeout=timeout, all_solutions=all_solutions, **kwargs
-        )
-        timeout = None if self.support_timeout else timeout
-
-        try:
-            log.debug('Starting solver with arguments {}'.format(solver_args))
-            return Process(solver_args).start(timeout=timeout)
-        except CalledProcessError as err:
-            log.exception(err.stderr)
-            raise RuntimeError(err.stderr) from err
 
     def solve(self, *args, timeout=None, all_solutions=False, **kwargs):
         """Solve a problem encoded with MiniZinc/FlatZinc.
@@ -322,9 +301,6 @@ class Optimathsat(Solver):
     def solve(fzn_file, *args, statistics=False, **kwargs):
         out, err = super().solve(fzn_file, *args, **kwargs)
         return self._parse_out(out, statistics), err
-
-    def solve_start(self, *args, **kwargs):
-        raise NotImplementedError()
 
 
 class Opturion(Solver):
