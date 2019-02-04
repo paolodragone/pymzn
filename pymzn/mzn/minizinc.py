@@ -119,8 +119,8 @@ class Solutions:
 def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-        all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        statistics=False, **kwargs
+        all_solutions=False, num_solutions=None, args=None, statistics=False,
+        **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -177,11 +177,6 @@ def minizinc(
         The upper bound on the number of solutions to be returned. Can only be
         used if the solver supports returning a fixed number of solutions.
         Default is 1.
-    force_flatten : bool
-        Wheter the function should be forced to produce a flat model. Whenever
-        possible, this function feeds the mzn file to the solver without passing
-        through the flattener, force_flatten=True prevents this behavior and
-        always produces a fzn file which is in turn passed to the solver.
     args : dict
         Arguments for the template engine.
     statistics : bool
@@ -263,40 +258,21 @@ def minizinc(
     log.debug('Compilation completed in {:>3.2f} sec'.format(compile_time))
     log.debug('Generated file {}'.format(mzn_file))
 
-    force_flatten = (
-           config.get('force_flatten', force_flatten)
-        or not solver.support_mzn
-        or (_output_mode in ['dzn', 'json'] and not solver.support_output_mode)
-    )
-
     timeout = config.get('timeout', timeout)
 
     solver_args = {**kwargs, **config.get('solver_args', {})}
     stderr = None
     try:
-        if force_flatten:
-            fzn_file, ozn_file = mzn2fzn(
-                mzn_file, *dzn_files, data=data, keep_data=keep,
-                include=include, globals_dir=solver.globals_dir,
-                output_mode=_output_mode
-            )
-            solver_stream, stderr = _solve(
-                solver, fzn_file, timeout=timeout, output_mode='dzn',
-                all_solutions=all_solutions, num_solutions=num_solutions,
-                statistics=statistics, **solver_args
-            )
-            out = solns2out(solver_stream, ozn_file)
-        else:
-            dzn_files = list(dzn_files)
-            data, data_file = _prepare_data(mzn_file, data, keep)
-            if data_file:
-                dzn_files.append(data_file)
-            out, stderr = _solve(
-                solver, mzn_file, *dzn_files, lines=True, data=data,
-                include=include, timeout=timeout, all_solutions=all_solutions,
-                num_solutions=num_solutions, output_mode=_output_mode,
-                statistics=statistics, **solver_args
-            )
+        dzn_files = list(dzn_files)
+        data, data_file = _prepare_data(mzn_file, data, keep)
+        if data_file:
+            dzn_files.append(data_file)
+        out, stderr = _solve(
+            solver, mzn_file, *dzn_files, lines=True, data=data,
+            include=include, timeout=timeout, all_solutions=all_solutions,
+            num_solutions=num_solutions, output_mode=_output_mode,
+            statistics=statistics, **solver_args
+        )
         solns = split_solns(out)
         if output_mode == 'dict':
             solns = _to_dict(solns)
