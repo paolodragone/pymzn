@@ -120,7 +120,7 @@ def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
         all_solutions=False, num_solutions=None, force_flatten=False, args=None,
-        wait=True, statistics=False, no_output_annotations=True, **kwargs
+        statistics=False, no_output_annotations=True, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -184,9 +184,6 @@ def minizinc(
         always produces a fzn file which is in turn passed to the solver.
     args : dict
         Arguments for the template engine.
-    wait : bool
-        Whether to wait for the solving process to finish before returning the
-        solution stream.
     statistics : bool
         Whether to save the statistics of the solver (if supported).
     no_output_annotations : bool
@@ -294,7 +291,7 @@ def minizinc(
                 output_mode=_output_mode
             )
             solver_stream, stderr = _solve(
-                solver, fzn_file, wait=wait, timeout=timeout, output_mode='dzn',
+                solver, fzn_file, timeout=timeout, output_mode='dzn',
                 all_solutions=all_solutions, num_solutions=num_solutions,
                 statistics=statistics, **solver_args
             )
@@ -305,7 +302,7 @@ def minizinc(
             if data_file:
                 dzn_files.append(data_file)
             out, stderr = _solve(
-                solver, mzn_file, *dzn_files, wait=wait, lines=True, data=data,
+                solver, mzn_file, *dzn_files, lines=True, data=data,
                 include=include, timeout=timeout, all_solutions=all_solutions,
                 num_solutions=num_solutions, output_mode=_output_mode,
                 statistics=statistics, **solver_args
@@ -342,21 +339,15 @@ def _cleanup(stream, mzn_file, files, stderr=None):
         raise err
 
 
-def _solve(solver, *args, lines=False, wait=False, **kwargs):
-    if wait:
-        t0 = _time()
-        out, err = solver.solve(*args, **kwargs)
-        solve_time = _time() - t0
-        log = logging.getLogger(__name__)
-        log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
-        if lines:
-            return out.splitlines(), err
-        return out, err
-    else:
-        solver_process = solver.solve_start(*args, **kwargs)
-        if lines:
-            return solver_process.readlines(), solver_process.stderr
-        return solver_process, solver_process.stderr
+def _solve(solver, *args, lines=False, **kwargs):
+    t0 = _time()
+    out, err = solver.solve(*args, **kwargs)
+    solve_time = _time() - t0
+    log = logging.getLogger(__name__)
+    log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
+    if lines:
+        return out.splitlines(), err
+    return out, err
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
@@ -514,19 +505,8 @@ def solns2out(stream, ozn_file):
     args = [config.get('solns2out', 'solns2out'), ozn_file]
     process = _solns2out_process(ozn_file)
     try:
-        if isinstance(stream, (BufferedReader, TextIOWrapper)):
-            process.start(stream)
-            yield from process.readlines()
-        elif isinstance(stream, Process):
-            if stream.alive:
-                process.start(stream.stdout)
-                yield from process.readlines()
-            else:
-                process.run(stream.stdout_data)
-                yield from process.stdout_data.splitlines()
-        else:
-            process.run(stream)
-            yield from process.stdout_data.splitlines()
+        process.run(stream)
+        yield from process.stdout_data.splitlines()
     except CalledProcessError as err:
         log.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
