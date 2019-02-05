@@ -340,17 +340,11 @@ def minizinc(
     timeout = config.get('timeout', timeout)
 
     solver_args = {**kwargs, **config.get('solver_args', {})}
-    stderr = None
     try:
-        dzn_files = list(dzn_files)
-        data, data_file = _prepare_data(mzn_file, data, keep)
-        if data_file:
-            dzn_files.append(data_file)
-        proc = _solve(
-            solver, mzn_file, *dzn_files, data=data, include=include,
-            timeout=timeout, all_solutions=all_solutions,
-            num_solutions=num_solutions, output_mode=_output_mode,
-            statistics=True, **solver_args
+        proc = solve(
+            solver, mzn_file, *dzn_files, data=data, output_mode=_output_mode,
+            include=include, timeout=timeout, all_solutions=all_solutions,
+            num_solutions=num_solutions, **solver_args
         )
         parser = Parser(mzn_file, solver, output_mode=output_mode)
         solns = parser.parse(proc)
@@ -359,11 +353,11 @@ def minizinc(
         raise err
 
     cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
-    _cleanup(mzn_file, cleanup_files, stderr)
+    cleanup(mzn_file, cleanup_files)
     return solns
 
 
-def _cleanup(mzn_file, files, stderr=None):
+def cleanup(mzn_file, files):
     log = logging.getLogger(__name__)
     with contextlib.suppress(FileNotFoundError):
         for _file in files:
@@ -372,9 +366,57 @@ def _cleanup(mzn_file, files, stderr=None):
                 log.debug('Deleted file: {}'.format(_file))
 
 
-def _solve(solver, *args, **kwargs):
+def _run_minizinc(*args, input=None):
+    args.insert(0, config.get('minizinc', 'minizinc'))
+    return run_process(*args, input=input)
+
+
+def solve(
+    solver, mzn_file, *dzn_files, data=None, stdlib_dir=None, globals_dir=None,
+    output_mode='dict', include=None, timeout=None, all_solutions=False,
+    num_solutions=None, free_search=False, parallel=None, seed=None, **kwargs
+):
+    args = []
+    if stdlib_dir:
+        args += ['--stdlib_dir', stdlib_dir]
+    if globals_dir:
+        args += ['-G', globals_dir]
+    if output_mode and output_mode in ['dzn', 'json', 'item']:
+        args += ['--output-mode', output_mode]
+
+    if include:
+        if isinstance(include, str):
+            include = [include]
+        elif not isinstance(include, list):
+            raise TypeError('The include path is not valid.')
+    else:
+        include = []
+
+    include += config.get('include', [])
+    for path in include:
+        args += ['-I', path]
+
+    if timeout:
+        args += ['--time-limit', timeout * 1000] # minizinc takes milliseconds
+
+    args += ['--solver', solver.solver_id]
+    args += solver.args(
+        all_solutions=all_solutions, num_solutions=num_solutions,
+        free_search=free_search, parallel=parallel, seed=seed, **kwargs
+    )
+
+    keep_data = config.get('keep', keep_data)
+
+    dzn_files = list(dzn_files)
+    data, data_file = prepare_data(mzn_file, data, keep_data)
+    if data:
+        args += ['-D', data]
+    elif data_file:
+        dzn_files.append(data_file)
+    args += [mzn_file] + dzn_files
+
     t0 = _time()
-    proc = solver.solve(*args, **kwargs)
+    proc = _run_minizinc(*args)
     solve_time = _time() - t0
     log = logging.getLogger(__name__)
     log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
@@ -483,7 +525,7 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     return fzn_file, ozn_file
 
 
-def _prepare_data(mzn_file, data, keep_data=False):
+def prepare_data(mzn_file, data, keep_data=False):
     if not data:
         return None, None
 
