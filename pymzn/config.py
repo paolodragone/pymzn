@@ -56,6 +56,7 @@ import os
 _modified = False
 _config = None
 _defaults = {
+    'minizinc': 'minizinc',
     'mzn2fzn': 'mzn2fzn',
     'solns2out': 'solns2out',
     'dzn_width': 70
