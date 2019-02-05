@@ -203,6 +203,14 @@ def save_model(model, output_file=None, output_dir=None, keep=False)
     return mzn_file
 
 
+def _cleanup(files):
+    with contextlib.suppress(FileNotFoundError):
+        for _file in files:
+            if _file:
+                os.remove(_file)
+                logger.debug('Deleted file: {}'.format(_file))
+
+
 def minizinc_version():
     vs = _run_minizinc('--version')
     m = re.findall('version ([\d\.]+)', vs)
@@ -327,17 +335,9 @@ def minizinc(
         raise err
 
     if not keep:
-        cleanup([mzn_file, data_file])
+        _cleanup([mzn_file, data_file])
 
     return solns
-
-
-def cleanup(files):
-    with contextlib.suppress(FileNotFoundError):
-        for _file in files:
-            if _file:
-                os.remove(_file)
-                logger.debug('Deleted file: {}'.format(_file))
 
 
 def solve(
