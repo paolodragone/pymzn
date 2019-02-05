@@ -44,10 +44,6 @@ class Process:
         Whether the process was completed without errors.
     runtime : float
         The running time in seconds.
-    stdout
-        The underlying output stream of the process.
-    stderr
-        The underlying error stream of the process.
     """
     def __init__(self, args):
         self.args = args
@@ -75,14 +71,6 @@ class Process:
             return 0.0
         end = self._end or _time()
         return end - self._start
-
-    @property
-    def stdout(self):
-        return self._process.stdout
-
-    @property
-    def stderr(self):
-        return self._process.stderr
 
     def _check_started(self):
         if self.started:
