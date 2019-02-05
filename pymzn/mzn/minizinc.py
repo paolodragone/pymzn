@@ -53,14 +53,15 @@ def process_template(model, **kwargs):
 
 
 def var_types(mzn):
-    args = [config.get('minizinc', 'minizinc'), '--model-types-only']
+    args = ['--model-types-only']
     input = None
     if mzn.endswith('.mzn'):
         args.append(mzn)
     else:
         args.append('-')
         input = mzn.encode()
-    json_str = process.run(*args, input=input)
+    proc = _run_minizinc(*args, input=input)
+    json_str = proc.stdout_data
     return json.loads(json_str)['var_types']['vars']
 
 
@@ -107,13 +108,13 @@ def output_statement(output_vars, types):
     return output_stmt
 
 
-def process_output_vars(mzn, output_vars=None):
+def process_output_vars(model, output_vars=None):
     if output_vars is None:
-        return mzn
-    types = var_types(mzn)
+        return model
+    types = var_types(model)
     output_stmt = output_statement(output_vars, types)
     output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
-    return output_stmt_p.sub(output_stmt, mzn)
+    return output_stmt_p.sub(output_stmt, model)
 
 
 def rewrap(s):
@@ -136,7 +137,7 @@ def rewrap(s):
 
 
 def preprocess_model(
-    mzn, keep=False, output_dir=None, args=None, output_vars=None
+    mzn, keep=False, output_dir=None, output_vars=None, **kwargs
 ):
     model = None
     mzn_file = None
@@ -177,7 +178,7 @@ def preprocess_model(
     args = {**(args or {}), **config.get('args', {})}
 
     t0 = _time()
-    model = process_template(model, **args)
+    model = process_template(model, **kwargs)
 
     if keep:
         model = rewrap(model)
@@ -191,8 +192,8 @@ def preprocess_model(
 
     output_file.write(model)
     output_file.close()
-    prep_time = _time() - t0
 
+    prep_time = _time() - t0
     mzn_file = output_file.name
 
     logger.debug('Preprocessing completed in {:>3.2f} sec'.format(prep_time))
