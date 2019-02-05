@@ -35,9 +35,170 @@ from . import solvers
 from .solutions import Solutions
 from .solvers import gecode
 from .model import MiniZincModel
+from .templates import from_string
 from ..process import Process
 from ..dzn import dict2dzn, dzn2dict
 from ..exceptions import *
+
+
+def minizinc_version():
+    p = run_process(config.get('minizinc', 'minizinc'), '--version')
+    vs = p.stdout_data.decode('utf-8')
+    m = re.findall('version ([\d\.]+)', vs)
+    return m[0]
+
+
+def process_template(model, **kwargs):
+    return from_string(model, kwargs)
+
+
+def var_types(mzn):
+    args = [config.get('minizinc', 'minizinc'), '--model-types-only']
+    input = None
+    if mzn.endswith('.mzn'):
+        args.append(mzn)
+    else:
+        args.append('-')
+        input = mzn.encode()
+    json_str = process.run(*args, input=input)
+    return json.loads(json_str)['var_types']['vars']
+
+
+def output_statement(output_vars, types):
+    out_var = '"{0} = ", show({0}), ";\\n"'
+    out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
+    out_list = []
+    enum_types = set()
+    for var in output_vars:
+        if 'enum_type' in types[var]:
+            enum_types.add(types[var]['enum_type'])
+        if 'dim' in types[var]:
+            dims = types[var]['dims']
+            if len(dims) == 1:
+                dim = dims[0]
+                if dim != 'int':
+                    enum_types.add(dim)
+                    show_idx_sets = '"{}"'.format(dim)
+                else:
+                    show_idx_sets = 'show(index_set({}))'.format(var)
+            else:
+                show_idx_sets = []
+                show_idx_sets_str = 'show(index_set_{}of{}({}))'
+                for d in range(1, len(dims) + 1):
+                    dim = dims[d - 1]
+                    if dim != 'int':
+                        enum_types.add(dim)
+                        show_idx_sets.append(dim)
+                    else:
+                        show_idx_sets.append(
+                            show_idx_sets_str.format(d, len(dims), var)
+                        )
+                show_idx_sets = ', ", ", '.join(show_idx_sets)
+            out_list.append(out_array.format(var, len(dims), show_idx_sets))
+        else:
+            out_list.append(out_var.format(var))
+
+    enum_list = []
+    for enum_type in enum_types:
+        enum_list.append(out_var.format(enum_type))
+
+    output = ', '.join(enum_list ++ out_list)
+    output_stmt = 'output [{}];'.format(output)
+    return output_stmt
+
+
+def process_output_vars(mzn, output_vars=None):
+    if output_vars is None:
+        return mzn
+    types = var_types(mzn)
+    output_stmt = output_statement(output_vars, types)
+    output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
+    return output_stmt_p.sub(output_stmt, mzn)
+
+
+def rewrap(s):
+    S = {' ', '\t', '\n', '\r', '\f', '\v'}
+    stmts_p = re.compile('(?:^|;)([^;]+)')
+    stmts = []
+    for stmt in stmts_p.findall(s):
+        spaces = 0
+        while spaces < len(stmt) and stmt[spaces] in S:
+            spaces += 1
+        spaces -= stmt[0] == '\n'
+        lines = []
+        for line in stmt.splitlines():
+            start = 0
+            while start < len(line) and start < spaces and line[start] in S:
+                start += 1
+            lines.append(line[start:])
+        stmts.append('\n'.join(lines))
+    return ';\n'.join(stmts)
+
+
+def preprocess_model(
+    mzn, keep=False, output_dir=None, args=None, output_vars=None
+):
+    model = None
+    mzn_file = None
+
+    if not output_dir:
+        output_dir = config.get('output_dir', None)
+
+    if mzn and isinstance(mzn, str):
+        if mzn.endswith('mzn'):
+            if os.path.isfile(mzn):
+                mzn_file = mzn
+                with open(mzn_file) as f:
+                    model = f.read()
+            else:
+                raise ValueError('The file does not exist.')
+        else:
+            model = mzn
+    else:
+        raise TypeError(
+            'The mzn variable must be either the path to or the '
+            'content of a MiniZinc model file.'
+        )
+
+    output_prefix = 'pymzn'
+    if keep:
+        mzn_dir = os.getcwd()
+        if mzn_file:
+            mzn_dir, mzn_name = os.path.split(mzn_file)
+            output_prefix, _ = os.path.splitext(mzn_name)
+        output_dir = output_dir or mzn_dir
+
+    output_prefix += '_'
+    output_file = NamedTemporaryFile(
+        dir=output_dir, prefix=output_prefix, suffix='.mzn', delete=False,
+        mode='w+', buffering=1
+    )
+
+    args = {**(args or {}), **config.get('args', {})}
+
+    t0 = _time()
+    model = process_template(model, **args)
+
+    if keep:
+        model = rewrap(model)
+    else:
+        block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
+        model = block_comm_p.sub('', model)
+        line_comm_p = re.compile('%.*\n')
+        model = line_comm_p.sub('', model)
+
+    model = process_output_vars(mzn, output_vars)
+
+    output_file.write(model)
+    output_file.close()
+    prep_time = _time() - t0
+
+    mzn_file = output_file.name
+
+    logger.debug('Preprocessing completed in {:>3.2f} sec'.format(prep_time))
+    logger.debug('Generated file {}'.format(mzn_file))
+
+    return mzn_file
 
 
 def minizinc(
