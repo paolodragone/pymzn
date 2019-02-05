@@ -275,78 +275,43 @@ def minizinc(
         Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
-    if isinstance(mzn, MiniZincModel):
-        mzn_model = mzn
-    else:
-        mzn_model = MiniZincModel(mzn)
-
-    if not solver:
-        solver = config.get('solver', gecode)
-    elif isinstance(solver, str):
-        solver = getattr(solvers, solver)
-
-    all_solutions = config.get('all_solutions', all_solutions)
-    num_solutions = config.get('num_solutions', num_solutions)
-
-    if all_solutions and not solver.support_all:
-        raise ValueError('The solver cannot return all solutions')
-    if num_solutions is not None and not solver.support_num:
-        raise ValueError('The solver cannot return a given number of solutions')
-    if output_mode != 'dict' and output_vars:
-        raise ValueError('Output vars only available in `dict` output mode')
-
-    if not output_dir:
-        output_dir = config.get('output_dir', None)
 
     keep = config.get('keep', keep)
 
+    mzn_file = preprocess_model(
+        mzn, keep=keep, output_dir=output_dir, output_vars=output_vars, **args
+    )
+
     if output_mode == 'dict':
         if output_vars:
-            mzn_model.dzn_output(output_vars)
             _output_mode = 'item'
         else:
             _output_mode = 'dzn'
     else:
         _output_mode = output_mode
 
-    output_prefix = 'pymzn'
-    if keep:
-        mzn_dir = os.getcwd()
-        if mzn_model.mzn_file:
-            mzn_dir, mzn_name = os.path.split(mzn_model.mzn_file)
-            output_prefix, _ = os.path.splitext(mzn_name)
-        output_dir = output_dir or mzn_dir
+    if not solver:
+        solver = config.get('solver', gecode)
 
-    output_prefix += '_'
-    output_file = NamedTemporaryFile(dir=output_dir, prefix=output_prefix,
-                                     suffix='.mzn', delete=False, mode='w+',
-                                     buffering=1)
-
-    args = {**(args or {}), **config.get('args', {})}
-
-    t0 = _time()
-    mzn_model.compile(output_file, rewrap=keep, args=args)
-    output_file.close()
-    compile_time = _time() - t0
-
-    mzn_file = output_file.name
-    data_file = None
-    fzn_file = None
-    ozn_file = None
-
-    log = logging.getLogger(__name__)
-    log.debug('Compilation completed in {:>3.2f} sec'.format(compile_time))
-    log.debug('Generated file {}'.format(mzn_file))
-
+    all_solutions = config.get('all_solutions', all_solutions)
+    num_solutions = config.get('num_solutions', num_solutions)
     timeout = config.get('timeout', timeout)
 
     solver_args = {**kwargs, **config.get('solver_args', {})}
+
+    dzn_files = list(dzn_files)
+    data, data_file = prepare_data(mzn_file, data, keep)
+    if data_file:
+        dzn_files.append(data_file)
+
+    solns = None
     try:
         proc = solve(
             solver, mzn_file, *dzn_files, data=data, output_mode=_output_mode,
             include=include, timeout=timeout, all_solutions=all_solutions,
             num_solutions=num_solutions, **solver_args
         )
+
         parser = Parser(mzn_file, solver, output_mode=output_mode)
         solns = parser.parse(proc)
     except MiniZincError as err:
