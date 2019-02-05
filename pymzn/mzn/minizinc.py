@@ -510,35 +510,23 @@ def mzn2fzn(
     return fzn_file, ozn_file
 
 
-def _solns2out_process(ozn_file):
-    args = [config.get('solns2out', 'solns2out'), ozn_file]
-    process = Process(args)
-    return process
-
-
 def solns2out(stream, ozn_file):
     """Wraps the solns2out utility, executes it on the solution stream, and
     then returns the output stream.
 
     Parameters
     ----------
-    stream : str or BufferedReader
-        The solution stream returned by the solver.
+    stream : str
+        A solution stream. It may be a solution stream saved by a previous call
+        to minizinc.
     ozn_file : str
         The ozn file path produced by the mzn2fzn function.
 
     Returns
     -------
-    generator of str
+    str
         The output stream of solns2out encoding the solution stream according to
         the provided ozn file.
     """
-    args = [config.get('solns2out', 'solns2out'), ozn_file]
-    process = _solns2out_process(ozn_file)
-    try:
-        process.run(stream)
-        yield from process.stdout_data.splitlines()
-    except CalledProcessError as err:
-        logger.exception(err.stderr)
-        raise RuntimeError(err.stderr) from err
+    return _run_minizinc('--ozn-file', ozn_file, input=stream)
 
