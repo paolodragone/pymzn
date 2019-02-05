@@ -97,12 +97,10 @@ class Solver:
         try:
             log.debug('Running solver with arguments {}'.format(solver_args))
             process = Process(solver_args).run(timeout=timeout)
-            out = process.stdout_data
-            err = process.stderr_data
         except CalledProcessError as err:
             log.exception(err.stderr)
             raise RuntimeError(err.stderr) from err
-        return out, err
+        return process
 
 
 class Gecode(Solver):
@@ -189,19 +187,17 @@ class Gecode(Solver):
         try:
             log.debug('Running solver with arguments {}'.format(solver_args))
             process = Process(solver_args).run()
-            out = process.stdout_data
-            err = process.stderr_data
         except CalledProcessError as err:
             if suppress_segfault and len(err.stdout) > 0 \
                     and err.stderr.startswith('Segmentation fault'):
                 log.warning('Gecode returned error code {} (segmentation '
                             'fault) but a solution was found and returned '
                             '(suppress_segfault=True).'.format(err.returncode))
-                out = err.stdout
+                process.stdout_data = err.stdout
             else:
                 log.exception(err.stderr)
                 raise RuntimeError(err.stderr) from err
-        return out, err
+        return process
 
 
 class Chuffed(Solver):
@@ -299,8 +295,9 @@ class Optimathsat(Solver):
         return [self.cmd, '-input=fzn', fzn_file]
 
     def solve(fzn_file, *args, statistics=False, **kwargs):
-        out, err = super().solve(fzn_file, *args, **kwargs)
-        return self._parse_out(out, statistics), err
+        process = super().solve(fzn_file, *args, **kwargs)
+        process.stdout_data = self._parse_out(out, statistics)
+        return process
 
 
 class Opturion(Solver):
