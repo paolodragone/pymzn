@@ -21,29 +21,35 @@ solver.
 """
 
 import os
+import re
 import contextlib
 
 from time import monotonic as _time
-from io import BufferedReader, TextIOWrapper
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
 import pymzn.config as config
 
-from . import solvers
 from .log import logger
-from .solutions import Solutions
 from .solvers import gecode
-from .model import MiniZincModel
 from .templates import from_string
-from ..process import Process
-from ..dzn import dict2dzn, dzn2dict
+from ..process import run, run_process
+from ..dzn import dict2dzn
 from ..exceptions import *
 
 
+def _run_minizinc_proc(*args, input=None):
+    args.insert(0, config.get('minizinc', 'minizinc'))
+    return run_process(*args, input=input)
+
+
+def _run_minizinc(*args, input=None):
+    args.insert(0, config.get('minizinc', 'minizinc'))
+    return run(*args, input=input)
+
+
 def minizinc_version():
-    p = run_process(config.get('minizinc', 'minizinc'), '--version')
-    vs = p.stdout_data.decode('utf-8')
+    vs = _run_minizinc('--version')
     m = re.findall('version ([\d\.]+)', vs)
     return m[0]
 
@@ -60,8 +66,7 @@ def var_types(mzn):
     else:
         args.append('-')
         input = mzn.encode()
-    proc = _run_minizinc(*args, input=input)
-    json_str = proc.stdout_data
+    json_str = _run_minizinc(*args, input=input)
     return json.loads(json_str)['var_types']['vars']
 
 
@@ -332,11 +337,6 @@ def cleanup(files):
                 logger.debug('Deleted file: {}'.format(_file))
 
 
-def _run_minizinc(*args, input=None):
-    args.insert(0, config.get('minizinc', 'minizinc'))
-    return run_process(*args, input=input)
-
-
 def solve(
     solver, mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
     globals_dir=None, output_mode='dict', include=None, timeout=None,
@@ -377,7 +377,7 @@ def solve(
     args += [mzn_file] + dzn_files
 
     t0 = _time()
-    proc = _run_minizinc(*args)
+    proc = _run_minizinc_proc(*args)
     solve_time = _time() - t0
     logger.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
 
