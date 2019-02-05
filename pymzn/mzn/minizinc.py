@@ -141,20 +141,12 @@ def rewrap(s):
     return ';\n'.join(stmts)
 
 
-def preprocess_model(
-    mzn, keep=False, output_dir=None, output_vars=None, **kwargs
-):
-    model = None
-    mzn_file = None
-
-    if not output_dir:
-        output_dir = config.get('output_dir', None)
-
+def preprocess_model(mzn, output_vars=None, keep=True, **kwargs):
     if mzn and isinstance(mzn, str):
         if mzn.endswith('mzn'):
             if os.path.isfile(mzn):
                 mzn_file = mzn
-                with open(mzn_file) as f:
+                with open(mzn) as f:
                     model = f.read()
             else:
                 raise ValueError('The file does not exist.')
@@ -166,24 +158,8 @@ def preprocess_model(
             'content of a MiniZinc model file.'
         )
 
-    output_prefix = 'pymzn'
-    if keep:
-        mzn_dir = os.getcwd()
-        if mzn_file:
-            mzn_dir, mzn_name = os.path.split(mzn_file)
-            output_prefix, _ = os.path.splitext(mzn_name)
-        output_dir = output_dir or mzn_dir
-
-    output_prefix += '_'
-    output_file = NamedTemporaryFile(
-        dir=output_dir, prefix=output_prefix, suffix='.mzn', delete=False,
-        mode='w+', buffering=1
-    )
-
-    args = {**(args or {}), **config.get('args', {})}
-
-    t0 = _time()
-    model = process_template(model, **kwargs)
+    args = {**kwargs, **config.get('args', {})}
+    model = process_template(model, **args)
 
     if keep:
         model = rewrap(model)
@@ -194,16 +170,36 @@ def preprocess_model(
         model = line_comm_p.sub('', model)
 
     model = process_output_vars(mzn, output_vars)
+    return model
+
+
+def save_model(model, output_file=None, output_dir=None, keep=False)
+    if output_file:
+        mzn_file = output_file
+        output_file = open(output_file, 'w+', buffering=1)
+    else:
+        if not output_dir:
+            output_dir = config.get('output_dir', None)
+
+        output_prefix = 'pymzn'
+        if keep:
+            mzn_dir = os.getcwd()
+            if mzn_file:
+                mzn_dir, mzn_name = os.path.split(mzn_file)
+                output_prefix, _ = os.path.splitext(mzn_name)
+            output_dir = output_dir or mzn_dir
+
+        output_prefix += '_'
+        output_file = NamedTemporaryFile(
+            dir=output_dir, prefix=output_prefix, suffix='.mzn', delete=False,
+            mode='w+', buffering=1
+        )
+        mzn_file = output_file.name
 
     output_file.write(model)
     output_file.close()
 
-    prep_time = _time() - t0
-    mzn_file = output_file.name
-
-    logger.debug('Preprocessing completed in {:>3.2f} sec'.format(prep_time))
     logger.debug('Generated file {}'.format(mzn_file))
-
     return mzn_file
 
 
@@ -283,9 +279,10 @@ def minizinc(
 
     keep = config.get('keep', keep)
 
-    mzn_file = preprocess_model(
-        mzn, keep=keep, output_dir=output_dir, output_vars=output_vars, **args
+    model = preprocess_model(
+        mzn, output_vars=output_vars, keep=keep, **args
     )
+    mzn_file = save_model(model, output_dir=output_dir, keep=keep)
 
     if output_mode == 'dict':
         if output_vars:
