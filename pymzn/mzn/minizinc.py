@@ -191,21 +191,18 @@ def minizinc(
         data, data_file = _prepare_data(mzn_file, data, keep)
         if data_file:
             dzn_files.append(data_file)
-        out, stderr = _solve(
+        proc = _solve(
             solver, mzn_file, *dzn_files, data=data, include=include,
             timeout=timeout, all_solutions=all_solutions,
             num_solutions=num_solutions, output_mode=_output_mode,
             statistics=statistics, **solver_args
         )
-        solns = split_solns(out)
-        if output_mode == 'dict':
-            solns = _to_dict(solns)
-        stream = solns
+        parser = Parser(mzn_file, solver, output_mode=output_mode)
+        solns = parser.parse(proc)
     except MiniZincError as err:
         err._set(mzn_file, stderr)
         raise err
 
-    solns = Solutions(stream)
     cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
     _cleanup(mzn_file, cleanup_files, stderr)
     return solns
@@ -222,11 +219,11 @@ def _cleanup(mzn_file, files, stderr=None):
 
 def _solve(solver, *args, **kwargs):
     t0 = _time()
-    out, err = solver.solve(*args, **kwargs)
+    proc = solver.solve(*args, **kwargs)
     solve_time = _time() - t0
     log = logging.getLogger(__name__)
     log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
-    return out.splitlines(), err
+    return proc
 
 
 def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
