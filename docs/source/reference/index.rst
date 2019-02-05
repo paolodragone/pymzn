@@ -9,7 +9,6 @@ This is the reference manual of PyMzn.
    minizinc/index
    dzn/index
    solvers/index
-   model/index
    templates/index
    process
    config
