@@ -364,19 +364,23 @@ def minizinc(
     return solns
 
 
-def solve(
-    solver, mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
-    globals_dir=None, output_mode='dict', include=None, timeout=None,
-    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, **kwargs
+def _flattening_args(
+    mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
+    globals_dir=None, output_mode='dict', include=None, no_ozn=False,
+    output_base=None
 ):
     args = []
+
     if stdlib_dir:
         args += ['--stdlib_dir', stdlib_dir]
     if globals_dir:
         args += ['-G', globals_dir]
     if output_mode and output_mode in ['dzn', 'json', 'item']:
         args += ['--output-mode', output_mode]
+    if no_ozn:
+        args.append('--no-output-ozn')
+    if output_base:
+        args += ['--output-base', output_base]
 
     if include:
         if isinstance(include, str):
@@ -390,6 +394,24 @@ def solve(
     for path in include:
         args += ['-I', path]
 
+    if data:
+        args += ['-D', data]
+    args += [mzn_file] + dzn_files
+
+    return args
+
+
+def solve(
+    solver, mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
+    globals_dir=None, output_mode='dict', include=None, timeout=None,
+    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
+    seed=None, **kwargs
+):
+    args = _flattening_args(
+        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir, output_mode=output_mode, include=include
+    )
+
     if timeout:
         args += ['--time-limit', timeout * 1000] # minizinc takes milliseconds
 
@@ -399,10 +421,6 @@ def solve(
         free_search=free_search, parallel=parallel, seed=seed, **kwargs
     )
 
-    if data:
-        args += ['-D', data]
-    args += [mzn_file] + dzn_files
-
     t0 = _time()
     proc = _run_minizinc_proc(*args)
     solve_time = _time() - t0
@@ -411,8 +429,11 @@ def solve(
     return proc
 
 
-def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
-            include=None, output_mode='item', no_ozn=False):
+def mzn2fzn(
+    mzn_file, *dzn_files, data=None, keep_data=False, stdlib_dir=None,
+    globals_dir=None, output_mode='dict', include=None, no_ozn=False,
+    output_base=None
+):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
 
@@ -451,44 +472,18 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         The paths to the generated fzn and ozn files. If ``no_ozn=True``, the
         second argument is None.
     """
-    args = [config.get('mzn2fzn', 'mzn2fzn')]
-    if globals_dir:
-        args += ['-G', globals_dir]
-    if no_ozn:
-        args.append('--no-output-ozn')
-    if output_mode and output_mode in ['dzn', 'json', 'item']:
-        args += ['--output-mode', output_mode]
-    if include:
-        if isinstance(include, str):
-            include = [include]
-        elif not isinstance(include, list):
-            raise TypeError('The path provided is not valid.')
-    else:
-        include = []
 
-    include += config.get('include', [])
-    for path in include:
-        args += ['-I', path]
+    args = _flattening_args(
+        mzn_file, *dzn_files, data=data, keep=keep_data, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir, output_mode=output_mode, include=include,
+        no_ozn=no_ozn, output_base=output_base
+    )
 
-    keep_data = config.get('keep', keep_data)
-
-    dzn_files = list(dzn_files)
-    data, data_file = _prepare_data(mzn_file, data, keep_data)
-    if data:
-        args += ['-D', data]
-    elif data_file:
-        dzn_files.append(data_file)
-    args += [mzn_file] + dzn_files
+    args.append('--compile')
 
     t0 = _time()
-    process = None
-    try:
-        process = Process(args).run()
-    except CalledProcessError as err:
-        logger.exception(err.stderr)
-        raise RuntimeError(err.stderr) from err
+    _run_minizinc(args)
     flattening_time = _time() - t0
-
     logger.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
     if not keep_data:
@@ -497,7 +492,11 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
                 os.remove(data_file)
                 logger.debug('Deleted file: {}'.format(data_file))
 
-    mzn_base = os.path.splitext(mzn_file)[0]
+    if output_base:
+        mzn_base = output_base
+    else:
+        mzn_base = os.path.splitext(mzn_file)[0]
+
     fzn_file = '.'.join([mzn_base, 'fzn'])
     fzn_file = fzn_file if os.path.isfile(fzn_file) else None
     ozn_file = '.'.join([mzn_base, 'ozn'])
