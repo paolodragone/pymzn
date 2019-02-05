@@ -43,8 +43,7 @@ from ..exceptions import *
 def minizinc(
         mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
         output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-        all_solutions=False, num_solutions=None, args=None, statistics=False,
-        **kwargs
+        all_solutions=False, num_solutions=None, args=None, **kwargs
     ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -103,8 +102,6 @@ def minizinc(
         Default is 1.
     args : dict
         Arguments for the template engine.
-    statistics : bool
-        Whether to save the statistics of the solver (if supported).
     **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
@@ -128,7 +125,6 @@ def minizinc(
 
     all_solutions = config.get('all_solutions', all_solutions)
     num_solutions = config.get('num_solutions', num_solutions)
-    statistics = config.get('statistics', statistics)
 
     if all_solutions and not solver.support_all:
         raise ValueError('The solver cannot return all solutions')
@@ -136,8 +132,6 @@ def minizinc(
         raise ValueError('The solver cannot return a given number of solutions')
     if output_mode != 'dict' and output_vars:
         raise ValueError('Output vars only available in `dict` output mode')
-    if statistics and not solver.support_stats:
-        raise ValueError('The solver does not support emitting statistics')
 
     if not output_dir:
         output_dir = config.get('output_dir', None)
@@ -195,7 +189,7 @@ def minizinc(
             solver, mzn_file, *dzn_files, data=data, include=include,
             timeout=timeout, all_solutions=all_solutions,
             num_solutions=num_solutions, output_mode=_output_mode,
-            statistics=statistics, **solver_args
+            statistics=True, **solver_args
         )
         parser = Parser(mzn_file, solver, output_mode=output_mode)
         solns = parser.parse(proc)
