@@ -22,6 +22,7 @@ solver.
 
 import os
 import re
+import json
 import contextlib
 
 from time import monotonic as _time
