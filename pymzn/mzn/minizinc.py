@@ -38,6 +38,11 @@ from ..process import run, run_process
 from ..dzn import dict2dzn
 from ..exceptions import *
 
+__all__ = [
+    'minizinc_version', 'preprocess_model', 'save_model', 'minizinc', 'solve',
+    'mzn2fzn', 'solns2out'
+]
+
 
 def _run_minizinc_proc(*args, input=None):
     args.insert(0, config.get('minizinc', 'minizinc'))
