@@ -373,9 +373,10 @@ def _run_minizinc(*args, input=None):
 
 
 def solve(
-    solver, mzn_file, *dzn_files, data=None, stdlib_dir=None, globals_dir=None,
-    output_mode='dict', include=None, timeout=None, all_solutions=False,
-    num_solutions=None, free_search=False, parallel=None, seed=None, **kwargs
+    solver, mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
+    globals_dir=None, output_mode='dict', include=None, timeout=None,
+    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
+    seed=None, **kwargs
 ):
     args = []
     if stdlib_dir:
@@ -406,14 +407,8 @@ def solve(
         free_search=free_search, parallel=parallel, seed=seed, **kwargs
     )
 
-    keep_data = config.get('keep', keep_data)
-
-    dzn_files = list(dzn_files)
-    data, data_file = prepare_data(mzn_file, data, keep_data)
     if data:
         args += ['-D', data]
-    elif data_file:
-        dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
 
     t0 = _time()
@@ -421,6 +416,7 @@ def solve(
     solve_time = _time() - t0
     log = logging.getLogger(__name__)
     log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
+
     return proc
 
 
