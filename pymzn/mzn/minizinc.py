@@ -211,6 +211,30 @@ def _cleanup(files):
                 logger.debug('Deleted file: {}'.format(_file))
 
 
+def _prepare_data(mzn_file, data, keep_data=False):
+    if not data:
+        return None, None
+
+    if isinstance(data, dict):
+        data = dict2dzn(data)
+    elif isinstance(data, str):
+        data = [data]
+    elif not isinstance(data, list):
+        raise TypeError('The additional data provided is not valid.')
+
+    if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
+        mzn_base, __ = os.path.splitext(mzn_file)
+        data_file = mzn_base + '_data.dzn'
+        with open(data_file, 'w') as f:
+            f.write('\n'.join(data))
+        logger.debug('Generated file: {}'.format(data_file))
+        data = None
+    else:
+        data = ' '.join(data)
+        data_file = None
+    return data, data_file
+
+
 def minizinc_version():
     vs = _run_minizinc('--version')
     m = re.findall('version ([\d\.]+)', vs)
@@ -316,7 +340,7 @@ def minizinc(
     solver_args = {**kwargs, **config.get('solver_args', {})}
 
     dzn_files = list(dzn_files)
-    data, data_file = prepare_data(mzn_file, data, keep)
+    data, data_file = _prepare_data(mzn_file, data, keep)
     if data_file:
         dzn_files.append(data_file)
 
@@ -485,30 +509,6 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         logger.debug('Generated file: {}'.format(ozn_file))
 
     return fzn_file, ozn_file
-
-
-def prepare_data(mzn_file, data, keep_data=False):
-    if not data:
-        return None, None
-
-    if isinstance(data, dict):
-        data = dict2dzn(data)
-    elif isinstance(data, str):
-        data = [data]
-    elif not isinstance(data, list):
-        raise TypeError('The additional data provided is not valid.')
-
-    if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
-        mzn_base, __ = os.path.splitext(mzn_file)
-        data_file = mzn_base + '_data.dzn'
-        with open(data_file, 'w') as f:
-            f.write('\n'.join(data))
-        logger.debug('Generated file: {}'.format(data_file))
-        data = None
-    else:
-        data = ' '.join(data)
-        data_file = None
-    return data, data_file
 
 
 def _solns2out_process(ozn_file):
