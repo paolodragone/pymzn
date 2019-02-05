@@ -318,12 +318,13 @@ def minizinc(
         err._set(mzn_file, proc.stderr_data)
         raise err
 
-    cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
-    cleanup(mzn_file, cleanup_files)
+    if not keep:
+        cleanup([mzn_file, data_file])
+
     return solns
 
 
-def cleanup(mzn_file, files):
+def cleanup(files):
     log = logging.getLogger(__name__)
     with contextlib.suppress(FileNotFoundError):
         for _file in files:
