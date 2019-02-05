@@ -194,7 +194,7 @@ def minizinc(
         parser = Parser(mzn_file, solver, output_mode=output_mode)
         solns = parser.parse(proc)
     except MiniZincError as err:
-        err._set(mzn_file, stderr)
+        err._set(mzn_file, proc.stderr_data)
         raise err
 
     cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
