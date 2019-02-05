@@ -205,28 +205,19 @@ def minizinc(
         err._set(mzn_file, stderr)
         raise err
 
+    solns = Solutions(stream)
     cleanup_files = [] if keep else [mzn_file, data_file, fzn_file, ozn_file]
-    stream = _cleanup(stream, mzn_file, cleanup_files, stderr)
-    return Solutions(stream)
+    _cleanup(mzn_file, cleanup_files, stderr)
+    return solns
 
 
-def _cleanup(stream, mzn_file, files, stderr=None):
-    try:
-        while True:
-            yield next(stream)
-    except StopIteration as stop:
-        log = logging.getLogger(__name__)
-        with contextlib.suppress(FileNotFoundError):
-            for _file in files:
-                if _file:
-                    os.remove(_file)
-                    log.debug('Deleted file: {}'.format(_file))
-            if stop.value[1]:
-                log.debug(stop.value[1])
-        return stop.value
-    except MiniZincError as err:
-        err._set(mzn_file, stderr)
-        raise err
+def _cleanup(mzn_file, files, stderr=None):
+    log = logging.getLogger(__name__)
+    with contextlib.suppress(FileNotFoundError):
+        for _file in files:
+            if _file:
+                os.remove(_file)
+                log.debug('Deleted file: {}'.format(_file))
 
 
 def _solve(solver, *args, **kwargs):
