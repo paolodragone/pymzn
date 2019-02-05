@@ -49,17 +49,11 @@ def _run_minizinc(*args, input=None):
     return run(*args, input=input)
 
 
-def minizinc_version():
-    vs = _run_minizinc('--version')
-    m = re.findall('version ([\d\.]+)', vs)
-    return m[0]
-
-
-def process_template(model, **kwargs):
+def _process_template(model, **kwargs):
     return from_string(model, kwargs)
 
 
-def var_types(mzn):
+def _var_types(mzn):
     args = ['--model-types-only']
     input = None
     if mzn.endswith('.mzn'):
@@ -71,7 +65,7 @@ def var_types(mzn):
     return json.loads(json_str)['var_types']['vars']
 
 
-def output_statement(output_vars, types):
+def _dzn_output_statement(output_vars, types):
     out_var = '"{0} = ", show({0}), ";\\n"'
     out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
     out_list = []
@@ -114,16 +108,16 @@ def output_statement(output_vars, types):
     return output_stmt
 
 
-def process_output_vars(model, output_vars=None):
+def _process_output_vars(model, output_vars=None):
     if output_vars is None:
         return model
-    types = var_types(model)
-    output_stmt = output_statement(output_vars, types)
+    types = _var_types(model)
+    output_stmt = _dzn_output_statement(output_vars, types)
     output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
     return output_stmt_p.sub(output_stmt, model)
 
 
-def rewrap(s):
+def _rewrap(s):
     S = {' ', '\t', '\n', '\r', '\f', '\v'}
     stmts_p = re.compile('(?:^|;)([^;]+)')
     stmts = []
@@ -160,17 +154,17 @@ def preprocess_model(mzn, output_vars=None, keep=True, **kwargs):
         )
 
     args = {**kwargs, **config.get('args', {})}
-    model = process_template(model, **args)
+    model = _process_template(model, **args)
 
     if keep:
-        model = rewrap(model)
+        model = _rewrap(model)
     else:
         block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
         model = block_comm_p.sub('', model)
         line_comm_p = re.compile('%.*\n')
         model = line_comm_p.sub('', model)
 
-    model = process_output_vars(mzn, output_vars)
+    model = _process_output_vars(mzn, output_vars)
     return model
 
 
@@ -202,6 +196,12 @@ def save_model(model, output_file=None, output_dir=None, keep=False)
 
     logger.debug('Generated file {}'.format(mzn_file))
     return mzn_file
+
+
+def minizinc_version():
+    vs = _run_minizinc('--version')
+    m = re.findall('version ([\d\.]+)', vs)
+    return m[0]
 
 
 def minizinc(
