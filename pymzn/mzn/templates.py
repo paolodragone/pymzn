@@ -63,11 +63,6 @@ template inheritance, and filters. PyMzn implements few custom filters as well:
 
 import logging
 
-from jinja2 import (
-    Environment, Template, BaseLoader, PackageLoader, FileSystemLoader,
-    TemplateNotFound
-)
-
 from copy import deepcopy
 from collections.abc import Iterable
 from pymzn.dzn.marsh import val2dzn
@@ -82,53 +77,75 @@ def discretize(value, factor=100):
         int_value[i] = int(int_value[i] * factor)
     return int_value
 
+try:
+    from jinja2 import (
+        Environment, BaseLoader, PackageLoader, FileSystemLoader,
+        TemplateNotFound
+    )
+    _has_jinja = True
+except ImportError:
+    _has_jinja = False
 
-class MultiLoader(BaseLoader):
+if _has_jinja:
 
-    def __init__(self):
-        self._loaders = []
+    class MultiLoader(BaseLoader):
 
-    def add_loader(self, loader):
-        self._loaders.append(loader)
+        def __init__(self):
+            self._loaders = []
 
-    def get_source(self, environment, template):
-        for loader in self._loaders:
-            try:
-                return loader.get_source(environment, template)
-            except TemplateNotFound:
-                pass
-        raise TemplateNotFound(template)
+        def add_loader(self, loader):
+            self._loaders.append(loader)
 
-    def list_templates(self):
-        seen = set()
-        templates = []
-        for loader in self._loaders:
-            for tmpl in loader.list_templates():
-                if tmpl not in seen:
-                    templates.append(tmpl)
-                    seen.add(tmpl)
-        return templates
+        def get_source(self, environment, template):
+            for loader in self._loaders:
+                try:
+                    return loader.get_source(environment, template)
+                except TemplateNotFound:
+                    pass
+            raise TemplateNotFound(template)
+
+        def list_templates(self):
+            seen = set()
+            templates = []
+            for loader in self._loaders:
+                for tmpl in loader.list_templates():
+                    if tmpl not in seen:
+                        templates.append(tmpl)
+                        seen.add(tmpl)
+            return templates
 
 
-_jload = MultiLoader()
-_jenv = Environment(trim_blocks=True, lstrip_blocks=True, loader=_jload)
-_jenv.filters['dzn'] = val2dzn
-_jenv.filters['int'] = discretize
+    _jload = MultiLoader()
+    _jenv = Environment(trim_blocks=True, lstrip_blocks=True, loader=_jload)
+    _jenv.filters['dzn'] = val2dzn
+    _jenv.filters['int'] = discretize
 
+_except_text = (
+    'Templates are not in use, but template arguments were '
+    'provided. If you intended to use tempaltes make sure the '
+    'Jinja2 templating library is installed on your system.'
+)
 
 def from_string(source, args=None):
     """Renders a template string"""
-    log = logging.getLogger(__name__)
-    log.debug('Compiling model with arguments {}'.format(args))
-    return _jenv.from_string(source).render(args or {})
-
+    if _has_jinja:
+        log = logging.getLogger(__name__)
+        log.debug('Precompiling model with arguments {}'.format(args))
+        return _jenv.from_string(source).render(args or {})
+    if args is not None:
+        raise RuntimeError(_except_text)
+    return source
 
 def add_package(package_name, package_path='templates', encoding='utf-8'):
     """Adds the given package to the template search routine"""
+    if not _has_jinja:
+        raise RuntimeError(_except_text)
     _jload.add_loader(PackageLoader(package_name, package_path, encoding))
 
 
 def add_path(searchpath, encoding='utf-8', followlinks=False):
     """Adds the given path to the template search routine"""
+    if not _has_jinja:
+        raise RuntimeError(_except_text)
     _jload.add_loader(FileSystemLoader(searchpath, encoding, followlinks))
 
