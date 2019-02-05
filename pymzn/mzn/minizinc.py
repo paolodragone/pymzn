@@ -21,7 +21,6 @@ solver.
 """
 
 import os
-import logging
 import contextlib
 
 from time import monotonic as _time
@@ -32,6 +31,7 @@ from tempfile import NamedTemporaryFile
 import pymzn.config as config
 
 from . import solvers
+from .log import logger
 from .solutions import Solutions
 from .solvers import gecode
 from .model import MiniZincModel
@@ -325,12 +325,11 @@ def minizinc(
 
 
 def cleanup(files):
-    log = logging.getLogger(__name__)
     with contextlib.suppress(FileNotFoundError):
         for _file in files:
             if _file:
                 os.remove(_file)
-                log.debug('Deleted file: {}'.format(_file))
+                logger.debug('Deleted file: {}'.format(_file))
 
 
 def _run_minizinc(*args, input=None):
@@ -380,8 +379,7 @@ def solve(
     t0 = _time()
     proc = _run_minizinc(*args)
     solve_time = _time() - t0
-    log = logging.getLogger(__name__)
-    log.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
+    logger.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
 
     return proc
 
@@ -455,24 +453,22 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
         dzn_files.append(data_file)
     args += [mzn_file] + dzn_files
 
-    log = logging.getLogger(__name__)
-
     t0 = _time()
     process = None
     try:
         process = Process(args).run()
     except CalledProcessError as err:
-        log.exception(err.stderr)
+        logger.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
     flattening_time = _time() - t0
 
-    log.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
+    logger.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
     if not keep_data:
         with contextlib.suppress(FileNotFoundError):
             if data_file:
                 os.remove(data_file)
-                log.debug('Deleted file: {}'.format(data_file))
+                logger.debug('Deleted file: {}'.format(data_file))
 
     mzn_base = os.path.splitext(mzn_file)[0]
     fzn_file = '.'.join([mzn_base, 'fzn'])
@@ -481,9 +477,9 @@ def mzn2fzn(mzn_file, *dzn_files, data=None, keep_data=False, globals_dir=None,
     ozn_file = ozn_file if os.path.isfile(ozn_file) else None
 
     if fzn_file:
-        log.debug('Generated file: {}'.format(fzn_file))
+        logger.debug('Generated file: {}'.format(fzn_file))
     if ozn_file:
-        log.debug('Generated file: {}'.format(ozn_file))
+        logger.debug('Generated file: {}'.format(ozn_file))
 
     return fzn_file, ozn_file
 
@@ -499,14 +495,12 @@ def prepare_data(mzn_file, data, keep_data=False):
     elif not isinstance(data, list):
         raise TypeError('The additional data provided is not valid.')
 
-    log = logging.getLogger(__name__)
-
     if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
         mzn_base, __ = os.path.splitext(mzn_file)
         data_file = mzn_base + '_data.dzn'
         with open(data_file, 'w') as f:
             f.write('\n'.join(data))
-        log.debug('Generated file: {}'.format(data_file))
+        logger.debug('Generated file: {}'.format(data_file))
         data = None
     else:
         data = ' '.join(data)
@@ -537,13 +531,12 @@ def solns2out(stream, ozn_file):
         The output stream of solns2out encoding the solution stream according to
         the provided ozn file.
     """
-    log = logging.getLogger(__name__)
     args = [config.get('solns2out', 'solns2out'), ozn_file]
     process = _solns2out_process(ozn_file)
     try:
         process.run(stream)
         yield from process.stdout_data.splitlines()
     except CalledProcessError as err:
-        log.exception(err.stderr)
+        logger.exception(err.stderr)
         raise RuntimeError(err.stderr) from err
 
