@@ -26,7 +26,7 @@ class Parser:
 
     def _gather(self, solns, proc):
         try:
-            for soln in self._parse(proc.stdout_data):
+            for soln in self._parse(proc.stdout_data.splitlines()):
                 solns.queue.put(soln)
             solns.complete = self.complete
             solns.stats = self.stats
