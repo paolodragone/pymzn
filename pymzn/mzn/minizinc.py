@@ -35,7 +35,7 @@ from .log import logger
 from .solvers import gecode
 from .templates import from_string
 from .process import run_process
-from .parser import SolutionParser
+from .output import SolutionParser
 from ..dzn import dict2dzn
 from ..exceptions import *
 
