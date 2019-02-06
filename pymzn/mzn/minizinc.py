@@ -29,9 +29,9 @@ from time import monotonic as _time
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
-import ..config as config
+from .. import config as config
 
-from .log import logger
+from ..log import logger
 from .solvers import gecode
 from .templates import from_string
 from .process import run_process
@@ -175,7 +175,7 @@ def preprocess_model(mzn, output_vars=None, keep=True, **kwargs):
     return model
 
 
-def save_model(model, output_file=None, output_dir=None, keep=False)
+def save_model(model, output_file=None, output_dir=None, keep=False):
     if output_file:
         mzn_file = output_file
         output_file = open(output_file, 'w+', buffering=1)

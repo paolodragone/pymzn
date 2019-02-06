@@ -6,9 +6,12 @@ problems encoded in MiniZinc and parse the solutions into Python objects."""
 
 import ast
 
+from . import log
 from .log import *
 from . import config
+from . import dzn
 from .dzn import *
+from . import mzn
 from .mzn import *
 
 __version__ = '0.17.1'

@@ -17,7 +17,7 @@ class Solutions:
         the stream contains all solutions in a satisfiability problem, or it
         contains the global optimum for maximization/minimization problems.
     """
-    def __init__(self, queue *, keep=True):
+    def __init__(self, queue, *, keep=True):
         self._queue = queue
         self._keep = keep
         self._solns = [] if keep else None
