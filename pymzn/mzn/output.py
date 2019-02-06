@@ -92,9 +92,9 @@ class SolutionParser:
         self.complete = False
         self.stats = None
 
-    def _gather(self, solns, proc):
+    def _collect(self, solns, proc):
         try:
-            for soln in self._parse(proc.stdout_data.splitlines()):
+            for soln in self._parse(proc):
                 solns.queue.put(soln)
             solns.complete = self.complete
             solns.stats = self.stats
@@ -105,25 +105,43 @@ class SolutionParser:
     def parse(self, proc):
         queue = Queue()
         solns = Solutions(queue)
-        self._gather(solns, proc)
+        self._collect(solns, proc)
         return solns
 
-    def _parse(self, out):
-        out = self.solver.parse_out(out)
-        solns = self._split_solns(out)
-        if self.output_mode == 'dict':
-            solns = self._to_dict(solns)
-        return solns
+    def _parse(self, proc):
+        parse_lines = self._parse_lines()
+        parse_lines.send(None)
+        for line in proc.readlines():
+            soln = parse_lines.send(line)
+            if soln is not None:
+                yield soln
 
-    def _split_solns(self, lines):
-        """Split the solutions from the output stream of a solver or solns2out"""
+    def _parse_lines(self):
+        solver_parse = self.solver.parse_out()
+        split_solns = self._split_solns()
+        solver_parse.send(None)
+        split_solns.send(None)
+
+        line = yield
+        while True:
+            line = solver_parse.send(line)
+            soln = split_solns.send(line)
+            if soln is not None:
+                if self.output_mode == 'dict':
+                    soln = dzn2dict(soln)
+                line = yield soln
+            else:
+                line = yield
+
+    def _split_solns(self):
         _buffer = []
-        complete = False
-        for line in lines:
+        line = yield
+        while True:
             line = line.strip()
             if line == self.SOLN_SEP:
-                yield '\n'.join(_buffer)
+                line = yield '\n'.join(_buffer)
                 _buffer = []
+                continue
             elif line == self.SEARCH_COMPLETE:
                 self.complete = True
                 _buffer = []
@@ -137,14 +155,7 @@ class SolutionParser:
                 raise MiniZincUnsatOrUnboundedError
             elif line == self.ERROR:
                 raise MiniZincGenericError
-            else:
+            elif line:
                 _buffer.append(line)
-        self.stats = '\n'.join(_buffer)
-
-    def _to_dict(self, stream):
-        try:
-            while True:
-                yield dzn2dict(next(stream))
-        except StopIteration as stop:
-            return stop.value
+            line = yield
 
