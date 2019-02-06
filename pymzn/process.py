@@ -9,7 +9,7 @@ from time import monotonic as _time
 from subprocess import Popen, PIPE, TimeoutExpired, CalledProcessError
 
 
-__all__ = ['run', 'run_process']
+__all__ = ['run_process']
 
 
 class CompletedProcessWrapper:
@@ -48,9 +48,4 @@ def run_process(*args, input=None):
     )
     end_time = _time()
     return CompletedProcessWrapper(cp, start_time, end_time)
-
-
-def run(*args, input=None):
-    proc = run_process(*args, input=input)
-    return proc.stdout_data.decode('utf-8')
 

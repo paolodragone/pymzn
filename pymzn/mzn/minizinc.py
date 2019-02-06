@@ -34,7 +34,7 @@ import pymzn.config as config
 from .log import logger
 from .solvers import gecode
 from .templates import from_string
-from ..process import run, run_process
+from ..process import run_process
 from ..dzn import dict2dzn
 from ..exceptions import *
 
@@ -51,7 +51,8 @@ def _run_minizinc_proc(*args, input=None):
 
 def _run_minizinc(*args, input=None):
     args.insert(0, config.get('minizinc', 'minizinc'))
-    return run(*args, input=input)
+    proc = _run_minizinc_proc(*args, input=input)
+    return proc.stdout_data.decode('utf-8')
 
 
 def _process_template(model, **kwargs):
