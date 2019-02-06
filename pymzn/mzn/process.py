@@ -4,9 +4,9 @@ This package provides utilities for running synchronous external processes.
 """
 
 import os
+import subprocess
 
 from time import monotonic as _time
-from subprocess import Popen, PIPE, TimeoutExpired, CalledProcessError
 
 
 __all__ = ['run_process']
