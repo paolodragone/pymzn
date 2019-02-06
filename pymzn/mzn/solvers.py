@@ -34,12 +34,8 @@ Then it is possible to run the ``minizinc`` function with the custom solver::
 """
 
 import re
-import logging
-
 import pymzn.config as config
 
-from ..process import Process
-from subprocess import CalledProcessError
 
 
 __all__ = [
