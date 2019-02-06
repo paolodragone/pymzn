@@ -132,7 +132,7 @@ def from_string(source, args=None):
         log = logging.getLogger(__name__)
         log.debug('Precompiling model with arguments {}'.format(args))
         return _jenv.from_string(source).render(args or {})
-    if args is not None:
+    if args:
         raise RuntimeError(_except_text)
     return source
 
