@@ -38,6 +38,10 @@ class CompletedProcessWrapper:
     def stderr_data(self):
         return self._proc.stderr
 
+    def readlines(self):
+        yield from self.stdout_data.splitlines()
+        yield b''
+
 
 def run_process(*args, input=None):
     shell = os.name == 'nt'
