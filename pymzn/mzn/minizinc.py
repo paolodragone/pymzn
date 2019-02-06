@@ -29,12 +29,12 @@ from time import monotonic as _time
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
-import pymzn.config as config
+import ..config as config
 
 from .log import logger
 from .solvers import gecode
 from .templates import from_string
-from ..process import run_process
+from .process import run_process
 from ..dzn import dict2dzn
 from ..exceptions import *
 
