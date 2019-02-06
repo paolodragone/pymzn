@@ -109,6 +109,7 @@ class SolutionParser:
         return solns
 
     def _parse(self, out):
+        out = self.solver.parse_out(out)
         solns = self._split_solns(out)
         if self.output_mode == 'dict':
             solns = self._to_dict(solns)
