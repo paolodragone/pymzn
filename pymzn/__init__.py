@@ -5,37 +5,14 @@ toolkit and provides a number of off-the-shelf functions to readily solve
 problems encoded in MiniZinc and parse the solutions into Python objects."""
 
 import ast
-import logging
 
+from .log import *
 from . import config
-from . import dzn
 from .dzn import *
-from . import mzn
 from .mzn import *
-from .mzn import templates
 
 __version__ = '0.17.1'
-__all__ = ['debug', 'config']
-__all__.extend(dzn.__all__)
-__all__.extend(mzn.__all__)
-
-# TODO: update python2 branch
-
-_debug_handler = None
-_pymzn_logger = logging.getLogger(__name__)
-_pymzn_logger.addHandler(logging.NullHandler())
-
-def debug(dbg=True):
-    """Enables or disables debugging messages on the standard output."""
-    global _debug_handler
-    if dbg and _debug_handler is None:
-        _debug_handler = logging.StreamHandler()
-        _pymzn_logger.addHandler(_debug_handler)
-        _pymzn_logger.setLevel(logging.DEBUG)
-    elif not dbg and _debug_handler is not None:
-        _pymzn_logger.removeHandler(_debug_handler)
-        _debug_handler = None
-        _pymzn_logger.setLevel(logging.WARNING)
+__all__ = ['config'] + log.__all__ + dzn.__all__ + mzn.__all__
 
 
 def main():
