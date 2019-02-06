@@ -35,6 +35,7 @@ from .log import logger
 from .solvers import gecode
 from .templates import from_string
 from .process import run_process
+from .parser import SolutionParser
 from ..dzn import dict2dzn
 from ..exceptions import *
 
@@ -353,7 +354,7 @@ def minizinc(
             num_solutions=num_solutions, **solver_args
         )
 
-        parser = Parser(mzn_file, solver, output_mode=output_mode)
+        parser = SolutionParser(mzn_file, solver, output_mode=output_mode)
         solns = parser.parse(proc)
     except MiniZincError as err:
         err._set(mzn_file, proc.stderr_data)

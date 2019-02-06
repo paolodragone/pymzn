@@ -74,7 +74,7 @@ class Solutions:
             return str(self)
 
 
-class Parser:
+class SolutionParser:
 
     SOLN_SEP = '----------'
     SEARCH_COMPLETE = '=========='
