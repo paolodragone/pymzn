@@ -26,7 +26,6 @@ import json
 import contextlib
 
 from time import monotonic as _time
-from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 
 from .. import config as config
@@ -46,12 +45,11 @@ __all__ = [
 
 
 def _run_minizinc_proc(*args, input=None):
-    args.insert(0, config.get('minizinc', 'minizinc'))
+    args = [config.get('minizinc', 'minizinc')] + list(args)
     return run_process(*args, input=input)
 
 
 def _run_minizinc(*args, input=None):
-    args.insert(0, config.get('minizinc', 'minizinc'))
     proc = _run_minizinc_proc(*args, input=input)
     return proc.stdout_data.decode('utf-8')
 
@@ -320,7 +318,7 @@ def minizinc(
     keep = config.get('keep', keep)
 
     model = preprocess_model(
-        mzn, output_vars=output_vars, keep=keep, **args
+        mzn, output_vars=output_vars, keep=keep, **(args or {})
     )
     mzn_file = save_model(model, output_dir=output_dir, keep=keep)
 
@@ -398,7 +396,7 @@ def _flattening_args(
 
     if data:
         args += ['-D', data]
-    args += [mzn_file] + dzn_files
+    args += [mzn_file] + list(dzn_files)
 
     return args
 
