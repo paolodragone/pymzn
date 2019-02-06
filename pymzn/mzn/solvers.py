@@ -42,6 +42,13 @@ from ..process import Process
 from subprocess import CalledProcessError
 
 
+__all__ = [
+    'Solver', 'Gecode', 'Chuffed', 'Optimathsat', 'Opturion', 'MIPSolver',
+    'Gurobi', 'CBC', 'OscarCBLS', 'ORTools', 'gecode', 'chuffed', 'optimathsat',
+    'opturion', 'gurobi', 'cbc', 'oscar_cbls', 'or_tools'
+]
+
+
 class Solver:
     """Abstract solver class.
 
