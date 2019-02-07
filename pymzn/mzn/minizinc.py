@@ -537,11 +537,15 @@ def solns2out(stream, ozn_file):
 
 class MiniZincError(RuntimeError):
 
-    def __init__(self, mzn_file, args):
-        super().__init__((
+    def __init__(self, mzn_file, args, stderr=None):
+        self.mzn_file = mzn_file
+        self.args = args
+        self.stderr = stderr
+        msg = (
             'An error occurred while executing minizinc on file {} '
             'with command line arguments: {}'
         ).format(mzn_file, args))
-        self.mzn_file = mzn_file
-        self.args = args
+        if stderr:
+            msg += '\n' + stderr
+        super().__init__(msg)
 
