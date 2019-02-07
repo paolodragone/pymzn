@@ -271,9 +271,10 @@ def check_model(
 
 
 def minizinc(
-    mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
-    output_mode='dict', output_vars=None, output_dir=None, timeout=None,
-    all_solutions=False, num_solutions=None, args=None, **kwargs
+    mzn, *dzn_files, data=None, keep=False, include=None, stdlib_dir=stdlib_dir,
+    globals_dir=globals_dir, solver=None, output_mode='dict', output_vars=None,
+    output_dir=None, timeout=None, all_solutions=False, num_solutions=None,
+    args=None, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
