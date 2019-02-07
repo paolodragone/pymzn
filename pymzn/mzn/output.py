@@ -66,17 +66,28 @@ class Solutions:
         self._fetch_all()
         return self._solns[key]
 
+    def _pp_solns(self):
+        if len(self._solns) <= 1:
+            return str(self._solns)
+        pp = ['[']
+        for i, soln in enumerate(self._solns):
+            pp.append('    ' + repr(soln))
+            if i < len(self._solns) - 1:
+                pp[-1] += ','
+        pp.append(']')
+        return '\n'.join(pp)
+
     def __repr__(self):
         if self._keep and self.status < 2:
             self._fetch_all()
-            return '<Solutions: {}>'.format(self._solns)
+            return '<Solutions: {}>'.format(self._pp_solns())
         else:
             return '<Solutions: {}>'.format(self.status.name)
 
     def __str__(self):
         if self._keep and self.status < 2:
             self._fetch_all()
-            return str(self._solns)
+            return self._pp_solns()
         else:
             return self.status.name
 
