@@ -51,7 +51,7 @@ def _run_minizinc_proc(*args, input=None):
 
 def _run_minizinc(*args, input=None):
     proc = _run_minizinc_proc(*args, input=input)
-    return proc.stdout_data.decode('utf-8')
+    return proc.stdout_data
 
 
 def _process_template(model, **kwargs):
@@ -509,7 +509,7 @@ def mzn2fzn(
     args.append('--compile')
 
     t0 = _time()
-    _run_minizinc(args)
+    _run_minizinc(*args)
     flattening_time = _time() - t0
     logger.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
