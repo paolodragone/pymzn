@@ -274,7 +274,7 @@ def minizinc(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
     globals_dir=None, output_vars=None, keep=False, output_dir=None,
     output_mode='dict', solver=None, timeout=None, all_solutions=False,
-    num_solutions=None, free_search=False, parallel=None, seed=None **kwargs
+    num_solutions=None, free_search=False, parallel=None, seed=None, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
