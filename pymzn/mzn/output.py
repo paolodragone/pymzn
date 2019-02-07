@@ -83,6 +83,7 @@ class Solutions:
         else:
             return str(self)
 
+
 class SolutionParser:
 
     SOLN_SEP = '----------'
@@ -115,15 +116,10 @@ class SolutionParser:
     def _parse(self, proc):
         parse_lines = self._parse_lines()
         parse_lines.send(None)
-        for line in proc.stdout.readlines():
+        for line in proc.readlines():
             soln = parse_lines.send(line)
             if soln is not None:
                 yield soln
-
-        solver_parse_err = self.solver_parser
-        solver_parser_err.send(None)
-        for line in proc.stderr.readlines():
-            solver_parser_err.send(line)
 
     def _parse_lines(self):
         solver_parse_out = self.solver_parser.parse_out()
