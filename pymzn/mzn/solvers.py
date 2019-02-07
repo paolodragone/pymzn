@@ -95,9 +95,14 @@ class Solver:
 
     class Parser:
 
+        _line_comm_p = re.compile('%.*')
+
+        def __init__(self):
+            self._stats = []
+
         @property
         def stats(self):
-            return None
+            return ''.join(self._stats)
 
         def parse_out(self):
             """Parse the output stream of the solver.
@@ -116,7 +121,11 @@ class Solver:
             """
             line = yield
             while True:
-                line = yield line
+                if self._line_comm_p.match(line):
+                    self._stats.append(line)
+                    line = yield ''
+                else:
+                    line = yield line
 
     def parser(self):
         return Solver.Parser()
@@ -151,20 +160,12 @@ class Optimathsat(Solver):
 
     class Parser(Solver.Parser):
 
-        _line_comm_p = re.compile('%.*')
         _rational_p = re.compile('(\d+)\/(\d+)')
-
-        def __init__(self):
-            self._stats = []
-
-        @property
-        def stats(self):
-            return ''.join(self._stats)
 
         def parse_out(self):
             line = yield
             while True:
-                if _line_comm_p.match(line):
+                if self._line_comm_p.match(line):
                     self._stats.append(line)
                     line = yield ''
                 else:
