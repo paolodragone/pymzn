@@ -38,8 +38,8 @@ from .output import SolutionParser
 from ..dzn import dict2dzn
 
 __all__ = [
-    'minizinc_version', 'preprocess_model', 'save_model', 'minizinc', 'solve',
-    'mzn2fzn', 'solns2out'
+    'minizinc_version', 'preprocess_model', 'save_model', 'check_model',
+    'minizinc', 'solve', 'mzn2fzn', 'solns2out'
 ]
 
 
