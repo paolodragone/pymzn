@@ -33,12 +33,8 @@ class Solutions:
         self._solns = [] if keep else None
         self._n_solns = 0
         self.status = Status.INCOMPLETE
-        self.stats = None
+        self.statistics = None
         self.stderr = None
-
-    @property
-    def statistics(self):
-        return self.stats
 
     def _fetch(self):
         while not self._queue.empty():
@@ -106,7 +102,7 @@ class SolutionParser:
         for soln in self._parse(proc):
             solns._queue.put(soln)
         solns.status = self.status
-        solns.stats = self.solver_parser.stats
+        solns.statistics = self.solver_parser.stats
         solns.stderr = proc.stderr_data
 
     def parse(self, proc):
