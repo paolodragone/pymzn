@@ -41,8 +41,8 @@ class Solutions:
         return self.stats
 
     def _fetch(self):
-        while not self.queue.empty():
-            soln = self.queue.get_nowait()
+        while not self._queue.empty():
+            soln = self._queue.get_nowait()
             if self._keep:
                 self._solns.append(soln)
             self._n_solns += 1
@@ -104,14 +104,13 @@ class SolutionParser:
 
     def _collect(self, solns, proc):
         for soln in self._parse(proc):
-            solns.queue.put(soln)
+            solns._queue.put(soln)
         solns.status = self.status
         solns.stats = self.solver_parser.stats
         solns.stderr = proc.stderr_data
 
     def parse(self, proc):
-        queue = Queue()
-        solns = Solutions(queue)
+        solns = Solutions(Queue())
         self._collect(solns, proc)
         return solns
 
@@ -131,7 +130,6 @@ class SolutionParser:
 
         line = yield
         while True:
-            line = line.decode('utf-8')
             line = solver_parse_out.send(line)
             soln = split_solns.send(line)
             if soln is not None:
