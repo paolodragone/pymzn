@@ -36,7 +36,6 @@ from .templates import from_string
 from .process import run_process
 from .output import SolutionParser
 from ..dzn import dict2dzn
-from ..exceptions import *
 
 __all__ = [
     'minizinc_version', 'preprocess_model', 'save_model', 'minizinc', 'solve',
@@ -344,19 +343,14 @@ def minizinc(
     if data_file:
         dzn_files.append(data_file)
 
-    solns = None
-    try:
-        proc = solve(
-            solver, mzn_file, *dzn_files, data=data, output_mode=_output_mode,
-            include=include, timeout=timeout, all_solutions=all_solutions,
-            num_solutions=num_solutions, **solver_args
-        )
+    proc = solve(
+        solver, mzn_file, *dzn_files, data=data, output_mode=_output_mode,
+        include=include, timeout=timeout, all_solutions=all_solutions,
+        num_solutions=num_solutions, **solver_args
+    )
 
-        parser = SolutionParser(mzn_file, solver, output_mode=output_mode)
-        solns = parser.parse(proc)
-    except MiniZincError as err:
-        err._set(mzn_file, proc.stderr_data)
-        raise err
+    parser = SolutionParser(mzn_file, solver, output_mode=output_mode)
+    solns = parser.parse(proc)
 
     if not keep:
         _cleanup([mzn_file, data_file])
@@ -422,7 +416,12 @@ def solve(
     )
 
     t0 = _time()
-    proc = _run_minizinc_proc(*args)
+
+    try:
+        proc = _run_minizinc_proc(*args)
+    except RuntimeError as err:
+        raise MiniZincError(mzn_file, args) from err
+
     solve_time = _time() - t0
     logger.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
 
@@ -529,4 +528,16 @@ def solns2out(stream, ozn_file):
         the provided ozn file.
     """
     return _run_minizinc('--ozn-file', ozn_file, input=stream)
+
+
+class MiniZincError(RuntimeError):
+
+    def __init__(self, mzn_file, args):
+        super().__init__(
+            'An error occurred while executing minizinc '
+            'on file {} '.format(mzn_file)
+            'with command line arguments: {}'.format(args)
+        )
+        self.mzn_file = mzn_file
+        self.args = args
 
