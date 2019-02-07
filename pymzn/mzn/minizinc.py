@@ -271,10 +271,10 @@ def check_model(
 
 
 def minizinc(
-    mzn, *dzn_files, data=None, keep=False, include=None, stdlib_dir=stdlib_dir,
-    globals_dir=globals_dir, solver=None, output_mode='dict', output_vars=None,
-    output_dir=None, timeout=None, all_solutions=False, num_solutions=None,
-    args=None, **kwargs
+    mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
+    globals_dir=None, output_vars=None, keep=False, output_dir=None,
+    output_mode='dict', solver=None, timeout=None, all_solutions=False,
+    num_solutions=None, free_search=False, parallel=None, seed=None **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -407,9 +407,11 @@ def minizinc(
     solver_args = {**kwargs, **config.get('solver_args', {})}
 
     proc = solve(
-        solver, mzn_file, *dzn_files, data=data, output_mode=_output_mode,
-        include=include, timeout=timeout, all_solutions=all_solutions,
-        num_solutions=num_solutions, **solver_args
+        solver, mzn_file, *dzn_files, data=data, include=include,
+        stdlib_dir=stdlib_dir, globals_dir=globals_dir, keep=keep,
+        output_mode=_output_mode, timeout=timeout, all_solutions=all_solutions,
+        num_solutions=num_solutions, free_search=free_search, parallel=parallel,
+        seed=seed, **solver_args
     )
 
     parser = SolutionParser(mzn_file, solver, output_mode=output_mode)
@@ -422,8 +424,8 @@ def minizinc(
 
 
 def solve(
-    solver, mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
-    globals_dir=None, output_mode='dict', include=None, timeout=None,
+    solver, mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
+    globals_dir=None, keep=False, output_mode='dict', timeout=None,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
     seed=None, **kwargs
 ):
