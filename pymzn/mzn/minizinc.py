@@ -500,6 +500,16 @@ def mzn2fzn(
         second argument is None.
     """
 
+    dzn_files = list(dzn_files)
+    data, data_file = _prepare_data(mzn_file, data, keep_data)
+    if data_file:
+        dzn_files.append(data_file)
+
+    check_model(
+        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir
+    )
+
     args = _flattening_args(
         mzn_file, *dzn_files, data=data, keep=keep_data, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir, output_mode=output_mode, include=include,
