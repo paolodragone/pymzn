@@ -40,7 +40,6 @@ class CompletedProcessWrapper:
 
     def readlines(self):
         yield from self.stdout_data.splitlines()
-        yield b''
 
 
 def run_process(*args, input=None):
