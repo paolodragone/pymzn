@@ -45,6 +45,7 @@ __all__ = [
 
 def _run_minizinc_proc(*args, input=None):
     args = [config.get('minizinc', 'minizinc')] + list(args)
+    logger.debug('Executing minizinc with arguments: {}'.format(args))
     return run_process(*args, input=input)
 
 
