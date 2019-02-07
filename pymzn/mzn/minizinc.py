@@ -218,6 +218,58 @@ def minizinc_version():
     return m[0]
 
 
+def _flattening_args(
+    mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
+    globals_dir=None, output_mode='dict', include=None, no_ozn=False,
+    output_base=None
+):
+    args = []
+
+    if stdlib_dir:
+        args += ['--stdlib_dir', stdlib_dir]
+    if globals_dir:
+        args += ['-G', globals_dir]
+    if output_mode and output_mode in ['dzn', 'json', 'item']:
+        args += ['--output-mode', output_mode]
+    if no_ozn:
+        args.append('--no-output-ozn')
+    if output_base:
+        args += ['--output-base', output_base]
+
+    if include:
+        if isinstance(include, str):
+            include = [include]
+        elif not isinstance(include, list):
+            raise TypeError('The include path is not valid.')
+    else:
+        include = []
+
+    include += config.get('include', [])
+    for path in include:
+        args += ['-I', path]
+
+    if data:
+        args += ['-D', data]
+    args += [mzn_file] + list(dzn_files)
+
+    return args
+
+
+def check_model(
+    mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
+    globals_dir=None
+):
+    args = _flattening_args(
+        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir
+    )
+    args.append('--instance-check-only')
+
+    proc = _run_minizinc_proc(*args)
+    if proc.stderr_data:
+        raise MiniZincError(mzn_file, args, proc.stderr_data)
+
+
 def minizinc(
     mzn, *dzn_files, data=None, keep=False, include=None, solver=None,
     output_mode='dict', output_vars=None, output_dir=None, timeout=None,
@@ -361,43 +413,6 @@ def minizinc(
         _cleanup([mzn_file, data_file])
 
     return solns
-
-
-def _flattening_args(
-    mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
-    globals_dir=None, output_mode='dict', include=None, no_ozn=False,
-    output_base=None
-):
-    args = []
-
-    if stdlib_dir:
-        args += ['--stdlib_dir', stdlib_dir]
-    if globals_dir:
-        args += ['-G', globals_dir]
-    if output_mode and output_mode in ['dzn', 'json', 'item']:
-        args += ['--output-mode', output_mode]
-    if no_ozn:
-        args.append('--no-output-ozn')
-    if output_base:
-        args += ['--output-base', output_base]
-
-    if include:
-        if isinstance(include, str):
-            include = [include]
-        elif not isinstance(include, list):
-            raise TypeError('The include path is not valid.')
-    else:
-        include = []
-
-    include += config.get('include', [])
-    for path in include:
-        args += ['-I', path]
-
-    if data:
-        args += ['-D', data]
-    args += [mzn_file] + list(dzn_files)
-
-    return args
 
 
 def solve(
