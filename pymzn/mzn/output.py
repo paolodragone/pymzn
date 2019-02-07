@@ -131,6 +131,7 @@ class SolutionParser:
 
         line = yield
         while True:
+            line = line.decode('utf-8')
             line = solver_parse_out.send(line)
             soln = split_solns.send(line)
             if soln is not None:
