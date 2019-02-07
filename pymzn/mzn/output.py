@@ -34,6 +34,7 @@ class Solutions:
         self._n_solns = 0
         self.status = Status.INCOMPLETE
         self.stats = None
+        self.stderr = None
 
     @property
     def statistics(self):
@@ -106,6 +107,7 @@ class SolutionParser:
             solns.queue.put(soln)
         solns.status = self.status
         solns.stats = self.solver_parser.stats
+        solns.stderr = proc.stderr_data
 
     def parse(self, proc):
         queue = Queue()
