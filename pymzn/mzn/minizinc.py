@@ -414,7 +414,7 @@ def minizinc(
         seed=seed, **solver_args
     )
 
-    parser = SolutionParser(mzn_file, solver, output_mode=output_mode)
+    parser = SolutionParser(solver, output_mode=output_mode)
     solns = parser.parse(proc)
 
     if not keep:

@@ -91,8 +91,7 @@ class SolutionParser:
     UNSATorUNBOUNDED = '=====UNSATorUNBOUNDED====='
     ERROR = '=====ERROR====='
 
-    def __init__(self, mzn_file, solver, output_mode='dict'):
-        self.mzn_file = mzn_file
+    def __init__(self, solver, output_mode='dict'):
         self.solver = solver
         self.solver_parser = self.solver.parser()
         self.output_mode = output_mode
