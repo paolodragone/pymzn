@@ -559,8 +559,8 @@ class MiniZincError(RuntimeError):
         msg = (
             'An error occurred while executing minizinc on file {} '
             'with command line arguments: {}'
-        ).format(mzn_file, args))
+        ).format(mzn_file, args)
         if stderr:
-            msg += '\n' + stderr
+            msg += '\n\n' + stderr
         super().__init__(msg)
 
