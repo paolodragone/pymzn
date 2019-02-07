@@ -142,6 +142,13 @@ class Optimathsat(Solver):
     def __init__(self, solver_id='optimathsat'):
         super().__init__(solver_id)
 
+    def args(
+        self, all_solutions=False, num_solutions=None, free_search=False,
+        parallel=None, seed=None, **kwargs
+    ):
+        args = ['-input=fzn']
+        return args
+
     class Parser(Solver.Parser):
 
         _line_comm_p = re.compile('%.*')
