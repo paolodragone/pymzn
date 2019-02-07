@@ -1,8 +1,18 @@
 
+from enum import IntEnum
 from ..dzn import dict2dzn, dzn2dict
-from ..exceptions import *
 
 from queue import Queue
+
+
+class Status(IntEnum):
+    COMPLETE = 0
+    INCOMPLETE = 1
+    UNKNOWN = 2
+    UNSATISFIABLE = 3
+    UNBOUNDED = 4
+    UNSATorUNBOUNDED = 5
+    ERROR = 6
 
 
 class Solutions:
@@ -22,7 +32,7 @@ class Solutions:
         self._keep = keep
         self._solns = [] if keep else None
         self._n_solns = 0
-        self.complete = False
+        self.status = Status.INCOMPLETE
         self.stats = None
 
     @property
@@ -73,7 +83,6 @@ class Solutions:
         else:
             return str(self)
 
-
 class SolutionParser:
 
     SOLN_SEP = '----------'
@@ -87,20 +96,15 @@ class SolutionParser:
     def __init__(self, mzn_file, solver, output_mode='dict'):
         self.mzn_file = mzn_file
         self.solver = solver
+        self.solver_parser = self.solver.parser()
         self.output_mode = output_mode
-        self._solns = None
-        self.complete = False
-        self.stats = None
+        self.status = Status.INCOMPLETE
 
     def _collect(self, solns, proc):
-        try:
-            for soln in self._parse(proc):
-                solns.queue.put(soln)
-            solns.complete = self.complete
-            solns.stats = self.stats
-        except MiniZincError as err:
-            err._set(self.mzn_file, proc.stderr_data)
-            raise err
+        for soln in self._parse(proc):
+            solns.queue.put(soln)
+        solns.status = self.status
+        solns.stats = self.solver_parser.stats
 
     def parse(self, proc):
         queue = Queue()
@@ -109,24 +113,27 @@ class SolutionParser:
         return solns
 
     def _parse(self, proc):
-        self.solver_parser = self.solver.parser()
         parse_lines = self._parse_lines()
         parse_lines.send(None)
-        for line in proc.readlines():
+        for line in proc.stdout.readlines():
             soln = parse_lines.send(line)
             if soln is not None:
                 yield soln
-        self.stats = self.solver_parser.stats
+
+        solver_parse_err = self.solver_parser
+        solver_parser_err.send(None)
+        for line in proc.stderr.readlines():
+            solver_parser_err.send(line)
 
     def _parse_lines(self):
-        solver_parse = self.solver_parser.parse_out()
+        solver_parse_out = self.solver_parser.parse_out()
         split_solns = self._split_solns()
-        solver_parse.send(None)
+        solver_parse_out.send(None)
         split_solns.send(None)
 
         line = yield
         while True:
-            line = solver_parse.send(line)
+            line = solver_parse_out.send(line)
             soln = split_solns.send(line)
             if soln is not None:
                 if self.output_mode == 'dict':
@@ -145,18 +152,18 @@ class SolutionParser:
                 _buffer = []
                 continue
             elif line == self.SEARCH_COMPLETE:
-                self.complete = True
+                self.status = Status.COMPLETE
                 _buffer = []
             elif line == self.UNKNOWN:
-                raise MiniZincUnknownError
+                self.status = Status.UNKNOWN
             elif line == self.UNSATISFIABLE:
-                raise MiniZincUnsatisfiableError
+                self.status = Status.UNSATISFIABLE
             elif line == self.UNBOUNDED:
-                raise MiniZincUnboundedError
+                self.status = Status.UNBOUNDED
             elif line == self.UNSATorUNBOUNDED:
-                raise MiniZincUnsatOrUnboundedError
+                self.status = Status.UNSATorUNBOUNDED
             elif line == self.ERROR:
-                raise MiniZincGenericError
+                self.status = Status.ERROR
             elif line:
                 _buffer.append(line)
             line = yield
