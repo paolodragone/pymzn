@@ -152,20 +152,36 @@ class Chuffed(Solver):
 class Optimathsat(Solver):
     """Interface to the Optimathsat solver."""
 
-    _line_comm_p = re.compile('%.*\n')
-    _rational_p = re.compile('(\d+)\/(\d+)')
-
     def __init__(self, solver_id='optimathsat'):
         super().__init__(solver_id)
 
-    def parse_out(self, out, err):
-        stats = ''.join(self._line_comm_p.findall(out))
-        out = self._line_comm_p.sub(out, '')
-        for m in self._rational_p.finditer(out):
-            n, d = m.groups()
-            val = float(n) / float(d)
-            out = re.sub('{}/{}'.format(n, d), str(val), out)
-        return out, {'statistics': stats}
+    class Parser(Solver.Parser):
+
+        _line_comm_p = re.compile('%.*')
+        _rational_p = re.compile('(\d+)\/(\d+)')
+
+        def __init__(self):
+            self._stats = []
+
+        @property
+        def stats(self):
+            return ''.join(self._stats)
+
+        def parse_out(self):
+            line = yield
+            while True:
+                if _line_comm_p.match(line):
+                    self._stats.append(line)
+                    line = yield ''
+                else:
+                    for m in self._rational_p.finditer(line):
+                        n, d = m.groups()
+                        val = float(n) / float(d)
+                        line = re.sub('{}/{}'.format(n, d), str(val), line)
+                    line = yield line
+
+    def parser(self):
+        return Optimathsat.Parser()
 
 
 class Opturion(Solver):
