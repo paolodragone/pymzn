@@ -141,27 +141,12 @@ def _rewrap(s):
     return ';\n'.join(stmts)
 
 
-def preprocess_model(mzn, output_vars=None, keep=True, **kwargs):
-    if mzn and isinstance(mzn, str):
-        if mzn.endswith('mzn'):
-            if os.path.isfile(mzn):
-                mzn_file = mzn
-                with open(mzn) as f:
-                    model = f.read()
-            else:
-                raise ValueError('The file does not exist.')
-        else:
-            model = mzn
-    else:
-        raise TypeError(
-            'The mzn variable must be either the path to or the '
-            'content of a MiniZinc model file.'
-        )
+def preprocess_model(model, output_vars=None, rewrap=True, **kwargs):
 
     args = {**kwargs, **config.get('args', {})}
     model = _process_template(model, **args)
 
-    if keep:
+    if rewrap:
         model = _rewrap(model)
     else:
         block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
@@ -169,25 +154,17 @@ def preprocess_model(mzn, output_vars=None, keep=True, **kwargs):
         line_comm_p = re.compile('%.*\n')
         model = line_comm_p.sub('', model)
 
-    model = _process_output_vars(mzn, output_vars)
+    model = _process_output_vars(model, output_vars)
     return model
 
 
-def save_model(model, output_file=None, output_dir=None, keep=False):
+def save_model(model, output_file=None, output_dir=None, output_prefix='pymzn'):
     if output_file:
         mzn_file = output_file
         output_file = open(output_file, 'w+', buffering=1)
     else:
         if not output_dir:
             output_dir = config.get('output_dir', None)
-
-        output_prefix = 'pymzn'
-        if keep:
-            mzn_dir = os.getcwd()
-            if mzn_file:
-                mzn_dir, mzn_name = os.path.split(mzn_file)
-                output_prefix, _ = os.path.splitext(mzn_name)
-            output_dir = output_dir or mzn_dir
 
         output_prefix += '_'
         output_file = NamedTemporaryFile(
@@ -314,13 +291,40 @@ def minizinc(
         Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
+    if mzn and isinstance(mzn, str):
+        if mzn.endswith('mzn'):
+            if os.path.isfile(mzn):
+                mzn_file = mzn
+                with open(mzn) as f:
+                    model = f.read()
+            else:
+                raise ValueError('The file does not exist.')
+        else:
+            mzn_file = None
+            model = mzn
+    else:
+        raise TypeError(
+            'The mzn variable must be either the path to or the '
+            'content of a MiniZinc model file.'
+        )
 
     keep = config.get('keep', keep)
 
     model = preprocess_model(
-        mzn, output_vars=output_vars, keep=keep, **(args or {})
+        model, output_vars=output_vars, rewrap=keep, **(args or {})
     )
-    mzn_file = save_model(model, output_dir=output_dir, keep=keep)
+
+    output_prefix = 'pymzn'
+    if keep:
+        mzn_dir = os.getcwd()
+        if mzn_file:
+            mzn_dir, mzn_name = os.path.split(mzn_file)
+            output_prefix, _ = os.path.splitext(mzn_name)
+        output_dir = output_dir or mzn_dir
+
+    mzn_file = save_model(
+        model, output_dir=output_dir, output_prefix=output_prefix
+    )
 
     if output_mode == 'dict':
         if output_vars:
