@@ -109,15 +109,17 @@ class SolutionParser:
         return solns
 
     def _parse(self, proc):
+        self.solver_parser = self.solver.parser()
         parse_lines = self._parse_lines()
         parse_lines.send(None)
         for line in proc.readlines():
             soln = parse_lines.send(line)
             if soln is not None:
                 yield soln
+        self.stats = self.solver_parser.stats
 
     def _parse_lines(self):
-        solver_parse = self.solver.parse_out()
+        solver_parse = self.solver_parser.parse_out()
         split_solns = self._split_solns()
         solver_parse.send(None)
         split_solns.send(None)
