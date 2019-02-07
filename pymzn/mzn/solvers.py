@@ -102,7 +102,7 @@ class Solver:
 
         @property
         def stats(self):
-            return ''.join(self._stats)
+            return '\n'.join(self._stats)
 
         def parse_out(self):
             """Parse the output stream of the solver.
