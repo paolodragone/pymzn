@@ -414,11 +414,14 @@ def minizinc(
         seed=seed, **solver_args
     )
 
-    parser = SolutionParser(solver, output_mode=output_mode)
-    solns = parser.parse(proc)
-
     if not keep:
         _cleanup([mzn_file, data_file])
+
+    if output_mode == 'raw':
+        return proc.stdout_data
+
+    parser = SolutionParser(solver, output_mode=output_mode)
+    solns = parser.parse(proc)
 
     return solns
 
