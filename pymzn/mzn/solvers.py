@@ -63,8 +63,8 @@ class Solver:
     ):
         """Returns a list of command line arguments for the specified options.
 
-        In all cases, this function should add options to display statistics and
-        log messages.
+        In all cases, this function should always add options to display
+        statistics.
 
         Parameters
         ----------
@@ -80,7 +80,7 @@ class Solver:
         seed : int
             The random number generator seed to pass to the solver.
         """
-        args = ['-s', '-v']
+        args = ['-s']
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
