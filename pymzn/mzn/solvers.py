@@ -118,19 +118,6 @@ class Solver:
             while True:
                 line = yield line
 
-        def parse_err(self):
-            """Parse the error stream of the solver.
-
-            This function is a generator that will receive in input the lines of
-            the stdout of the minizinc solver via the send() function. For each
-            line in input there should be a line in output.  This function
-            should log any relevant message through the pymzn logger.
-            """
-            line = yield
-            while True:
-                logger.debug(line)
-                line = yield line
-
     def parser(self):
         return Solver.Parser()
 
