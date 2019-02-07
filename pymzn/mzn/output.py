@@ -67,18 +67,18 @@ class Solutions:
         return self._solns[key]
 
     def __repr__(self):
-        if self._keep:
+        if self._keep and self.status < 2:
             self._fetch_all()
-            return repr(self._solns)
+            return '<Solutions: {}>'.format(self._solns)
         else:
-            return repr(self)
+            return '<Solutions: {}>'.format(self.status.name)
 
     def __str__(self):
-        if self._keep:
+        if self._keep and self.status < 2:
             self._fetch_all()
             return str(self._solns)
         else:
-            return str(self)
+            return self.status.name
 
 
 class SolutionParser:
