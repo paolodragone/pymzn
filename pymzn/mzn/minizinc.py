@@ -378,6 +378,16 @@ def minizinc(
         model, output_dir=output_dir, output_prefix=output_prefix
     )
 
+    dzn_files = list(dzn_files)
+    data, data_file = _prepare_data(mzn_file, data, keep)
+    if data_file:
+        dzn_files.append(data_file)
+
+    check_model(
+        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir
+    )
+
     if output_mode == 'dict':
         if output_vars:
             _output_mode = 'item'
@@ -394,11 +404,6 @@ def minizinc(
     timeout = config.get('timeout', timeout)
 
     solver_args = {**kwargs, **config.get('solver_args', {})}
-
-    dzn_files = list(dzn_files)
-    data, data_file = _prepare_data(mzn_file, data, keep)
-    if data_file:
-        dzn_files.append(data_file)
 
     proc = solve(
         solver, mzn_file, *dzn_files, data=data, output_mode=_output_mode,
