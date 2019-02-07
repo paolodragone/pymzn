@@ -34,8 +34,9 @@ Then it is possible to run the ``minizinc`` function with the custom solver::
 """
 
 import re
-import pymzn.config as config
 
+from .. import config as config
+from ..log import logger
 
 
 __all__ = [
@@ -92,21 +93,46 @@ class Solver:
             args += ['-r', seed]
         return args
 
-    def parse_out(self, out, err):
-        """Parse the output streams for e.g. statistics and log messages.
+    class Parser:
 
-        Statistics should be wrapped in a dictionary and returned.
-        Log messages should be logged using the pymzn logger.
+        @property
+        def stats(self):
+            return None
 
-        Parameters
-        ----------
-        out : str
-            The raw output stream of the solver.
-        err : str
-            The raw error stream of the solver.
-        """
-        stats = {}
-        return out, stats
+        def parse_out(self):
+            """Parse the output stream of the solver.
+
+            This function is a generator that will receive in input the lines of
+            the stdout of the minizinc solver via the send() function. For each
+            line in input there should be a line in output.  This function
+            should remove all the lines that are not part of the solution stream
+            by yielding empty strings instead (which will be ignored by the
+            solution parser).  This function should also process the lines
+            following a non-standard dzn format, substituting them with
+            equivalent standard dzn format (see e.g.  Optimathsat).  Statistics
+            should also be extracted, depending on the format of the solver, and
+            then returned by the stats property.  Debug messages may be logged
+            through the pymzn logger.
+            """
+            line = yield
+            while True:
+                line = yield line
+
+        def parse_err(self):
+            """Parse the error stream of the solver.
+
+            This function is a generator that will receive in input the lines of
+            the stdout of the minizinc solver via the send() function. For each
+            line in input there should be a line in output.  This function
+            should log any relevant message through the pymzn logger.
+            """
+            line = yield
+            while True:
+                logger.debug(line)
+                line = yield line
+
+    def parser(self):
+        return Solver.Parser()
 
 
 class Gecode(Solver):
