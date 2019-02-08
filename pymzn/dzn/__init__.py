@@ -79,7 +79,7 @@ transform it into a list (list of lists). For instance::
 """
 
 from .marsh import *
-from .eval import *
+from .parse import *
 
 __all__ = ['dict2dzn', 'stmt2dzn', 'val2dzn', 'rebase_array', 'dzn2dict']
 
