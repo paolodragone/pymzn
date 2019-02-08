@@ -45,9 +45,6 @@ messages you can then call::
 import os
 
 
-config = Config()
-
-
 class Config(dict):
 
     _defaults = {
@@ -56,7 +53,7 @@ class Config(dict):
     }
 
     def __init__(self, **kwargs):
-        super().__init__({**Config.defaults, **kwargs})
+        super().__init__({**Config._defaults, **kwargs})
 
         try:
             import yaml
@@ -104,4 +101,7 @@ class Config(dict):
                 'Cannot dump the configuration settings to file. You need to '
                 'install the necessary dependencies (pyyaml, appdirs).'
             ) from err
+
+
+config = Config()
 
