@@ -2,7 +2,7 @@
 import asyncio
 from functools import partial
 
-from ... import config as config
+from ...config import config
 
 from ...log import logger
 from ..minizinc import (
@@ -16,7 +16,7 @@ __all__ = ['minizinc', 'solve']
 
 
 async def _start_minizinc_proc(*args, input=None):
-    args = [config.get('minizinc', 'minizinc')] + list(args)
+    args = [config.minizinc] + list(args)
     logger.debug('Starting minizinc with arguments: {}'.format(args))
     return await start_process(*args, stdin=input)
 

@@ -35,9 +35,6 @@ Then it is possible to run the ``minizinc`` function with the custom solver::
 
 import re
 
-from .. import config as config
-from ..log import logger
-
 
 __all__ = [
     'Solver', 'Gecode', 'Chuffed', 'Optimathsat', 'Opturion', 'MIPSolver',

@@ -8,7 +8,7 @@ import ast
 
 from . import log
 from .log import *
-from . import config
+from .config import config
 from . import dzn
 from .dzn import *
 from . import mzn

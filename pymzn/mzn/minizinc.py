@@ -28,7 +28,7 @@ import contextlib
 from time import monotonic as _time
 from tempfile import NamedTemporaryFile
 
-from .. import config as config
+from ..config import config
 
 from ..log import logger
 from .solvers import gecode
@@ -45,7 +45,7 @@ __all__ = [
 
 
 def _run_minizinc_proc(*args, input=None):
-    args = [config.get('minizinc', 'minizinc')] + list(args)
+    args = [config.minizinc] + list(args)
     logger.debug('Executing minizinc with arguments: {}'.format(args))
     return run_process(*args, input=input)
 
@@ -200,7 +200,7 @@ def _prepare_data(mzn_file, data, keep_data=False):
     elif not isinstance(data, list):
         raise TypeError('The additional data provided is not valid.')
 
-    if keep_data or sum(map(len, data)) >= config.get('dzn_width', 70):
+    if keep_data or sum(map(len, data)) >= config.dzn_width:
         mzn_base, __ = os.path.splitext(mzn_file)
         data_file = mzn_base + '_data.dzn'
         with open(data_file, 'w') as f:

@@ -45,83 +45,60 @@ messages you can then call::
 import os
 
 
-_modified = False
-_config = None
-_defaults = {
-    'minizinc': 'minizinc',
-    'dzn_width': 70
-}
+config = Config()
 
 
-def _cfg_file():
-    try:
-        import appdirs
-        return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
-    except ImportError:
-        return None
+class Config(dict):
 
+    _defaults = {
+        'minizinc': 'minizinc',
+        'dzn_width': 70
+    }
 
-def get(key, default=None):
-    """Get the value of a configuration variable.
+    def __init__(self, **kwargs):
+        super().__init__({**Config.defaults, **kwargs})
 
-    Parameters
-    ----------
-    key : str
-        The key of the variable to retrieve.
-    default
-        The default value to return if the key does not exist.
-
-    Returns
-    -------
-        The value associated to the key if the key exists, otherwise the default
-        if provided.
-    """
-    global _config
-    if _config is None:
-        _config = {}
         try:
             import yaml
             cfg_file = _cfg_file()
             if cfg_file and os.path.isfile(cfg_file):
                 with open(cfg_file) as f:
                     _config = yaml.load(f)
+                self.update(_config)
         except ImportError:
             pass
-    if default is None:
-        default = _defaults.get(key)
-    return _config.get(key, default)
 
+    def __setattr__(self, key, value):
+        self[key] = value
 
-def set(key, value):
-    """Set the value of configuration variable.
+    def __dir__(self):
+        return self.keys()
 
-    Parameters
-    ----------
-    key : str
-        The key of the variable to set.
-    value
-        The value to assign to the variable.
-    """
-    global _config
-    global _modified
-    if get(key) != value:
-        _config[key] = value
-        _modified = True
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(key)
 
+    def __setstate__(self, state):
+        pass
 
-def dump():
-    """Writes the changes to the configuration file."""
-    global _config
-    global _modified
-    if _modified:
+    def _cfg_file():
+        try:
+            import appdirs
+            return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
+        except ImportError:
+            return None
+
+    def dump():
+        """Writes the changes to the configuration file."""
         try:
             import yaml
             cfg_file = _cfg_file()
             cfg_dir, __ = os.path.split(cfg_file)
             os.makedirs(cfg_dir, exist_ok=True)
             with open(cfg_file, 'w') as f:
-                yaml.dump(_config, f)
-            _modified = False
+                yaml.dump(self, f)
         except ImportError as err:
             raise RuntimeError(
                 'Cannot dump the configuration settings to file. You need to '

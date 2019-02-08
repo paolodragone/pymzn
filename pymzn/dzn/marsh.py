@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pymzn.config as config
+from ..config import config
 
 from textwrap import TextWrapper
 from numbers import Integral, Real, Number
@@ -12,7 +12,7 @@ _wrapper = None
 def _get_wrapper():
     global _wrapper
     if not _wrapper:
-        _wrapper = TextWrapper(width=config.get('dzn_width', 70),
+        _wrapper = TextWrapper(width=config.dzn_width,
                                subsequent_indent=' '*4, break_long_words=False,
                                break_on_hyphens = False)
     return _wrapper
