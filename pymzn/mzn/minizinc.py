@@ -37,6 +37,7 @@ from .process import run_process
 from .output import SolutionParser
 from ..dzn import dict2dzn
 
+
 __all__ = [
     'minizinc_version', 'preprocess_model', 'save_model', 'check_model',
     'minizinc', 'solve', 'mzn2fzn', 'solns2out'
@@ -270,6 +271,75 @@ def check_model(
         raise MiniZincError(mzn_file, args, proc.stderr_data)
 
 
+def _minizinc_preliminaries(
+    mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
+    globals_dir=None, output_vars=None, keep=False, output_dir=None,
+    output_mode='dict', solver=None, timeout=None, **kwargs
+):
+    if mzn and isinstance(mzn, str):
+        if mzn.endswith('mzn'):
+            if os.path.isfile(mzn):
+                mzn_file = mzn
+                with open(mzn) as f:
+                    model = f.read()
+            else:
+                raise ValueError('The file does not exist.')
+        else:
+            mzn_file = None
+            model = mzn
+    else:
+        raise TypeError(
+            'The mzn variable must be either the path to or the '
+            'content of a MiniZinc model file.'
+        )
+
+    keep = config.get('keep', keep)
+
+    model = preprocess_model(
+        model, output_vars=output_vars, rewrap=keep, **(args or {})
+    )
+
+    output_prefix = 'pymzn'
+    if keep:
+        mzn_dir = os.getcwd()
+        if mzn_file:
+            mzn_dir, mzn_name = os.path.split(mzn_file)
+            output_prefix, _ = os.path.splitext(mzn_name)
+        output_dir = output_dir or mzn_dir
+
+    mzn_file = save_model(
+        model, output_dir=output_dir, output_prefix=output_prefix
+    )
+
+    dzn_files = list(dzn_files)
+    data, data_file = _prepare_data(mzn_file, data, keep)
+    if data_file:
+        dzn_files.append(data_file)
+
+    check_model(
+        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir
+    )
+
+    if output_mode == 'dict':
+        if output_vars:
+            _output_mode = 'item'
+        else:
+            _output_mode = 'dzn'
+    else:
+        _output_mode = output_mode
+
+    if not solver:
+        solver = config.get('solver', gecode)
+
+    solver_args = {**kwargs, **config.get('solver_args', {})}
+
+    return (
+        mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
+        solver_args
+    )
+
+
 def minizinc(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
     globals_dir=None, output_vars=None, keep=False, output_dir=None,
@@ -346,67 +416,16 @@ def minizinc(
         Returns a list of solutions as a Solutions instance. The actual content
         of the stream depends on the output_mode chosen.
     """
-    if mzn and isinstance(mzn, str):
-        if mzn.endswith('mzn'):
-            if os.path.isfile(mzn):
-                mzn_file = mzn
-                with open(mzn) as f:
-                    model = f.read()
-            else:
-                raise ValueError('The file does not exist.')
-        else:
-            mzn_file = None
-            model = mzn
-    else:
-        raise TypeError(
-            'The mzn variable must be either the path to or the '
-            'content of a MiniZinc model file.'
+
+    (
+        mzn_file, dzn_files, data, data_file, keep, _output_mode, solver,
+        solver_args
+    ) = _minizinc_preliminaries(
+            mzn, *dzn_files, args=args, data=data, include=include,
+            stdlib_dir=stdlib_dir, globals_dir=globals_dir,
+            output_vars=output_vars, keep=keep, output_dir=output_dir,
+            output_mode=output_mode, solver=solver, **kwargs
         )
-
-    keep = config.get('keep', keep)
-
-    model = preprocess_model(
-        model, output_vars=output_vars, rewrap=keep, **(args or {})
-    )
-
-    output_prefix = 'pymzn'
-    if keep:
-        mzn_dir = os.getcwd()
-        if mzn_file:
-            mzn_dir, mzn_name = os.path.split(mzn_file)
-            output_prefix, _ = os.path.splitext(mzn_name)
-        output_dir = output_dir or mzn_dir
-
-    mzn_file = save_model(
-        model, output_dir=output_dir, output_prefix=output_prefix
-    )
-
-    dzn_files = list(dzn_files)
-    data, data_file = _prepare_data(mzn_file, data, keep)
-    if data_file:
-        dzn_files.append(data_file)
-
-    check_model(
-        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir
-    )
-
-    if output_mode == 'dict':
-        if output_vars:
-            _output_mode = 'item'
-        else:
-            _output_mode = 'dzn'
-    else:
-        _output_mode = output_mode
-
-    if not solver:
-        solver = config.get('solver', gecode)
-
-    all_solutions = config.get('all_solutions', all_solutions)
-    num_solutions = config.get('num_solutions', num_solutions)
-    timeout = config.get('timeout', timeout)
-
-    solver_args = {**kwargs, **config.get('solver_args', {})}
 
     proc = solve(
         solver, mzn_file, *dzn_files, data=data, include=include,
@@ -426,22 +445,15 @@ def minizinc(
 
     parser = SolutionParser(solver, output_mode=output_mode)
     solns = parser.parse(proc)
-
     return solns
 
 
-def solve(
-    solver, mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
-    globals_dir=None, keep=False, output_mode='dict', timeout=None,
-    two_pass=None, pre_passes=None, output_objective=False, non_unique=False,
-    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, **kwargs
+def _solve_args(
+    solver, timeout=None, two_pass=None, pre_passes=None,
+    output_objective=False, non_unique=False, all_solutions=False,
+    num_solutions=None, free_search=False, parallel=None, seed=None, **kwargs
 ):
-    args = _flattening_args(
-        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir, output_mode=output_mode, include=include
-    )
-
+    args = []
     if timeout:
         args += ['--time-limit', timeout * 1000] # minizinc takes milliseconds
 
@@ -462,6 +474,28 @@ def solve(
 
     args += ['--solver', solver.solver_id]
     args += solver.args(
+        all_solutions=all_solutions, num_solutions=num_solutions,
+        free_search=free_search, parallel=parallel, seed=seed, **kwargs
+    )
+
+    return args
+
+
+def solve(
+    solver, mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
+    globals_dir=None, keep=False, output_mode='dict', timeout=None,
+    two_pass=None, pre_passes=None, output_objective=False, non_unique=False,
+    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
+    seed=None, **kwargs
+):
+    args = _flattening_args(
+        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir, output_mode=output_mode, include=include
+    )
+
+    args += _solve_args(
+        solver, timeout=timeout, two_pass=two_pass, pre_passes=pre_passes,
+        output_objective=output_objective, non_unique=non_unique,
         all_solutions=all_solutions, num_solutions=num_solutions,
         free_search=free_search, parallel=parallel, seed=seed, **kwargs
     )
