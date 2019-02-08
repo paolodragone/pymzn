@@ -7,14 +7,17 @@ from textwrap import TextWrapper
 from numbers import Integral, Real, Number
 from collections.abc import Set, Sized, Iterable, Mapping
 
+
 _wrapper = None
+
 
 def _get_wrapper():
     global _wrapper
     if not _wrapper:
-        _wrapper = TextWrapper(width=config.dzn_width,
-                               subsequent_indent=' '*4, break_long_words=False,
-                               break_on_hyphens = False)
+        _wrapper = TextWrapper(
+            width=config.dzn_width, subsequent_indent=' '*4,
+            break_long_words=False, break_on_hyphens = False
+        )
     return _wrapper
 
 
@@ -43,8 +46,10 @@ def _is_elem(obj):
 
 
 def _is_list(obj):
-    return (isinstance(obj, Sized) and isinstance(obj, Iterable) and
-            not isinstance(obj, (Set, Mapping)))
+    return (
+        isinstance(obj, Sized) and isinstance(obj, Iterable) and
+        not isinstance(obj, (Set, Mapping))
+    )
 
 
 def _is_dict(obj):
@@ -97,8 +102,9 @@ def _index_set(obj):
                     # all children index-sets must be identical
                     if idx_sets[1:] == idx_sets[:-1]:
                         return idx_set + idx_sets[0]
-    raise ValueError('The input object is not a proper array: '
-                     '{}'.format(repr(obj)), obj)
+    raise ValueError(
+        'The input object is not a proper array: {}'.format(repr(obj)), obj
+    )
 
 
 def _flatten_array(arr, lvl):
@@ -138,8 +144,10 @@ def _dzn_array_nd(arr):
     idx_set = _index_set(arr)
     dim = max([len(idx_set), 1])
     if dim > 6:  # max 6-dimensional array in dzn language
-        raise ValueError('The input array has {} dimensions. Minizinc supports'
-                         ' arrays of up to 6 dimensions.'.format(dim), arr)
+        raise ValueError((
+            'The input array has {} dimensions. Minizinc supports arrays of '
+            'up to 6 dimensions.'
+        ).format(dim), arr)
 
     if _is_dict(arr):
         arr_it = arr.values()
@@ -245,7 +253,9 @@ def stmt2dzn(name, val, declare=True, assign=True, wrap=True):
         The serialized dzn representation of the value.
     """
     if not (declare or assign):
-        raise ValueError('The statement must be a declaration or an assignment.')
+        raise ValueError(
+            'The statement must be a declaration or an assignment.'
+        )
 
     stmt = []
     if declare:

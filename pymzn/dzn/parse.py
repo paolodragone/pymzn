@@ -21,16 +21,17 @@ _cont_int_set_p = re.compile('^([+\-]?\d+)\.\.([+\-]?\d+)$')
 _int_set_p = re.compile('^(\{(?P<vals>[\d\s,+\-]*)\})$')
 
 # matches any of the previous
-_val_p = re.compile('(?:true|false|\{(?:[\d ,+\-]*)\}'
-                    '|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)'
-                    '|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?'
-                    '|[+\-]?\d+)')
+_val_p = re.compile(
+    '(?:true|false|\{(?:[\d ,+\-]*)\}|(?:[+\-]?\d+)\.\.(?:[+\-]?\d+)'
+    '|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?|[+\-]?\d+)'
+)
 
 # multi-dimensional array pattern
-_array_p = re.compile('^\s*(?:array(?P<dim>\d)d\s*\(\s*'
-                      '(?P<indices>([\d\.+\-]+|\{\})'
-                      '(?:\s*,\s*([\d\.+\-]+|\{\}))*)\s*,\s*)?'
-                      '\[(?P<vals>[\w\s\.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$')
+_array_p = re.compile(
+    '^\s*(?:array(?P<dim>\d)d\s*\(\s*(?P<indices>([\d\.+\-]+|\{\})'
+    '(?:\s*,\s*([\d\.+\-]+|\{\}))*)\s*,\s*)?'
+    '\[(?P<vals>[\w\s\.,+\-\\\/\*^|\(\)\{\}]*)\]\)?$'
+)
 
 # ratio pattern (used in OptiMathSat)
 _ratio_p = re.compile('^\s*(?P<numerator>\d+)/(?P<denominator>\d+)$')
@@ -87,8 +88,9 @@ def _parse_set(vals):
             p_val = int(p_val)
             p_s.add(p_val)
         else:
-            raise ValueError('A value of the input set is not an integer: '
-                             '{}'.format(repr(p_val)), p_val)
+            raise ValueError((
+                'A value of the input set is not an integer: {}'
+            ).format(repr(p_val)), p_val)
     return p_s
 
 
@@ -182,7 +184,8 @@ def dzn2dict(dzn, *, rebase_arrays=True):
                 den = float(ratio_m.group('denominator'))
                 assign[var] = num / den
                 continue
-        raise ValueError('Unsupported parsing for statement:\n'
-                         '{}'.format(repr(stmt)))
+        raise ValueError(
+            'Unsupported parsing for statement:\n{}'.format(repr(stmt))
+        )
     return assign
 
