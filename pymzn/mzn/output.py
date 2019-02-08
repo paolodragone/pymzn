@@ -1,6 +1,6 @@
 
 from enum import IntEnum
-from ..dzn import dict2dzn, dzn2dict
+from ..dzn import dzn2dict
 
 from queue import Queue
 
