@@ -178,10 +178,7 @@ def _rewrap(s):
     return ';\n'.join(stmts)
 
 
-def preprocess_model(
-    model, types, output_vars=None, rewrap=True, output_mode='dict',
-    allow_multiple_assignments=False, **kwargs
-):
+def preprocess_model(model, rewrap=True, **kwargs):
 
     args = {**kwargs, **config.get('args', {})}
     model = _process_template(model, **args)
@@ -193,12 +190,6 @@ def preprocess_model(
         model = block_comm_p.sub('', model)
         line_comm_p = re.compile('%.*\n')
         model = line_comm_p.sub('', model)
-
-    if output_mode == 'dict':
-        model = _process_output_vars(
-            model, types, output_vars,
-            allow_multiple_assignments=allow_multiple_assignments
-        )
 
     return model
 
@@ -337,15 +328,17 @@ def _minizinc_preliminaries(
 
     keep = config.get('keep', keep)
 
+    model = preprocess_model(model, rewrap=keep, **(args or {}))
+
     types = _var_types(
         model, allow_multiple_assignments=allow_multiple_assignments
     )
 
-    model = preprocess_model(
-        model, types, output_vars=output_vars, rewrap=keep,
-        output_mode=output_mode,
-        allow_multiple_assignments=allow_multiple_assignments, **(args or {})
-    )
+    if output_mode == 'dict':
+        model = _process_output_vars(
+            model, types, output_vars,
+            allow_multiple_assignments=allow_multiple_assignments
+        )
 
     output_prefix = 'pymzn'
     if keep:
