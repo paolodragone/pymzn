@@ -12,7 +12,7 @@ from .mzn import *
 __all__ = ['config'] + log.__all__ + dzn.__all__ + mzn.__all__
 
 
-__version__ = '0.17.1'
+__version__ = '0.18.0'
 
 
 def main():
@@ -39,20 +39,20 @@ def main():
             _args['solver'] = getattr(solvers, solver)
 
         solns = minizinc(
-            _args['mzn'], *_args['dzn_files'],
+            _args['mzn'], *_args['dzn_files'], keep_solutions=False,
             **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}
         )
 
-        out = str(sols)
-
-        if statistics:
-            out += '\n' + str(out.statistics)
-
         if output_file:
-            with open(output_file, 'w+') as f:
-                print(out, file=f)
+            out = open(output_file, 'w+')
         else:
-            print(out)
+            out = sys.stdout
+
+        if 'output_mode' in _args and _args['output_mode'] == 'raw':
+            print(solns, file=out)
+        else:
+            solns.print(output_file=out, statistics=statistics)
+        out.close()
 
     def _config(key, value=None, delete=False, **__):
         if delete:
@@ -69,11 +69,13 @@ def main():
     parser = argparse.ArgumentParser(description=desc, formatter_class=fmt)
     parser.add_argument(
         '--version', action='version',
-        version='PyMzn version: {}'.format(__version__)
+        version=(
+            'PyMzn, version {} | Copyright (c) 2016 Paolo Dragone'
+        ).format(__version__)
     )
     parser.add_argument(
         '-v', '--verbose', action='store_true',
-        help='display informative messages on standard output'
+        help='display informative messages'
     )
 
     subparsers = parser.add_subparsers()
