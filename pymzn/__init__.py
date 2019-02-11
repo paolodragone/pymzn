@@ -4,8 +4,6 @@ modelling and solving constraint programs. It is built on top of the MiniZinc
 toolkit and provides a number of off-the-shelf functions to readily solve
 problems encoded in MiniZinc and parse the solutions into Python objects."""
 
-import ast
-
 from . import log
 from .log import *
 from .config import config
@@ -19,12 +17,15 @@ __all__ = ['config'] + log.__all__ + dzn.__all__ + mzn.__all__
 
 
 def main():
+    import ast
     import argparse
     from textwrap import dedent
 
     def _minizinc(**_args):
-        print(minizinc(_args['mzn'], *_args['dzn_files'],
-            **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}))
+        print(minizinc(
+        _args['mzn'], *_args['dzn_files'],
+        **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}
+    ))
 
     def _config(key, value=None, **__):
         if value is None:
