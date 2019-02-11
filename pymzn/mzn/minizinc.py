@@ -71,6 +71,18 @@ def _var_types(mzn):
     return json.loads(json_str)['var_types']['vars']
 
 
+def _model_interface(mzn):
+    args = ['--model-interface-only']
+    input = None
+    if mzn.endswith('.mzn'):
+        args.append(mzn)
+    else:
+        args.append('-')
+        input = mzn
+    json_str = _run_minizinc(*args, input=input)
+    return json.loads(json_str)
+
+
 def _dzn_output_statement(output_vars, types):
     out_var = '"{0} = ", show({0}), ";\\n"'
     out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
