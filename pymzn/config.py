@@ -16,7 +16,6 @@ The configurable properties used by PyMzn are the following:
  * **args**: Additional arguments to pass to the template engine;
  * **include**: List of search paths to include in all minizinc calls;
  * **keep**: Overrides the keep flag of all minizinc calls;
- * **output_dir**: Set a default output directory for generated files;
  * **dzn_width**: The horizontal character limit for dzn files;
    This property is used to wrap long dzn statements when writing dzn files.
    This property is also used in the minizinc function as a limit to decide

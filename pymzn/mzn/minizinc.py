@@ -199,9 +199,6 @@ def save_model(model, output_file=None, output_dir=None, output_prefix='pymzn'):
         mzn_file = output_file
         output_file = open(output_file, 'w+', buffering=1)
     else:
-        if not output_dir:
-            output_dir = config.get('output_dir', None)
-
         output_prefix += '_'
         output_file = NamedTemporaryFile(
             dir=output_dir, prefix=output_prefix, suffix='.mzn', delete=False,
