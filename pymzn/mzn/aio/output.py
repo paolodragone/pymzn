@@ -18,7 +18,7 @@ class AsyncSolutionParser(SolutionParser):
         solns.stderr = proc.stderr_data
 
     async def parse(self, proc):
-        solns = Solutions(asyncio.Queue())
+        solns = Solutions(asyncio.Queue(), keep=self.keep_solutions)
         self.parse_task = asyncio.create_task(self._collect(solns, proc))
         return solns
 
