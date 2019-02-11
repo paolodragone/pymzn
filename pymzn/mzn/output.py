@@ -5,6 +5,16 @@ from ..dzn import dzn2dict
 from queue import Queue
 
 
+SOLN_SEP = '----------'
+SEARCH_COMPLETE = '=========='
+UNKNOWN = '=====UNKNOWN====='
+UNSATISFIABLE = '=====UNSATISFIABLE====='
+UNBOUNDED = '=====UNBOUNDED====='
+UNSATorUNBOUNDED = '=====UNSATorUNBOUNDED====='
+ERROR = '=====ERROR====='
+
+
+
 class Status(IntEnum):
     COMPLETE = 0
     INCOMPLETE = 1
@@ -94,14 +104,6 @@ class Solutions:
 
 class SolutionParser:
 
-    SOLN_SEP = '----------'
-    SEARCH_COMPLETE = '=========='
-    UNSATISFIABLE = '=====UNSATISFIABLE====='
-    UNKNOWN = '=====UNKNOWN====='
-    UNBOUNDED = '=====UNBOUNDED====='
-    UNSATorUNBOUNDED = '=====UNSATorUNBOUNDED====='
-    ERROR = '=====ERROR====='
-
     def __init__(
         self, solver, output_mode='dict', rebase_arrays=True, types=None,
         keep_solutions=True
@@ -158,22 +160,22 @@ class SolutionParser:
         line = yield
         while True:
             line = line.strip()
-            if line == self.SOLN_SEP:
+            if line == SOLN_SEP:
                 line = yield '\n'.join(_buffer)
                 _buffer = []
                 continue
-            elif line == self.SEARCH_COMPLETE:
+            elif line == SEARCH_COMPLETE:
                 self.status = Status.COMPLETE
                 _buffer = []
-            elif line == self.UNKNOWN:
+            elif line == UNKNOWN:
                 self.status = Status.UNKNOWN
-            elif line == self.UNSATISFIABLE:
+            elif line == UNSATISFIABLE:
                 self.status = Status.UNSATISFIABLE
-            elif line == self.UNBOUNDED:
+            elif line == UNBOUNDED:
                 self.status = Status.UNBOUNDED
-            elif line == self.UNSATorUNBOUNDED:
+            elif line == UNSATorUNBOUNDED:
                 self.status = Status.UNSATorUNBOUNDED
-            elif line == self.ERROR:
+            elif line == ERROR:
                 self.status = Status.ERROR
             elif line:
                 _buffer.append(line)
