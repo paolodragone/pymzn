@@ -16,15 +16,43 @@ __version__ = '0.17.1'
 
 
 def main():
+    import sys
     import ast
     import argparse
-    from textwrap import dedent
 
-    def _minizinc(**_args):
-        print(minizinc(
-        _args['mzn'], *_args['dzn_files'],
-        **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}
-    ))
+    def _minizinc(
+        no_declare_enums=False, solver=None, output_file=None, statistics=False,
+        **_args
+    ):
+        if no_declare_enums:
+            _args['declare_enums'] = False
+
+        if 'compile' in _args and _args['compile']:
+            other_args = {
+                k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']
+            }
+            mzn2fzn(_args['mzn'], *_args['dzn_files'], **other_args)
+            return
+
+        if solver:
+            from .mzn import solvers
+            _args['solver'] = getattr(solvers, solver)
+
+        solns = minizinc(
+            _args['mzn'], *_args['dzn_files'],
+            **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}
+        )
+
+        out = str(sols)
+
+        if statistics:
+            out += '\n' + str(out.statistics)
+
+        if output_file:
+            with open(output_file, 'w+') as f:
+                print(out, file=f)
+        else:
+            print(out)
 
     def _config(key, value=None, delete=False, **__):
         if delete:
@@ -36,14 +64,7 @@ def main():
             config[key] = value
             config.dump()
 
-    desc = dedent('''\
-        PyMzn is a Python library that wraps and enhances the MiniZinc tools for
-        modelling and solving constraint programs. It is built on top of the
-        MiniZinc toolkit and provides a number of off-the-shelf functions to
-        readily solve problems encoded in MiniZinc and parse the solutions into
-        Python objects.
-    ''')
-
+    desc = sys.modules[__name__].__doc__
     fmt = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(description=desc, formatter_class=fmt)
     parser.add_argument(
@@ -55,39 +76,121 @@ def main():
         help='display informative messages on standard output'
     )
 
+    subparsers = parser.add_subparsers()
+
     # minizinc
-    parser.add_argument(
+    minizinc_parser = subparsers.add_parser(
+        'minizinc', help='execute minizinc'
+    )
+    minizinc_parser.add_argument(
         'mzn', help='the mzn file to solve'
     )
-    parser.add_argument(
+
+    flattener_options = minizinc_parser.add_argument_group('Flattener options')
+    flattener_options.add_argument(
         'dzn_files', nargs='*', help='additional dzn files'
     )
-    parser.add_argument(
+    flattener_options.add_argument(
         '--data', type=ast.literal_eval, help='additional inline data'
     )
-    parser.add_argument(
-        '-a', '--all-solutions', action='store_true',
-        help='wheter to return all solutions (if supported by the solver)'
+    flattener_options.add_argument(
+        '--args', type=ast.literal_eval,
+        help='additional arguments for the template engine'
     )
-    parser.add_argument(
+    flattener_options.add_argument(
+        '--output-vars', type=ast.literal_eval,
+        help='list of variables to output'
+    )
+    flattener_options.add_argument(
+        '-I', '--include', dest='path', action='append',
+        help='additional search directories'
+    )
+    flattener_options.add_argument(
+        '--stdlib-dir', help='path to MiniZinc standard library directory'
+    )
+    flattener_options.add_argument(
+        '-G', '--globals-dir', help='name of directory including globals'
+    )
+    flattener_options.add_argument(
+        '-c', '--compile', action='store_true',
+        help='compile only'
+    )
+    flattener_options.add_argument(
+        '-k', '--keep', action='store_true',
+        help='keep generated files'
+    )
+    flattener_options.add_argument(
+        '--two-pass', type=int, help='equivalent to MiniZinc -O<n> option'
+    )
+    flattener_options.add_argument(
+        '--pre-passes', type=int,
+        help='equivalent to MiniZinc --pre-passes option'
+    )
+
+    solver_options = minizinc_parser.add_argument_group('Solver options')
+    solver_options.add_argument(
         '-S', '--solver', help='name of the solver'
     )
-    parser.add_argument(
-        '-s', '--solver-args', type=ast.literal_eval, default={},
-        help='arguments to pass to the solver'
+    solver_options.add_argument(
+        '-a', '--all-solutions', action='store_true',
+        help='return all solutions (if supported by the solver)'
     )
-    parser.add_argument(
-        '-k', '--keep', action='store_true',
-        help='whether to keep generated files'
+    solver_options.add_argument(
+        '-n', '--num-solutions', type=int, help='number of solutions to return'
     )
-    parser.add_argument(
-        '-I', '--include', dest='path', action='append',
-        help='directory the standard library'
+    solver_options.add_argument(
+        '-t', '--timeout', type=int,
+        help='time limit for flattening and solving (in seconds)'
     )
-    parser.set_defaults(func=_minizinc)
+    solver_options.add_argument(
+        '-p', '--parallel', type=int,
+        help='the number of threads the solver should use'
+    )
+    solver_options.add_argument(
+        '-f', '--free-search', action='store_true',
+        help='instruct the solver to run a free search'
+    )
+    solver_options.add_argument(
+        '-r', '--seed', type=int, help='the random seed for the user'
+    )
+    solver_options.add_argument(
+        '--solver-args', type=ast.literal_eval, default={},
+        help='additional arguments to pass to the solver'
+    )
+
+    output_options = minizinc_parser.add_argument_group('Output options')
+    output_options.add_argument(
+        '-o', '--output-file',
+        help='path to the output file (default print on standard output)'
+    )
+    output_options.add_argument(
+        '-s', '--statistics', action='store_true', help='print statistics'
+    )
+    output_options.add_argument(
+        '--output-mode', choices=['dict', 'item', 'dzn', 'json', 'raw'],
+        default='dict', help='the output format'
+    )
+    output_options.add_argument(
+        '--output-objective', action='store_true',
+        help='print the value of the objective'
+    )
+    output_options.add_argument(
+        '--non-unique', action='store_true',
+        help='allow for non unique solutions'
+    )
+    output_options.add_argument(
+        '--allow-multiple-assignments', action='store_true',
+        help='equivalent to MiniZinc allow-multiple-assigments option'
+    )
+    output_options.add_argument(
+        '--no-declare-enums', action='store_true',
+        help='do not declare enums when serializing enum values'
+    )
+
+    minizinc_parser.set_defaults(func=_minizinc)
+
 
     # config
-    subparsers = parser.add_subparsers()
     config_parser = subparsers.add_parser(
         'config', help='config pymzn variables'
     )
