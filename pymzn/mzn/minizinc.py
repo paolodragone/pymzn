@@ -327,9 +327,8 @@ def check_model(
 
 def _minizinc_preliminaries(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
-    globals_dir=None, output_vars=None, keep=False, output_dir=None,
-    output_mode='dict', solver=None, allow_multiple_assignments=False,
-    declare_enums=True, **kwargs
+    globals_dir=None, output_vars=None, keep=False, output_base=None,
+    output_mode='dict', declare_enums=True, allow_multiple_assignments=False
 ):
     if mzn and isinstance(mzn, str):
         if mzn.endswith('mzn'):
@@ -392,15 +391,7 @@ def _minizinc_preliminaries(
     else:
         _output_mode = output_mode
 
-    if not solver:
-        solver = config.get('solver', gecode)
-
-    solver_args = {**kwargs, **config.get('solver_args', {})}
-
-    return (
-        mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
-        solver_args, types
-    )
+    return mzn_file, dzn_files, data_file, data, keep, _output_mode, types
 
 
 def minizinc(
@@ -481,17 +472,19 @@ def minizinc(
         of the stream depends on the output_mode chosen.
     """
 
-    (
-        mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
-        solver_args, types
-    ) = _minizinc_preliminaries(
-        mzn, *dzn_files, args=args, data=data, include=include,
-        stdlib_dir=stdlib_dir, globals_dir=globals_dir,
-        output_vars=output_vars, keep=keep, output_dir=output_dir,
-        output_mode=output_mode, solver=solver,
-        allow_multiple_assignments=allow_multiple_assignments,
-        declare_enums=declare_enums, **kwargs
-    )
+    mzn_file, dzn_files, data_file, data, keep, _output_mode, types = \
+        _minizinc_preliminaries(
+            mzn, *dzn_files, args=args, data=data, include=include,
+            stdlib_dir=stdlib_dir, globals_dir=globals_dir,
+            output_vars=output_vars, keep=keep, output_base=output_base,
+            output_mode=output_mode, declare_enums=declare_enums,
+            allow_multiple_assignments=allow_multiple_assignments
+        )
+
+    if not solver:
+        solver = config.get('solver', gecode)
+
+    solver_args = {**kwargs, **config.get('solver_args', {})}
 
     proc = solve(
         solver, mzn_file, *dzn_files, data=data, include=include,
