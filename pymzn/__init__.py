@@ -4,16 +4,15 @@ modelling and solving constraint programs. It is built on top of the MiniZinc
 toolkit and provides a number of off-the-shelf functions to readily solve
 problems encoded in MiniZinc and parse the solutions into Python objects."""
 
-from . import log
 from .log import *
 from .config import config
-from . import dzn
 from .dzn import *
-from . import mzn
 from .mzn import *
 
-__version__ = '0.17.1'
 __all__ = ['config'] + log.__all__ + dzn.__all__ + mzn.__all__
+
+
+__version__ = '0.17.1'
 
 
 def main():

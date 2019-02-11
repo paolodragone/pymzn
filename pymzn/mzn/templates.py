@@ -65,7 +65,10 @@ import logging
 
 from copy import deepcopy
 from collections.abc import Iterable
-from pymzn.dzn.marsh import val2dzn
+from ..dzn import val2dzn
+
+
+__all__ = ['from_string', 'add_path', 'add_package']
 
 
 def discretize(value, factor=100):
