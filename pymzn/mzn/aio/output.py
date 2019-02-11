@@ -6,8 +6,14 @@ from ..output import SolutionParser, Solutions
 
 class AsyncSolutionParser(SolutionParser):
 
-    def __init__(self, solver, output_mode='dict'):
-        super().__init__(solver, output_mode=output_mode)
+    def __init__(
+        self, solver, output_mode='dict', rebase_arrays=True, types=None,
+        keep_solutions=True
+    ):
+        super().__init__(
+            solver, output_mode=output_mode, rebase_arrays=rebase_arrays,
+            types=types, keep_solutions=keep_solutions
+        )
         self.parse_task = None
 
     async def _collect(self, solns, proc):
