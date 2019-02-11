@@ -440,7 +440,7 @@ def minizinc(
     """
 
     (
-        mzn_file, dzn_files, data, data_file, keep, _output_mode, solver,
+        mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
         solver_args, types
     ) = _minizinc_preliminaries(
             mzn, *dzn_files, args=args, data=data, include=include,
