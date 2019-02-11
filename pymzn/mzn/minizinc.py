@@ -40,7 +40,7 @@ from ..dzn import dict2dzn
 
 __all__ = [
     'minizinc_version', 'preprocess_model', 'save_model', 'check_model',
-    'minizinc', 'solve', 'mzn2fzn', 'solns2out'
+    'check_instance', 'minizinc', 'solve', 'mzn2fzn', 'solns2out'
 ]
 
 
@@ -291,20 +291,41 @@ def _flattening_args(
     return args
 
 
-def check_model(
-    mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
-    globals_dir=None, allow_multiple_assignments=False
+def check_instance(
+    mzn, *dzn_files, data=None, include=None, stdlib_dir=None, globals_dir=None,
+    allow_multiple_assignments=False
 ):
-    args = _flattening_args(
-        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
+    args = ['--instance-check-only']
+    args += _flattening_args(
+        mzn, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir,
         allow_multiple_assignments=allow_multiple_assignments
     )
-    args.append('--instance-check-only')
 
-    proc = _run_minizinc_proc(*args)
+    input = mzn if args[-1] == '-' else None
+    proc = _run_minizinc_proc(*args, input=input)
+
     if proc.stderr_data:
-        raise MiniZincError(mzn_file, args, proc.stderr_data)
+        raise MiniZincError(
+            mzn if input is None else '\n' + mzn + '\n', args, proc.stderr_data
+        )
+
+
+def check_model(
+    mzn, *, include=None, stdlib_dir=None, globals_dir=None
+):
+    args = ['--model-check-only']
+    args += _flattening_args(
+        mzn, include=include, stdlib_dir=stdlib_dir, globals_dir=globals_dir
+    )
+
+    input = mzn if args[-1] == '-' else None
+    proc = _run_minizinc_proc(*args, input=input)
+
+    if proc.stderr_data:
+        raise MiniZincError(
+            mzn if input is None else '\n' + mzn + '\n', args, proc.stderr_data
+        )
 
 
 def _minizinc_preliminaries(
