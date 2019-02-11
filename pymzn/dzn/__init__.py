@@ -78,8 +78,10 @@ transform it into a list (list of lists). For instance::
 
 """
 
+from . import marsh
+from . import parse
+
+__all__ = marsh.__all__ + parse.__all__
+
 from .marsh import *
 from .parse import *
-
-__all__ = ['dict2dzn', 'stmt2dzn', 'val2dzn', 'rebase_array', 'dzn2dict']
-

@@ -8,6 +8,9 @@ from collections import namedtuple
 from .marsh import rebase_array
 
 
+__all__ = ['IntSet', 'FloatSet', 'parse_value', 'dzn2dict']
+
+
 IntSet = namedtuple('IntSet', ['lb', 'ub'])
 FloatSet = namedtuple('FloatSet', ['lb', 'ub'])
 
@@ -378,7 +381,7 @@ def _parse_indices(st, enums=None):
     return indices
 
 
-def parse(val, var_type=None, enums=None, rebase_arrays=True):
+def parse_value(val, var_type=None, enums=None, rebase_arrays=True):
 
     if not var_type:
         p_val = _parse_array(
@@ -469,7 +472,7 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
         var_type = None
         if types:
             var_type = types.get(var, None)
-        assign[var] = parse(
+        assign[var] = parse_value(
             val, var_type=var_type, enums=enums, rebase_arrays=rebase_arrays
         )
     return assign
