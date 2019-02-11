@@ -26,11 +26,14 @@ def main():
         **{k: v for k, v in _args.items() if k not in ['mzn', 'dzn_files']}
     ))
 
-    def _config(key, value=None, **__):
-        if value is None:
+    def _config(key, value=None, delete=False, **__):
+        if delete:
+            del config[key]
+            config.dump()
+        elif value is None:
             print('{} : {}'.format(key, config.get(key)))
         else:
-            config.set(key, value)
+            config[key] = value
             config.dump()
 
     desc = dedent('''\
@@ -90,6 +93,9 @@ def main():
     )
     config_parser.add_argument(
         'key', help='the property to get/set'
+    )
+    config_parser.add_argument(
+        '-d', '--delete', action='store_true', help='delete a key'
     )
     config_parser.add_argument(
         'value', nargs='?', help='the value(s) to set'
