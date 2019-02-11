@@ -554,29 +554,32 @@ def _solve_args(
 
 
 def solve(
-    solver, mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
+    solver, mzn, *dzn_files, data=None, include=None, stdlib_dir=None,
     globals_dir=None, keep=False, output_mode='dict', timeout=None,
     two_pass=None, pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
     seed=None, allow_multiple_assignments=False, **kwargs
 ):
-    args = _flattening_args(
-        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir, output_mode=output_mode, include=include,
-        allow_multiple_assignments=allow_multiple_assignments
-    )
 
-    args += _solve_args(
+    args = _solve_args(
         solver, timeout=timeout, two_pass=two_pass, pre_passes=pre_passes,
         output_objective=output_objective, non_unique=non_unique,
         all_solutions=all_solutions, num_solutions=num_solutions,
         free_search=free_search, parallel=parallel, seed=seed, **kwargs
     )
 
+    args += _flattening_args(
+        mzn, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir, output_mode=output_mode, include=include,
+        allow_multiple_assignments=allow_multiple_assignments
+    )
+
+    input = mzn if args[-1] == '-' else None
+
     t0 = _time()
 
     try:
-        proc = _run_minizinc_proc(*args)
+        proc = _run_minizinc_proc(*args, input=input)
     except RuntimeError as err:
         raise MiniZincError(mzn_file, args) from err
 
