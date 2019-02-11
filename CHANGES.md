@@ -1,6 +1,7 @@
 
-PyMzn changes
-=============
+PyMzn Change Log
+================
+
 
 0.16.0
 ------
@@ -18,18 +19,16 @@ PyMzn changes
   receives lazily the solutions from the solving pipeline, but can also be
   referenced as a list after receiving the full solution stream.
 * Add ``num_solutions`` parameter to ``pymzn.minizinc``.
-
 * API changes:
-  * Deleted ``pymzn.utils`` module, along with the ``pymzn.run`` function
-  * Added ``pymzn.process`` module
-  * Renamed ``pymzn.SolnStream`` into ``pymzn.Solutions``
-  * The function ``pymzn.solns2out`` now returns a generator
-  * The function ``pymzn.minizinc`` is no longer blocking until the underlying
-    solving process is completed. It now returns a ``pymzn.Solutions`` that can
-    be lazily accessed.
-  * Added ``solve_start`` method to ``pymzn.Solver`` class which returns a
-    started process that produces solutions asynchronously.
-
+    * Deleted ``pymzn.utils`` module, along with the ``pymzn.run`` function
+    * Added ``pymzn.process`` module
+    * Renamed ``pymzn.SolnStream`` into ``pymzn.Solutions``
+    * The function ``pymzn.solns2out`` now returns a generator
+    * The function ``pymzn.minizinc`` is no longer blocking until the underlying
+      solving process is completed. It now returns a ``pymzn.Solutions`` that
+      can be lazily accessed.
+    * Added ``solve_start`` method to ``pymzn.Solver`` class which returns a
+      started process that produces solutions asynchronously.
 * Several improvements and bug fixes.
 
 
@@ -39,21 +38,20 @@ PyMzn changes
 * Function ``pymzn.minizinc`` now returns a ``SolnStream``
 * Completely revisited ``pymzn.Solver`` abstract class.
 * Added support to many new solvers:
-
-  * Chuffed
-  * CBC
-  * Gurobi
-  * G12 (fd, lazy, mip)
-
+    * Chuffed
+    * CBC
+    * Gurobi
+    * G12 (fd, lazy, mip)
 * API changes:
-
-  * Renamed ``pymzn.dzn_eval`` into ``pymzn.dzn2dict``
-  * Renamed ``pymzn.dzn`` into ``pymzn.dict2dzn``
-  * Renamed ``pymzn.dzn_statement`` into ``pymzn.stmt2dzn``
-  * Renamed ``pymzn.dzn_value`` into ``pymzn.val2dzn``
-  * Renamed ``path`` into ``include`` in the ``pymzn.minizinc`` and ``pymzn.mzn2fzn`` functions.
-  * Introduced ``output_mode`` in place of ``parse_output`` and ``eval_output`` as parameter to the ``pymzn.minizinc`` function.
-
+    * Renamed ``pymzn.dzn_eval`` into ``pymzn.dzn2dict``
+    * Renamed ``pymzn.dzn`` into ``pymzn.dict2dzn``
+    * Renamed ``pymzn.dzn_statement`` into ``pymzn.stmt2dzn``
+    * Renamed ``pymzn.dzn_value`` into ``pymzn.val2dzn``
+    * Renamed ``path`` into ``include`` in the ``pymzn.minizinc`` and
+      ``pymzn.mzn2fzn`` functions.
+    * Introduced ``output_mode`` in place of ``parse_output`` and
+      ``eval_output`` as parameter to the ``pymzn.minizinc`` function.
 * Moved ``pymzn.run`` into utils
 * Slim down the library quite a bit. Removed unnecessary stuff.
 * Many bug fixes
+
