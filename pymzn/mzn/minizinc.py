@@ -590,9 +590,9 @@ def solve(
 
 
 def mzn2fzn(
-    mzn_file, *dzn_files, data=None, keep_data=False, stdlib_dir=None,
-    globals_dir=None, output_mode='dict', include=None, no_ozn=False,
-    output_base=None, allow_multiple_assignments=False, declare_enums=True
+    mzn, *dzn_files, data=None, keep=False, stdlib_dir=None, globals_dir=None,
+    output_mode='dict', include=None, no_ozn=False, output_base=None,
+    declare_enums=True, allow_multiple_assignments=False
 ):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -609,7 +609,7 @@ def mzn2fzn(
         the mzn2fnz function. The dictionary is then automatically converted to
         dzn format by the ``pymzn.dict2dzn`` function. Notice that if the data
         provided is too large, a temporary dzn file will be produced.
-    keep_data : bool
+    keep : bool
         Whether to write the inline data into a dzn file and keep it.
         Default is False.
     globals_dir : str
@@ -633,34 +633,29 @@ def mzn2fzn(
         second argument is None.
     """
 
-    dzn_files = list(dzn_files)
-    data, data_file = _prepare_data(
-        mzn_file, data, keep_data, declare_enums=declare_enums
-    )
-    if data_file:
-        dzn_files.append(data_file)
+    mzn_file, dzn_files, data_file, data, keep, _output_mode, types = \
+        _minizinc_preliminaries(
+            mzn, *dzn_files, args=args, data=data, include=include,
+            stdlib_dir=stdlib_dir, globals_dir=globals_dir,
+            output_vars=output_vars, keep=keep, output_base=output_base,
+            output_mode=output_mode, declare_enums=declare_enums,
+            allow_multiple_assignments=allow_multiple_assignments
+        )
 
-    check_model(
-        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir,
-        allow_multiple_assignments=allow_multiple_assignments
-    )
-
-    args = _flattening_args(
-        mzn_file, *dzn_files, data=data, keep=keep_data, stdlib_dir=stdlib_dir,
+    args = ['--compile']
+    args += _flattening_args(
+        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir, output_mode=output_mode, include=include,
         no_ozn=no_ozn, output_base=output_base,
         allow_multiple_assignments=allow_multiple_assignments
     )
-
-    args.append('--compile')
 
     t0 = _time()
     _run_minizinc(*args)
     flattening_time = _time() - t0
     logger.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
-    if not keep_data:
+    if not keep:
         with contextlib.suppress(FileNotFoundError):
             if data_file:
                 os.remove(data_file)
