@@ -408,8 +408,8 @@ def minizinc(
     output_mode='dict', solver=None, timeout=None, two_pass=None,
     pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, rebase_arrays=True, keep_solutions=True,
-    allow_multiple_assignments=False, declare_enums=True, **kwargs
+    seed=None, rebase_arrays=True, keep_solutions=True, declare_enums=True,
+    allow_multiple_assignments=False, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
