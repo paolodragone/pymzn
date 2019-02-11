@@ -103,13 +103,15 @@ class SolutionParser:
     ERROR = '=====ERROR====='
 
     def __init__(
-        self, solver, output_mode='dict', rebase_arrays=True, types=None
+        self, solver, output_mode='dict', rebase_arrays=True, types=None,
+        keep_solutions=True
     ):
         self.solver = solver
         self.solver_parser = self.solver.parser()
         self.output_mode = output_mode
         self.rebase_arrays = rebase_arrays
         self.types = types
+        self.keep_solutions = keep_solutions
         self.status = Status.INCOMPLETE
 
     def _collect(self, solns, proc):
@@ -120,7 +122,7 @@ class SolutionParser:
         solns.stderr = proc.stderr_data
 
     def parse(self, proc):
-        solns = Solutions(Queue())
+        solns = Solutions(Queue(), keep=self.keep_solutions)
         self._collect(solns, proc)
         return solns
 
