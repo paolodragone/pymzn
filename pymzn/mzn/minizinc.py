@@ -365,13 +365,17 @@ def _minizinc_preliminaries(
             allow_multiple_assignments=allow_multiple_assignments
         )
 
+
     output_prefix = 'pymzn'
     if keep:
-        mzn_dir = os.getcwd()
-        if mzn_file:
-            mzn_dir, mzn_name = os.path.split(mzn_file)
-            output_prefix, _ = os.path.splitext(mzn_name)
-        output_dir = output_dir or mzn_dir
+        if output_base:
+            output_dir, output_prefix = os.path.split(output_base)
+        else:
+            mzn_dir = os.getcwd()
+            if mzn_file:
+                mzn_dir, mzn_name = os.path.split(mzn_file)
+                output_prefix, _ = os.path.splitext(mzn_name)
+            output_dir = mzn_dir
 
     mzn_file = save_model(
         model, output_dir=output_dir, output_prefix=output_prefix
