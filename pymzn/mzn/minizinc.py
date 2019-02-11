@@ -227,12 +227,12 @@ def _cleanup(files):
                 logger.debug('Deleted file: {}'.format(_file))
 
 
-def _prepare_data(mzn_file, data, keep_data=False):
+def _prepare_data(mzn_file, data, keep_data=False, declare_enums=True):
     if not data:
         return None, None
 
     if isinstance(data, dict):
-        data = dict2dzn(data)
+        data = dict2dzn(data, declare_enums=declare_enums)
     elif isinstance(data, str):
         data = [data]
     elif not isinstance(data, list):
@@ -315,7 +315,8 @@ def check_model(
 def _minizinc_preliminaries(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
     globals_dir=None, output_vars=None, keep=False, output_dir=None,
-    output_mode='dict', solver=None, allow_multiple_assignments=False, **kwargs
+    output_mode='dict', solver=None, allow_multiple_assignments=False,
+    declare_enums=True, **kwargs
 ):
     if mzn and isinstance(mzn, str):
         if mzn.endswith('mzn'):
@@ -359,7 +360,9 @@ def _minizinc_preliminaries(
     )
 
     dzn_files = list(dzn_files)
-    data, data_file = _prepare_data(mzn_file, data, keep)
+    data, data_file = _prepare_data(
+        mzn_file, data, keep, declare_enums=declare_enums
+    )
     if data_file:
         dzn_files.append(data_file)
 
@@ -392,7 +395,7 @@ def minizinc(
     pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
     seed=None, rebase_arrays=True, keep_solutions=True,
-    allow_multiple_assignments=False, **kwargs
+    allow_multiple_assignments=False, declare_enums=True, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -471,7 +474,8 @@ def minizinc(
             stdlib_dir=stdlib_dir, globals_dir=globals_dir,
             output_vars=output_vars, keep=keep, output_dir=output_dir,
             output_mode=output_mode, solver=solver,
-            allow_multiple_assignments=allow_multiple_assignments, **kwargs
+            allow_multiple_assignments=allow_multiple_assignments,
+            declare_enums=declare_enums, **kwargs
         )
 
     proc = solve(
@@ -568,7 +572,7 @@ def solve(
 def mzn2fzn(
     mzn_file, *dzn_files, data=None, keep_data=False, stdlib_dir=None,
     globals_dir=None, output_mode='dict', include=None, no_ozn=False,
-    output_base=None, allow_multiple_assignments=False
+    output_base=None, allow_multiple_assignments=False, declare_enums=True
 ):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -610,7 +614,9 @@ def mzn2fzn(
     """
 
     dzn_files = list(dzn_files)
-    data, data_file = _prepare_data(mzn_file, data, keep_data)
+    data, data_file = _prepare_data(
+        mzn_file, data, keep_data, declare_enums=declare_enums
+    )
     if data_file:
         dzn_files.append(data_file)
 
