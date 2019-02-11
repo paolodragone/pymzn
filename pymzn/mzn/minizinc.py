@@ -249,7 +249,7 @@ def _prepare_data(mzn_file, data, keep_data=False, declare_enums=True):
 
 
 def _flattening_args(
-    mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
+    mzn, *dzn_files, data=None, keep=False, stdlib_dir=None,
     globals_dir=None, output_mode='dict', include=None, no_ozn=False,
     output_base=None, allow_multiple_assignments=False
 ):
@@ -282,7 +282,11 @@ def _flattening_args(
 
     if data:
         args += ['-D', data]
-    args += [mzn_file] + list(dzn_files)
+
+    if mzn.endswith('.mzn'):
+        args += [mzn] + list(dzn_files)
+    else:
+        args += list(dzn_files) + ['-']
 
     return args
 
