@@ -57,7 +57,7 @@ class Config(dict):
 
         try:
             import yaml
-            cfg_file = _cfg_file()
+            cfg_file = self._cfg_file()
             if cfg_file and os.path.isfile(cfg_file):
                 with open(cfg_file) as f:
                     _config = yaml.load(f)
@@ -80,18 +80,18 @@ class Config(dict):
     def __setstate__(self, state):
         pass
 
-    def _cfg_file():
+    def _cfg_file(self):
         try:
             import appdirs
             return os.path.join(appdirs.user_config_dir(__name__), 'config.yml')
         except ImportError:
             return None
 
-    def dump():
+    def dump(self):
         """Writes the changes to the configuration file."""
         try:
             import yaml
-            cfg_file = _cfg_file()
+            cfg_file = self._cfg_file()
             cfg_dir, __ = os.path.split(cfg_file)
             os.makedirs(cfg_dir, exist_ok=True)
             with open(cfg_file, 'w') as f:
