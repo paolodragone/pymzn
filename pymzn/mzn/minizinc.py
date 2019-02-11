@@ -66,7 +66,7 @@ def _var_types(mzn):
         args.append(mzn)
     else:
         args.append('-')
-        input = mzn.encode()
+        input = mzn
     json_str = _run_minizinc(*args, input=input)
     return json.loads(json_str)['var_types']['vars']
 
@@ -109,7 +109,7 @@ def _dzn_output_statement(output_vars, types):
     for enum_type in enum_types:
         enum_list.append(out_var.format(enum_type))
 
-    output = ', '.join(enum_list ++ out_list)
+    output = ', '.join(enum_list + out_list)
     output_stmt = 'output [{}];'.format(output)
     return output_stmt
 
