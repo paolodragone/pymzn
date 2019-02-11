@@ -351,6 +351,10 @@ def _minizinc_preliminaries(
 
     model = preprocess_model(model, rewrap=keep, **(args or {}))
 
+    check_model(
+        model, include=include, stdlib_dir=stdlib_dir, globals_dir=globals_dir
+    )
+
     types = _var_types(
         model, allow_multiple_assignments=allow_multiple_assignments
     )
@@ -380,8 +384,8 @@ def _minizinc_preliminaries(
     if data_file:
         dzn_files.append(data_file)
 
-    check_model(
-        mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
+    check_instance(
+        model, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir,
         allow_multiple_assignments=allow_multiple_assignments
     )
