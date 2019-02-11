@@ -3,6 +3,7 @@
 import logging
 from ..config import config
 
+from enum import Enum
 from textwrap import TextWrapper
 from numbers import Integral, Real, Number
 from collections.abc import Set, Sized, Iterable, Mapping
@@ -25,6 +26,10 @@ def _is_bool(obj):
     return isinstance(obj, bool)
 
 
+def _is_enum(obj):
+    return isinstance(obj, Enum)
+
+
 def _is_int(obj):
     return isinstance(obj, Integral)
 
@@ -34,7 +39,7 @@ def _is_float(obj):
 
 
 def _is_value(obj):
-    return isinstance(obj, (bool, str, Number))
+    return isinstance(obj, (bool, str, Enum, Number))
 
 
 def _is_set(obj):
@@ -48,7 +53,7 @@ def _is_elem(obj):
 def _is_list(obj):
     return (
         isinstance(obj, Sized) and isinstance(obj, Iterable) and
-        not isinstance(obj, (Set, Mapping))
+        not isinstance(obj, (str, Set, Mapping))
     )
 
 
@@ -125,6 +130,8 @@ def _flatten_array(arr, lvl):
 def _dzn_val(val):
     if isinstance(val, bool):
         return 'true' if val else 'false'
+    if isinstance(val, Enum):
+        return val.name
     return str(val)
 
 
@@ -181,6 +188,8 @@ def _array_elem_type(arr, idx_set):
 def _dzn_type(val):
     if _is_bool(val):
         return 'bool'
+    if _is_enum(val):
+        return type(val).__name__
     if _is_int(val):
         return 'int'
     if _is_float(val):
@@ -196,7 +205,7 @@ def _dzn_type(val):
         idx_set_str = _index_set_str(idx_set)
         elem_type = _array_elem_type(val, idx_set)
         return 'array[{}] of {}'.format(idx_set_str, elem_type)
-    raise TypeError('Unsupported parsing for value: {}'.format(repr(val)))
+    raise TypeError('Could not infer type for value: {}'.format(repr(val)))
 
 
 def val2dzn(val, wrap=True):
@@ -222,7 +231,9 @@ def val2dzn(val, wrap=True):
     elif _is_array_type(val):
         dzn_val =_dzn_array_nd(val)
     else:
-        raise TypeError('Unsupported parsing for value: {}'.format(repr(val)))
+        raise TypeError(
+            'Unsupported serialization of value: {}'.format(repr(val))
+        )
 
     if wrap:
         wrapper = _get_wrapper()
@@ -269,7 +280,35 @@ def stmt2dzn(name, val, declare=True, assign=True, wrap=True):
     return ''.join(stmt)
 
 
-def dict2dzn(objs, declare=False, assign=True, wrap=True, fout=None):
+def stmt2enum(enum_type, declare=True, assign=True, wrap=True):
+
+    if not (declare or assign):
+        raise ValueError(
+            'The statement must be a declaration or an assignment.'
+        )
+
+    stmt = []
+    if declare:
+        stmt.append('enum ')
+    stmt.append(enum_type.__name__)
+    if assign:
+        val_str = []
+        for v in list(enum_type):
+            val_str.append(v.name)
+        val_str = ''.join(['{', ','.join(val_str), '}'])
+
+        if wrap:
+            wrapper = _get_wrapper()
+            val_str = wrapper.fill(val_str)
+
+        stmt.append(' = {}'.format(val_str))
+    stmt.append(';')
+    return ''.join(stmt)
+
+
+def dict2dzn(
+    objs, declare=False, assign=True, declare_enums=True, wrap=True, fout=None
+):
     """Serializes the objects in input and produces a list of strings encoding
     them into dzn format. Optionally, the produced dzn is written in a file.
 
@@ -303,6 +342,11 @@ def dict2dzn(objs, declare=False, assign=True, wrap=True, fout=None):
 
     vals = []
     for key, val in objs.items():
+        if _is_enum(val) and declare_enums:
+            enum_stmt = stmt2enum(
+                type(val), declare=declare, assign=assign, wrap=wrap
+            )
+            vals.append(enum_stmt)
         stmt = stmt2dzn(key, val, declare=declare, assign=assign, wrap=wrap)
         vals.append(stmt)
 
