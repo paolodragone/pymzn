@@ -364,7 +364,7 @@ def minizinc(
     output_mode='dict', solver=None, timeout=None, two_pass=None,
     pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, rebase_arrays=True, **kwargs
+    seed=None, rebase_arrays=True, keep_solutions=True, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -463,7 +463,7 @@ def minizinc(
 
     parser = SolutionParser(
         solver, output_mode=output_mode, rebase_arrays=rebase_arrays,
-        types=types
+        types=types, keep_solutions=keep_solutions
     )
     solns = parser.parse(proc)
     return solns
