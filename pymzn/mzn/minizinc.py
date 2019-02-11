@@ -172,7 +172,7 @@ def _rewrap(s):
             lines.append(line[start:])
         stmts.append('\n'.join(lines))
 
-    if len(stmts) > 0:
+    if len(stmts) > 0 and stmts[-1] != '':
         stmts.append('')
 
     return ';\n'.join(stmts)
