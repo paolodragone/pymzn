@@ -102,10 +102,14 @@ class SolutionParser:
     UNSATorUNBOUNDED = '=====UNSATorUNBOUNDED====='
     ERROR = '=====ERROR====='
 
-    def __init__(self, solver, output_mode='dict'):
+    def __init__(
+        self, solver, output_mode='dict', rebase_arrays=True, types=None
+    ):
         self.solver = solver
         self.solver_parser = self.solver.parser()
         self.output_mode = output_mode
+        self.rebase_arrays = rebase_arrays
+        self.types = types
         self.status = Status.INCOMPLETE
 
     def _collect(self, solns, proc):
@@ -140,7 +144,9 @@ class SolutionParser:
             soln = split_solns.send(line)
             if soln is not None:
                 if self.output_mode == 'dict':
-                    soln = dzn2dict(soln)
+                    soln = dzn2dict(
+                        soln, rebase_arrays=self.rebase_arrays, types=self.types
+                    )
                 line = yield soln
             else:
                 line = yield
