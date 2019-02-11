@@ -126,10 +126,10 @@ def _dzn_output_statement(output_vars, types):
     return output_stmt
 
 
-def _process_output_vars(model, output_vars=None):
+def _process_output_vars(model, types, output_vars=None):
     if output_vars is None:
-        return model
-    types = _var_types(model)
+        model_int = _model_interface(model)
+        output_vars = [k for k in model_int['output']]
     output_stmt = _dzn_output_statement(output_vars, types)
     output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
     if output_stmt_p.search(model):
@@ -156,7 +156,9 @@ def _rewrap(s):
     return ';\n'.join(stmts)
 
 
-def preprocess_model(model, output_vars=None, rewrap=True, **kwargs):
+def preprocess_model(
+    model, types, output_vars=None, rewrap=True, output_mode='dict', **kwargs
+):
 
     args = {**kwargs, **config.get('args', {})}
     model = _process_template(model, **args)
@@ -169,7 +171,9 @@ def preprocess_model(model, output_vars=None, rewrap=True, **kwargs):
         line_comm_p = re.compile('%.*\n')
         model = line_comm_p.sub('', model)
 
-    model = _process_output_vars(model, output_vars)
+    if output_mode == 'dict':
+        model = _process_output_vars(model, types, output_vars)
+
     return model
 
 
@@ -309,8 +313,11 @@ def _minizinc_preliminaries(
 
     keep = config.get('keep', keep)
 
+    types = _var_types(model)
+
     model = preprocess_model(
-        model, output_vars=output_vars, rewrap=keep, **(args or {})
+        model, types, output_vars=output_vars, rewrap=keep,
+        output_mode=output_mode, **(args or {})
     )
 
     output_prefix = 'pymzn'
@@ -336,10 +343,7 @@ def _minizinc_preliminaries(
     )
 
     if output_mode == 'dict':
-        if output_vars:
-            _output_mode = 'item'
-        else:
-            _output_mode = 'dzn'
+        _output_mode = 'item'
     else:
         _output_mode = output_mode
 
@@ -350,7 +354,7 @@ def _minizinc_preliminaries(
 
     return (
         mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
-        solver_args
+        solver_args, types
     )
 
 
@@ -360,7 +364,7 @@ def minizinc(
     output_mode='dict', solver=None, timeout=None, two_pass=None,
     pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, **kwargs
+    seed=None, rebase_arrays=True, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -433,7 +437,7 @@ def minizinc(
 
     (
         mzn_file, dzn_files, data, data_file, keep, _output_mode, solver,
-        solver_args
+        solver_args, types
     ) = _minizinc_preliminaries(
             mzn, *dzn_files, args=args, data=data, include=include,
             stdlib_dir=stdlib_dir, globals_dir=globals_dir,
@@ -457,7 +461,10 @@ def minizinc(
     if output_mode == 'raw':
         return proc.stdout_data
 
-    parser = SolutionParser(solver, output_mode=output_mode)
+    parser = SolutionParser(
+        solver, output_mode=output_mode, rebase_arrays=rebase_arrays,
+        types=types
+    )
     solns = parser.parse(proc)
     return solns
 
