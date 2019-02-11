@@ -55,6 +55,12 @@ def _run_minizinc(*args, input=None):
     return proc.stdout_data
 
 
+def minizinc_version():
+    vs = _run_minizinc('--version')
+    m = re.findall('version ([\d\.]+)', vs)
+    return m[0]
+
+
 def _process_template(model, **kwargs):
     return from_string(model, kwargs)
 
@@ -249,12 +255,6 @@ def _prepare_data(mzn_file, data, keep_data=False, declare_enums=True):
         data = ' '.join(data)
         data_file = None
     return data, data_file
-
-
-def minizinc_version():
-    vs = _run_minizinc('--version')
-    m = re.findall('version ([\d\.]+)', vs)
-    return m[0]
 
 
 def _flattening_args(
@@ -470,13 +470,13 @@ def minizinc(
         mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
         solver_args, types
     ) = _minizinc_preliminaries(
-            mzn, *dzn_files, args=args, data=data, include=include,
-            stdlib_dir=stdlib_dir, globals_dir=globals_dir,
-            output_vars=output_vars, keep=keep, output_dir=output_dir,
-            output_mode=output_mode, solver=solver,
-            allow_multiple_assignments=allow_multiple_assignments,
-            declare_enums=declare_enums, **kwargs
-        )
+        mzn, *dzn_files, args=args, data=data, include=include,
+        stdlib_dir=stdlib_dir, globals_dir=globals_dir,
+        output_vars=output_vars, keep=keep, output_dir=output_dir,
+        output_mode=output_mode, solver=solver,
+        allow_multiple_assignments=allow_multiple_assignments,
+        declare_enums=declare_enums, **kwargs
+    )
 
     proc = solve(
         solver, mzn_file, *dzn_files, data=data, include=include,
