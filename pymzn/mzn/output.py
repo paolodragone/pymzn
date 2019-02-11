@@ -15,7 +15,6 @@ UNSATorUNBOUNDED = '=====UNSATorUNBOUNDED====='
 ERROR = '=====ERROR====='
 
 
-
 class Status(IntEnum):
     COMPLETE = 0
     INCOMPLETE = 1
@@ -103,7 +102,17 @@ class Solutions:
         return self.status.name
 
     def print(self, output_file=sys.stdout, statistics=False):
-        if self.status >= 2:
+
+        for soln in iter(self):
+            print(soln, file=output_file)
+            print(SOLN_SEP, file=output_file)
+
+        if self.status <= 1:
+            if self.status == 0:
+                print(SEARCH_COMPLETE, file=output_file)
+            if statistics:
+                print(str(self.statistics), file=output_file)
+        else:
             print({
                 Status.UNKNOWN: UNKNOWN,
                 Status.UNSATISFIABLE: UNSATISFIABLE,
@@ -114,16 +123,6 @@ class Solutions:
 
             if self.stderr:
                 print(self.stderr, file=sys.stderr)
-
-        for soln in iter(self):
-            print(soln, file=output_file)
-            print(SOLN_SEP, file=output_file)
-
-        if self.status == 0:
-            print(SEARCH_COMPLETE, file=output_file)
-
-        if statistics:
-            print(str(self.statistics), file=output_file)
 
 
 class SolutionParser:
