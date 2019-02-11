@@ -134,7 +134,7 @@ def _process_output_vars(model, types, output_vars=None):
     output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
     if output_stmt_p.search(model):
         return output_stmt_p.sub(output_stmt, model)
-    return '\n\n'.join([model, output_stmt])
+    return '\n'.join([model, output_stmt])
 
 
 def _rewrap(s):
@@ -153,6 +153,10 @@ def _rewrap(s):
                 start += 1
             lines.append(line[start:])
         stmts.append('\n'.join(lines))
+
+    if len(stmts) > 0:
+        stmts.append('')
+
     return ';\n'.join(stmts)
 
 
