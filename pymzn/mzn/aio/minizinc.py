@@ -32,25 +32,27 @@ def _cleanup_cb(files, task):
 
 async def minizinc(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
-    globals_dir=None, output_vars=None, keep=False, output_dir=None,
+    globals_dir=None, output_vars=None, keep=False, output_base=None,
     output_mode='dict', solver=None, timeout=None, two_pass=None,
     pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, rebase_arrays=True, keep_solutions=True,
-    allow_multiple_assignments=False, declare_enums=True, **kwargs
+    seed=None, rebase_arrays=True, keep_solutions=True, declare_enums=True,
+    allow_multiple_assignments=False, **kwargs
 ):
 
-    (
-        mzn_file, dzn_files, data_file, data, keep, _output_mode, solver,
-        solver_args, types
-    ) = _minizinc_preliminaries(
-        mzn, *dzn_files, args=args, data=data, include=include,
-        stdlib_dir=stdlib_dir, globals_dir=globals_dir,
-        output_vars=output_vars, keep=keep, output_dir=output_dir,
-        output_mode=output_mode, solver=solver,
-        allow_multiple_assignments=allow_multiple_assignments,
-        declare_enums=declare_enums, **kwargs
-    )
+    mzn_file, dzn_files, data_file, data, keep, _output_mode, types = \
+        _minizinc_preliminaries(
+            mzn, *dzn_files, args=args, data=data, include=include,
+            stdlib_dir=stdlib_dir, globals_dir=globals_dir,
+            output_vars=output_vars, keep=keep, output_base=output_base,
+            output_mode=output_mode, declare_enums=declare_enums,
+            allow_multiple_assignments=allow_multiple_assignments
+        )
+
+    if not solver:
+        solver = config.get('solver', gecode)
+
+    solver_args = {**kwargs, **config.get('solver_args', {})}
 
     proc = await solve(
         solver, mzn_file, *dzn_files, data=data, include=include,
@@ -67,7 +69,10 @@ async def minizinc(
         solns = asyncio.Queue()
         task = asyncio.create_task(_collect(proc, solns))
     else:
-        parser = AsyncSolutionParser(solver, output_mode=output_mode)
+        parser = AsyncSolutionParser(
+            solver, output_mode=output_mode, rebase_arrays=rebase_arrays,
+            types=types, keep_solutions=keep_solutions
+        )
         solns = await parser.parse(proc)
         task = parser.parse_task
 
@@ -78,26 +83,27 @@ async def minizinc(
 
 
 async def solve(
-    solver, mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
+    solver, mzn, *dzn_files, data=None, include=None, stdlib_dir=None,
     globals_dir=None, keep=False, output_mode='dict', timeout=None,
     two_pass=None, pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
     seed=None, allow_multiple_assignments=False, **kwargs
 ):
-    args = _flattening_args(
-        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir, output_mode=output_mode, include=include,
-        allow_multiple_assignments=allow_multiple_assignments
-    )
-
-    args += _solve_args(
+    args = _solve_args(
         solver, timeout=timeout, two_pass=two_pass, pre_passes=pre_passes,
         output_objective=output_objective, non_unique=non_unique,
         all_solutions=all_solutions, num_solutions=num_solutions,
         free_search=free_search, parallel=parallel, seed=seed, **kwargs
     )
 
-    proc = await _start_minizinc_proc(*args)
+    args += _flattening_args(
+        mzn, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        globals_dir=globals_dir, output_mode=output_mode, include=include,
+        allow_multiple_assignments=allow_multiple_assignments
+    )
+
+    input = mzn if args[-1] == '-' else None
+    proc = await _start_minizinc_proc(*args, stdin=input)
     logger.debug('Solving process started.')
     return proc
 
