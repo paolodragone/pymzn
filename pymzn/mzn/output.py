@@ -80,16 +80,16 @@ class Solutions:
     def __repr__(self):
         if self._keep and self.status < 2:
             self._fetch_all()
-            return '<Solutions: {}>'.format(self._pp_solns())
-        else:
-            return '<Solutions: {}>'.format(self.status.name)
+            if len(self._solns) > 0:
+                return '<Solutions: {}>'.format(self._pp_solns())
+        return '<Solutions: {}>'.format(self.status.name)
 
     def __str__(self):
         if self._keep and self.status < 2:
             self._fetch_all()
-            return self._pp_solns()
-        else:
-            return self.status.name
+            if len(self._solns) > 0:
+                return self._pp_solns()
+        return self.status.name
 
 
 class SolutionParser:
