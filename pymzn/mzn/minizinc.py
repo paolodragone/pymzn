@@ -132,7 +132,9 @@ def _process_output_vars(model, output_vars=None):
     types = _var_types(model)
     output_stmt = _dzn_output_statement(output_vars, types)
     output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
-    return output_stmt_p.sub(output_stmt, model)
+    if output_stmt_p.search(model):
+        return output_stmt_p.sub(output_stmt, model)
+    return '\n\n'.join([model, output_stmt])
 
 
 def _rewrap(s):
