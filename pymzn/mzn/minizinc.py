@@ -59,26 +59,34 @@ def _process_template(model, **kwargs):
     return from_string(model, kwargs)
 
 
-def _var_types(mzn):
+def _var_types(mzn, allow_multiple_assignments=False):
     args = ['--model-types-only']
+    if allow_multiple_assignments:
+        args.append('--allow-multiple-assignments')
+
     input = None
     if mzn.endswith('.mzn'):
         args.append(mzn)
     else:
         args.append('-')
         input = mzn
+
     json_str = _run_minizinc(*args, input=input)
     return json.loads(json_str)['var_types']['vars']
 
 
-def _model_interface(mzn):
+def _model_interface(mzn, allow_multiple_assignments=False):
     args = ['--model-interface-only']
+    if allow_multiple_assignments:
+        args.append('--allow-multiple-assignments')
+
     input = None
     if mzn.endswith('.mzn'):
         args.append(mzn)
     else:
         args.append('-')
         input = mzn
+
     json_str = _run_minizinc(*args, input=input)
     return json.loads(json_str)
 
@@ -126,9 +134,13 @@ def _dzn_output_statement(output_vars, types):
     return output_stmt
 
 
-def _process_output_vars(model, types, output_vars=None):
+def _process_output_vars(
+    model, types, output_vars=None, allow_multiple_assignments=False
+):
     if output_vars is None:
-        model_int = _model_interface(model)
+        model_int = _model_interface(
+            model, allow_multiple_assignments=allow_multiple_assignments
+        )
         output_vars = [k for k in model_int['output']]
     output_stmt = _dzn_output_statement(output_vars, types)
     output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
@@ -161,7 +173,8 @@ def _rewrap(s):
 
 
 def preprocess_model(
-    model, types, output_vars=None, rewrap=True, output_mode='dict', **kwargs
+    model, types, output_vars=None, rewrap=True, output_mode='dict',
+    allow_multiple_assignments=False, **kwargs
 ):
 
     args = {**kwargs, **config.get('args', {})}
@@ -176,7 +189,10 @@ def preprocess_model(
         model = line_comm_p.sub('', model)
 
     if output_mode == 'dict':
-        model = _process_output_vars(model, types, output_vars)
+        model = _process_output_vars(
+            model, types, output_vars,
+            allow_multiple_assignments=allow_multiple_assignments
+        )
 
     return model
 
@@ -244,7 +260,7 @@ def minizinc_version():
 def _flattening_args(
     mzn_file, *dzn_files, data=None, keep=False, stdlib_dir=None,
     globals_dir=None, output_mode='dict', include=None, no_ozn=False,
-    output_base=None
+    output_base=None, allow_multiple_assignments=False
 ):
     args = []
 
@@ -258,6 +274,8 @@ def _flattening_args(
         args.append('--no-output-ozn')
     if output_base:
         args += ['--output-base', output_base]
+    if allow_multiple_assignments:
+        args.append('--allow-multiple-assignments')
 
     if include:
         if isinstance(include, str):
@@ -280,11 +298,12 @@ def _flattening_args(
 
 def check_model(
     mzn_file, *dzn_files, data=None, include=None, stdlib_dir=None,
-    globals_dir=None
+    globals_dir=None, allow_multiple_assignments=False
 ):
     args = _flattening_args(
         mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir
+        globals_dir=globals_dir,
+        allow_multiple_assignments=allow_multiple_assignments
     )
     args.append('--instance-check-only')
 
@@ -296,7 +315,7 @@ def check_model(
 def _minizinc_preliminaries(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
     globals_dir=None, output_vars=None, keep=False, output_dir=None,
-    output_mode='dict', solver=None, timeout=None, **kwargs
+    output_mode='dict', solver=None, allow_multiple_assignments=False, **kwargs
 ):
     if mzn and isinstance(mzn, str):
         if mzn.endswith('mzn'):
@@ -317,11 +336,14 @@ def _minizinc_preliminaries(
 
     keep = config.get('keep', keep)
 
-    types = _var_types(model)
+    types = _var_types(
+        model, allow_multiple_assignments=allow_multiple_assignments
+    )
 
     model = preprocess_model(
         model, types, output_vars=output_vars, rewrap=keep,
-        output_mode=output_mode, **(args or {})
+        output_mode=output_mode,
+        allow_multiple_assignments=allow_multiple_assignments, **(args or {})
     )
 
     output_prefix = 'pymzn'
@@ -343,7 +365,8 @@ def _minizinc_preliminaries(
 
     check_model(
         mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir
+        globals_dir=globals_dir,
+        allow_multiple_assignments=allow_multiple_assignments
     )
 
     if output_mode == 'dict':
@@ -368,7 +391,8 @@ def minizinc(
     output_mode='dict', solver=None, timeout=None, two_pass=None,
     pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, rebase_arrays=True, keep_solutions=True, **kwargs
+    seed=None, rebase_arrays=True, keep_solutions=True,
+    allow_multiple_assignments=False, **kwargs
 ):
     """Implements the workflow to solve a CSP problem encoded with MiniZinc.
 
@@ -446,7 +470,8 @@ def minizinc(
             mzn, *dzn_files, args=args, data=data, include=include,
             stdlib_dir=stdlib_dir, globals_dir=globals_dir,
             output_vars=output_vars, keep=keep, output_dir=output_dir,
-            output_mode=output_mode, solver=solver, **kwargs
+            output_mode=output_mode, solver=solver,
+            allow_multiple_assignments=allow_multiple_assignments, **kwargs
         )
 
     proc = solve(
@@ -456,7 +481,8 @@ def minizinc(
         pre_passes=pre_passes, output_objective=output_objective,
         non_unique=non_unique, all_solutions=all_solutions,
         num_solutions=num_solutions, free_search=free_search, parallel=parallel,
-        seed=seed, **solver_args
+        seed=seed, allow_multiple_assignments=allow_multiple_assignments,
+        **solver_args
     )
 
     if not keep:
@@ -511,11 +537,12 @@ def solve(
     globals_dir=None, keep=False, output_mode='dict', timeout=None,
     two_pass=None, pre_passes=None, output_objective=False, non_unique=False,
     all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, **kwargs
+    seed=None, allow_multiple_assignments=False, **kwargs
 ):
     args = _flattening_args(
         mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir, output_mode=output_mode, include=include
+        globals_dir=globals_dir, output_mode=output_mode, include=include,
+        allow_multiple_assignments=allow_multiple_assignments
     )
 
     args += _solve_args(
@@ -541,7 +568,7 @@ def solve(
 def mzn2fzn(
     mzn_file, *dzn_files, data=None, keep_data=False, stdlib_dir=None,
     globals_dir=None, output_mode='dict', include=None, no_ozn=False,
-    output_base=None
+    output_base=None, allow_multiple_assignments=False
 ):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -589,13 +616,15 @@ def mzn2fzn(
 
     check_model(
         mzn_file, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
-        globals_dir=globals_dir
+        globals_dir=globals_dir,
+        allow_multiple_assignments=allow_multiple_assignments
     )
 
     args = _flattening_args(
         mzn_file, *dzn_files, data=data, keep=keep_data, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir, output_mode=output_mode, include=include,
-        no_ozn=no_ozn, output_base=output_base
+        no_ozn=no_ozn, output_base=output_base,
+        allow_multiple_assignments=allow_multiple_assignments
     )
 
     args.append('--compile')
