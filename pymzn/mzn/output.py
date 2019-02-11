@@ -1,4 +1,5 @@
 
+import sys
 from enum import IntEnum
 from ..dzn import dzn2dict
 
@@ -100,6 +101,29 @@ class Solutions:
             if len(self._solns) > 0:
                 return self._pp_solns()
         return self.status.name
+
+    def print(self, output_file=sys.stdout, statistics=False):
+        if self.status >= 2:
+            print({
+                Status.UNKNOWN: UNKNOWN,
+                Status.UNSATISFIABLE: UNSATISFIABLE,
+                Status.UNBOUNDED: UNBOUNDED,
+                Status.UNSATorUNBOUNDED: UNSATorUNBOUNDED,
+                Status.ERROR: ERROR
+            }[solns.status], file=output_file)
+
+            if self.stderr:
+                print(self.stderr, file=sys.stderr)
+
+        for soln in iter(self):
+            print(soln, file=output_file)
+            print(SOLN_SEP, file=output_file)
+
+        if self.status == 0:
+            print(SEARCH_COMPLETE, file=output_file)
+
+        if statistics:
+            print(str(self.statistics), file=output_file)
 
 
 class SolutionParser:
