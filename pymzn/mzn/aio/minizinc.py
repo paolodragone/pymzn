@@ -2,12 +2,12 @@
 import asyncio
 from functools import partial
 
-from ...config import config
+from ... import config, logger
 
-from ...log import logger
 from ..minizinc import (
     _minizinc_preliminaries, _flattening_args, _solve_args, _cleanup
 )
+
 from .process import start_process
 from .output import AsyncSolutionParser
 

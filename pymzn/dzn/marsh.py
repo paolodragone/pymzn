@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from ..config import config
+
+from .. import config
 
 from enum import Enum
 from textwrap import TextWrapper

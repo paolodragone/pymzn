@@ -1,7 +1,7 @@
 
 import sys
 from enum import IntEnum
-from ..dzn import dzn2dict
+from .. import dzn2dict
 
 from queue import Queue
 

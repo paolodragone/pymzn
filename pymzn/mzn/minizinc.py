@@ -28,13 +28,11 @@ import contextlib
 from time import monotonic as _time
 from tempfile import NamedTemporaryFile
 
-from ..config import config
+from .. import config, dict2dzn, logger
 
-from ..log import logger
 from .solvers import gecode
 from .process import run_process
 from .output import SolutionParser
-from ..dzn import dict2dzn
 
 
 __all__ = [
