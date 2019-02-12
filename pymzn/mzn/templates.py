@@ -124,16 +124,17 @@ if _has_jinja:
     _jenv.filters['int'] = discretize
 
 _except_text = (
-    'Templates are not in use, but template arguments were '
-    'provided. If you intended to use tempaltes make sure the '
-    'Jinja2 templating library is installed on your system.'
+    '\nThe template engine is currently not available.\nTo use templates make '
+    'sure Jinja2 is installed on your system.\nYou can install Jinja2 via pip:'
+    '\n\n\tpip install Jinja2\n\nMore information at: '
+    'http://jinja.pocoo.org/docs/intro/#installation'
 )
 
 def from_string(source, args=None):
     """Renders a template string"""
     if _has_jinja:
         log = logging.getLogger(__name__)
-        log.debug('Precompiling model with arguments {}'.format(args))
+        log.debug('Precompiling model with arguments: {}'.format(args))
         return _jenv.from_string(source).render(args or {})
     if args:
         raise RuntimeError(_except_text)
