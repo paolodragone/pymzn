@@ -365,7 +365,7 @@ def _minizinc_preliminaries(
             allow_multiple_assignments=allow_multiple_assignments
         )
 
-
+    output_dir = None
     output_prefix = 'pymzn'
     if keep:
         if output_base:
