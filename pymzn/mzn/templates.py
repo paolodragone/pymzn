@@ -134,7 +134,7 @@ def from_string(source, args=None):
     """Renders a template string"""
     if _has_jinja:
         log = logging.getLogger(__name__)
-        log.debug('Precompiling model with arguments: {}'.format(args))
+        log.info('Precompiling model with arguments: {}'.format(args))
         return _jenv.from_string(source).render(args or {})
     if args:
         raise RuntimeError(_except_text)

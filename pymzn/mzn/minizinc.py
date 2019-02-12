@@ -44,8 +44,8 @@ __all__ = [
 
 
 def _run_minizinc_proc(*args, input=None):
-    args = [config.minizinc] + list(args)
     logger.debug('Executing minizinc with arguments: {}'.format(args))
+    args = [config.minizinc] + list(args)
     return run_process(*args, input=input)
 
 
@@ -219,7 +219,7 @@ def save_model(model, output_file=None, output_dir=None, output_prefix='pymzn'):
     output_file.write(model)
     output_file.close()
 
-    logger.debug('Generated file {}'.format(mzn_file))
+    logger.info('Generated file {}'.format(mzn_file))
     return mzn_file
 
 
@@ -228,7 +228,7 @@ def _cleanup(files):
         for _file in files:
             if _file:
                 os.remove(_file)
-                logger.debug('Deleted file: {}'.format(_file))
+                logger.info('Deleted file: {}'.format(_file))
 
 
 def _prepare_data(mzn_file, data, keep_data=False, declare_enums=True):
@@ -597,7 +597,7 @@ def solve(
         raise MiniZincError(mzn_file, args) from err
 
     solve_time = _time() - t0
-    logger.debug('Solving completed in {:>3.2f} sec'.format(solve_time))
+    logger.info('Solving completed in {:>3.2f} sec'.format(solve_time))
 
     return proc
 
@@ -666,13 +666,13 @@ def mzn2fzn(
     t0 = _time()
     _run_minizinc(*args)
     flattening_time = _time() - t0
-    logger.debug('Flattening completed in {:>3.2f} sec'.format(flattening_time))
+    logger.info('Flattening completed in {:>3.2f} sec'.format(flattening_time))
 
     if not keep:
         with contextlib.suppress(FileNotFoundError):
             if data_file:
                 os.remove(data_file)
-                logger.debug('Deleted file: {}'.format(data_file))
+                logger.info('Deleted file: {}'.format(data_file))
 
     if output_base:
         mzn_base = output_base
@@ -685,9 +685,9 @@ def mzn2fzn(
     ozn_file = ozn_file if os.path.isfile(ozn_file) else None
 
     if fzn_file:
-        logger.debug('Generated file: {}'.format(fzn_file))
+        logger.info('Generated file: {}'.format(fzn_file))
     if ozn_file:
-        logger.debug('Generated file: {}'.format(ozn_file))
+        logger.info('Generated file: {}'.format(ozn_file))
 
     return fzn_file, ozn_file
 
