@@ -61,11 +61,10 @@ template inheritance, and filters. PyMzn implements few custom filters as well:
 - `dzn(value)` : transform the input into its equivalent dzn string.
 """
 
-import logging
+from .. import val2dzn, logger
 
 from copy import deepcopy
 from collections.abc import Iterable
-from ..dzn import val2dzn
 
 
 __all__ = ['from_string', 'add_path', 'add_package']
@@ -133,8 +132,7 @@ _except_text = (
 def from_string(source, args=None):
     """Renders a template string"""
     if _has_jinja:
-        log = logging.getLogger(__name__)
-        log.info('Precompiling model with arguments: {}'.format(args))
+        logger.info('Precompiling model with arguments: {}'.format(args))
         return _jenv.from_string(source).render(args or {})
     if args:
         raise RuntimeError(_except_text)
