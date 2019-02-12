@@ -4,6 +4,8 @@ from functools import partial
 
 from ... import config, logger
 
+from ..solvers import gecode
+
 from ..minizinc import (
     _minizinc_preliminaries, _flattening_args, _solve_args, _cleanup
 )
@@ -103,7 +105,7 @@ async def solve(
     )
 
     input = mzn if args[-1] == '-' else None
-    proc = await _start_minizinc_proc(*args, stdin=input)
+    proc = await _start_minizinc_proc(*args, input=input)
     logger.debug('Solving process started.')
     return proc
 
