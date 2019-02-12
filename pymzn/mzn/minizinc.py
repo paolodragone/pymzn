@@ -60,6 +60,16 @@ def minizinc_version():
     return m[0]
 
 
+def check_version():
+    version = minizinc_version()
+    logger.info('Using MiniZinc {}.'.format(version))
+    major, minor, *_ = version.split('.')
+    major, minor = int(major), int(minor)
+    vs = major * 100 + minor
+    if vs < 202:
+        raise RuntimeError('PyMzn requires MiniZinc 2.2.0 or later.')
+
+
 def _process_template(model, **kwargs):
     from .templates import from_string
     return from_string(model, kwargs)
@@ -330,6 +340,9 @@ def _minizinc_preliminaries(
     globals_dir=None, output_vars=None, keep=False, output_base=None,
     output_mode='dict', declare_enums=True, allow_multiple_assignments=False
 ):
+
+    check_version()
+
     if mzn and isinstance(mzn, str):
         if mzn.endswith('mzn'):
             if os.path.isfile(mzn):
