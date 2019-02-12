@@ -106,8 +106,8 @@ def _model_interface(mzn, allow_multiple_assignments=False):
 
 
 def _dzn_output_statement(output_vars, types):
-    out_var = '"{0} = ", show({0}), ";\\n"'
-    out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\n"'
+    out_var = '"{0} = ", show({0}), ";\\\\n"'
+    out_array = '"{0} = array{1}d(", {2}, ", ", show({0}), ");\\\\n"'
     out_list = []
     enum_types = set()
     for var in output_vars:
@@ -157,7 +157,7 @@ def _process_output_vars(
         )
         output_vars = [k for k in model_int['output']]
     output_stmt = _dzn_output_statement(output_vars, types)
-    output_stmt_p = re.compile('\s*output\s*\[(.+?)\]\s*(?:;)?\s*')
+    output_stmt_p = re.compile('output\s*\[(.+?)\]\s*(?:;)?', re.DOTALL)
     if output_stmt_p.search(model):
         return output_stmt_p.sub(output_stmt, model)
     return '\n'.join([model, output_stmt])
