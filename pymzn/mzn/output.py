@@ -6,6 +6,9 @@ from .. import dzn2dict
 from queue import Queue
 
 
+__all__ = ['Status']
+
+
 SOLN_SEP = '----------'
 SEARCH_COMPLETE = '=========='
 UNKNOWN = '=====UNKNOWN====='
