@@ -179,16 +179,16 @@ def _parse_val_infer_basic_type(val, raise_errors=True):
 def _parse_contiguous_set(val, raise_errors=True):
     cont_set_m = _cont_set_p.match(val)
     if cont_set_m:
-        lb = cont_int_set_m.group(1)
-        ub = cont_int_set_m.group(2)
+        lb = cont_set_m.group(1)
+        ub = cont_set_m.group(2)
         if _int_p.match(lb):
             lb = int(lb)
             ub = int(ub)
-            return IntSet(lb=v1, ub=v2)
+            return IntSet(lb=lb, ub=ub)
         if _float_p.match(lb):
             lb = float(lb)
             ub = float(ub)
-            return FloatSet(lb=v1, ub=v2)
+            return FloatSet(lb=lb, ub=ub)
         raise ValueError('Could not parse contiguous set \'{}\'.'.format(val))
     if raise_errors:
         raise ValueError('Value \'{}\' is not a contiguous set.'.format(val))
