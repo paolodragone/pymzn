@@ -2,7 +2,7 @@
 
 import logging
 
-__all__ = ['debug']
+__all__ = ['debug', 'logger']
 
 logger = logging.getLogger(__package__)
 
