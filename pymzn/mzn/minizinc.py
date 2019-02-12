@@ -32,7 +32,6 @@ from ..config import config
 
 from ..log import logger
 from .solvers import gecode
-from .templates import from_string
 from .process import run_process
 from .output import SolutionParser
 from ..dzn import dict2dzn
@@ -62,6 +61,7 @@ def minizinc_version():
 
 
 def _process_template(model, **kwargs):
+    from .templates import from_string
     return from_string(model, kwargs)
 
 
