@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-
+"""\
 PyMzn can be configured with custom executable paths and other variables.
-Configuration is done via the module ``pymzn.config``. For instance::
+Configuration is done via the ``pymzn.config`` object. For instance::
 
-    import pymzn.config
+    import pymzn
 
     pymzn.config.set('minizinc', 'path/to/minizinc')
 
@@ -23,6 +22,14 @@ The configurable properties used by PyMzn are the following:
 
 One can also set custom properties to be used for custom solvers.
 
+The configuration of PyMzn can be made permanent by using the `dump` function of
+the `config` object::
+
+    pymzn.config.dump()
+
+This operation, as well as loading the saved configuration file, requires the
+`appdirs` and `pyyaml` libraries to be installed on your system.
+
 
 Debug
 -----
@@ -34,8 +41,7 @@ PyMzn can also be set to print debugging messages on standard output via::
 This function is meant to be used in interactive sessions or in
 applications that do not configure the ``logging`` library. If you configure the
 ``logging`` library in your application, then PyMzn will print logging messages
-as well. The logging level in PyMzn is always ``DEBUG``. To disable debugging
-messages you can then call::
+as well. To disable debugging messages you can then call::
 
     pymzn.debug(False)
 

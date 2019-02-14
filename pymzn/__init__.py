@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-"""PyMzn is a Python library that wraps and enhances the MiniZinc tools for
-modelling and solving constraint programs. It is built on top of the MiniZinc
-toolkit and provides a number of off-the-shelf functions to readily solve
-problems encoded in MiniZinc and parse the solutions into Python objects."""
+"""\
+PyMzn is a Python library that wraps and enhances the MiniZinc tools for
+constraint programming. PyMzn is built on top of the minizinc toolkit and
+provides a number of off-the-shelf functions to readily solve problems encoded
+with the MiniZinc language and return solutions as Python dictionaries.
+"""
 
 from .log import *
 from .config import config
