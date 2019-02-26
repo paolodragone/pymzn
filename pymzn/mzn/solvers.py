@@ -46,8 +46,8 @@ __all__ = [
 class Solver:
     """Abstract solver class.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     solver_id : str
         The identifier to use when launching the minizinc command.
     """
