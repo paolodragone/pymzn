@@ -37,7 +37,8 @@ from .output import SolutionParser
 
 __all__ = [
     'minizinc_version', 'preprocess_model', 'save_model', 'check_model',
-    'check_instance', 'minizinc', 'solve', 'mzn2fzn', 'solns2out'
+    'check_instance', 'minizinc', 'solve', 'mzn2fzn', 'solns2out',
+    'MiniZincError'
 ]
 
 
