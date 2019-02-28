@@ -158,7 +158,7 @@ def _process_output_vars(
         )
         output_vars = [k for k in model_int['output']]
     output_stmt = _dzn_output_statement(output_vars, types)
-    output_stmt_p = re.compile('output\s*\[(.+?)\]\s*(?:;)?', re.DOTALL)
+    output_stmt_p = re.compile('output\s*\[(\".+?\"|[^\"]+?)+\](\s*\+\+\s*\[(\".+?\"|[^\"]+?)+\])*\s*(?:;)?', re.DOTALL)
     if output_stmt_p.search(model):
         return output_stmt_p.sub(output_stmt, model)
     return '\n'.join([model, output_stmt])
@@ -602,9 +602,10 @@ def solve(
 
 
 def mzn2fzn(
-    mzn, *dzn_files, data=None, keep=False, stdlib_dir=None, globals_dir=None,
-    output_mode='dict', include=None, no_ozn=False, output_base=None,
-    declare_enums=True, allow_multiple_assignments=False
+    mzn, *dzn_files, args=None, data=None, keep=False, stdlib_dir=None,
+    globals_dir=None, output_vars=None, output_mode='dict', include=None,
+    no_ozn=False, output_base=None, declare_enums=True,
+    allow_multiple_assignments=False
 ):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
