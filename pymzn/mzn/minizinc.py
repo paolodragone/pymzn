@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
-"""
-PyMzn provides functions that mimic and enhance the tools from the libminizinc
-library. With these tools, it is possible to compile a MiniZinc model into a
-FlatZinc one, solve a given problem and get the output solutions directly into
-the python code.
+"""\
+PyMzn provides an interface to the ``minizinc`` executable tocompile a MiniZinc
+model into a FlatZinc one, solve a given problem and get back the resulting
+solutions directly as Python objects.
 
-The main function that PyMzn provides is the ``minizinc`` function, which
+The main function that PyMzn provides is the ``pymzn.minizinc`` function, which
 executes the entire workflow for solving a constranint program encoded in
-MiniZinc.  Solving a MiniZinc problem with PyMzn is as simple as::
+MiniZinc, just like using the ``minizinc`` executable from command line. As
+added benefit, the ``pymzn.minizinc`` function takes care of adding
+solver-dependent parameters and converts the solutions into Python dictionaries
+by default. Solving a MiniZinc problem with PyMzn is as simple as::
 
     import pymzn
     pymzn.minizinc('test.mzn')
 
-The ``minizinc`` function is probably the way to go for most of the problems,
-but the ``mzn2fzn`` and ``solns2out`` functions are also included in the public
-API to allow for maximum flexibility. The latter two functions are wrappers of
-the two homonym MiniZinc tools for, respectively, converting a MiniZinc model
-into a FlatZinc one and getting custom output from the solution stream of a
-solver.
+The ``pymzn.minizinc`` function is probably the way to go for most of the
+problems, but the ``pymzn.mzn2fzn`` and ``pymzn.solns2out`` functions are also
+included in the public API to allow for maximum flexibility. The latter two
+functions are wrappers of the two homonym MiniZinc tools for, respectively,
+converting a MiniZinc model into a FlatZinc one and getting custom output from
+the solution stream of a solver.
 """
 
 import os
@@ -54,6 +56,7 @@ def _run_minizinc(*args, input=None):
 
 
 def minizinc_version():
+    """Returns the version of the found minizinc executable."""
     vs = _run_minizinc('--version')
     m = re.findall('version ([\d\.]+)', vs)
     if not m:
@@ -190,6 +193,28 @@ def _rewrap(s):
 
 
 def preprocess_model(model, rewrap=True, **kwargs):
+    """Preprocess a MiniZinc model.
+
+    This function takes care of preprocessing the model by resolving the
+    template using the arguments passed as keyword arguments to this function.
+    Optionally, this function can also "rewrap" the model, deleating spaces at
+    the beginning of the lines while preserving indentation.
+
+    Parameters
+    ----------
+    model : str
+        The minizinc model (i.e. the content of a ``.mzn`` file).
+    rewrap : bool
+        Whether to 'rewrap' the model, i.e. to deleate leading spaces, while
+        preserving indentation. Default is True.
+    **kwargs
+        Additional arguments to pass to the template engine.
+
+    Returns
+    -------
+    str
+        The preprocessed model.
+    """
 
     args = {**kwargs, **config.get('args', {})}
     model = _process_template(model, **args)
@@ -206,6 +231,27 @@ def preprocess_model(model, rewrap=True, **kwargs):
 
 
 def save_model(model, output_file=None, output_dir=None, output_prefix='pymzn'):
+    """Save a model to file.
+
+    Parameters
+    ----------
+    model : str
+        The minizinc model (i.e. the content of a ``.mzn`` file).
+    output_file : str
+        The path to the output file. If this parameter is None (default), a
+        temporary file is created with the given model in the specified output
+        directory, using the specified prefix.
+    output_dir : str
+        The directory where to create the file in case ``output_file`` is None.
+        Default is None, which creates a file in the system temporary directory.
+    output_prefix : str
+        The prefix for the output file if created. Default is "pymzn".
+
+    Returns
+    -------
+    str
+        The path to the newly created ``.mzn`` file.
+    """
     if output_file:
         mzn_file = output_file
         output_file = open(output_file, 'w+', buffering=1)
@@ -303,6 +349,40 @@ def check_instance(
     mzn, *dzn_files, data=None, include=None, stdlib_dir=None, globals_dir=None,
     allow_multiple_assignments=False
 ):
+    """Perform instance checking on a model + data.
+
+    This function calls the command ``minizinc --instance-check-only`` to check
+    for consistency of the given model + data.
+
+    Parameters
+    ----------
+    mzn : str
+        The minizinc model. This can be either the path to the ``.mzn`` file or
+        the content of the model itself.
+    *dzn_files
+        A list of paths to dzn files to attach to the minizinc execution,
+        provided as positional arguments; by default no data file is attached.
+    data : dict
+        Additional data as a list of strings containing dzn variables
+        assignments.
+    include : str or list
+        One or more additional paths to search for included ``.mzn`` files.
+    stdlib_dir : str
+        The path to the MiniZinc standard library. Provide it only if it is
+        different from the default one.
+    globals_dir : str
+        The path to the MiniZinc globals directory. Provide it only if it is
+        different from the default one.
+    allow_multiple_assignments : bool
+        Whether to allow multiple assignments of variables. Sometimes is
+        convenient to simply let the data file override the value already
+        assigned in the minizinc file. Default is False.
+
+    Raises
+    ------
+    MiniZincError if instance checking fails.
+    """
+
     args = ['--instance-check-only']
     args += _flattening_args(
         mzn, *dzn_files, data=data, include=include, stdlib_dir=stdlib_dir,
@@ -322,6 +402,30 @@ def check_instance(
 def check_model(
     mzn, *, include=None, stdlib_dir=None, globals_dir=None
 ):
+    """Perform model checking on a given model.
+
+    This function calls the command ``minizinc --model-check-only`` to check
+    for consistency of the given model.
+
+    Parameters
+    ----------
+    mzn : str
+        The minizinc model. This can be either the path to the ``.mzn`` file or
+        the content of the model itself.
+    include : str or list
+        One or more additional paths to search for included mzn files.
+    stdlib_dir : str
+        The path to the MiniZinc standard library. Provide it only if it is
+        different from the default one.
+    globals_dir : str
+        The path to the MiniZinc globals directory. Provide it only if it is
+        different from the default one.
+
+    Raises
+    ------
+    MiniZincError if model checking fails.
+    """
+
     args = ['--model-check-only']
     args += _flattening_args(
         mzn, include=include, stdlib_dir=stdlib_dir, globals_dir=globals_dir
@@ -418,71 +522,105 @@ def _minizinc_preliminaries(
 
 def minizinc(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
-    globals_dir=None, output_vars=None, keep=False, output_base=None,
-    output_mode='dict', solver=None, timeout=None, two_pass=None,
-    pre_passes=None, output_objective=False, non_unique=False,
-    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, rebase_arrays=True, keep_solutions=True, declare_enums=True,
-    allow_multiple_assignments=False, **kwargs
+    globals_dir=None, declare_enums=True, allow_multiple_assignments=False,
+    keep=False, output_vars=None, output_base=None, output_mode='dict',
+    solver=None, timeout=None, two_pass=None, pre_passes=None,
+    output_objective=False, non_unique=False, all_solutions=False,
+    num_solutions=None, free_search=False, parallel=None, seed=None,
+    rebase_arrays=True, keep_solutions=True,**kwargs
 ):
-    """Implements the workflow to solve a CSP problem encoded with MiniZinc.
+    """Implements the workflow for solving a CSP problem encoded with MiniZinc.
 
     Parameters
     ----------
-    mzn : str or MiniZincModel
-        The minizinc problem to be solved.  It can be either a string or an
-        instance of MiniZincModel.  If it is a string, it can be either the path
-        to the mzn file or the content of the model.
+    mzn : str
+        The minizinc model. This can be either the path to the ``.mzn`` file or
+        the content of the model itself.
     *dzn_files
-        A list of paths to dzn files to attach to the mzn2fzn execution,
+        A list of paths to dzn files to attach to the minizinc execution,
         provided as positional arguments; by default no data file is attached.
-        Data files are meant to be used when there is data that is static across
-        several minizinc executions.
+    args : dict
+        Arguments for the template engine.
     data : dict
         Additional data as a dictionary of variables assignments to supply to
-        the mzn2fnz function. The dictionary is then automatically converted to
-        dzn format by the pymzn.dzn function. This property is meant to include
-        data that dynamically changes across several minizinc executions.
-    keep : bool
-        Whether to keep the generated mzn, dzn, fzn and ozn files or not. If
-        False, the generated files are created as temporary files which will be
-        deleted right after the problem is solved. Though pymzn generated files
-        are not originally intended to be kept, this property can be used for
-        debugging purpose. Notice that in case of error the files are not
-        deleted even if this parameter is False.  Default is False.
+        the minizinc executable. The dictionary is automatically converted to
+        dzn format by the ``pymzn.dict2dzn`` function.
     include : str or list
-        One or more additional paths to search for included mzn files.
-    solver : Solver
-        An instance of Solver to use to solve the minizinc problem. The default
-        is pymzn.gecode.
-    output_mode : 'dzn', 'json', 'item', 'dict'
+        One or more additional paths to search for included ``.mzn`` files.
+    stdlib_dir : str
+        The path to the MiniZinc standard library. Provide it only if it is
+        different from the default one.
+    globals_dir : str
+        The path to the MiniZinc globals directory. Provide it only if it is
+        different from the default one.
+    declare_enums : bool
+        Whether to declare enum types when converting inline data into dzn
+        format. If the enum types are declared elsewhere this option should be
+        False. Default is True.
+    allow_multiple_assignments : bool
+        Whether to allow multiple assignments of variables. Sometimes is
+        convenient to simply let the data file override the value already
+        assigned in the minizinc file. Default is False.
+    keep : bool
+        Whether to keep the generated ``.mzn``, ``.dzn``, ``.fzn`` and ``.ozn``
+        files or not. If False, the generated files are created as temporary
+        files which will be deleted right after the problem is solved. Though
+        files generated by PyMzn are not intended to be kept, this property can
+        be used for debugging purpose. Note that in case of error the files are
+        not deleted even if this parameter is False. Default is False.
+    output_vars : list of str
+        A list of output variables. These variables will be the ones included in
+        the output dictionary. Only available if ``ouptut_mode='dict'``.
+    output_base : str
+        Output directory for the files generated by PyMzn. The default (None) is
+        the temporary directory of your OS (if keep=False) or the current
+        working directory (if keep=True).
+    output_mode : {'dict', 'item', 'dzn', 'json', 'raw'}
         The desired output format. The default is 'dict' which returns a stream
         of solutions decoded as python dictionaries. The 'item' format outputs a
         stream of strings as returned by the solns2out tool, formatted according
         to the output statement of the MiniZinc model. The 'dzn' and 'json'
         formats output a stream of strings formatted in dzn of json
-        respectively.
-    output_vars : [str]
-        A list of output variables. These variables will be the ones included in
-        the output dictionary. Only available if ouptut_mode='dict'.
-    output_base : str
-        # TODO
-        Output directory for files generated by PyMzn. The default (None) is the
-        temporary directory of your OS (if keep=False) or the current working
-        directory (if keep=True).
+        respectively. The 'raw' format, instead returns the whole solution
+        stream, without parsing.
+    solver : Solver
+        The Solver instance to use. The default solver is Gecode.
     timeout : int
-        Number of seconds after which the solver should stop the computation and
-        return the best solution found. This is only available if the solver has
-        support for a timeout.
+        The timeout in seconds for the flattening + solving process.
+    two_pass : bool or int
+        If ``two_pass`` is True, then it is equivalent to the ``--two-pass``
+        option for the ``minizinc`` executable. If ``two_pass`` is an integer
+        ``<n>``, instead, it is equivalent to the ``-O<n>`` option for the
+        ``minizinc`` executable.
+    pre_passes : int
+        Equivalent to the ``--pre-passes`` option for the ``minizinc``
+        executable.
+    output_objective : bool
+        Equivalent to the ``--output-objective`` option for the ``minizinc``
+        executable. Adds a field ``_objective`` to all solutions.
+    non_unique : bool
+        Equivalent to the ``--non-unique`` option for the ``minizinc``
+        executable.
     all_solutions : bool
-        Whether all the solutions must be returned. Notice that this can only
-        be used if the solver supports returning all solutions. Default is False.
+        Whether all the solutions must be returned. This option might not work
+        if the solver does not support it. Default is False.
     num_solutions : int
-        The upper bound on the number of solutions to be returned. Can only be
-        used if the solver supports returning a fixed number of solutions.
-        Default is 1.
-    args : dict
-        Arguments for the template engine.
+        The upper bound on the number of solutions to be returned. This option
+        might not work if the solver does not support it. Default is 1.
+    free_search : bool
+        If True, instruct the solver to perform free search.
+    parallel : int
+        The number of parallel threads the solver can utilize for the solving.
+    seed : int
+        The random number generator seed to pass to the solver.
+    rebase_arrays : bool
+        Whether to "rebase" parsed arrays (see the `Dzn files
+        <http://paolodragone.com/pymzn/reference/dzn>`__ section). Default is
+        True.
+    keep_solutions : bool
+        Whether to store the solutions in memory after solving is done. If
+        ``keep_solutions`` is False, the returned solution stream can only be
+        iterated once and cannot be addressed as a list.
     **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
@@ -490,9 +628,13 @@ def minizinc(
 
     Returns
     -------
-    Solutions
-        Returns a list of solutions as a Solutions instance. The actual content
-        of the stream depends on the output_mode chosen.
+    list-like or str
+        If ``output_mode`` is not 'raw', returns a list-like object containing
+        the solutions found by the solver. The format of the solution depends on
+        the specified ``output_mode``. If ``keep_solutions=False``, the returned
+        object cannot be addressed as a list and can only be iterated once. If
+        ``output_mode='raw'``, the function returns the whole solution stream as
+        a single string.
     """
 
     mzn_file, dzn_files, data_file, data, keep, _output_mode, types = \
@@ -574,6 +716,74 @@ def solve(
     non_unique=False, all_solutions=False, num_solutions=None,
     free_search=False, parallel=None, seed=None, **kwargs
 ):
+    """Flatten and solve a MiniZinc program.
+
+    Parameters
+    ----------
+    solver : Solver
+        The Solver instance to use.
+    mzn : str
+        The path to the minizinc model file.
+    *dzn_files
+        A list of paths to dzn files to attach to the minizinc execution,
+        provided as positional arguments; by default no data file is attached.
+    data : list of str
+        Additional data as a list of strings containing dzn variables
+        assignments.
+    include : str or list
+        One or more additional paths to search for included ``.mzn`` files.
+    stdlib_dir : str
+        The path to the MiniZinc standard library. Provide it only if it is
+        different from the default one.
+    globals_dir : str
+        The path to the MiniZinc globals directory. Provide it only if it is
+        different from the default one.
+    allow_multiple_assignments : bool
+        Whether to allow multiple assignments of variables. Sometimes is
+        convenient to simply let the data file override the value already
+        assigned in the minizinc file. Default is False.
+    output_mode : {'item', 'dzn', 'json'}
+        The desired output format. The default is 'item' which outputs a stream
+        of strings as returned by the solns2out tool, formatted according to the
+        output statement of the MiniZinc model. The 'dzn' and 'json' formats
+        output a stream of strings formatted in dzn of json respectively.
+    timeout : int
+        The timeout in seconds for the flattening + solving process.
+    two_pass : bool or int
+        If ``two_pass`` is True, then it is equivalent to the ``--two-pass``
+        option for the ``minizinc`` executable. If ``two_pass`` is an integer
+        ``<n>``, instead, it is equivalent to the ``-O<n>`` option for the
+        ``minizinc`` executable.
+    pre_passes : int
+        Equivalent to the ``--pre-passes`` option for the ``minizinc``
+        executable.
+    output_objective : bool
+        Equivalent to the ``--output-objective`` option for the ``minizinc``
+        executable. Adds a field ``_objective`` to all solutions.
+    non_unique : bool
+        Equivalent to the ``--non-unique`` option for the ``minizinc``
+        executable.
+    all_solutions : bool
+        Whether all the solutions must be returned. This option might not work
+        if the solver does not support it. Default is False.
+    num_solutions : int
+        The upper bound on the number of solutions to be returned. This option
+        might not work if the solver does not support it. Default is 1.
+    free_search : bool
+        If True, instruct the solver to perform free search.
+    parallel : int
+        The number of parallel threads the solver can utilize for the solving.
+    seed : int
+        The random number generator seed to pass to the solver.
+    **kwargs
+        Additional arguments to pass to the solver, provided as additional
+        keyword arguments to this function. Check the solver documentation for
+        the available arguments.
+
+    Returns
+    -------
+        Object wrapping the executed process.
+    """
 
     args = _solve_args(
         solver, timeout=timeout, two_pass=two_pass, pre_passes=pre_passes,
@@ -609,35 +819,62 @@ def mzn2fzn(
     keep=False, output_vars=None, output_base=None, output_mode='item',
     no_ozn=False
 ):
-    """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
-    utility from libminizinc to produce a fzn and ozn files from a mzn one.
+    """Flatten a MiniZinc model into a FlatZinc one.
+
+    This function is equivalent to the command ``minizinc --compile``.
 
     Parameters
     ----------
-    mzn_file : str
-        The path to the minizinc problem file.
+    mzn : str
+        The minizinc model. This can be either the path to the ``.mzn`` file or
+        the content of the model itself.
     *dzn_files
-        A list of paths to dzn files to attach to the mzn2fzn execution,
+        A list of paths to dzn files to attach to the minizinc execution,
         provided as positional arguments; by default no data file is attached.
+    args : dict
+        Arguments for the template engine.
     data : dict
         Additional data as a dictionary of variables assignments to supply to
-        the mzn2fnz function. The dictionary is then automatically converted to
-        dzn format by the ``pymzn.dict2dzn`` function. Notice that if the data
-        provided is too large, a temporary dzn file will be produced.
-    keep : bool
-        Whether to write the inline data into a dzn file and keep it.
-        Default is False.
-    globals_dir : str
-        The path to the directory for global included files.
+        the minizinc executable. The dictionary is automatically converted to
+        dzn format by the ``pymzn.dict2dzn`` function.
     include : str or list
-        One or more additional paths to search for included mzn files when
-        running ``mzn2fzn``.
-    output_mode : 'dzn', 'json', 'item'
-        The desired output format. The default is 'item' which outputs a
+        One or more additional paths to search for included ``.mzn`` files.
+    stdlib_dir : str
+        The path to the MiniZinc standard library. Provide it only if it is
+        different from the default one.
+    globals_dir : str
+        The path to the MiniZinc globals directory. Provide it only if it is
+        different from the default one.
+    declare_enums : bool
+        Whether to declare enum types when converting inline data into dzn
+        format. If the enum types are declared elsewhere this option should be
+        False. Default is True.
+    allow_multiple_assignments : bool
+        Whether to allow multiple assignments of variables. Sometimes is
+        convenient to simply let the data file override the value already
+        assigned in the minizinc file. Default is False.
+    keep : bool
+        Whether to keep the generated ``.mzn``, ``.dzn``, ``.fzn`` and ``.ozn``
+        files or not. If False, the generated files are created as temporary
+        files which will be deleted right after the problem is solved. Though
+        files generated by PyMzn are not intended to be kept, this property can
+        be used for debugging purpose. Note that in case of error the files are
+        not deleted even if this parameter is False. Default is False.
+    output_vars : list of str
+        A list of output variables. These variables will be the ones included in
+        the output dictionary. Only available if ``ouptut_mode='dict'``.
+    output_base : str
+        Output directory for the files generated by PyMzn. The default (None) is
+        the temporary directory of your OS (if keep=False) or the current
+        working directory (if keep=True).
+    output_mode : {'dict', 'item', 'dzn', 'json', 'raw'}
+        The desired output format. The default is 'dict' which returns a stream
+        of solutions decoded as python dictionaries. The 'item' format outputs a
         stream of strings as returned by the solns2out tool, formatted according
         to the output statement of the MiniZinc model. The 'dzn' and 'json'
         formats output a stream of strings formatted in dzn of json
-        respectively.
+        respectively. The 'raw' format, instead returns the whole solution
+        stream, without parsing.
     no_ozn : bool
         If True, the ozn file is not produced, False otherwise.
 
@@ -716,6 +953,17 @@ def solns2out(stream, ozn_file):
 
 
 class MiniZincError(RuntimeError):
+    """Generic error raised by the PyMzn functions.
+
+    Arguments
+    ---------
+    mzn_file : str
+        The MiniZinc file that generated the error.
+    args : list of str
+        The command line arguments that generated the error.
+    stderr : str
+        The standard error printed by the ``minizinc`` executable.
+    """
 
     def __init__(self, mzn_file, args, stderr=None):
         self.mzn_file = mzn_file
