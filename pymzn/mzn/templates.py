@@ -3,61 +3,92 @@
 PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
 code from the `Jinja2 <http://jinja.pocoo.org/>`_ templating language within a
 MiniZinc model to make a PyMzn template file (usually distinguished with the
-`pmzn` extension). An example::
+``.pmzn`` extension). An example::
 
     %% knapsack.pmzn %%
     int: n;                     % number of objects
     set of int: OBJ = 1..n;
+    array[OBJ] of int: profit;  % the profit of each object
+    array[OBJ] of int: size;    % the size of each object
     int: capacity;              % the capacity of the knapsack
-    array[OBJ] of int: size;    % the size of each object=
 
     var set of OBJ: x;
+
     constraint sum(i in x)(size[i]) <= capacity;
 
-    {% if objective == 'profit' %}
-        array[OBJ] of int: profit;  % the profit of each object
-        solve maximize sum(i in x)(profit[i]);
-    {% elif objective == 'cost' %}
-        array[OBJ] of int: cost;    % the cost of each object
-        solve minimize sum(i in x)(cost[i]);
-    {% else %}
-        solve satisfy;
-    {% endif%}
+    {% if with_compatibility %}
+        array[OBJ, OBJ] of bool: compatibility;
+        constraint forall(i, j in x where i != j)(
+            compatibility[i, j]
+        );
+    {% endif %}
+
+    var int: obj = sum(i in x)(profit[i]);
+
+    solve maximize obj;
+
+    output [
+        "knapsack = ", show(x), "\n",
+        "objective = ", show(obj)
+    ];
 
     %% knapsack.dzn %%
     n = 5;
+    profit = [10, 3, 9, 4, 8];
     size = [14, 4, 10, 6, 9];
-    capacity = 20;
+    capacity = 24;
 
-Now it is possible to pass `objective` as a member of `args` in the
-`pymzn.minizinc` function::
+The above MiniZinc model encodes a 0-1 knapsack problem with optional
+compatibility constraint. By default the argument ``with_compatibility`` is
+None, so the constraint is not enabled. In this case, the model can be solved as
+usual by running::
 
-    pymzn.minizinc('knapsack.pmzn', data={'cost': [10, 3, 9, 4, 8]}, args={'objective': 'cost'})
+    pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn')
 
-The compiled model that will be solved looks like this::
+which returns::
 
-    %% knapsack.mzn %%
-    int: n;                     % number of objects
-    set of int: OBJ = 1..n;
-    int: capacity;              % the capacity of the knapsack
-    array[OBJ] of int: size;    % the size of each object=
+    [{'x': {2, 3, 5}}]
 
-    var set of OBJ: x;
-    constraint sum(i in x)(size[i]) <= capacity;
+If we want to use the compatibility constraint, we define it e.g. in a dzn
+file::
 
-    array[OBJ] of int: cost;    % the cost of each object
-    solve minimize sum(i in x)(cost[i]);
+    %% compatibility.dzn %%
 
-Notice that now the model expects a `cost` array as dzn input data, so we passed
-it with the `data` argument as usual.
+    compatibility = [|
+        true,  true, false,  true,  true |
+        true,  true, false,  true, false |
+       false, false,  true,  true,  true |
+        true,  true,  true,  true, false |
+        true, false,  true, false,  true
+    |];
+
+Now it is possible to pass `with_compatibility` argument to `pymzn.minizinc`
+function, along with the other dzn file::
+
+    pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn', 'compatibility.dzn', args={'with_compatibility': True})
+
+which yields::
+
+    [{'x': {1, 5}}]
 
 As mentioned, PyMzn employs Jinja2 under the hood, so anything you can do with
 Jinja2 is also possible in PyMzn, including variables, control structured,
 template inheritance, and filters. PyMzn implements few custom filters as well:
 
-- `int(value, factor=100)` : discretizes the given input or array,
-  pre-multiplying by the given factor.
-- `dzn(value)` : transform the input into its equivalent dzn string.
+- ``int(value, factor=100)`` : discretizes the given input or array,
+  pre-multiplying by the given factor. Usage:
+  ``{{ float_value_or_array | int}}`` or
+  ``{{ float_value_or_array | int(factor=1000) }}``
+- ``dzn(value)`` : transform the input into its equivalent dzn string. Usage:
+  ``{{ dzn_argument | dzn }}``
+
+To provide a custom search path to the template engine you can use the
+function ``add_path``::
+
+    pymzn.templates.add_path('path/to/templates/directory/')
+
+This ensures that the template engine will look for imported tempates into the
+provided path as well.
 """
 
 from .. import val2dzn, logger
