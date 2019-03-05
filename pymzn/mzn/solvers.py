@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Provides classes to interface solvers with PyMzn.
-
+"""\
 PyMzn interfaces with solvers through the ``Solver`` base class. This class
 includes the necessary infomation for PyMzn to setup the solver, together with
 the ``solve`` method, which respectively take care of the running or

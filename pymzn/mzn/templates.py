@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Handles MiniZinc template files.
-
+"""\
 PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
 code from the `Jinja2 <http://jinja.pocoo.org/>`_ templating language within a
 MiniZinc model to make a PyMzn template file (usually distinguished with the
