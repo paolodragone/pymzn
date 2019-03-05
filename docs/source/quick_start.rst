@@ -1,5 +1,6 @@
 Quick Start
 ===========
+
 First, we need to define a constraint program via MiniZinc.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 
@@ -24,8 +25,8 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc::
 You can solve the above problem using the ``pymzn.minizinc`` function::
 
     import pymzn
-    s = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
-    print(s)
+    solns = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
+    print(solns)
 
 The result will be::
 
@@ -33,18 +34,16 @@ The result will be::
 
 The returned object is a lazy solution stream, which can however be directly
 referenced as a list. The default behavior is to evaluate the solutions into
-python objects. Solutions are dictionaries containing variable assignments. The
-solution evaluation by PyMzn uses dzn as intermediate format from the solver.
-More details on how PyMzn works internally are available in the `Implementation
-details <reference/internal>`__ section).
+python objects. Solutions are dictionaries containing variable assignments.
 
 If you wish to override the default behavior and get a different output format
 you can specify the ``output_mode`` argument. Possible formats are: ``dict``,
-``item``, ``dzn`` and ``json``. The first is the default one. The ``item``
-format will return strings formatted according to the output statement in the
-input model. The ``dzn`` and ``json`` formats return strings formatted in dzn or
-json respectively. The latter two formats are only available if the solver used
-supports them. ::
+``item``, ``dzn``, ``json`` and ``raw``. The first is the default one. The
+``item`` format will return strings formatted according to the output statement
+in the input model. The ``dzn`` and ``json`` formats return strings formatted in
+dzn or json respectively. The ``raw`` format, instead, returns the output of the
+solver as a string without splitting the solutions. For instance, to get the
+solution in ``dzn`` format::
 
     pymzn.minizinc('test.mzn', output_mode='dzn')
 
@@ -66,20 +65,18 @@ With the ``data`` argument you can specify an assignment of variables that will
 be automatically converted into dzn format with the ``pymzn.dict2dzn`` function
 (more details in the `Dzn files <reference/dzn/>`__ section).
 
-Solver's arguments
-------------------
+
+Solver arguments
+----------------
 
 Usually, solvers provide arguments that can be used to modify their behavior.
 You can specify arguments to pass to the solver as additional keyword arguments
-in the ``minizinc`` function. For instance, using the argument ``timeout`` for
-Gecode, it will set a time cut-off (in seconds) for the problem solving::
+in the ``minizinc`` function. For instance, adding the ``parallel`` argument,
+you can specify how many threads should the solver use::
 
-    pymzn.minizinc('test.mzn', timeout=30)  # 30 seconds cut-off
+    pymzn.minizinc('test.mzn', parallel=4)
 
-Adding the ``parallel`` argument, you can specify how many threads
-should Gecode use for the problem solving::
+Solver arguments are subject to the support of the solver. Some solver may also
+provide additional parameters. More details in the `Solvers
+<reference/solvers/>`__ section.
 
-    pymzn.minizinc('test.mzn', timeout=30, parallel=4)
-
-More details on available options are in the `Solvers <reference/solvers/>`__
-section.
