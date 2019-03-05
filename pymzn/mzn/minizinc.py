@@ -56,6 +56,8 @@ def _run_minizinc(*args, input=None):
 def minizinc_version():
     vs = _run_minizinc('--version')
     m = re.findall('version ([\d\.]+)', vs)
+    if not m:
+        raise RuntimeError('MiniZinc executable not found.')
     return m[0]
 
 
