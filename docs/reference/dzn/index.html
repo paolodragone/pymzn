@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dzn files &mdash; PyMzn 0.17.0 documentation</title>
+  <title>Dzn files &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../index.html"/>
-        <link rel="up" title="Manual" href="../index.html"/>
-        <link rel="next" title="pymzn.dict2dzn" href="generated/pymzn.dict2dzn.html"/>
-        <link rel="prev" title="pymzn.MiniZincUnboundedError" href="../minizinc/generated/pymzn.MiniZincUnboundedError.html"/> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pymzn.dict2dzn" href="generated/pymzn.dict2dzn.html" />
+    <link rel="prev" title="pymzn.MiniZincError" href="../minizinc/generated/pymzn.MiniZincError.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +60,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -105,14 +98,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -124,7 +113,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PyMzn</a>
@@ -132,9 +121,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -165,8 +155,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/reference/dzn/index.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -186,11 +174,11 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.dict2dzn.html#pymzn.dict2dzn" title="pymzn.dict2dzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict2dzn</span></code></a>(objs[,&nbsp;declare,&nbsp;assign,&nbsp;wrap,&nbsp;fout])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.dict2dzn.html#pymzn.dict2dzn" title="pymzn.dict2dzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict2dzn</span></code></a>(objs[,&nbsp;declare,&nbsp;assign,&nbsp;…])</td>
 <td>Serializes the objects in input and produces a list of strings encoding them into dzn format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.dzn2dict.html#pymzn.dzn2dict" title="pymzn.dzn2dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dzn2dict</span></code></a>(dzn,&nbsp;*[,&nbsp;rebase_arrays])</td>
-<td>Evaluates a dzn string or file into a Python dictionary of variable assignments.</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.dzn2dict.html#pymzn.dzn2dict" title="pymzn.dzn2dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dzn2dict</span></code></a>(dzn,&nbsp;*[,&nbsp;rebase_arrays,&nbsp;types])</td>
+<td>Parses a dzn string or file into a dictionary of variable assignments.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.stmt2dzn.html#pymzn.stmt2dzn" title="pymzn.stmt2dzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stmt2dzn</span></code></a>(name,&nbsp;val[,&nbsp;declare,&nbsp;assign,&nbsp;wrap])</td>
 <td>Returns a dzn statement declaring and assigning the given value.</td>
@@ -278,9 +266,7 @@ transform it into a list (list of lists). For instance:</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -289,7 +275,7 @@ transform it into a list (list of lists). For instance:</p>
         <a href="generated/pymzn.dict2dzn.html" class="btn btn-neutral float-right" title="pymzn.dict2dzn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../minizinc/generated/pymzn.MiniZincUnboundedError.html" class="btn btn-neutral" title="pymzn.MiniZincUnboundedError" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../minizinc/generated/pymzn.MiniZincError.html" class="btn btn-neutral float-left" title="pymzn.MiniZincError" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -298,11 +284,11 @@ transform it into a list (list of lists). For instance:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -315,36 +301,15 @@ transform it into a list (list of lists). For instance:</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

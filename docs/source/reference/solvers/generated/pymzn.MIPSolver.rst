@@ -13,8 +13,7 @@ pymzn.MIPSolver
       :toctree:
    
       ~MIPSolver.args
-      ~MIPSolver.solve
-      ~MIPSolver.solve_start
+      ~MIPSolver.parser
    
    
 

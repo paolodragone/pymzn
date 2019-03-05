@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.minizinc &mdash; PyMzn 0.17.0 documentation</title>
+  <title>pymzn.minizinc &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../../index.html"/>
-        <link rel="up" title="MiniZinc tools" href="../index.html"/>
-        <link rel="next" title="pymzn.mzn2fzn" href="pymzn.mzn2fzn.html"/>
-        <link rel="prev" title="pymzn.Solutions" href="pymzn.Solutions.html"/> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pymzn.mzn2fzn" href="pymzn.mzn2fzn.html" />
+    <link rel="prev" title="MiniZinc tools" href="../index.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +60,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -96,26 +89,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">MiniZinc tools</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pymzn.Solutions.html">pymzn.Solutions</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.minizinc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.solns2out.html">pymzn.solns2out</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnsatisfiableError.html">pymzn.MiniZincUnsatisfiableError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnknownError.html">pymzn.MiniZincUnknownError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnboundedError.html">pymzn.MiniZincUnboundedError</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -127,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">PyMzn</a>
@@ -135,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -170,8 +156,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../../_sources/reference/minizinc/generated/pymzn.minizinc.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -187,14 +171,14 @@
 <h1>pymzn.minizinc<a class="headerlink" href="#pymzn-minizinc" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.minizinc">
-<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep=False</em>, <em>include=None</em>, <em>solver=None</em>, <em>output_mode='dict'</em>, <em>output_vars=None</em>, <em>output_dir=None</em>, <em>timeout=None</em>, <em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>force_flatten=False</em>, <em>args=None</em>, <em>wait=True</em>, <em>statistics=False</em>, <em>no_output_annotations=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>include=None</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>output_vars=None</em>, <em>keep=False</em>, <em>output_base=None</em>, <em>output_mode='dict'</em>, <em>solver=None</em>, <em>timeout=None</em>, <em>two_pass=None</em>, <em>pre_passes=None</em>, <em>output_objective=False</em>, <em>non_unique=False</em>, <em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>rebase_arrays=True</em>, <em>keep_solutions=True</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the workflow to solve a CSP problem encoded with MiniZinc.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mzn</strong> (<em>str</em><em> or </em><a class="reference internal" href="../../model/generated/pymzn.MiniZincModel.html#pymzn.MiniZincModel" title="pymzn.MiniZincModel"><em>MiniZincModel</em></a>) – The minizinc problem to be solved.  It can be either a string or an
+<li><strong>mzn</strong> (<em>str</em><em> or </em><em>MiniZincModel</em>) – The minizinc problem to be solved.  It can be either a string or an
 instance of MiniZincModel.  If it is a string, it can be either the path
 to the mzn file or the content of the model.</li>
 <li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the mzn2fzn execution,
@@ -222,7 +206,8 @@ formats output a stream of strings formatted in dzn of json
 respectively.</li>
 <li><strong>output_vars</strong> (<em>[</em><em>str</em><em>]</em>) – A list of output variables. These variables will be the ones included in
 the output dictionary. Only available if ouptut_mode=’dict’.</li>
-<li><strong>output_dir</strong> (<em>str</em>) – Output directory for files generated by PyMzn. The default (None) is the
+<li><strong>output_base</strong> (<em>str</em>) – # TODO
+Output directory for files generated by PyMzn. The default (None) is the
 temporary directory of your OS (if keep=False) or the current working
 directory (if keep=True).</li>
 <li><strong>timeout</strong> (<em>int</em>) – Number of seconds after which the solver should stop the computation and
@@ -233,16 +218,7 @@ be used if the solver supports returning all solutions. Default is False.</li>
 <li><strong>num_solutions</strong> (<em>int</em>) – The upper bound on the number of solutions to be returned. Can only be
 used if the solver supports returning a fixed number of solutions.
 Default is 1.</li>
-<li><strong>force_flatten</strong> (<em>bool</em>) – Wheter the function should be forced to produce a flat model. Whenever
-possible, this function feeds the mzn file to the solver without passing
-through the flattener, force_flatten=True prevents this behavior and
-always produces a fzn file which is in turn passed to the solver.</li>
 <li><strong>args</strong> (<em>dict</em>) – Arguments for the template engine.</li>
-<li><strong>wait</strong> (<em>bool</em>) – Whether to wait for the solving process to finish before returning the
-solution stream.</li>
-<li><strong>statistics</strong> (<em>bool</em>) – Whether to save the statistics of the solver (if supported).</li>
-<li><strong>no_output_annotations</strong> (<em>bool</em>) – Whether to avoid using output annotation when handling output
-variables.</li>
 <li><strong>**kwargs</strong> – Additional arguments to pass to the solver, provided as additional
 keyword arguments to this function. Check the solver documentation for
 the available arguments.</li>
@@ -253,7 +229,7 @@ the available arguments.</li>
 of the stream depends on the output_mode chosen.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pymzn.Solutions.html#pymzn.Solutions" title="pymzn.Solutions">Solutions</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Solutions</p>
 </td>
 </tr>
 </tbody>
@@ -264,9 +240,7 @@ of the stream depends on the output_mode chosen.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -275,7 +249,7 @@ of the stream depends on the output_mode chosen.</p>
         <a href="pymzn.mzn2fzn.html" class="btn btn-neutral float-right" title="pymzn.mzn2fzn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.Solutions.html" class="btn btn-neutral" title="pymzn.Solutions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="MiniZinc tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -284,11 +258,11 @@ of the stream depends on the output_mode chosen.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -301,36 +275,15 @@ of the stream depends on the output_mode chosen.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

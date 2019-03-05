@@ -1,7 +1,7 @@
 Templating
 ==========
 
-.. currentmodule:: pymzn
+.. currentmodule:: pymzn.templates
 
 .. autosummary::
    :toctree: generated/

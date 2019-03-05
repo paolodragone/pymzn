@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MiniZinc tools &mdash; PyMzn 0.17.0 documentation</title>
+  <title>MiniZinc tools &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../index.html"/>
-        <link rel="up" title="Manual" href="../index.html"/>
-        <link rel="next" title="pymzn.Solutions" href="generated/pymzn.Solutions.html"/>
-        <link rel="prev" title="Manual" href="../index.html"/> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pymzn.minizinc" href="generated/pymzn.minizinc.html" />
+    <link rel="prev" title="Manual" href="../index.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +60,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -96,26 +89,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MiniZinc tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Solutions.html">pymzn.Solutions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.minizinc.html">pymzn.minizinc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.solns2out.html">pymzn.solns2out</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MiniZincUnsatisfiableError.html">pymzn.MiniZincUnsatisfiableError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MiniZincUnknownError.html">pymzn.MiniZincUnknownError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MiniZincUnboundedError.html">pymzn.MiniZincUnboundedError</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -127,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PyMzn</a>
@@ -135,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -168,8 +154,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/reference/minizinc/index.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -189,29 +173,17 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Solutions.html#pymzn.Solutions" title="pymzn.Solutions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Solutions</span></code></a>(stream)</td>
-<td>Represents a solution stream from the <a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a> function.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;data,&nbsp;keep,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;…])</td>
 <td>Implements the workflow to solve a CSP problem encoded with MiniZinc.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.mzn2fzn.html#pymzn.mzn2fzn" title="pymzn.mzn2fzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mzn2fzn</span></code></a>(mzn_file,&nbsp;*dzn_files[,&nbsp;data,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.mzn2fzn.html#pymzn.mzn2fzn" title="pymzn.mzn2fzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mzn2fzn</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;keep,&nbsp;…])</td>
 <td>Flatten a MiniZinc model into a FlatZinc one.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.solns2out.html#pymzn.solns2out" title="pymzn.solns2out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solns2out</span></code></a>(stream,&nbsp;ozn_file)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.solns2out.html#pymzn.solns2out" title="pymzn.solns2out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solns2out</span></code></a>(stream,&nbsp;ozn_file)</td>
 <td>Wraps the solns2out utility, executes it on the solution stream, and then returns the output stream.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincError.html#pymzn.MiniZincError" title="pymzn.MiniZincError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincError</span></code></a>([msg])</td>
-<td>Generic error for the MiniZinc functions.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincUnsatisfiableError.html#pymzn.MiniZincUnsatisfiableError" title="pymzn.MiniZincUnsatisfiableError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincUnsatisfiableError</span></code></a>()</td>
-<td>Error raised when a minizinc problem is found to be unsatisfiable.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.MiniZincUnknownError.html#pymzn.MiniZincUnknownError" title="pymzn.MiniZincUnknownError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincUnknownError</span></code></a>()</td>
-<td>Error raised when minizinc returns no solution (unknown).</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincUnboundedError.html#pymzn.MiniZincUnboundedError" title="pymzn.MiniZincUnboundedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincUnboundedError</span></code></a>()</td>
-<td>Error raised when a minizinc problem is found to be unbounded.</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincError.html#pymzn.MiniZincError" title="pymzn.MiniZincError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincError</span></code></a>(mzn_file,&nbsp;args[,&nbsp;stderr])</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -236,18 +208,16 @@ solver.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/pymzn.Solutions.html" class="btn btn-neutral float-right" title="pymzn.Solutions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="generated/pymzn.minizinc.html" class="btn btn-neutral float-right" title="pymzn.minizinc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral" title="Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -256,11 +226,11 @@ solver.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -273,36 +243,15 @@ solver.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

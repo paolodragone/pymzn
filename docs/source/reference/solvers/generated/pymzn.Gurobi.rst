@@ -13,8 +13,7 @@ pymzn.Gurobi
       :toctree:
    
       ~Gurobi.args
-      ~Gurobi.solve
-      ~Gurobi.solve_start
+      ~Gurobi.parser
    
    
 

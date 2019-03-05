@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.Gurobi.args &mdash; PyMzn 0.17.0 documentation</title>
+  <title>pymzn.Gurobi.args &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../../index.html"/>
-        <link rel="up" title="pymzn.Gurobi" href="pymzn.Gurobi.html"/>
-        <link rel="next" title="pymzn.Gurobi.solve" href="pymzn.Gurobi.solve.html"/>
-        <link rel="prev" title="pymzn.Gurobi" href="pymzn.Gurobi.html"/> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pymzn.Gurobi.parser" href="pymzn.Gurobi.parser.html" />
+    <link rel="prev" title="pymzn.Gurobi" href="pymzn.Gurobi.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +60,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -106,34 +99,26 @@
 <li class="toctree-l3"><a class="reference internal" href="pymzn.MIPSolver.html">pymzn.MIPSolver</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="pymzn.Gurobi.html">pymzn.Gurobi</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pymzn.Gurobi.args</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymzn.Gurobi.solve.html">pymzn.Gurobi.solve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymzn.Gurobi.solve_start.html">pymzn.Gurobi.solve_start</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymzn.Gurobi.parser.html">pymzn.Gurobi.parser</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.CBC.html">pymzn.CBC</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.G12Solver.html">pymzn.G12Solver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.G12Fd.html">pymzn.G12Fd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.G12Lazy.html">pymzn.G12Lazy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.G12MIP.html">pymzn.G12MIP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.OscarCBLS.html">pymzn.OscarCBLS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.ORTools.html">pymzn.ORTools</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.gecode.html">pymzn.gecode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.chuffed.html">pymzn.chuffed</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.optimathsat.html">pymzn.optimathsat</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.opturion.html">pymzn.opturion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.gurobi.html">pymzn.gurobi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.cbc.html">pymzn.cbc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.g12fd.html">pymzn.g12fd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.g12lazy.html">pymzn.g12lazy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.g12mip.html">pymzn.g12mip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.oscar_cbls.html">pymzn.oscar_cbls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.or_tools.html">pymzn.or_tools</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -145,7 +130,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">PyMzn</a>
@@ -153,9 +138,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -190,8 +176,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../../_sources/reference/solvers/generated/pymzn.Gurobi.args.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -207,26 +191,42 @@
 <h1>pymzn.Gurobi.args<a class="headerlink" href="#pymzn-gurobi-args" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="pymzn.Gurobi.args">
-<code class="descclassname">Gurobi.</code><code class="descname">args</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Gurobi.args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the command line arguments to start the solver</p>
+<code class="descclassname">Gurobi.</code><code class="descname">args</code><span class="sig-paren">(</span><em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Gurobi.args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of command line arguments for the specified options.</p>
+<p>In all cases, this function should always add options to display
+statistics.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned (default is False).</li>
+<li><strong>num_solutions</strong> (<em>int</em>) – The maximum number of solutions to be returned (only used in
+satisfation problems).</li>
+<li><strong>free_search</strong> (<em>bool</em>) – Whether the solver should be instructed to perform a free search.</li>
+<li><strong>parallel</strong> (<em>int</em>) – The number of parallel threads the solver should use.</li>
+<li><strong>seed</strong> (<em>int</em>) – The random number generator seed to pass to the solver.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pymzn.Gurobi.solve.html" class="btn btn-neutral float-right" title="pymzn.Gurobi.solve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pymzn.Gurobi.parser.html" class="btn btn-neutral float-right" title="pymzn.Gurobi.parser" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.Gurobi.html" class="btn btn-neutral" title="pymzn.Gurobi" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pymzn.Gurobi.html" class="btn btn-neutral float-left" title="pymzn.Gurobi" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -235,11 +235,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -252,36 +252,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

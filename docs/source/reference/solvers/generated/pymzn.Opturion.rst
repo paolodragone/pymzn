@@ -13,8 +13,7 @@ pymzn.Opturion
       :toctree:
    
       ~Opturion.args
-      ~Opturion.solve
-      ~Opturion.solve_start
+      ~Opturion.parser
    
    
 

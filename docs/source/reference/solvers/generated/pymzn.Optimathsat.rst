@@ -13,8 +13,7 @@ pymzn.Optimathsat
       :toctree:
    
       ~Optimathsat.args
-      ~Optimathsat.solve
-      ~Optimathsat.solve_start
+      ~Optimathsat.parser
    
    
 

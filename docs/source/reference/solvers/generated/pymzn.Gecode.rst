@@ -13,8 +13,7 @@ pymzn.Gecode
       :toctree:
    
       ~Gecode.args
-      ~Gecode.solve
-      ~Gecode.solve_start
+      ~Gecode.parser
    
    
 

@@ -6,8 +6,4 @@ Configuration
 .. autosummary::
    :toctree: generated/
 
-   get
-   set
-   dump
-
 .. automodule:: pymzn.config

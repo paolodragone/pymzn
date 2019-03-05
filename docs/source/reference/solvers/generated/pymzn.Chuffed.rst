@@ -13,8 +13,7 @@ pymzn.Chuffed
       :toctree:
    
       ~Chuffed.args
-      ~Chuffed.solve
-      ~Chuffed.solve_start
+      ~Chuffed.parser
    
    
 

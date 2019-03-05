@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Templating &mdash; PyMzn 0.17.0 documentation</title>
+  <title>Templating &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../index.html"/>
-        <link rel="up" title="Manual" href="../index.html"/>
-        <link rel="next" title="pymzn.add_package" href="generated/pymzn.add_package.html"/>
-        <link rel="prev" title="pymzn.SolveStatement" href="../model/generated/pymzn.SolveStatement.html"/> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pymzn.templates.add_package" href="generated/pymzn.templates.add_package.html" />
+    <link rel="prev" title="pymzn.or_tools" href="../solvers/generated/pymzn.or_tools.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +60,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -98,18 +91,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../minizinc/index.html">MiniZinc tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../model/index.html">Modelling</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Templating</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.add_package.html">pymzn.add_package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.add_path.html">pymzn.add_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.templates.add_package.html">pymzn.templates.add_package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.templates.add_path.html">pymzn.templates.add_path</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -121,7 +110,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PyMzn</a>
@@ -129,9 +118,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -162,8 +152,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/reference/templates/index.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -183,10 +171,10 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.add_package.html#pymzn.add_package" title="pymzn.add_package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_package</span></code></a>(package_name[,&nbsp;package_path,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.templates.add_package.html#pymzn.templates.add_package" title="pymzn.templates.add_package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_package</span></code></a>(package_name[,&nbsp;package_path,&nbsp;…])</td>
 <td>Adds the given package to the template search routine</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.add_path.html#pymzn.add_path" title="pymzn.add_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_path</span></code></a>(searchpath[,&nbsp;encoding,&nbsp;followlinks])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.templates.add_path.html#pymzn.templates.add_path" title="pymzn.templates.add_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_path</span></code></a>(searchpath[,&nbsp;encoding,&nbsp;followlinks])</td>
 <td>Adds the given path to the template search routine</td>
 </tr>
 </tbody>
@@ -195,7 +183,7 @@
 <p>PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
 code from the <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> templating language within a
 MiniZinc model to make a PyMzn template file (usually distinguished with the
-<em class="xref py py-obj">pmzn</em> extension). An example:</p>
+<cite>pmzn</cite> extension). An example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">pmzn</span> <span class="o">%%</span>
 <span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
 <span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
@@ -221,8 +209,8 @@ MiniZinc model to make a PyMzn template file (usually distinguished with the
 <span class="n">capacity</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Now it is possible to pass <em class="xref py py-obj">objective</em> as a member of <em class="xref py py-obj">args</em> in the
-<a class="reference internal" href="../minizinc/generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code></a> function:</p>
+<p>Now it is possible to pass <cite>objective</cite> as a member of <cite>args</cite> in the
+<cite>pymzn.minizinc</cite> function:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack.pmzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cost&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]},</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="s1">&#39;cost&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
@@ -240,32 +228,30 @@ MiniZinc model to make a PyMzn template file (usually distinguished with the
 <span class="n">solve</span> <span class="n">minimize</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 </pre></div>
 </div>
-<p>Notice that now the model expects a <em class="xref py py-obj">cost</em> array as dzn input data, so we passed
-it with the <em class="xref py py-obj">data</em> argument as usual.</p>
+<p>Notice that now the model expects a <cite>cost</cite> array as dzn input data, so we passed
+it with the <cite>data</cite> argument as usual.</p>
 <p>As mentioned, PyMzn employs Jinja2 under the hood, so anything you can do with
 Jinja2 is also possible in PyMzn, including variables, control structured,
 template inheritance, and filters. PyMzn implements few custom filters as well:</p>
 <ul class="simple">
-<li><em class="xref py py-obj">int(value, factor=100)</em> : discretizes the given input or array,
+<li><cite>int(value, factor=100)</cite> : discretizes the given input or array,
 pre-multiplying by the given factor.</li>
-<li><em class="xref py py-obj">dzn(value)</em> : transform the input into its equivalent dzn string.</li>
+<li><cite>dzn(value)</cite> : transform the input into its equivalent dzn string.</li>
 </ul>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/pymzn.add_package.html" class="btn btn-neutral float-right" title="pymzn.add_package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="generated/pymzn.templates.add_package.html" class="btn btn-neutral float-right" title="pymzn.templates.add_package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../model/generated/pymzn.SolveStatement.html" class="btn btn-neutral" title="pymzn.SolveStatement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../solvers/generated/pymzn.or_tools.html" class="btn btn-neutral float-left" title="pymzn.or_tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -274,11 +260,11 @@ pre-multiplying by the given factor.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -291,36 +277,15 @@ pre-multiplying by the given factor.</li>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

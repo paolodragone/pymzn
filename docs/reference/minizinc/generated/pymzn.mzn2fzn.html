@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.mzn2fzn &mdash; PyMzn 0.17.0 documentation</title>
+  <title>pymzn.mzn2fzn &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../../../index.html"/>
-        <link rel="up" title="MiniZinc tools" href="../index.html"/>
-        <link rel="next" title="pymzn.solns2out" href="pymzn.solns2out.html"/>
-        <link rel="prev" title="pymzn.minizinc" href="pymzn.minizinc.html"/> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pymzn.solns2out" href="pymzn.solns2out.html" />
+    <link rel="prev" title="pymzn.minizinc" href="pymzn.minizinc.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +60,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -96,26 +89,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">MiniZinc tools</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pymzn.Solutions.html">pymzn.Solutions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.minizinc.html">pymzn.minizinc</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.solns2out.html">pymzn.solns2out</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnsatisfiableError.html">pymzn.MiniZincUnsatisfiableError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnknownError.html">pymzn.MiniZincUnknownError</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincUnboundedError.html">pymzn.MiniZincUnboundedError</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../process.html">Process execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -127,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">PyMzn</a>
@@ -135,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -170,8 +156,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../../_sources/reference/minizinc/generated/pymzn.mzn2fzn.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -187,7 +171,7 @@
 <h1>pymzn.mzn2fzn<a class="headerlink" href="#pymzn-mzn2fzn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.mzn2fzn">
-<code class="descclassname">pymzn.</code><code class="descname">mzn2fzn</code><span class="sig-paren">(</span><em>mzn_file</em>, <em>*dzn_files</em>, <em>data=None</em>, <em>keep_data=False</em>, <em>globals_dir=None</em>, <em>include=None</em>, <em>output_mode='item'</em>, <em>no_ozn=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.mzn2fzn" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pymzn.</code><code class="descname">mzn2fzn</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>keep=False</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>output_vars=None</em>, <em>output_mode='dict'</em>, <em>include=None</em>, <em>no_ozn=False</em>, <em>output_base=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.mzn2fzn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
 utility from libminizinc to produce a fzn and ozn files from a mzn one.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -202,7 +186,7 @@ provided as positional arguments; by default no data file is attached.</li>
 the mzn2fnz function. The dictionary is then automatically converted to
 dzn format by the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function. Notice that if the data
 provided is too large, a temporary dzn file will be produced.</li>
-<li><strong>keep_data</strong> (<em>bool</em>) – Whether to write the inline data into a dzn file and keep it.
+<li><strong>keep</strong> (<em>bool</em>) – Whether to write the inline data into a dzn file and keep it.
 Default is False.</li>
 <li><strong>globals_dir</strong> (<em>str</em>) – The path to the directory for global included files.</li>
 <li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included mzn files when
@@ -231,9 +215,7 @@ second argument is None.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -242,7 +224,7 @@ second argument is None.</p>
         <a href="pymzn.solns2out.html" class="btn btn-neutral float-right" title="pymzn.solns2out" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.minizinc.html" class="btn btn-neutral" title="pymzn.minizinc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pymzn.minizinc.html" class="btn btn-neutral float-left" title="pymzn.minizinc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -251,11 +233,11 @@ second argument is None.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -268,36 +250,15 @@ second argument is None.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

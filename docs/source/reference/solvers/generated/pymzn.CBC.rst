@@ -13,8 +13,7 @@ pymzn.CBC
       :toctree:
    
       ~CBC.args
-      ~CBC.solve
-      ~CBC.solve_start
+      ~CBC.parser
    
    
 

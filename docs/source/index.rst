@@ -16,7 +16,6 @@ Table of Contents
    install
    quick_start
    reference/index
-   troubleshooting
 
 Indices and tables
 ==================

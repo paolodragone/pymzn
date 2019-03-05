@@ -13,8 +13,7 @@ pymzn.Solver
       :toctree:
    
       ~Solver.args
-      ~Solver.solve
-      ~Solver.solve_start
+      ~Solver.parser
    
    
 

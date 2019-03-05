@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; PyMzn 0.17.0 documentation</title>
+  <title>Configuration &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -17,43 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="PyMzn 0.17.0 documentation" href="../index.html"/>
-        <link rel="up" title="Manual" href="index.html"/>
-        <link rel="next" title="pymzn.config.get" href="generated/pymzn.config.get.html"/>
-        <link rel="prev" title="pymzn.process.Process.stop" href="generated/pymzn.process.Process.stop.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="pymzn.templates.add_path" href="templates/generated/pymzn.templates.add_path.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -67,7 +59,7 @@
             
             
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
             
           
@@ -98,20 +90,13 @@
 <li class="toctree-l2"><a class="reference internal" href="minizinc/index.html">MiniZinc tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/index.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model/index.html">Modelling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="process.html">Process execution</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.config.get.html">pymzn.config.get</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.config.set.html">pymzn.config.set</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.config.dump.html">pymzn.config.dump</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#debug">Debug</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="internal.html">Implementation details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
 </ul>
 
             
@@ -123,7 +108,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">PyMzn</a>
@@ -131,9 +116,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -164,8 +150,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/reference/config.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -185,50 +169,38 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.config.get.html#pymzn.config.get" title="pymzn.config.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>(key[,&nbsp;default])</td>
-<td>Get the value of a configuration variable.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.config.set.html#pymzn.config.set" title="pymzn.config.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(key,&nbsp;value)</td>
-<td>Set the value of configuration variable.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.config.dump.html#pymzn.config.dump" title="pymzn.config.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump</span></code></a>()</td>
-<td>Writes the changes to the configuration file.</td>
-</tr>
 </tbody>
 </table>
 <span class="target" id="module-pymzn.config"></span><p>PyMzn can be configured with custom executable paths and other variables.
-Configuration is done via the module <code class="docutils literal notranslate"><span class="pre">pymzn.config</span></code>. For instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn.config</span>
+Configuration is done via the <code class="docutils literal notranslate"><span class="pre">pymzn.config</span></code> object. For instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
 
-<span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mzn2fzn&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/mzn2fzn&#39;</span><span class="p">)</span>
-<span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;solns2out&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/solns2out&#39;</span><span class="p">)</span>
+<span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;minizinc&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/minizinc&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The configurable properties used by PyMzn are the following:</p>
 <blockquote>
 <div><ul class="simple">
-<li><strong>mzn2fzn</strong>: Path to the <em>mzn2fzn</em> executable;</li>
-<li><strong>solns2out</strong>: Path to the <em>solns2out</em> executable;</li>
+<li><strong>minizinc</strong>: Path to the minizinc executable;</li>
 <li><strong>solver</strong>: Solver instance to use when calling pymzn.minizinc;</li>
 <li><strong>solver_args</strong>: Arguments to pass to the solver when calling pymzn.minizinc;</li>
-<li><strong>all_solutions</strong>: Overrides the all_solutions flag for minizinc calls;</li>
-<li><strong>num_solutions</strong>: Overrides the num_solutions value for minizinc calls;</li>
-<li><strong>statistics</strong>: Overrides the statistics flag for all calls to minizinc;</li>
-<li><strong>timeout</strong>: Overrides the timeout for all calls to minizinc;</li>
 <li><strong>args</strong>: Additional arguments to pass to the template engine;</li>
-<li><strong>include</strong>: List of search paths to include in all mzn2fzn calls;</li>
-<li><strong>keep</strong>: Overrides the keep flag of all minizinc and mzn2fzn calls;</li>
-<li><strong>output_dir</strong>: Set a default output directory for generated files;</li>
-<li><strong>force_flatten</strong>: Overrides the force_flatten flag of all minizinc calls;</li>
-<li><strong>no_output_annotations</strong>: Overrides the no_output_annotation flag of all
-minizinc calls;</li>
+<li><strong>include</strong>: List of search paths to include in all minizinc calls;</li>
+<li><strong>keep</strong>: Overrides the keep flag of all minizinc calls;</li>
 <li><strong>dzn_width</strong>: The horizontal character limit for dzn files;
 This property is used to wrap long dzn statements when writing dzn files.
-This property is also used in the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function as a limit to
-decide whether to write the inline data into a file.</li>
+This property is also used in the minizinc function as a limit to decide
+whether to write the inline data into a file.</li>
 </ul>
 </div></blockquote>
 <p>One can also set custom properties to be used for custom solvers.</p>
+<p>The configuration of PyMzn can be made permanent by using the <cite>dump</cite> function of
+the <cite>config</cite> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation, as well as loading the saved configuration file, requires the
+<cite>appdirs</cite> and <cite>pyyaml</cite> libraries to be installed on your system.</p>
 <div class="section" id="debug">
 <h2>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
 <p>PyMzn can also be set to print debugging messages on standard output via:</p>
@@ -238,8 +210,7 @@ decide whether to write the inline data into a file.</li>
 <p>This function is meant to be used in interactive sessions or in
 applications that do not configure the <code class="docutils literal notranslate"><span class="pre">logging</span></code> library. If you configure the
 <code class="docutils literal notranslate"><span class="pre">logging</span></code> library in your application, then PyMzn will print logging messages
-as well. The logging level in PyMzn is always <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>. To disable debugging
-messages you can then call:</p>
+as well. To disable debugging messages you can then call:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -248,18 +219,14 @@ messages you can then call:</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/pymzn.config.get.html" class="btn btn-neutral float-right" title="pymzn.config.get" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="generated/pymzn.process.Process.stop.html" class="btn btn-neutral" title="pymzn.process.Process.stop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="templates/generated/pymzn.templates.add_path.html" class="btn btn-neutral float-left" title="pymzn.templates.add_path" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -268,11 +235,11 @@ messages you can then call:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Paolo Dragone (MIT Licence).
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -285,36 +252,15 @@ messages you can then call:</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.17.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

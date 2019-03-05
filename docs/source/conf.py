@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -6,6 +5,7 @@ import re
 import sys
 import codecs
 
+sys.path.insert(0, os.path.abspath('../../'))
 here = os.path.abspath(os.path.dirname(__file__))
 
 def find_version(*parts):
@@ -22,38 +22,41 @@ def find_version(*parts):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+project = 'PyMzn'
+copyright = '2016, Paolo Dragone (MIT License)'
+author = 'Paolo Dragone'
 
-sys.path.insert(0, os.path.abspath('../../'))
+version = find_version('..', '..', 'pymzn', '__init__.py')
+release = find_version('..', '..', 'pymzn', '__init__.py')
 
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon'
-    # 'numpydoc'
 ]
 
 autosummary_generate = True
-# numpydoc_show_class_members = False
 
 templates_path = ['_templates']
-exclude_patterns = []
-
 source_suffix = '.rst'
 master_doc = 'index'
-html_theme = 'sphinx_rtd_theme'
 
 language = None
-today_fmt = '%B %d, %Y'
-default_role = 'autolink'
+
+exclude_patterns = []
+
 pygments_style = 'sphinx'
-todo_include_todos = False
+html_theme = 'sphinx_rtd_theme'
+# html_theme_options = {}
+html_static_path = ['_static']
+html_copy_source = False
+
 htmlhelp_basename = 'pymzn'
 
-project = 'PyMzn'
-copyright = '2017, Paolo Dragone (MIT Licence)'
-author = 'Paolo Dragone'
+latex_elements = {
+}
 
-version = find_version('..', '..', 'pymzn', '__init__.py')
-release = find_version('..', '..', 'pymzn', '__init__.py')
-print(version)
+latex_documents = [
+    (master_doc, 'pymzn.tex', 'PyMzn Documentation', 'Paolo Dragone', 'manual'),
+]
 
