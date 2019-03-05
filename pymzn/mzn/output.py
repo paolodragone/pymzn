@@ -19,6 +19,8 @@ ERROR = '=====ERROR====='
 
 
 class Status(IntEnum):
+    """Status of the solution stream."""
+
     COMPLETE = 0
     INCOMPLETE = 1
     UNKNOWN = 2
@@ -29,17 +31,7 @@ class Status(IntEnum):
 
 
 class Solutions:
-    """Represents a solution stream from the `minizinc` function.
 
-    This class populates lazily but can be referenced and iterated as a list.
-
-    Attributes
-    ----------
-    complete : bool
-        Whether the stream includes the complete set of solutions. This means
-        the stream contains all solutions in a satisfiability problem, or it
-        contains the global optimum for maximization/minimization problems.
-    """
     def __init__(self, queue, *, keep=True):
         self._queue = queue
         self._keep = keep
