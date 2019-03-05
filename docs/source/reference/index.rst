@@ -12,3 +12,4 @@ This is the reference manual of PyMzn.
    templates/index
    aio
    config
+   exec
