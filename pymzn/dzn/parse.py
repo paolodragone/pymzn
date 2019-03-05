@@ -11,7 +11,10 @@ from .marsh import rebase_array
 __all__ = ['IntSet', 'FloatSet', 'parse_value', 'dzn2dict']
 
 
+#: Representation of a contiguous integer set
 IntSet = namedtuple('IntSet', ['lb', 'ub'])
+
+#: Representation of a contiguous float set
 FloatSet = namedtuple('FloatSet', ['lb', 'ub'])
 
 
@@ -382,6 +385,34 @@ def _parse_indices(st, enums=None):
 
 
 def parse_value(val, var_type=None, enums=None, rebase_arrays=True):
+    """Parses the value of a dzn statement.
+
+    Parameters
+    ----------
+    val : str
+        A value in dzn format.
+    var_type : dict
+        The dictionary of variable type as returned by the command ``minizinc
+        --model-types-only``. Default is None, in which case the type of the
+        variable is inferred from its value. To parse an enum value as a Python
+        enum type its ``var_type`` is required, otherwise the value is simply
+        returned as a string.
+    enums : dict of IntEnum
+        A dictionary containing Python enums, with their respective names as
+        keys. These enums are available to the parser to convert enum values
+        into corresponding values of their respective enum types. Enum values
+        can only be parsed if also the ``var_type`` of the variable is
+        available.
+    rebase_arrays : bool
+        If the parsed value is an array and ``rebase_arrays`` is True, return it
+        as zero-based lists. If ``rebase_arrays`` is False, instead, return it
+        as a dictionary, preserving the original index-set.
+
+    Returns
+    -------
+    object
+        The parsed object. The type of the object depend on the dzn value.
+    """
 
     if not var_type:
         p_val = _parse_array(
@@ -409,6 +440,11 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
     rebase_arrays : bool
         Whether to return arrays as zero-based lists or to return them as
         dictionaries, preserving the original index-sets.
+    types : dict
+        Dictionary of variable types, as returned by the ``minizinc
+        --model-types-only``. Default is None, in which case the type of most
+        dzn assignments will be inferred automatically from the value. Enum
+        values can only be parsed if their respective types are available.
 
     Returns
     -------

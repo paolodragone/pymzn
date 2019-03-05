@@ -257,8 +257,8 @@ def stmt2dzn(name, val, declare=True, assign=True, wrap=True):
         Whether to include the declaration of the variable in the statement or
         just the assignment.
     assign : bool
-        Wheter to include assignment of the value in the statement or just the
-        declaration.
+        Wheter to include the assignment of the value in the statement or just
+        the declaration.
     wrap : bool
         Whether to wrap the serialized value.
 
@@ -285,6 +285,26 @@ def stmt2dzn(name, val, declare=True, assign=True, wrap=True):
 
 
 def stmt2enum(enum_type, declare=True, assign=True, wrap=True):
+    """Returns a dzn enum declaration from an enum type.
+
+    Parameters
+    ----------
+    enum_type : Enum
+        The enum to serialize.
+    declare : bool
+        Whether to include the ``enum`` declatation keyword in the statement or
+        just the assignment.
+    assign : bool
+        Wheter to include the assignment of the enum in the statement or just
+        the declaration.
+    wrap : bool
+        Whether to wrap the serialized enum.
+
+    Returns
+    -------
+    str
+        The serialized dzn representation of the enum.
+    """
 
     if not (declare or assign):
         raise ValueError(
@@ -328,10 +348,13 @@ def dict2dzn(
         of the variables.
     declare : bool
         Whether to include the declaration of the variable in the statements or
-        just the assignment. (Default is False for backward compatibility)
+        just the assignment. (Default is False)
     assign : bool
-        Wheter to include assignment of the value in the statements or just the
+        Whether to include assignment of the value in the statements or just the
         declaration.
+    declare_enums : bool
+        Whether to declare the enums found as types of the objects to serialize.
+        (Default is True)
     wrap : bool
         Whether to wrap the serialized values.
     fout : str
