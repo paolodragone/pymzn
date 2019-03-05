@@ -36,8 +36,8 @@ You can solve the above problem using the `pymzn.minizinc` function:
 
 ```
     import pymzn
-    s = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
-    print(s)
+    solns = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
+    print(solns)
 ```
 
 The result will be:
@@ -102,9 +102,9 @@ from PyMzn 0.18.0, the minimum MiniZinc version required is the 2.2.0. If you
 need to work with previous versions of MiniZinc, PyMzn 0.17.1 should work fine.
 
 The easiest way to install MiniZinc is to download the
-[MiniZincIDE](https://github.com/MiniZinc/MiniZincIDE>) package, which
+[MiniZincIDE](https://github.com/MiniZinc/MiniZincIDE) package, which
 contains both the MiniZinc binaries and several solvers. After downloading the
-package, make sure the executables are visible to PyMzn by either setting the
+package, make sure the executables are visible to PyMzn either by setting the
 `PATH` environment variable or by configuring it using the `pymzn.config`
 module.
 
