@@ -43,6 +43,20 @@ class CompletedProcessWrapper:
 
 
 def run_process(*args, input=None):
+    """Run an external process.
+
+    Parameters
+    ----------
+    *args : list of str
+        The arguments to pass to the external process. The first argument should
+        be the executable to call.
+    input : str or bytes
+        The input stream to supply to the extenal process.
+
+    Return
+    ------
+        Object wrapping the executed process.
+    """
     shell = os.name == 'nt'
     start_time = _time()
     cp = subprocess.run(
