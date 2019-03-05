@@ -1,35 +1,66 @@
 # -*- coding: utf-8 -*-
 """\
 PyMzn interfaces with solvers through the ``Solver`` base class. This class
-includes the necessary infomation for PyMzn to setup the solver, together with
-the ``solve`` method, which respectively take care of the running or
-asynchronously starting a process that solves the MiniZinc/FlatZinc model. PyMzn
-provides a number of solver implementations out-of-the-box.  PyMzn's default
-solver is ``pymzn.gecode``, an instance of `pymzn.Gecode`.
+includes the necessary infomation for PyMzn to setup the solver, and provides
+two main functions to support custom solver arguments and parsing the solution
+stream of the solver.
 
-To use a solver that is not provided by PyMzn or to exend an existing one, one
+PyMzn provides a number of solver implementations out-of-the-box.  PyMzn's
+default solver is ``pymzn.gecode``, an instance of `pymzn.Gecode`.
+
+To use a solver that is not provided by PyMzn or to extend an existing one, one
 has to subclass the `Solver` class and implement the ``args`` method, which
-returns a list of command line arguments for executing the process. This is
-generally enough for most solvers, but you can also directly reimplement the
-``solve`` method for extra flexibility.
+returns a list of command line arguments for executing the process. The
+command line arguments supported by this function have to be paired with proper
+``extraFlags`` in the solver configuration file (see the `solver configuration
+files page
+<https://www.minizinc.org/doc-latest/en/fzn-spec.html#solver-configuration-files>`__
+from the MiniZinc reference manual for additional details).
 
-For instance::
+For instance, suppose you have the following configuration file for an external
+solver, ``my_solver.msc``::
+
+    {
+      "name" : "My Solver",
+      "version": "1.0",
+      "id": "org.myorg.my_solver",
+      "executable": "fzn-mysolver"
+    }
+
+You want to support the command line argument ``--solve-twice-as-fast``. First
+you need to add the flag into the solver configuration file::
+
+    {
+      "name" : "My Solver",
+      "version": "1.0",
+      "id": "org.myorg.my_solver",
+      "executable": "fzn-mysolver",
+      "extraFlags": [
+          ["--solve-twice-as-fast", "provides twofold speedup", "bool", "false"]
+      ]
+    }
+
+Next, you need to subclass the ``Solver`` class and provide an alternative
+implementation to the ``args`` function::
 
     from pymzn import Solver
-    from pymzn.process import Process
 
     class MySolver(Solver):
-        def __init__(self, path='path/to/solver', globals_dir='path/to/gobals'):
-            super().__init__(globals_dir)
+        def __init__(self):
+            super().__init__(solver_id='my_solver')
             self.cmd = path
 
-        def args(self, fzn_file, *args, arg1=val1, arg2=val2, **kwargs):
-            return [self.cmd, '-arg1', arg1, '-arg2', arg2, fzn_file]
+        def args(self, solve_twice_as_fast=False, **kwargs):
+            args = super().args(**kwargs)
+            if solve_twice_as_fast:
+                args.append('--solve-twice-as-fast')
+            return args
 
-Then it is possible to run the ``minizinc`` function with the custom solver::
+It is then possible to run the ``minizinc`` function with the custom solver::
 
     my_solver = MySolver()
-    pymzn.minizinc('test.mzn', solver=my_solver, arg1=val1, arg2=val2)
+    pymzn.minizinc('test.mzn', solver=my_solver, solve_twice_as_fast=True)
+
 """
 
 import re
@@ -124,6 +155,7 @@ class Solver:
                     line = yield line
 
     def parser(self):
+        """This function should return a new instance of the solver parser."""
         return Solver.Parser()
 
 
