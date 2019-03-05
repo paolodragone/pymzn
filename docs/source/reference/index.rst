@@ -10,4 +10,5 @@ This is the reference manual of PyMzn.
    dzn/index
    solvers/index
    templates/index
+   aio
    config
