@@ -56,12 +56,14 @@ def main():
             solns.print(output_file=out, statistics=statistics)
         out.close()
 
-    def _config(key, value=None, delete=False, **__):
-        if delete:
+    def _config(key=None, value=None, delete=False, **__):
+        if not key:
+            print('\n'.join(list(config.keys())))
+        elif delete:
             del config[key]
             config.dump()
         elif value is None:
-            print('{} : {}'.format(key, config.get(key)))
+            print('{} : "{}"'.format(key, config.get(key)))
         else:
             config[key] = value
             config.dump()
@@ -199,7 +201,7 @@ def main():
         'config', help='config pymzn variables'
     )
     config_parser.add_argument(
-        'key', help='the property to get/set'
+        'key', nargs='?', help='the property to get/set'
     )
     config_parser.add_argument(
         '-d', '--delete', action='store_true', help='delete a key'
@@ -212,7 +214,12 @@ def main():
     args = parser.parse_args()
 
     debug(args.verbose)
-    args.func(**{**vars(args), **args.solver_args})
+
+    args = vars(args)
+    if 'solver_args' in args:
+        args.extend(args['solver_args'])
+
+    args['func'](**args)
 
 
 if __name__ == '__main__':
