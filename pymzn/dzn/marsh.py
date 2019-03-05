@@ -345,12 +345,17 @@ def dict2dzn(
     log = logging.getLogger(__name__)
 
     vals = []
+    enums = set()
     for key, val in objs.items():
         if _is_enum(val) and declare_enums:
-            enum_stmt = stmt2enum(
-                type(val), declare=declare, assign=assign, wrap=wrap
-            )
-            vals.append(enum_stmt)
+            enum_type = type(val)
+            enum_name = enum_type.__name__
+            if enum_name not in enums:
+                enum_stmt = stmt2enum(
+                    enum_type, declare=declare, assign=assign, wrap=wrap
+                )
+                vals.append(enum_stmt)
+                enums.add(enum_name)
         stmt = stmt2dzn(key, val, declare=declare, assign=assign, wrap=wrap)
         vals.append(stmt)
 
