@@ -550,7 +550,7 @@ def _solve_args(
             args.append('-O{}'.format(two_pass))
 
     if pre_passes:
-        args += ['--pre-passes', pre_passes]
+        args += ['--pre-passes', str(pre_passes)]
 
     if output_objective:
         args.append('--output-objective')
