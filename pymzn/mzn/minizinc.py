@@ -257,9 +257,9 @@ def _prepare_data(mzn_file, data, keep_data=False, declare_enums=True):
 
 
 def _flattening_args(
-    mzn, *dzn_files, data=None, keep=False, stdlib_dir=None,
-    globals_dir=None, output_mode='dict', include=None, no_ozn=False,
-    output_base=None, allow_multiple_assignments=False
+    mzn, *dzn_files, data=None, stdlib_dir=None, globals_dir=None,
+    output_mode='dict', include=None, no_ozn=False, output_base=None,
+    allow_multiple_assignments=False
 ):
     args = []
 
@@ -511,7 +511,7 @@ def minizinc(
 
     proc = solve(
         solver, mzn_file, *dzn_files, data=data, include=include,
-        stdlib_dir=stdlib_dir, globals_dir=globals_dir, keep=keep,
+        stdlib_dir=stdlib_dir, globals_dir=globals_dir,
         output_mode=_output_mode, timeout=timeout, two_pass=two_pass,
         pre_passes=pre_passes, output_objective=output_objective,
         non_unique=non_unique, all_solutions=all_solutions,
@@ -569,10 +569,10 @@ def _solve_args(
 
 def solve(
     solver, mzn, *dzn_files, data=None, include=None, stdlib_dir=None,
-    globals_dir=None, keep=False, output_mode='dict', timeout=None,
-    two_pass=None, pre_passes=None, output_objective=False, non_unique=False,
-    all_solutions=False, num_solutions=None, free_search=False, parallel=None,
-    seed=None, allow_multiple_assignments=False, **kwargs
+    globals_dir=None, allow_multiple_assignments=False, output_mode='item',
+    timeout=None, two_pass=None, pre_passes=None, output_objective=False,
+    non_unique=False, all_solutions=False, num_solutions=None,
+    free_search=False, parallel=None, seed=None, **kwargs
 ):
 
     args = _solve_args(
@@ -583,7 +583,7 @@ def solve(
     )
 
     args += _flattening_args(
-        mzn, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        mzn, *dzn_files, data=data, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir, output_mode=output_mode, include=include,
         allow_multiple_assignments=allow_multiple_assignments
     )
@@ -604,10 +604,10 @@ def solve(
 
 
 def mzn2fzn(
-    mzn, *dzn_files, args=None, data=None, keep=False, stdlib_dir=None,
-    globals_dir=None, output_vars=None, output_mode='dict', include=None,
-    no_ozn=False, output_base=None, declare_enums=True,
-    allow_multiple_assignments=False
+    mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
+    globals_dir=None, declare_enums=True, allow_multiple_assignments=False,
+    keep=False, output_vars=None, output_base=None, output_mode='item',
+    no_ozn=False
 ):
     """Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
     utility from libminizinc to produce a fzn and ozn files from a mzn one.
@@ -659,7 +659,7 @@ def mzn2fzn(
 
     args = ['--compile']
     args += _flattening_args(
-        mzn_file, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        mzn_file, *dzn_files, data=data, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir, output_mode=output_mode, include=include,
         no_ozn=no_ozn, output_base=output_base,
         allow_multiple_assignments=allow_multiple_assignments
