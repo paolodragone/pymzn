@@ -6,10 +6,10 @@ two main functions to support custom solver arguments and parsing the solution
 stream of the solver.
 
 PyMzn provides a number of solver implementations out-of-the-box.  PyMzn's
-default solver is ``pymzn.gecode``, an instance of `pymzn.Gecode`.
+default solver is ``pymzn.gecode``, an instance of ``pymzn.Gecode``.
 
 To use a solver that is not provided by PyMzn or to extend an existing one, one
-has to subclass the `Solver` class and implement the ``args`` method, which
+has to subclass the ``Solver`` class and implement the ``args`` method, which
 returns a list of command line arguments for executing the process. The
 command line arguments supported by this function have to be paired with proper
 ``extraFlags`` in the solver configuration file (see the `solver configuration
@@ -40,15 +40,15 @@ you need to add the flag into the solver configuration file::
       ]
     }
 
-Next, you need to subclass the ``Solver`` class and provide an alternative
-implementation to the ``args`` function::
+This will make the argument available to the ``minizinc`` executable when using
+the solver ``my_solver``. Next, to add this option to PyMzn, you need to
+subclass the ``Solver`` class and override the ``args`` function::
 
     from pymzn import Solver
 
     class MySolver(Solver):
         def __init__(self):
             super().__init__(solver_id='my_solver')
-            self.cmd = path
 
         def args(self, solve_twice_as_fast=False, **kwargs):
             args = super().args(**kwargs)
@@ -141,7 +141,7 @@ class Solver:
             by yielding empty strings instead (which will be ignored by the
             solution parser).  This function should also process the lines
             following a non-standard dzn format, substituting them with
-            equivalent standard dzn format (see e.g.  Optimathsat).  Statistics
+            equivalent standard dzn format (see e.g. Optimathsat).  Statistics
             should also be extracted, depending on the format of the solver, and
             then returned by the stats property.  Debug messages may be logged
             through the pymzn logger.
