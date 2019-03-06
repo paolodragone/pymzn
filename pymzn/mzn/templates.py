@@ -3,71 +3,54 @@
 PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
 code from the `Jinja2 <http://jinja.pocoo.org/>`_ templating language within a
 MiniZinc model to make a PyMzn template file (usually distinguished with the
-``.pmzn`` extension). An example::
+``.pmzn`` extension). An example:
 
-    %% knapsack.pmzn %%
-    int: n;                     % number of objects
-    set of int: OBJ = 1..n;
-    array[OBJ] of int: profit;  % the profit of each object
-    array[OBJ] of int: size;    % the size of each object
-    int: capacity;              % the capacity of the knapsack
+.. literalinclude:: ../../../../examples/templates/knapsack.pmzn
+  :language: pymzn
+  :caption: :download:`knapsack.pmzn <../../../../examples/templates/knapsack.pmzn>`
+  :name: ex-knapsack-comp
+  :linenos:
 
-    var set of OBJ: x;
-
-    constraint sum(i in x)(size[i]) <= capacity;
-
-    {% if with_compatibility %}
-        array[OBJ, OBJ] of bool: compatibility;
-        constraint forall(i, j in x where i != j)(
-            compatibility[i, j]
-        );
-    {% endif %}
-
-    var int: obj = sum(i in x)(profit[i]);
-
-    solve maximize obj;
-
-    output [
-        "knapsack = ", show(x), "\\n",
-        "objective = ", show(obj)
-    ];
-
-    %% knapsack.dzn %%
-    n = 5;
-    profit = [10, 3, 9, 4, 8];
-    size = [14, 4, 10, 6, 9];
-    capacity = 24;
+.. literalinclude:: ../../../../examples/templates/knapsack.dzn
+  :language: minizinc
+  :caption: :download:`knapsack.dzn <../../../../examples/templates/knapsack.dzn>`
+  :name: ex-knapsack-comp-dzn
+  :linenos:
 
 The above MiniZinc model encodes a 0-1 knapsack problem with optional
 compatibility constraint. By default the template engine argument
 ``with_compatibility`` is ``None``, so the constraint is not enabled. In this
-case, the model can be solved as usual by running::
+case, the model can be solved as usual by running:
+
+.. code-block:: python
 
     pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn')
 
-which returns::
+which returns:
+
+.. code-block:: python
 
     [{'x': {2, 3, 5}}]
 
 If we want to use the compatibility constraint, we define a compatibility
-matrix e.g. in a dzn file::
+matrix e.g. in a dzn file:
 
-    %% compatibility.dzn %%
-
-    compatibility = [|
-        true,  true, false,  true,  true |
-        true,  true, false,  true, false |
-       false, false,  true,  true,  true |
-        true,  true,  true,  true, false |
-        true, false,  true, false,  true
-    |];
+.. literalinclude:: ../../../../examples/templates/compatibility.dzn
+  :language: minizinc
+  :caption: :download:`compatibility.dzn <../../../../examples/templates/compatibility.dzn>`
+  :name: ex-knapsack-comp-dzn-comp
+  :linenos:
 
 Now it is possible to pass ``with_compatibility`` argument to ``pymzn.minizinc``
-function, along with the dzn file with the compatibility matrix::
+function, along with the dzn file with the compatibility matrix:
+
+.. code-block:: python
 
     pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn', 'compatibility.dzn', args={'with_compatibility': True})
 
-which yields::
+which yields:
+
+.. code-block:: python
 
     [{'x': {1, 5}}]
 
@@ -82,7 +65,9 @@ template inheritance, and filters. PyMzn implements few custom filters as well:
   ``{{ dzn_argument | dzn }}``
 
 To provide a custom search path to the template engine you can use the
-function ``add_path``::
+function ``add_path``:
+
+.. code-block:: python
 
     pymzn.templates.add_path('path/to/templates/directory/')
 
