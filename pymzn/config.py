@@ -22,13 +22,13 @@ The configurable properties used by PyMzn are the following:
 
 One can also set custom properties to be used for custom solvers.
 
-The configuration of PyMzn can be made permanent by using the `dump` function of
-the `config` object::
+The configuration of PyMzn can be made permanent by using the ``dump`` function
+of the ``config`` object::
 
     pymzn.config.dump()
 
 This operation, as well as loading the saved configuration file, requires the
-`appdirs` and `pyyaml` libraries to be installed on your system.
+``appdirs`` and ``pyyaml`` libraries to be installed on your system.
 
 
 Debug
