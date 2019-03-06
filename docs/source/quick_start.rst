@@ -1,34 +1,38 @@
 Quick Start
 ===========
 
+.. highlight:: minizinc
+  :linenothreshold: 5
+
 First, we need to define a constraint program via MiniZinc.
-Here is a simple 0-1 knapsack problem encoded with MiniZinc::
+Here is a simple 0-1 knapsack problem encoded with MiniZinc:
 
-    %% knapsack01.mzn %%
-    int: n;                     % number of objects
-    set of int: OBJ = 1..n;
-    int: capacity;              % the capacity of the knapsack
-    array[OBJ] of int: profit;  % the profit of each object
-    array[OBJ] of int: size;    % the size of each object
+.. literalinclude:: ../../examples/knapsack/knapsack01.mzn
+  :language: minizinc
+  :caption: :download:`knapsack01.mzn <../../examples/knapsack/knapsack01.mzn>`
+  :name: ex-knapsack
+  :linenos:
 
-    var set of OBJ: x;
-    constraint sum(i in x)(size[i]) <= capacity;
-    var int: obj = sum(i in x)(profit[i]);
-    solve maximize obj;
+And here is a data file for the above problem:
+
+.. literalinclude:: ../../examples/knapsack/knapsack01.dzn
+  :language: minizinc
+  :caption: :download:`knapsack01.dzn <../../examples/knapsack/knapsack01.dzn>`
+  :name: ex-knapsack-dzn
+  :linenos:
 
 
-    %% knapsack01.dzn %%
-    n = 5;
-    profit = [10, 3, 9, 4, 8];
-    size = [14, 4, 10, 6, 9];
+You can solve the above problem using the ``pymzn.minizinc`` function:
 
-You can solve the above problem using the ``pymzn.minizinc`` function::
+.. code-block:: python
 
     import pymzn
     solns = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
     print(solns)
 
-The result will be::
+The result will be:
+
+.. code-block:: python
 
     [{'x': {3, 5}}]
 
@@ -43,7 +47,9 @@ you can specify the ``output_mode`` argument. Possible formats are: ``dict``,
 in the input model. The ``dzn`` and ``json`` formats return strings formatted in
 dzn or json respectively. The ``raw`` format, instead, returns the output of the
 solver as a string without splitting the solutions. For instance, to get the
-solution in ``dzn`` format::
+solution in ``dzn`` format:
+
+.. code-block:: python
 
     pymzn.minizinc('test.mzn', output_mode='dzn')
 
@@ -52,18 +58,22 @@ Data
 ----
 
 It is possible to specify data (.dzn) files to the ``minizinc`` function as
-additional positional arguments::
+additional positional arguments:
+
+.. code-block:: python
 
     pymzn.minizinc('test.mzn', 'data1.dzn', 'data2.dzn')
 
 It is also possible to specify additional data inline along with the
-``minizinc`` function::
+``minizinc`` function:
+
+.. code-block:: python
 
     pymzn.minizinc('test.mzn', 'data1.dzn', 'data2.dzn', data={'n': 10, 'm': [1,3,5]})
 
 With the ``data`` argument you can specify an assignment of variables that will
 be automatically converted into dzn format with the ``pymzn.dict2dzn`` function
-(more details in the `Dzn files <reference/dzn/>`__ section).
+(more details in the `Dzn files <./reference/dzn/index.html>`__ section).
 
 
 Solver arguments
@@ -72,7 +82,9 @@ Solver arguments
 Usually, solvers provide arguments that can be used to modify their behavior.
 You can specify arguments to pass to the solver as additional keyword arguments
 in the ``minizinc`` function. For instance, adding the ``parallel`` argument,
-you can specify how many threads should the solver use::
+you can specify how many threads should the solver use:
+
+.. code-block:: python
 
     pymzn.minizinc('test.mzn', parallel=4)
 

@@ -1,15 +1,19 @@
 Install
 =======
 
-PyMzn can be installed via Pip::
+PyMzn can be installed via Pip:
 
-    pip install pymzn
+.. code-block:: shell
+
+    $ pip install pymzn
 
 
 or from the source code available
-on `GitHub <https://github.com/paolodragone/pymzn/releases/latest>`__::
+on `GitHub <https://github.com/paolodragone/pymzn/releases/latest>`__:
 
-    python setup.py install
+.. code-block:: shell
+
+    $ python setup.py install
 
 
 Requirements
@@ -37,9 +41,11 @@ Optional dependencies
 PyMzn offers the possibility of using `Jinja2
 <http://jinja.pocoo.org/docs/intro/#installation>`__ syntax for templating
 MiniZinc code (see `Templates <./reference/templates/index.html>`__). To use
-templates you need to install Jinja2. You can do that via Pip::
+templates you need to install Jinja2. You can do that via Pip:
 
-    pip install Jinja2
+.. code-block:: shell
+
+    $ pip install Jinja2
 
 Check out Jinja's `installation
 <http://jinja.pocoo.org/docs/intro/#installation>`__ for details.
@@ -47,9 +53,11 @@ Check out Jinja's `installation
 To be able to set custom configuration for PyMzn (see `Configuration
 <./reference/config.html>`__) you need to install the `PyYAML
 <https://pyyaml.org/wiki/PyYAML>`__ and `appdirs
-<https://github.com/ActiveState/appdirs>`__ packages::
+<https://github.com/ActiveState/appdirs>`__ packages:
 
-    pip install pyyaml appdirs
+.. code-block:: shell
+
+    $ pip install pyyaml appdirs
 
 
 Install additional solvers
@@ -61,9 +69,11 @@ solvers. For more detailed information follow this `guide
 <https://www.minizinc.org/doc-2.2.3/en/command_line.html#adding-solvers>`__ from
 the MiniZinc user manual. Generally, any solver available to the ``minizinc``
 executable will be available to PyMzn as well. You can check which solvers are
-installed by running the command::
+installed by running the command:
 
-    minizinc --solvers
+.. code-block:: shell
+
+    $ minizinc --solvers
 
 For MiniZinc versions prior to the 2.2.0 and PyMzn versions prior to the 0.18.0,
 you will need to install the solver and make sure that the path of the
