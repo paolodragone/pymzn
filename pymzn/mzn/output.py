@@ -102,13 +102,12 @@ class Solutions:
             print(soln, file=output_file)
             print(SOLN_SEP, file=output_file)
 
-        if self.status <= 1:
-            if self.status == 0:
-                print(SEARCH_COMPLETE, file=output_file)
-            if statistics:
-                print(str(self.statistics), file=output_file)
-        else:
+        if self.status == 0:
+            print(SEARCH_COMPLETE, file=output_file)
+
+        if (self.status == 1 and self._n_solns == 0) or self.status >= 2:
             print({
+                Status.INCOMPLETE : ERROR,
                 Status.UNKNOWN: UNKNOWN,
                 Status.UNSATISFIABLE: UNSATISFIABLE,
                 Status.UNBOUNDED: UNBOUNDED,
@@ -117,7 +116,10 @@ class Solutions:
             }[self.status], file=output_file)
 
             if self.stderr:
-                print(self.stderr, file=sys.stderr)
+                print(self.stderr.strip(), file=sys.stderr)
+
+        elif statistics:
+            print(str(self.statistics), file=output_file)
 
 
 class SolutionParser:
