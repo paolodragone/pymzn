@@ -114,7 +114,7 @@ class Solutions:
                 Status.UNBOUNDED: UNBOUNDED,
                 Status.UNSATorUNBOUNDED: UNSATorUNBOUNDED,
                 Status.ERROR: ERROR
-            }[solns.status], file=output_file)
+            }[self.status], file=output_file)
 
             if self.stderr:
                 print(self.stderr, file=sys.stderr)
