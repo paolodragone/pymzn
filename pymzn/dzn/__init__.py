@@ -1,5 +1,4 @@
-"""
-
+"""\
 PyMzn provides a set of functions to deal with dzn encoded strings and
 files. Using these functions it is possible to serialize Python objects
 into dzn format and vice-versa. For instance, the ``pymzn.dict2dzn`` function
@@ -19,13 +18,13 @@ statements.
 
     pymzn.dict2dzn(data, fout='path/to/dzn')
 
-The supported types of python objects are: \* Booleans \* Integers \*
-Floats \* Sets \* Multi-dimensional arrays: \* lists are converted into
-dzn arrays with index-set 1..len(list); \* dicts are converted into dzn
-arrays with index-set equal to the key-set of the dict, provided that
-the index-set is contiguous; \* nested combinations of the previous two,
-provided that the children of every node have the same index-set. The
-maximum depth is 6.
+The supported types of python objects are: ``bool``, ``int``, ``float``,
+``set``, ``list``, ``dict``. Lists are converted into dzn arrays with index-set
+``1 .. len(list)``. Nested lists can be cast into MiniZinc multi-dimensional
+array as well. Dictionaries are converted into dzn arrays with index-set equal
+to the key-set of the dictionaryy, provided that the index-set is contiguous.
+Nested combinations of the previous two are also allowed, provided that the
+children of every node have the same index-set. The maximum depth is 6.
 
 To evaluate back from dzn to python objects you can use the
 ``pymzn.dzn2dict`` function, which takes as input a dzn formatted
@@ -51,18 +50,18 @@ will return::
 which is identical to the object we serialized in the previous example.
 
 In general, there is a one to one translation from python objects to dzn and
-back, with the only exception of arrays with index-sets not based in 1. Arrays
-and matrices based in 1 are translated into lists instead of dictionaries with
+back, with the only exception of arrays with index-sets not based at 1. Arrays
+and matrices based at 1 are translated into lists instead of dictionaries with
 explicit keys. For instance::
 
     pymzn.dict2dzn({'a': {1: 2, 2: 4, 3: 6}})
-    # returns: ['a = array1d(1..3, [2, 4, 6]);']
+    # ['a = array1d(1..3, [2, 4, 6]);']
 
 but when translating back the array, whose index-set is based in 1, will be
 translated into a list::
 
     pymzn.dzn2dict('a = array1d(1..3, [2, 4, 6]);')
-    # returns: {'a': [2, 4, 6]}
+    # {'a': [2, 4, 6]}
 
 If you wish to avoid this behavior and get all arrays as dictionaries then you
 can specify ``rebase_arrays=False`` as argument to the ``pymzn.dzn2dict``
@@ -74,7 +73,7 @@ the index-sets in the dictionary representation of the array (matrix) and
 transform it into a list (list of lists). For instance::
 
     pymzn.rebase_array({3: {2: 1, 3: 2, 4: 3}, 4: {1: 2, 2: 3}}, recursive=True)
-    # returns: [[1, 2, 3], [2, 3]]
+    # [[1, 2, 3], [2, 3]]
 
 """
 
