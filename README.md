@@ -2,7 +2,7 @@ PyMzn
 =====
 
 **PyMzn** is a Python library that wraps and enhances the
-[MiniZinc](http://minzinc.org>) tools for constraint programming. PyMzn is built
+[MiniZinc](http://minizinc.org) tools for constraint programming. PyMzn is built
 on top of the [minizinc](https://github.com/MiniZinc/MiniZincIDE) toolkit and
 provides a number of off-the-shelf functions to readily solve problems encoded
 with the MiniZinc language and return solutions as Python dictionaries.
@@ -12,7 +12,7 @@ Usage
 First, we need to define a constraint program via MiniZinc.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc:
 
-```
+``` minizinc
     %% knapsack01.mzn %%
     int: n;                     % number of objects
     set of int: OBJ = 1..n;
@@ -34,7 +34,7 @@ Here is a simple 0-1 knapsack problem encoded with MiniZinc:
 
 You can solve the above problem using the `pymzn.minizinc` function:
 
-```
+``` python3
     import pymzn
     solns = pymzn.minizinc('knapsack01.mzn', 'knapsack01.dzn', data={'capacity': 20})
     print(solns)
@@ -42,7 +42,7 @@ You can solve the above problem using the `pymzn.minizinc` function:
 
 The result will be:
 
-```
+``` python3
     [{'x': {3, 5}}]
 ```
 
@@ -61,10 +61,8 @@ PyMzn is also able to:
 * Preprocess MiniZinc models (a.k.a. [dynamic
   modelling](http://paolodragone.com/pymzn/reference/model/)) by embedding code
   from the [Jinja2](http://jinja.pocoo.org/) templating language;
-* Safely
-  [parallelize](http://paolodragone.com/pymzn/reference/serialization.html)
-  several instances of the same problem;
-* Concurrent MiniZinc execution using Python coroutines.
+* Perform [concurrent](http://paolodragone.com/pymzn/reference/aio) MiniZinc
+  execution using Python coroutines.
 
 For a follow-up of the previous example, read the
 [Quick Start guide](http://paolodragone.com/pymzn/quick_start.html).
@@ -78,14 +76,14 @@ Install
 
 PyMzn can be installed via Pip:
 
-```
+``` bash
     pip install pymzn
 ```
 
 or from the source code available
 on [GitHub](https://github.com/paolodragone/pymzn/releases/latest):
 
-```
+``` bash
     python setup.py install
 ```
 
@@ -118,17 +116,6 @@ Optional dependencies include:
 * [PyYAML](https://pyyaml.org/wiki/PyYAML) and
   [appdirs](https://github.com/ActiveState/appdirs), for loading and saving
   configuration files.
-
-Contribute
-----------
-
-If you find a bug or think of a useful feature, please submit an issue on the
-[GitHub page](https://github.com/paolodragone/pymzn/) of PyMzn.
-
-Pull requests are very welcome too. If you are interested in contributing to the
-PyMzn source code, read about its
-[implementation details](http://paolodragone.com/pymzn/reference/internal.html).
-
 
 Author
 ------
