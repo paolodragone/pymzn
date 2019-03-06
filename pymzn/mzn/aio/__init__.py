@@ -12,31 +12,19 @@ To use the ``minizinc`` coroutine, you need to have an event loop running in the
 main thread of your application. Awaiting the ``minizinc`` coroutine produces a
 lazy solution stream that, when addressed or iterated over returns all the
 solutions found so far by the solver. The following is a full example of how to
-use the ``minizinc`` coroutine::
+use the ``minizinc`` coroutine:
 
-    %% async.mzn %%
+.. literalinclude:: ../../../examples/asyncronous/async.mzn
+  :language: minizinc
+  :caption: :download:`async.mzn <../../../examples/asyncronous/async.mzn>`
+  :name: ex-async-mzn
+  :linenos:
 
-    % Make it a large domain to simulate a long solving process
-    var 0 .. 1000000: x;
-    solve satisfy;
-
-
-    ## async_test.py ##
-
-    import asyncio
-
-    import pymzn
-    from pymzn.aio import minizinc
-
-    async def main():
-        solns = await minizinc('async.mzn', all_solutions=True, keep_solutions=False)
-        while solns.status is not pymzn.Status.COMPLETE:
-            await asyncio.sleep(1)
-            for i, soln in enumerate(solns):
-                if i == 0:
-                    print(soln)
-
-    asyncio.run(main())
+.. literalinclude:: ../../../examples/asyncronous/async_test.py
+  :language: python
+  :caption: :download:`async.mzn <../../../examples/asyncronous/async_test.py>`
+  :name: ex-async
+  :linenos:
 
 This code will execute the ``main`` coroutine, which calls ``minizinc`` to find
 all solutions of the ``async.mzn`` file. The option ``keep_solutions`` is set to
