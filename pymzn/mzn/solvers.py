@@ -90,8 +90,8 @@ class Solver:
     ):
         """Returns a list of command line arguments for the specified options.
 
-        In all cases, this function should always add options to display
-        statistics.
+        If the solver parser is able to parse statistics, this function should
+        always add options to display statistics.
 
         Parameters
         ----------
@@ -107,7 +107,7 @@ class Solver:
         seed : int
             The random number generator seed to pass to the solver.
         """
-        args = ['-s']
+        args = []
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
@@ -241,7 +241,7 @@ class Gurobi(MIPSolver):
         self, all_solutions=False, num_solutions=None, free_search=False,
         parallel=None, seed=None, **kwargs
     ):
-        args = ['-s', '-v']
+        args = []
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
