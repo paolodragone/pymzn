@@ -41,6 +41,7 @@ async def minizinc(
     seed=None, rebase_arrays=True, keep_solutions=True, declare_enums=True,
     allow_multiple_assignments=False, **kwargs
 ):
+    """Coroutine version of the ``minizinc`` function."""
 
     mzn_file, dzn_files, data_file, data, keep, _output_mode, types = \
         _minizinc_preliminaries(
