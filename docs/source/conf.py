@@ -5,6 +5,7 @@ import re
 import sys
 import codecs
 
+sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../../'))
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -45,7 +46,7 @@ language = None
 
 exclude_patterns = []
 
-pygments_style = 'sphinx'
+pygments_style = 'manni'
 html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {}
 html_static_path = ['_static']
@@ -59,4 +60,12 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'pymzn.tex', 'PyMzn Documentation', 'Paolo Dragone', 'manual'),
 ]
+
+
+def setup(sphinx):
+    from minizinc_lexer import MznLexer
+    from pymzn_lexer import PyMznLexer
+    sphinx.add_lexer("minizinc", MznLexer())
+    sphinx.add_lexer("pymzn", PyMznLexer())
+    sphinx.add_stylesheet("style.css")
 
