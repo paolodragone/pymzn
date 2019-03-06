@@ -18,7 +18,9 @@ files page
 from the MiniZinc reference manual for additional details).
 
 For instance, suppose you have the following configuration file for an external
-solver, ``my_solver.msc``::
+solver, ``my_solver.msc``:
+
+.. code-block:: json
 
     {
       "name" : "My Solver",
@@ -28,7 +30,9 @@ solver, ``my_solver.msc``::
     }
 
 You want to support the command line argument ``--solve-twice-as-fast``. First
-you need to add the flag into the solver configuration file::
+you need to add the flag into the solver configuration file:
+
+.. code-block:: json
 
     {
       "name" : "My Solver",
@@ -42,7 +46,10 @@ you need to add the flag into the solver configuration file::
 
 This will make the argument available to the ``minizinc`` executable when using
 the solver ``my_solver``. Next, to add this option to PyMzn, you need to
-subclass the ``Solver`` class and override the ``args`` function::
+subclass the ``Solver`` class and override the ``args`` function:
+
+.. code-block:: python
+   :linenos:
 
     from pymzn import Solver
 
@@ -56,7 +63,9 @@ subclass the ``Solver`` class and override the ``args`` function::
                 args.append('--solve-twice-as-fast')
             return args
 
-It is then possible to run the ``minizinc`` function with the custom solver::
+It is then possible to run the ``minizinc`` function with the custom solver:
+
+.. code-block:: python
 
     my_solver = MySolver()
     pymzn.minizinc('test.mzn', solver=my_solver, solve_twice_as_fast=True)
