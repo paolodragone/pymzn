@@ -291,7 +291,7 @@ def _prepare_data(mzn_file, data, keep_data=False, declare_enums=True):
     elif not isinstance(data, list):
         raise TypeError('The additional data provided is not valid.')
 
-    if keep_data or sum(map(len, data)) >= config.dzn_width:
+    if keep_data or sum(map(len, data)) >= int(config.dzn_width):
         mzn_base, __ = os.path.splitext(mzn_file)
         data_file = mzn_base + '_data.dzn'
         with open(data_file, 'w') as f:
