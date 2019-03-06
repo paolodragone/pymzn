@@ -20,7 +20,7 @@ def _get_wrapper():
     global _wrapper
     if not _wrapper:
         _wrapper = TextWrapper(
-            width=config.dzn_width, subsequent_indent=' '*4,
+            width=int(config.dzn_width), subsequent_indent=' '*4,
             break_long_words=False, break_on_hyphens = False
         )
     return _wrapper
