@@ -213,8 +213,9 @@ def _dzn_type(val):
 
 
 def val2dzn(val, wrap=True):
-    """Serializes a value (bool, int, float, set, array) into its dzn
-    representation.
+    """Serializes a value into its dzn representation.
+
+    The supported types are ``bool``, ``int``, ``float``, ``set``, ``array``.
 
     Parameters
     ----------
@@ -334,12 +335,12 @@ def dict2dzn(
     objs, declare=False, assign=True, declare_enums=True, wrap=True, fout=None
 ):
     """Serializes the objects in input and produces a list of strings encoding
-    them into dzn format. Optionally, the produced dzn is written in a file.
+    them into dzn format. Optionally, the produced dzn is written on a file.
 
-    Supported types of objects include: str, int, float, set, list or dict.
-    List and dict are serialized into dzn (multi-dimensional) arrays. The
-    key-set of a dict is used as index-set of dzn arrays. The index-set of a
-    list is implicitly set to 1..len(list).
+    Supported types of objects include: ``str``, ``int``, ``float``, ``set``,
+    ``list`` or ``dict``. List and dict are serialized into dzn
+    (multi-dimensional) arrays. The key-set of a dict is used as index-set of
+    dzn arrays. The index-set of a list is implicitly set to ``1 .. len(list)``.
 
     Parameters
     ----------
@@ -348,13 +349,13 @@ def dict2dzn(
         of the variables.
     declare : bool
         Whether to include the declaration of the variable in the statements or
-        just the assignment. (Default is False)
+        just the assignment. Default is ``False``.
     assign : bool
         Whether to include assignment of the value in the statements or just the
         declaration.
     declare_enums : bool
         Whether to declare the enums found as types of the objects to serialize.
-        (Default is True)
+        Default is ``True``.
     wrap : bool
         Whether to wrap the serialized values.
     fout : str
