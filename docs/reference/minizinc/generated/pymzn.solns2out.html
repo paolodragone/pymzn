@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pymzn.MiniZincError" href="pymzn.MiniZincError.html" />
@@ -98,7 +99,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -172,7 +175,7 @@
 <dl class="function">
 <dt id="pymzn.solns2out">
 <code class="descclassname">pymzn.</code><code class="descname">solns2out</code><span class="sig-paren">(</span><em>stream</em>, <em>ozn_file</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.solns2out" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wraps the solns2out utility, executes it on the solution stream, and
+<dd><p>Wraps the <code class="docutils literal notranslate"><span class="pre">solns2out</span></code> utility, executes it on the solution stream, and
 then returns the output stream.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -181,7 +184,7 @@ then returns the output stream.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>stream</strong> (<em>str</em>) – A solution stream. It may be a solution stream saved by a previous call
 to minizinc.</li>
-<li><strong>ozn_file</strong> (<em>str</em>) – The ozn file path produced by the mzn2fzn function.</li>
+<li><strong>ozn_file</strong> (<em>str</em>) – The path to the <code class="docutils literal notranslate"><span class="pre">.ozn</span></code> file produced by the <code class="docutils literal notranslate"><span class="pre">mzn2fzn</span></code> function.</li>
 </ul>
 </td>
 </tr>

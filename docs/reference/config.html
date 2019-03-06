@@ -33,9 +33,11 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="pymzn.templates.add_path" href="templates/generated/pymzn.templates.add_path.html" /> 
+    <link rel="next" title="PyMzn executable" href="exec.html" />
+    <link rel="prev" title="pymzn.aio.minizinc" href="generated/pymzn.aio.minizinc.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,10 +93,12 @@
 <li class="toctree-l2"><a class="reference internal" href="dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#debug">Debug</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -173,8 +177,7 @@
 </table>
 <span class="target" id="module-pymzn.config"></span><p>PyMzn can be configured with custom executable paths and other variables.
 Configuration is done via the <code class="docutils literal notranslate"><span class="pre">pymzn.config</span></code> object. For instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
-
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
 <span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;minizinc&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/minizinc&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -194,24 +197,24 @@ whether to write the inline data into a file.</li>
 </ul>
 </div></blockquote>
 <p>One can also set custom properties to be used for custom solvers.</p>
-<p>The configuration of PyMzn can be made permanent by using the <cite>dump</cite> function of
-the <cite>config</cite> object:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
+<p>The configuration of PyMzn can be made permanent by using the <code class="docutils literal notranslate"><span class="pre">dump</span></code> function
+of the <code class="docutils literal notranslate"><span class="pre">config</span></code> object:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>This operation, as well as loading the saved configuration file, requires the
-<cite>appdirs</cite> and <cite>pyyaml</cite> libraries to be installed on your system.</p>
+<code class="docutils literal notranslate"><span class="pre">appdirs</span></code> and <code class="docutils literal notranslate"><span class="pre">pyyaml</span></code> libraries to be installed on your system.</p>
 <div class="section" id="debug">
 <h2>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
 <p>PyMzn can also be set to print debugging messages on standard output via:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>This function is meant to be used in interactive sessions or in
 applications that do not configure the <code class="docutils literal notranslate"><span class="pre">logging</span></code> library. If you configure the
 <code class="docutils literal notranslate"><span class="pre">logging</span></code> library in your application, then PyMzn will print logging messages
 as well. To disable debugging messages you can then call:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -225,8 +228,10 @@ as well. To disable debugging messages you can then call:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="exec.html" class="btn btn-neutral float-right" title="PyMzn executable" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="templates/generated/pymzn.templates.add_path.html" class="btn btn-neutral float-left" title="pymzn.templates.add_path" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="generated/pymzn.aio.minizinc.html" class="btn btn-neutral float-left" title="pymzn.aio.minizinc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

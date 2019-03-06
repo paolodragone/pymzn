@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Manual" href="reference/index.html" />
@@ -88,7 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#solver-s-arguments">Solver’s arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solver-arguments">Solver arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">Manual</a></li>
@@ -158,83 +159,104 @@
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
 <p>First, we need to define a constraint program via MiniZinc.
 Here is a simple 0-1 knapsack problem encoded with MiniZinc:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack01</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
-<span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
-<span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
-<span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
-<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">profit</span><span class="p">;</span>  <span class="o">%</span> <span class="n">the</span> <span class="n">profit</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
-<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">size</span><span class="p">;</span>    <span class="o">%</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/20aa38ef897c1fa30066691cd72f2e25/knapsack01.mzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.mzn</span></code></a></span><a class="headerlink" href="#ex-knapsack" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">n</span><span class="p">;</span><span class="s">                     </span><span class="c">% number of objects</span><span class="s"></span>
+<span class="kt">set</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">OBJ</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">1</span><span class="o">..</span><span class="nv">n</span><span class="p">;</span><span class="s"></span>
+<span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">profit</span><span class="p">;</span><span class="s">  </span><span class="c">% the profit of each object</span><span class="s"></span>
+<span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">size</span><span class="p">;</span><span class="s">    </span><span class="c">% the size of each object</span><span class="s"></span>
+<span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">capacity</span><span class="p">;</span><span class="s">              </span><span class="c">% the capacity of the knapsack</span><span class="s"></span>
 
-<span class="n">var</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">OBJ</span><span class="p">:</span> <span class="n">x</span><span class="p">;</span>
-<span class="n">constraint</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">capacity</span><span class="p">;</span>
-<span class="n">var</span> <span class="nb">int</span><span class="p">:</span> <span class="n">obj</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">profit</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-<span class="n">solve</span> <span class="n">maximize</span> <span class="n">obj</span><span class="p">;</span>
+<span class="kt">var</span><span class="s"> </span><span class="kt">set</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="nv">OBJ</span><span class="p">:</span><span class="s"> </span><span class="nv">x</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nb">sum</span><span class="p">(</span><span class="nv">i</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="p">)(</span><span class="nv">size</span><span class="p">[</span><span class="nv">i</span><span class="p">])</span><span class="s"> </span><span class="o">&lt;=</span><span class="s"> </span><span class="nv">capacity</span><span class="p">;</span><span class="s"></span>
 
+<span class="kt">var</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">obj</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="nb">sum</span><span class="p">(</span><span class="nv">i</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="p">)(</span><span class="nv">profit</span><span class="p">[</span><span class="nv">i</span><span class="p">]);</span><span class="s"></span>
+<span class="k">solve</span><span class="s"> </span><span class="k">maximize</span><span class="s"> </span><span class="nv">obj</span><span class="p">;</span><span class="s"></span>
 
-<span class="o">%%</span> <span class="n">knapsack01</span><span class="o">.</span><span class="n">dzn</span> <span class="o">%%</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-<span class="n">profit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
-<span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">];</span>
+<span class="k">output</span><span class="s"> </span><span class="p">[</span><span class="s"></span>
+<span class="s">    &quot;knapsack = &quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">x</span><span class="p">),</span><span class="s"> &quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s"></span>
+<span class="s">    &quot;objective = &quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">obj</span><span class="p">)</span><span class="s"></span>
+<span class="p">];</span><span class="s"></span>
 </pre></div>
+</td></tr></table></div>
+</div>
+<p>And here is a data file for the above problem:</p>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack-dzn">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/ef11346e09d4d5e43e37afa051422e34/knapsack01.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-dzn" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">n</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">5</span><span class="p">;</span><span class="s"></span>
+<span class="nv">profit</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[</span><span class="m">10</span><span class="p">,</span><span class="s"> </span><span class="m">3</span><span class="p">,</span><span class="s"> </span><span class="m">9</span><span class="p">,</span><span class="s"> </span><span class="m">4</span><span class="p">,</span><span class="s"> </span><span class="m">8</span><span class="p">];</span><span class="s"></span>
+<span class="nv">size</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[</span><span class="m">14</span><span class="p">,</span><span class="s"> </span><span class="m">4</span><span class="p">,</span><span class="s"> </span><span class="m">10</span><span class="p">,</span><span class="s"> </span><span class="m">6</span><span class="p">,</span><span class="s"> </span><span class="m">9</span><span class="p">];</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
 </div>
 <p>You can solve the above problem using the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack01.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack01.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
+<span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack01.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack01.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">solns</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The result will be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}]</span>
 </pre></div>
 </div>
 <p>The returned object is a lazy solution stream, which can however be directly
 referenced as a list. The default behavior is to evaluate the solutions into
-python objects. Solutions are dictionaries containing variable assignments. The
-solution evaluation by PyMzn uses dzn as intermediate format from the solver.
-More details on how PyMzn works internally are available in the <a class="reference external" href="reference/internal">Implementation
-details</a> section).</p>
+python objects. Solutions are dictionaries containing variable assignments.</p>
 <p>If you wish to override the default behavior and get a different output format
 you can specify the <code class="docutils literal notranslate"><span class="pre">output_mode</span></code> argument. Possible formats are: <code class="docutils literal notranslate"><span class="pre">dict</span></code>,
-<code class="docutils literal notranslate"><span class="pre">item</span></code>, <code class="docutils literal notranslate"><span class="pre">dzn</span></code> and <code class="docutils literal notranslate"><span class="pre">json</span></code>. The first is the default one. The <code class="docutils literal notranslate"><span class="pre">item</span></code>
-format will return strings formatted according to the output statement in the
-input model. The <code class="docutils literal notranslate"><span class="pre">dzn</span></code> and <code class="docutils literal notranslate"><span class="pre">json</span></code> formats return strings formatted in dzn or
-json respectively. The latter two formats are only available if the solver used
-supports them.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">output_mode</span><span class="o">=</span><span class="s1">&#39;dzn&#39;</span><span class="p">)</span>
+<code class="docutils literal notranslate"><span class="pre">item</span></code>, <code class="docutils literal notranslate"><span class="pre">dzn</span></code>, <code class="docutils literal notranslate"><span class="pre">json</span></code> and <code class="docutils literal notranslate"><span class="pre">raw</span></code>. The first is the default one. The
+<code class="docutils literal notranslate"><span class="pre">item</span></code> format will return strings formatted according to the output statement
+in the input model. The <code class="docutils literal notranslate"><span class="pre">dzn</span></code> and <code class="docutils literal notranslate"><span class="pre">json</span></code> formats return strings formatted in
+dzn or json respectively. The <code class="docutils literal notranslate"><span class="pre">raw</span></code> format, instead, returns the output of the
+solver as a string without splitting the solutions. For instance, to get the
+solution in <code class="docutils literal notranslate"><span class="pre">dzn</span></code> format:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">output_mode</span><span class="o">=</span><span class="s1">&#39;dzn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="data">
 <h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to specify data (.dzn) files to the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function as
 additional positional arguments:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is also possible to specify additional data inline along with the
 <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]})</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data1.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;data2.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]})</span>
 </pre></div>
 </div>
 <p>With the <code class="docutils literal notranslate"><span class="pre">data</span></code> argument you can specify an assignment of variables that will
 be automatically converted into dzn format with the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function
-(more details in the <a class="reference external" href="reference/dzn/">Dzn files</a> section).</p>
+(more details in the <a class="reference external" href="./reference/dzn/index.html">Dzn files</a> section).</p>
 </div>
-<div class="section" id="solver-s-arguments">
-<h2>Solver’s arguments<a class="headerlink" href="#solver-s-arguments" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="solver-arguments">
+<h2>Solver arguments<a class="headerlink" href="#solver-arguments" title="Permalink to this headline">¶</a></h2>
 <p>Usually, solvers provide arguments that can be used to modify their behavior.
 You can specify arguments to pass to the solver as additional keyword arguments
-in the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function. For instance, using the argument <code class="docutils literal notranslate"><span class="pre">timeout</span></code> for
-Gecode, it will set a time cut-off (in seconds) for the problem solving:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># 30 seconds cut-off</span>
+in the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function. For instance, adding the <code class="docutils literal notranslate"><span class="pre">parallel</span></code> argument,
+you can specify how many threads should the solver use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Adding the <code class="docutils literal notranslate"><span class="pre">parallel</span></code> argument, you can specify how many threads
-should Gecode use for the problem solving:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>More details on available options are in the <a class="reference external" href="reference/solvers/">Solvers</a>
-section.</p>
+<p>Solver arguments are subject to the support of the solver. Some solver may also
+provide additional parameters. More details in the <a class="reference external" href="reference/solvers/">Solvers</a> section.</p>
 </div>
 </div>
 

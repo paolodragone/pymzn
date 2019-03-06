@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pymzn.CBC.parser" href="pymzn.CBC.parser.html" />
@@ -116,7 +117,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -193,8 +196,8 @@
 <dt id="pymzn.CBC.args">
 <code class="descclassname">CBC.</code><code class="descname">args</code><span class="sig-paren">(</span><em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.CBC.args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of command line arguments for the specified options.</p>
-<p>In all cases, this function should always add options to display
-statistics.</p>
+<p>If the solver parser is able to parse statistics, this function should
+always add options to display statistics.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

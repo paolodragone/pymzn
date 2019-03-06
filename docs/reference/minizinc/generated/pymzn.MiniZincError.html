@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Dzn files" href="../../dzn/index.html" />
@@ -98,7 +99,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -172,7 +175,21 @@
 <dl class="exception">
 <dt id="pymzn.MiniZincError">
 <em class="property">exception </em><code class="descclassname">pymzn.</code><code class="descname">MiniZincError</code><span class="sig-paren">(</span><em>mzn_file</em>, <em>args</em>, <em>stderr=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.MiniZincError" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generic error raised by the PyMzn functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mzn_file</strong> (<em>str</em>) – The MiniZinc file that generated the error.</li>
+<li><strong>args</strong> (<em>list of str</em>) – The command line arguments that generated the error.</li>
+<li><strong>stderr</strong> (<em>str</em>) – The standard error printed by the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 

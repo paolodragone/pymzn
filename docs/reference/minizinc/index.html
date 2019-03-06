@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pymzn.minizinc" href="generated/pymzn.minizinc.html" />
@@ -98,7 +99,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -174,36 +177,38 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.minizinc.html#pymzn.minizinc" title="pymzn.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;…])</td>
-<td>Implements the workflow to solve a CSP problem encoded with MiniZinc.</td>
+<td>Implements the workflow for solving a CSP problem encoded with MiniZinc.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.mzn2fzn.html#pymzn.mzn2fzn" title="pymzn.mzn2fzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mzn2fzn</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;keep,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.mzn2fzn.html#pymzn.mzn2fzn" title="pymzn.mzn2fzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mzn2fzn</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;…])</td>
 <td>Flatten a MiniZinc model into a FlatZinc one.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.solns2out.html#pymzn.solns2out" title="pymzn.solns2out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solns2out</span></code></a>(stream,&nbsp;ozn_file)</td>
-<td>Wraps the solns2out utility, executes it on the solution stream, and then returns the output stream.</td>
+<td>Wraps the <code class="docutils literal notranslate"><span class="pre">solns2out</span></code> utility, executes it on the solution stream, and then returns the output stream.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincError.html#pymzn.MiniZincError" title="pymzn.MiniZincError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincError</span></code></a>(mzn_file,&nbsp;args[,&nbsp;stderr])</td>
-<td></td>
+<td>Generic error raised by the PyMzn functions.</td>
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pymzn.mzn.minizinc"></span><p>PyMzn provides functions that mimic and enhance the tools from the libminizinc
-library. With these tools, it is possible to compile a MiniZinc model into a
-FlatZinc one, solve a given problem and get the output solutions directly into
-the python code.</p>
-<p>The main function that PyMzn provides is the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function, which
+<span class="target" id="module-pymzn.mzn.minizinc"></span><p>PyMzn provides an interface to the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable to compile a MiniZinc
+model into a FlatZinc one, solve a given problem and get back the resulting
+solutions directly as Python objects.</p>
+<p>The main function that PyMzn provides is the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function, which
 executes the entire workflow for solving a constranint program encoded in
-MiniZinc.  Solving a MiniZinc problem with PyMzn is as simple as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
+MiniZinc, just like using the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable from command line. As
+added benefit, the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function takes care of adding
+solver-dependent parameters and converts the solutions into Python dictionaries
+by default. Solving a MiniZinc problem with PyMzn is as simple as:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
 <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function is probably the way to go for most of the problems,
-but the <code class="docutils literal notranslate"><span class="pre">mzn2fzn</span></code> and <code class="docutils literal notranslate"><span class="pre">solns2out</span></code> functions are also included in the public
-API to allow for maximum flexibility. The latter two functions are wrappers of
-the two homonym MiniZinc tools for, respectively, converting a MiniZinc model
-into a FlatZinc one and getting custom output from the solution stream of a
-solver.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function is probably the way to go for most of the
+problems, but the <code class="docutils literal notranslate"><span class="pre">pymzn.mzn2fzn</span></code> and <code class="docutils literal notranslate"><span class="pre">pymzn.solns2out</span></code> functions are also
+included in the library to allow for maximum flexibility. The latter two
+functions are wrappers of the two homonym MiniZinc tools for, respectively,
+converting a MiniZinc model into a FlatZinc one and getting custom output from
+the solution stream of a solver.</p>
 </div>
 
 

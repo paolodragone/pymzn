@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pymzn.Solver" href="generated/pymzn.Solver.html" />
@@ -112,7 +113,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -243,34 +246,71 @@
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pymzn.mzn.solvers"></span><p>Provides classes to interface solvers with PyMzn.</p>
-<p>PyMzn interfaces with solvers through the <code class="docutils literal notranslate"><span class="pre">Solver</span></code> base class. This class
-includes the necessary infomation for PyMzn to setup the solver, together with
-the <code class="docutils literal notranslate"><span class="pre">solve</span></code> method, which respectively take care of the running or
-asynchronously starting a process that solves the MiniZinc/FlatZinc model. PyMzn
-provides a number of solver implementations out-of-the-box.  PyMzn’s default
-solver is <code class="docutils literal notranslate"><span class="pre">pymzn.gecode</span></code>, an instance of <cite>pymzn.Gecode</cite>.</p>
-<p>To use a solver that is not provided by PyMzn or to exend an existing one, one
-has to subclass the <cite>Solver</cite> class and implement the <code class="docutils literal notranslate"><span class="pre">args</span></code> method, which
-returns a list of command line arguments for executing the process. This is
-generally enough for most solvers, but you can also directly reimplement the
-<code class="docutils literal notranslate"><span class="pre">solve</span></code> method for extra flexibility.</p>
-<p>For instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymzn</span> <span class="k">import</span> <span class="n">Solver</span>
-<span class="kn">from</span> <span class="nn">pymzn.process</span> <span class="k">import</span> <span class="n">Process</span>
-
-<span class="k">class</span> <span class="nc">MySolver</span><span class="p">(</span><span class="n">Solver</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;path/to/solver&#39;</span><span class="p">,</span> <span class="n">globals_dir</span><span class="o">=</span><span class="s1">&#39;path/to/gobals&#39;</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">globals_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">path</span>
-
-    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fzn_file</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">arg1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="n">val2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;-arg1&#39;</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="s1">&#39;-arg2&#39;</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">fzn_file</span><span class="p">]</span>
+<span class="target" id="module-pymzn.mzn.solvers"></span><p>PyMzn interfaces with solvers through the <code class="docutils literal notranslate"><span class="pre">Solver</span></code> base class. This class
+includes the necessary infomation for PyMzn to setup the solver, and provides
+two main functions to support custom solver arguments and parsing the solution
+stream of the solver.</p>
+<p>PyMzn provides a number of solver implementations out-of-the-box.  PyMzn’s
+default solver is <code class="docutils literal notranslate"><span class="pre">pymzn.gecode</span></code>, an instance of <code class="docutils literal notranslate"><span class="pre">pymzn.Gecode</span></code>.</p>
+<p>To use a solver that is not provided by PyMzn or to extend an existing one, one
+has to subclass the <code class="docutils literal notranslate"><span class="pre">Solver</span></code> class and implement the <code class="docutils literal notranslate"><span class="pre">args</span></code> method, which
+returns a list of command line arguments for executing the process. The
+command line arguments supported by this function have to be paired with proper
+<code class="docutils literal notranslate"><span class="pre">extraFlags</span></code> in the solver configuration file (see the <a class="reference external" href="https://www.minizinc.org/doc-latest/en/fzn-spec.html#solver-configuration-files">solver configuration
+files page</a>
+from the MiniZinc reference manual for additional details).</p>
+<p>For instance, suppose you have the following configuration file for an external
+solver, <code class="docutils literal notranslate"><span class="pre">my_solver.msc</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;My Solver&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;org.myorg.my_solver&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;executable&quot;</span><span class="p">:</span> <span class="s2">&quot;fzn-mysolver&quot;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>Then it is possible to run the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function with the custom solver:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_solver</span> <span class="o">=</span> <span class="n">MySolver</span><span class="p">()</span>
-<span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">my_solver</span><span class="p">,</span> <span class="n">arg1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="n">val2</span><span class="p">)</span>
+<p>You want to support the command line argument <code class="docutils literal notranslate"><span class="pre">--solve-twice-as-fast</span></code>. First
+you need to add the flag into the solver configuration file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;My Solver&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;org.myorg.my_solver&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;executable&quot;</span><span class="p">:</span> <span class="s2">&quot;fzn-mysolver&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;extraFlags&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">[</span><span class="s2">&quot;--solve-twice-as-fast&quot;</span><span class="p">,</span> <span class="s2">&quot;provides twofold speedup&quot;</span><span class="p">,</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">]</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This will make the argument available to the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable when using
+the solver <code class="docutils literal notranslate"><span class="pre">my_solver</span></code>. Next, to add this option to PyMzn, you need to
+subclass the <code class="docutils literal notranslate"><span class="pre">Solver</span></code> class and override the <code class="docutils literal notranslate"><span class="pre">args</span></code> function:</p>
+<div class="highlight-python3 notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span> <span class="kn">from</span> <span class="nn">pymzn</span> <span class="k">import</span> <span class="n">Solver</span>
+
+ <span class="k">class</span> <span class="nc">MySolver</span><span class="p">(</span><span class="n">Solver</span><span class="p">):</span>
+     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">solver_id</span><span class="o">=</span><span class="s1">&#39;my_solver&#39;</span><span class="p">)</span>
+
+     <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solve_twice_as_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+         <span class="n">args</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+         <span class="k">if</span> <span class="n">solve_twice_as_fast</span><span class="p">:</span>
+             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--solve-twice-as-fast&#39;</span><span class="p">)</span>
+         <span class="k">return</span> <span class="n">args</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is then possible to run the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function with the custom solver:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_solver</span> <span class="o">=</span> <span class="n">MySolver</span><span class="p">()</span>
+<span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">my_solver</span><span class="p">,</span> <span class="n">solve_twice_as_fast</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

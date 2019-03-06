@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pymzn.solns2out" href="pymzn.solns2out.html" />
@@ -98,7 +99,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -171,37 +174,57 @@
 <h1>pymzn.mzn2fzn<a class="headerlink" href="#pymzn-mzn2fzn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.mzn2fzn">
-<code class="descclassname">pymzn.</code><code class="descname">mzn2fzn</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>keep=False</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>output_vars=None</em>, <em>output_mode='dict'</em>, <em>include=None</em>, <em>no_ozn=False</em>, <em>output_base=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.mzn2fzn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flatten a MiniZinc model into a FlatZinc one. It executes the mzn2fzn
-utility from libminizinc to produce a fzn and ozn files from a mzn one.</p>
+<code class="descclassname">pymzn.</code><code class="descname">mzn2fzn</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>include=None</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em>, <em>keep=False</em>, <em>output_vars=None</em>, <em>output_base=None</em>, <em>output_mode='item'</em>, <em>no_ozn=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.mzn2fzn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten a MiniZinc model into a FlatZinc one.</p>
+<p>This function is equivalent to the command <code class="docutils literal notranslate"><span class="pre">minizinc</span> <span class="pre">--compile</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mzn_file</strong> (<em>str</em>) – The path to the minizinc problem file.</li>
-<li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the mzn2fzn execution,
+<li><strong>mzn</strong> (<em>str</em>) – The minizinc model. This can be either the path to the <code class="docutils literal notranslate"><span class="pre">.mzn</span></code> file or
+the content of the model itself.</li>
+<li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the minizinc execution,
 provided as positional arguments; by default no data file is attached.</li>
+<li><strong>args</strong> (<em>dict</em>) – Arguments for the template engine.</li>
 <li><strong>data</strong> (<em>dict</em>) – Additional data as a dictionary of variables assignments to supply to
-the mzn2fnz function. The dictionary is then automatically converted to
-dzn format by the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function. Notice that if the data
-provided is too large, a temporary dzn file will be produced.</li>
-<li><strong>keep</strong> (<em>bool</em>) – Whether to write the inline data into a dzn file and keep it.
-Default is False.</li>
-<li><strong>globals_dir</strong> (<em>str</em>) – The path to the directory for global included files.</li>
-<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included mzn files when
-running <code class="docutils literal notranslate"><span class="pre">mzn2fzn</span></code>.</li>
-<li><strong>output_mode</strong> (<em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'item'</em>) – The desired output format. The default is ‘item’ which outputs a
-stream of strings as returned by the solns2out tool, formatted according
-to the output statement of the MiniZinc model. The ‘dzn’ and ‘json’
-formats output a stream of strings formatted in dzn of json
-respectively.</li>
-<li><strong>no_ozn</strong> (<em>bool</em>) – If True, the ozn file is not produced, False otherwise.</li>
+the minizinc executable. The dictionary is automatically converted to
+dzn format by the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function.</li>
+<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included <code class="docutils literal notranslate"><span class="pre">.mzn</span></code> files.</li>
+<li><strong>stdlib_dir</strong> (<em>str</em>) – The path to the MiniZinc standard library. Provide it only if it is
+different from the default one.</li>
+<li><strong>globals_dir</strong> (<em>str</em>) – The path to the MiniZinc globals directory. Provide it only if it is
+different from the default one.</li>
+<li><strong>declare_enums</strong> (<em>bool</em>) – Whether to declare enum types when converting inline data into dzn
+format. If the enum types are declared elsewhere this option should be
+False. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</li>
+<li><strong>allow_multiple_assignments</strong> (<em>bool</em>) – Whether to allow multiple assignments of variables. Sometimes is
+convenient to simply let the data file override the value already
+assigned in the minizinc file. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
+<li><strong>keep</strong> (<em>bool</em>) – Whether to keep the generated <code class="docutils literal notranslate"><span class="pre">.mzn</span></code>, <code class="docutils literal notranslate"><span class="pre">.dzn</span></code>, <code class="docutils literal notranslate"><span class="pre">.fzn</span></code> and <code class="docutils literal notranslate"><span class="pre">.ozn</span></code>
+files or not. If False, the generated files are created as temporary
+files which will be deleted right after the problem is solved. Though
+files generated by PyMzn are not intended to be kept, this property can
+be used for debugging purpose. Note that in case of error the files are
+not deleted even if this parameter is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
+<li><strong>output_vars</strong> (<em>list of str</em>) – A list of output variables. These variables will be the ones included in
+the output dictionary. Only available if <code class="docutils literal notranslate"><span class="pre">ouptut_mode='dict'</span></code>.</li>
+<li><strong>output_base</strong> (<em>str</em>) – Output directory for the files generated by PyMzn. The default
+(<code class="docutils literal notranslate"><span class="pre">None</span></code>) is the temporary directory of your OS (if <code class="docutils literal notranslate"><span class="pre">keep=False</span></code>) or
+the current working directory (if <code class="docutils literal notranslate"><span class="pre">keep=True</span></code>).</li>
+<li><strong>output_mode</strong> (<em>{'dict'</em><em>, </em><em>'item'</em><em>, </em><em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'raw'}</em>) – The desired output format. The default is <code class="docutils literal notranslate"><span class="pre">'dict'</span></code> which returns a
+stream of solutions decoded as python dictionaries. The <code class="docutils literal notranslate"><span class="pre">'item'</span></code>
+format outputs a stream of strings as returned by the <code class="docutils literal notranslate"><span class="pre">solns2out</span></code>
+tool, formatted according to the output statement of the MiniZinc model.
+The <code class="docutils literal notranslate"><span class="pre">'dzn'</span></code> and <code class="docutils literal notranslate"><span class="pre">'json'</span></code> formats output a stream of strings
+formatted in dzn and json respectively. The <code class="docutils literal notranslate"><span class="pre">'raw'</span></code> format, instead
+returns the whole solution stream, without parsing.</li>
+<li><strong>no_ozn</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the ozn file is not produced, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The paths to the generated fzn and ozn files. If <code class="docutils literal notranslate"><span class="pre">no_ozn=True</span></code>, the
-second argument is None.</p>
+second argument is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (str, str)</p>

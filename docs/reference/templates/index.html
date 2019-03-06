@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pymzn.templates.add_package" href="generated/pymzn.templates.add_package.html" />
@@ -96,7 +97,9 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.templates.add_path.html">pymzn.templates.add_path</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -179,65 +182,129 @@
 </tr>
 </tbody>
 </table>
-<span class="target" id="module-pymzn.mzn.templates"></span><p>Handles MiniZinc template files.</p>
-<p>PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
+<span class="target" id="module-pymzn.mzn.templates"></span><p>PyMzn supports templating as a form of dynamic modelling. PyMzn allows to embed
 code from the <a class="reference external" href="http://jinja.pocoo.org/">Jinja2</a> templating language within a
 MiniZinc model to make a PyMzn template file (usually distinguished with the
-<cite>pmzn</cite> extension). An example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">pmzn</span> <span class="o">%%</span>
-<span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
-<span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
-<span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
-<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">size</span><span class="p">;</span>    <span class="o">%</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span><span class="o">=</span>
+<code class="docutils literal notranslate"><span class="pre">.pmzn</span></code> extension). An example:</p>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack-comp">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/7df95a7d6b7bf4813ba0af9dcccf77c9/knapsack.pmzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack.pmzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp" title="Permalink to this code">¶</a></div>
+<div class="highlight-pymzn notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">n</span><span class="p">;</span><span class="s">                     </span><span class="c">% number of objects</span><span class="s"></span>
+<span class="kt">set</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">OBJ</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">1</span><span class="o">..</span><span class="nv">n</span><span class="p">;</span><span class="s"></span>
+<span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">profit</span><span class="p">;</span><span class="s">  </span><span class="c">% the profit of each object</span><span class="s"></span>
+<span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">size</span><span class="p">;</span><span class="s">    </span><span class="c">% the size of each object</span><span class="s"></span>
+<span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">capacity</span><span class="p">;</span><span class="s">              </span><span class="c">% the capacity of the knapsack</span><span class="s"></span>
 
-<span class="n">var</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">OBJ</span><span class="p">:</span> <span class="n">x</span><span class="p">;</span>
-<span class="n">constraint</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">capacity</span><span class="p">;</span>
+<span class="kt">var</span><span class="s"> </span><span class="kt">set</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="nv">OBJ</span><span class="p">:</span><span class="s"> </span><span class="nv">x</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nb">sum</span><span class="p">(</span><span class="nv">i</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="p">)(</span><span class="nv">size</span><span class="p">[</span><span class="nv">i</span><span class="p">])</span><span class="s"> </span><span class="o">&lt;=</span><span class="s"> </span><span class="nv">capacity</span><span class="p">;</span><span class="s"></span>
 
-<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">objective</span> <span class="o">==</span> <span class="s1">&#39;profit&#39;</span> <span class="o">%</span><span class="p">}</span>
-    <span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">profit</span><span class="p">;</span>  <span class="o">%</span> <span class="n">the</span> <span class="n">profit</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
-    <span class="n">solve</span> <span class="n">maximize</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">profit</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-<span class="p">{</span><span class="o">%</span> <span class="k">elif</span> <span class="n">objective</span> <span class="o">==</span> <span class="s1">&#39;cost&#39;</span> <span class="o">%</span><span class="p">}</span>
-    <span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">cost</span><span class="p">;</span>    <span class="o">%</span> <span class="n">the</span> <span class="n">cost</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
-    <span class="n">solve</span> <span class="n">minimize</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-<span class="p">{</span><span class="o">%</span> <span class="k">else</span> <span class="o">%</span><span class="p">}</span>
-    <span class="n">solve</span> <span class="n">satisfy</span><span class="p">;</span>
-<span class="p">{</span><span class="o">%</span> <span class="n">endif</span><span class="o">%</span><span class="p">}</span>
+<span class="cp">{%</span> <span class="k">if</span> <span class="nv">with_compatibility</span> <span class="cp">%}</span><span class="s"></span>
+<span class="s">    </span><span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">,</span><span class="s"> </span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">bool</span><span class="p">:</span><span class="s"> </span><span class="nv">compatibility</span><span class="p">;</span><span class="s"></span>
+<span class="s">    </span><span class="k">constraint</span><span class="s"> </span><span class="k">forall</span><span class="p">(</span><span class="nv">i</span><span class="p">,</span><span class="s"> </span><span class="nv">j</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="s"> </span><span class="k">where</span><span class="s"> </span><span class="nv">i</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">j</span><span class="p">)(</span><span class="s"></span>
+<span class="s">        </span><span class="nv">compatibility</span><span class="p">[</span><span class="nv">i</span><span class="p">,</span><span class="s"> </span><span class="nv">j</span><span class="p">]</span><span class="s"></span>
+<span class="s">    </span><span class="p">);</span><span class="s"></span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="s"></span>
 
-<span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">dzn</span> <span class="o">%%</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-<span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">];</span>
-<span class="n">capacity</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<span class="kt">var</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">obj</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="nb">sum</span><span class="p">(</span><span class="nv">i</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="p">)(</span><span class="nv">profit</span><span class="p">[</span><span class="nv">i</span><span class="p">]);</span><span class="s"></span>
+<span class="k">solve</span><span class="s"> </span><span class="k">maximize</span><span class="s"> </span><span class="nv">obj</span><span class="p">;</span><span class="s"></span>
+
+<span class="k">output</span><span class="s"> </span><span class="p">[</span><span class="s"></span>
+<span class="s">    &quot;knapsack = &quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">x</span><span class="p">),</span><span class="s"> &quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s"></span>
+<span class="s">    &quot;objective = &quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">obj</span><span class="p">)</span><span class="s"></span>
+<span class="p">];</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack-comp-dzn">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/50ea5b09ca0786ad1de7b2a42e0edf87/knapsack.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp-dzn" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">n</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">5</span><span class="p">;</span><span class="s"></span>
+<span class="nv">profit</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[</span><span class="m">10</span><span class="p">,</span><span class="s"> </span><span class="m">3</span><span class="p">,</span><span class="s"> </span><span class="m">9</span><span class="p">,</span><span class="s"> </span><span class="m">4</span><span class="p">,</span><span class="s"> </span><span class="m">8</span><span class="p">];</span><span class="s"></span>
+<span class="nv">size</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[</span><span class="m">14</span><span class="p">,</span><span class="s"> </span><span class="m">4</span><span class="p">,</span><span class="s"> </span><span class="m">10</span><span class="p">,</span><span class="s"> </span><span class="m">6</span><span class="p">,</span><span class="s"> </span><span class="m">9</span><span class="p">];</span><span class="s"></span>
+<span class="nv">capacity</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">24</span><span class="p">;</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>The above MiniZinc model encodes a 0-1 knapsack problem with optional
+compatibility constraint. By default the template engine argument
+<code class="docutils literal notranslate"><span class="pre">with_compatibility</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, so the constraint is not enabled. In this
+case, the model can be solved as usual by running:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack.pmzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack.dzn&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now it is possible to pass <cite>objective</cite> as a member of <cite>args</cite> in the
-<cite>pymzn.minizinc</cite> function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack.pmzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cost&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]},</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="s1">&#39;cost&#39;</span><span class="p">})</span>
+<p>which returns:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}]</span>
 </pre></div>
 </div>
-<p>The compiled model that will be solved looks like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">knapsack</span><span class="o">.</span><span class="n">mzn</span> <span class="o">%%</span>
-<span class="nb">int</span><span class="p">:</span> <span class="n">n</span><span class="p">;</span>                     <span class="o">%</span> <span class="n">number</span> <span class="n">of</span> <span class="n">objects</span>
-<span class="nb">set</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">OBJ</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">.</span><span class="n">n</span><span class="p">;</span>
-<span class="nb">int</span><span class="p">:</span> <span class="n">capacity</span><span class="p">;</span>              <span class="o">%</span> <span class="n">the</span> <span class="n">capacity</span> <span class="n">of</span> <span class="n">the</span> <span class="n">knapsack</span>
-<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">size</span><span class="p">;</span>    <span class="o">%</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span><span class="o">=</span>
-
-<span class="n">var</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">OBJ</span><span class="p">:</span> <span class="n">x</span><span class="p">;</span>
-<span class="n">constraint</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">capacity</span><span class="p">;</span>
-
-<span class="n">array</span><span class="p">[</span><span class="n">OBJ</span><span class="p">]</span> <span class="n">of</span> <span class="nb">int</span><span class="p">:</span> <span class="n">cost</span><span class="p">;</span>    <span class="o">%</span> <span class="n">the</span> <span class="n">cost</span> <span class="n">of</span> <span class="n">each</span> <span class="nb">object</span>
-<span class="n">solve</span> <span class="n">minimize</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)(</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<p>If we want to use the compatibility constraint, we define a compatibility
+matrix e.g. in a dzn file:</p>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack-comp-dzn-comp">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/312ca0d0d05226e8d550f3842830024a/compatibility.dzn"><code class="xref download docutils literal notranslate"><span class="pre">compatibility.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp-dzn-comp" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">compatibility</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[|</span><span class="s"></span>
+<span class="s">    </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="s"> </span><span class="p">|</span><span class="s"></span>
+<span class="s">    </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="s"> </span><span class="p">|</span><span class="s"></span>
+<span class="s">   </span><span class="l">false</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="s"> </span><span class="p">|</span><span class="s"></span>
+<span class="s">    </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="s"> </span><span class="p">|</span><span class="s"></span>
+<span class="s">    </span><span class="l">true</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="p">,</span><span class="s"> </span><span class="l">false</span><span class="p">,</span><span class="s">  </span><span class="l">true</span><span class="s"></span>
+<span class="p">|];</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>Now it is possible to pass <code class="docutils literal notranslate"><span class="pre">with_compatibility</span></code> argument to <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code>
+function, along with the dzn file with the compatibility matrix:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack.pmzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;compatibility.dzn&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;with_compatibility&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>Notice that now the model expects a <cite>cost</cite> array as dzn input data, so we passed
-it with the <cite>data</cite> argument as usual.</p>
+<p>which yields:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">}}]</span>
+</pre></div>
+</div>
 <p>As mentioned, PyMzn employs Jinja2 under the hood, so anything you can do with
-Jinja2 is also possible in PyMzn, including variables, control structured,
+Jinja2 is also possible in PyMzn, including variables, control structures,
 template inheritance, and filters. PyMzn implements few custom filters as well:</p>
 <ul class="simple">
-<li><cite>int(value, factor=100)</cite> : discretizes the given input or array,
-pre-multiplying by the given factor.</li>
-<li><cite>dzn(value)</cite> : transform the input into its equivalent dzn string.</li>
+<li><code class="docutils literal notranslate"><span class="pre">int(value,</span> <span class="pre">factor=100)</span></code> : discretizes the given input or array,
+pre-multiplying by the given factor. Usage:
+<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">float_value_or_array</span> <span class="pre">|</span> <span class="pre">int}}</span></code> or <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">float_value_or_array</span> <span class="pre">|</span> <span class="pre">int(factor=1000)</span> <span class="pre">}}</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">dzn(value)</span></code> : transform the input into its equivalent dzn string. Usage:
+<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">dzn_argument</span> <span class="pre">|</span> <span class="pre">dzn</span> <span class="pre">}}</span></code></li>
 </ul>
+<p>To provide a custom search path to the template engine you can use the
+function <code class="docutils literal notranslate"><span class="pre">add_path</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;path/to/templates/directory/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This ensures that the template engine will look for imported tempates into the
+provided path as well.</p>
 </div>
 
 

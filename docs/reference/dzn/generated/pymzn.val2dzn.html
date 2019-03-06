@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pymzn.rebase_array" href="pymzn.rebase_array.html" />
@@ -99,7 +100,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
 </li>
 </ul>
@@ -173,8 +176,8 @@
 <dl class="function">
 <dt id="pymzn.val2dzn">
 <code class="descclassname">pymzn.</code><code class="descname">val2dzn</code><span class="sig-paren">(</span><em>val</em>, <em>wrap=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.val2dzn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Serializes a value (bool, int, float, set, array) into its dzn
-representation.</p>
+<dd><p>Serializes a value into its dzn representation.</p>
+<p>The supported types are <code class="docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">set</span></code>, <code class="docutils literal notranslate"><span class="pre">array</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

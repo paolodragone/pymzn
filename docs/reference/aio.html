@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Asynchronous execution &mdash; PyMzn 0.18.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pymzn.aio.minizinc" href="generated/pymzn.aio.minizinc.html" />
+    <link rel="prev" title="pymzn.templates.add_path" href="templates/generated/pymzn.templates.add_path.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> PyMzn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.18.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="minizinc/index.html">MiniZinc tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers/index.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates/index.html">Templating</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Asynchronous execution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.aio.minizinc.html">pymzn.aio.minizinc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exec.html">PyMzn executable</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyMzn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Manual</a> &raquo;</li>
+        
+      <li>Asynchronous execution</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asynchronous-execution">
+<h1>Asynchronous execution<a class="headerlink" href="#asynchronous-execution" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.aio.minizinc.html#pymzn.aio.minizinc" title="pymzn.aio.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;…])</td>
+<td>Coroutine version of the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function.</td>
+</tr>
+</tbody>
+</table>
+<span class="target" id="module-pymzn.mzn.aio"></span><p>PyMzn supports asynchronous solving through Python coroutines. The package
+<code class="docutils literal notranslate"><span class="pre">pymzn.aio</span></code> contains the coroutine version of the standard <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code>
+function. This coroutine allows to execute the minizinc as an asynchronous
+process and to obtain intermediate solutions while the solver is still in
+execution. This is useful e.g. when the solver may take a long time to finish
+and one needs to keep track of the progress or when the number of returned
+solutions is very high, so the MiniZinc process does not have to keep the
+solutions in memory before the caller can start consuming them.</p>
+<p>To use the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> coroutine, you need to have an event loop running in the
+main thread of your application. Awaiting the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> coroutine produces a
+lazy solution stream that, when addressed or iterated over returns all the
+solutions found so far by the solver. The following is a full example of how to
+use the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> coroutine:</p>
+<div class="literal-block-wrapper docutils container" id="ex-async-mzn">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../_downloads/fd8fafa82b253649490a82cd19510e47/async.mzn"><code class="xref download docutils literal notranslate"><span class="pre">async.mzn</span></code></a></span><a class="headerlink" href="#ex-async-mzn" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Use a large domain to simulate a long solving process</span><span class="s"></span>
+<span class="kt">var</span><span class="s"> </span><span class="m">0</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="m">1000000</span><span class="p">:</span><span class="s"> </span><span class="nv">x</span><span class="p">;</span><span class="s"></span>
+<span class="k">solve</span><span class="s"> </span><span class="k">satisfy</span><span class="p">;</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="ex-async">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../_downloads/7274b86b658cdf3ca83e550b5305764e/async_test.py"><code class="xref download docutils literal notranslate"><span class="pre">async.mzn</span></code></a></span><a class="headerlink" href="#ex-async" title="Permalink to this code">¶</a></div>
+<div class="highlight-python3 notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">pymzn.aio</span> <span class="k">import</span> <span class="n">minizinc</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">solns</span> <span class="o">=</span> <span class="k">await</span> <span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;async.mzn&#39;</span><span class="p">,</span> <span class="n">all_solutions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep_solutions</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">solns</span><span class="o">.</span><span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">soln</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solns</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">soln</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>This code will execute the <code class="docutils literal notranslate"><span class="pre">main</span></code> coroutine, which calls <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> to find
+all solutions of the <code class="docutils literal notranslate"><span class="pre">async.mzn</span></code> file. The option <code class="docutils literal notranslate"><span class="pre">keep_solutions</span></code> is set to
+<code class="docutils literal notranslate"><span class="pre">False</span></code> to avoid saving the solutions in memory. Each time the <code class="docutils literal notranslate"><span class="pre">solns</span></code>
+object is iterated over, it will return all the solutions found until that
+point. Between iterations, a period 1 second is waited to simulate other work
+performed on the main thread.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/pymzn.aio.minizinc.html" class="btn btn-neutral float-right" title="pymzn.aio.minizinc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="templates/generated/pymzn.templates.add_path.html" class="btn btn-neutral float-left" title="pymzn.templates.add_path" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
