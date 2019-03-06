@@ -28,7 +28,7 @@ MiniZinc model to make a PyMzn template file (usually distinguished with the
     solve maximize obj;
 
     output [
-        "knapsack = ", show(x), "\n",
+        "knapsack = ", show(x), "\\n",
         "objective = ", show(obj)
     ];
 
@@ -39,9 +39,9 @@ MiniZinc model to make a PyMzn template file (usually distinguished with the
     capacity = 24;
 
 The above MiniZinc model encodes a 0-1 knapsack problem with optional
-compatibility constraint. By default the argument ``with_compatibility`` is
-None, so the constraint is not enabled. In this case, the model can be solved as
-usual by running::
+compatibility constraint. By default the template engine argument
+``with_compatibility`` is ``None``, so the constraint is not enabled. In this
+case, the model can be solved as usual by running::
 
     pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn')
 
@@ -49,8 +49,8 @@ which returns::
 
     [{'x': {2, 3, 5}}]
 
-If we want to use the compatibility constraint, we define it e.g. in a dzn
-file::
+If we want to use the compatibility constraint, we define a compatibility
+matrix e.g. in a dzn file::
 
     %% compatibility.dzn %%
 
@@ -62,8 +62,8 @@ file::
         true, false,  true, false,  true
     |];
 
-Now it is possible to pass `with_compatibility` argument to `pymzn.minizinc`
-function, along with the other dzn file::
+Now it is possible to pass ``with_compatibility`` argument to ``pymzn.minizinc``
+function, along with the dzn file with the compatibility matrix::
 
     pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn', 'compatibility.dzn', args={'with_compatibility': True})
 
@@ -72,13 +72,12 @@ which yields::
     [{'x': {1, 5}}]
 
 As mentioned, PyMzn employs Jinja2 under the hood, so anything you can do with
-Jinja2 is also possible in PyMzn, including variables, control structured,
+Jinja2 is also possible in PyMzn, including variables, control structures,
 template inheritance, and filters. PyMzn implements few custom filters as well:
 
 - ``int(value, factor=100)`` : discretizes the given input or array,
   pre-multiplying by the given factor. Usage:
-  ``{{ float_value_or_array | int}}`` or
-  ``{{ float_value_or_array | int(factor=1000) }}``
+  ``{{ float_value_or_array | int}}`` or ``{{ float_value_or_array | int(factor=1000) }}``
 - ``dzn(value)`` : transform the input into its equivalent dzn string. Usage:
   ``{{ dzn_argument | dzn }}``
 
