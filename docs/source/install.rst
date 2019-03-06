@@ -7,7 +7,7 @@ PyMzn can be installed via Pip::
 
 
 or from the source code available
-on [GitHub](https://github.com/paolodragone/pymzn/releases/latest)::
+on `GitHub <https://github.com/paolodragone/pymzn/releases/latest>`__::
 
     python setup.py install
 
@@ -36,16 +36,16 @@ Optional dependencies
 
 PyMzn offers the possibility of using `Jinja2
 <http://jinja.pocoo.org/docs/intro/#installation>`__ syntax for templating
-MiniZinc code (see `Templates <reference/templates>`__). To use templates you
-need to install Jinja2. You can do that via Pip::
+MiniZinc code (see `Templates <./reference/templates/index.html>`__). To use
+templates you need to install Jinja2. You can do that via Pip::
 
     pip install Jinja2
 
 Check out Jinja's `installation
-<http://jinja.pocoo.org/docs/intro/#installation>` for details.
+<http://jinja.pocoo.org/docs/intro/#installation>`__ for details.
 
 To be able to set custom configuration for PyMzn (see `Configuration
-<reference/configuration>`__) you need to install the `PyYAML
+<./reference/config.html>`__) you need to install the `PyYAML
 <https://pyyaml.org/wiki/PyYAML>`__ and `appdirs
 <https://github.com/ActiveState/appdirs>`__ packages::
 

@@ -7,6 +7,10 @@ Welcome to the documentation of the PyMzn project.
 
 `GitHub repository <https://github.com/paolodragone/pymzn>`__
 
+`MiniZinc Homepage <https://www.minizinc.org/>`__
+
+`MiniZinc Handbook <https://www.minizinc.org/doc-latest/en/>`__
+
 Table of Contents
 =================
 
