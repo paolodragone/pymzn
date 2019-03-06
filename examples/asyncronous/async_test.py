@@ -1,7 +1,5 @@
-
-import asyncio
-
 import pymzn
+import asyncio
 from pymzn.aio import minizinc
 
 async def main():
@@ -13,4 +11,3 @@ async def main():
                 print(soln)
 
 asyncio.run(main())
-
