@@ -9,7 +9,9 @@ executes the entire workflow for solving a constranint program encoded in
 MiniZinc, just like using the ``minizinc`` executable from command line. As
 added benefit, the ``pymzn.minizinc`` function takes care of adding
 solver-dependent parameters and converts the solutions into Python dictionaries
-by default. Solving a MiniZinc problem with PyMzn is as simple as::
+by default. Solving a MiniZinc problem with PyMzn is as simple as:
+
+.. code-block:: python
 
     import pymzn
     pymzn.minizinc('test.mzn')
