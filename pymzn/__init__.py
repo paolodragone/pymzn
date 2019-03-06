@@ -217,7 +217,7 @@ def main():
 
     args = vars(args)
     if 'solver_args' in args:
-        args.extend(args['solver_args'])
+        args.update(args['solver_args'])
 
     args['func'](**args)
 
