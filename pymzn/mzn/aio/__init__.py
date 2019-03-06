@@ -21,7 +21,7 @@ use the ``minizinc`` coroutine:
   :linenos:
 
 .. literalinclude:: ../../../examples/asyncronous/async_test.py
-  :language: python
+  :language: python3
   :caption: :download:`async.mzn <../../../examples/asyncronous/async_test.py>`
   :name: ex-async
   :linenos:

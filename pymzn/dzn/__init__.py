@@ -5,20 +5,20 @@ into dzn format and vice-versa. For instance, the ``pymzn.dict2dzn`` function
 converts an assignment of variables (provided as a dictionary) into dzn
 format:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.dict2dzn({'a': 2, 'b': {4, 6}, 'c': {1, 2, 3}, 'd': {3: 4.5, 4: 1.3}, 'e': [[1, 2], [3, 4], [5, 6]]})
 
 The output is a list of dzn statements, as for the previous example:
 
-.. code-block:: python
+.. code-block:: python3
 
     ['a = 2;', 'b = {4, 6};', 'c = 1..3;', 'd = array1d(3..4, [4.5, 1.3]);', 'e = array2d(1..3, 1..2, [1, 2, 3, 4, 5, 6];']
 
 Optionally, you can pass the path to a dzn file where to write the
 statements.
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.dict2dzn(data, fout='path/to/dzn')
 
@@ -47,13 +47,13 @@ variable assignments. For instance, given the following dzn file:
 
 Running the function:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.dzn2dict('test.dzn')
 
 will return:
 
-.. code-block:: python
+.. code-block:: python3
 
     {'a': 2, 'b': {4, 6}, 'c': {1, 2, 3}, 'd': {3: 4.5, 4: 1.3}, 'e': [[1, 2], [3, 4], [5, 6]]}
 
@@ -64,7 +64,7 @@ back, with the only exception of arrays with index-sets not based at 1. Arrays
 and matrices based at 1 are translated into lists instead of dictionaries with
 explicit keys. For instance:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.dict2dzn({'a': {1: 2, 2: 4, 3: 6}})
     # ['a = array1d(1..3, [2, 4, 6]);']
@@ -72,7 +72,7 @@ explicit keys. For instance:
 but when translating back the array, whose index-set is based in 1, will be
 translated into a list:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.dzn2dict('a = array1d(1..3, [2, 4, 6]);')
     # {'a': [2, 4, 6]}
@@ -86,7 +86,7 @@ index-sets you can use the ``pymzn.rebase_array`` function, which will discard
 the index-sets in the dictionary representation of the array (matrix) and
 transform it into a list (list of lists). For instance:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.rebase_array({3: {2: 1, 3: 2, 4: 3}, 4: {1: 2, 2: 3}}, recursive=True)
     # [[1, 2, 3], [2, 3]]

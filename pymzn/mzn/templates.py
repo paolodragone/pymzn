@@ -22,13 +22,13 @@ compatibility constraint. By default the template engine argument
 ``with_compatibility`` is ``None``, so the constraint is not enabled. In this
 case, the model can be solved as usual by running:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn')
 
 which returns:
 
-.. code-block:: python
+.. code-block:: python3
 
     [{'x': {2, 3, 5}}]
 
@@ -44,13 +44,13 @@ matrix e.g. in a dzn file:
 Now it is possible to pass ``with_compatibility`` argument to ``pymzn.minizinc``
 function, along with the dzn file with the compatibility matrix:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.minizinc('knapsack.pmzn', 'knapsack.dzn', 'compatibility.dzn', args={'with_compatibility': True})
 
 which yields:
 
-.. code-block:: python
+.. code-block:: python3
 
     [{'x': {1, 5}}]
 
@@ -67,7 +67,7 @@ template inheritance, and filters. PyMzn implements few custom filters as well:
 To provide a custom search path to the template engine you can use the
 function ``add_path``:
 
-.. code-block:: python
+.. code-block:: python3
 
     pymzn.templates.add_path('path/to/templates/directory/')
 

@@ -11,7 +11,7 @@ added benefit, the ``pymzn.minizinc`` function takes care of adding
 solver-dependent parameters and converts the solutions into Python dictionaries
 by default. Solving a MiniZinc problem with PyMzn is as simple as:
 
-.. code-block:: python
+.. code-block:: python3
 
     import pymzn
     pymzn.minizinc('test.mzn')

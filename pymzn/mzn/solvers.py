@@ -48,7 +48,7 @@ This will make the argument available to the ``minizinc`` executable when using
 the solver ``my_solver``. Next, to add this option to PyMzn, you need to
 subclass the ``Solver`` class and override the ``args`` function:
 
-.. code-block:: python
+.. code-block:: python3
    :linenos:
 
     from pymzn import Solver
@@ -65,7 +65,7 @@ subclass the ``Solver`` class and override the ``args`` function:
 
 It is then possible to run the ``minizinc`` function with the custom solver:
 
-.. code-block:: python
+.. code-block:: python3
 
     my_solver = MySolver()
     pymzn.minizinc('test.mzn', solver=my_solver, solve_twice_as_fast=True)
