@@ -393,7 +393,7 @@ def parse_value(val, var_type=None, enums=None, rebase_arrays=True):
         A value in dzn format.
     var_type : dict
         The dictionary of variable type as returned by the command ``minizinc
-        --model-types-only``. Default is None, in which case the type of the
+        --model-types-only``. Default is ``None``, in which case the type of the
         variable is inferred from its value. To parse an enum value as a Python
         enum type its ``var_type`` is required, otherwise the value is simply
         returned as a string.
@@ -404,14 +404,14 @@ def parse_value(val, var_type=None, enums=None, rebase_arrays=True):
         can only be parsed if also the ``var_type`` of the variable is
         available.
     rebase_arrays : bool
-        If the parsed value is an array and ``rebase_arrays`` is True, return it
-        as zero-based lists. If ``rebase_arrays`` is False, instead, return it
-        as a dictionary, preserving the original index-set.
+        If the parsed value is an array and ``rebase_arrays`` is ``True``,
+        return it as zero-based lists. If ``rebase_arrays`` is ``False``,
+        instead, return it as a dictionary, preserving the original index-set.
 
     Returns
     -------
     object
-        The parsed object. The type of the object depend on the dzn value.
+        The parsed object. The type of the object depends on the dzn value.
     """
 
     if not var_type:
@@ -442,8 +442,8 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
         dictionaries, preserving the original index-sets.
     types : dict
         Dictionary of variable types, as returned by the ``minizinc
-        --model-types-only``. Default is None, in which case the type of most
-        dzn assignments will be inferred automatically from the value. Enum
+        --model-types-only``. Default is ``None``, in which case the type of
+        most dzn assignments will be inferred automatically from the value. Enum
         values can only be parsed if their respective types are available.
 
     Returns
