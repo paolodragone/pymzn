@@ -1,5 +1,4 @@
-"""process.py
-
+"""\
 This package provides utilities for running synchronous external processes.
 """
 
