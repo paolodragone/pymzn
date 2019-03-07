@@ -100,7 +100,7 @@ async def solve(
     )
 
     args += _flattening_args(
-        mzn, *dzn_files, data=data, keep=keep, stdlib_dir=stdlib_dir,
+        mzn, *dzn_files, data=data, stdlib_dir=stdlib_dir,
         globals_dir=globals_dir, output_mode=output_mode, include=include,
         allow_multiple_assignments=allow_multiple_assignments
     )
