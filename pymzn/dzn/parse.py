@@ -487,7 +487,7 @@ def _to_var_type(var, var_type):
         raise ValueError(err.format(var_type, var))
 
 
-def dzn2dict(dzn, *, rebase_arrays=True, types=None):
+def dzn2dict(dzn, *, rebase_arrays=True, types=None, return_enums=False):
     """Parses a dzn string or file into a dictionary of variable assignments.
 
     Parameters
@@ -506,6 +506,8 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
         default value for ``var_types`` is ``None``, in which case the type of
         most dzn assignments will be inferred automatically from the value. Enum
         values can only be parsed if their respective types are available.
+    return_enums : bool
+        Whether to return the parsed enum types included in the dzn content.
 
     Returns
     -------
@@ -584,5 +586,9 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
         assign[var] = parse_value(
             val, var_type=var_type, enums=enums, rebase_arrays=rebase_arrays
         )
+
+    if return_enums and enums:
+        assign.update(enums)
+
     return assign
 
