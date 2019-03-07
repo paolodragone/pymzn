@@ -54,6 +54,8 @@ class Solutions:
             pass
 
     def __len__(self):
+        if self._keep:
+            self._fetch_all()
         return self._n_solns
 
     def __iter__(self):
