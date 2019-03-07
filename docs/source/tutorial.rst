@@ -1,5 +1,5 @@
-Quick Start
-===========
+Tutorial
+========
 
 .. highlight:: minizinc
   :linenothreshold: 5
