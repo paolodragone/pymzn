@@ -35,7 +35,7 @@ _enum_val_p = re.compile('^\w+$')
 
 # contiguous set
 _cont_set_p = re.compile(
-    '^\(?\s*([+\-]?\d+(?:\.\d+)?)\)?\.\.\(?([+\-]?\d+(?:\.\d+)?)\s*\)?$'
+    '^\(?\s*([+\-]?\s*\d+(?:\.\d+)?)\s*\)?\s*\.\.\s*\(?\s*([+\-]?\s*\d+(?:\.\d+)?)\s*\)?$'
 )
 
 # set pattern
@@ -50,7 +50,7 @@ _enum_p = re.compile('^\{(?P<vals>[\w\s,]*)\}$')
 # matches any of the previous
 _val_p = re.compile(
     '(?:true|false|[+\-]?\d+|[+\-]?\d*\.\d+(?:[eE][+\-]?\d+)?|\w+'
-    '|\(?\s*[+\-]?\d+(?:\.\d+)?\)?\.\.\(?[+\-]?\d+(?:\.\d+)?\s*\)?'
+    '|\(?\s*([+\-]?\d+(?:\.\d+)?)\)?\.\.\(?([+\-]?\d+(?:\.\d+)?)\s*\)?'
     '|\{[\w\d\s,\.+\-\(\)]*\})'
 )
 
@@ -69,6 +69,14 @@ _stmt_p = re.compile('\s*([^;]+?);')
 
 # comment pattern
 _comm_p = re.compile('%.+?\n')
+
+# set type pattern
+_set_type_p = re.compile('set\s+of\s+(?P<type>\w+)')
+
+# array type pattern
+_array_type_p = re.compile(
+    'array\s*\[\s*(?P<indices>\w+(\s*,\s*\w+)*)\s*\]\s+of\s+(?P<type>[\w ]+)'
+)
 
 
 def _parse_bool(val, raise_errors=True):
@@ -430,6 +438,55 @@ def parse_value(val, var_type=None, enums=None, rebase_arrays=True):
     return _parse_val(val, var_type=var_type, enums=enums)
 
 
+def _to_var_type(var, var_type):
+    var_type = var_type.strip()
+    if var_type == 'bool':
+        return {'type': 'bool'}
+    elif var_type == 'int':
+        return {'type': 'int'}
+    elif var_type == 'float':
+        return {'type': 'float'}
+    elif var_type == 'enum':
+        return {'type': 'int', 'set': True, 'enum_type': var}
+    elif var_type.startswith('set'):
+        _set_type_m = _set_type_p.match(var_type)
+        set_type = _set_type_m.group('type')
+        var_type = {'type': 'int', 'set': True}
+        if set_type in ['bool', 'int', 'float']:
+            var_type['type'] = set_type
+        else:
+            var_type['enum_type'] = set_type
+        return var_type
+    elif var_type.startswith('array'):
+        _array_type_m = _array_type_p.match(var_type)
+        indices = _array_type_m.group('indices')
+        array_type = _array_type_m.group('type')
+        array_type = array_type.strip()
+        dims = [s.strip() for s in indices.split(',')]
+        dim = len(dims)
+        var_type = {'dim': dim, 'dims': dims}
+        if array_type.startswith('set'):
+            _set_type_m = _set_type_p.match(array_type)
+            set_type = _set_type_m.group('type')
+            var_type['type'] = 'int'
+            var_type['set'] = True
+            if set_type in ['bool', 'int', 'float']:
+                var_type['type'] = set_type
+            else:
+                var_type['enum_type'] = set_type
+        elif array_type in ['bool', 'int', 'float']:
+            var_type['type'] = array_type
+        else:
+            var_type['type'] = 'int'
+            var_type['enum_type'] = array_type
+        return var_type
+    elif re.match('\w+', var_type):
+        return {'type': 'int', 'enum_type': var_type}
+    else:
+        err = 'Type {} of variable {} not recognized.'
+        raise ValueError(err.format(var_type, var))
+
+
 def dzn2dict(dzn, *, rebase_arrays=True, types=None):
     """Parses a dzn string or file into a dictionary of variable assignments.
 
@@ -441,8 +498,12 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
         Whether to return arrays as zero-based lists or to return them as
         dictionaries, preserving the original index-sets.
     types : dict
-        Dictionary of variable types, as returned by the ``minizinc
-        --model-types-only``. Default is ``None``, in which case the type of
+        Dictionary of variable types. Types can either be dictionaries, as
+        returned by the ``minizinc --model-types-only``, or strings containing a
+        type in dzn format. If the type is a string, it can either be the name
+        of an enum type or one of the following: ``bool``, ``int``, ``float``,
+        ``enum``, ``set of <type>``, ``array[<index_sets>] of <type>``. The
+        default value for ``var_types`` is ``None``, in which case the type of
         most dzn assignments will be inferred automatically from the value. Enum
         values can only be parsed if their respective types are available.
 
@@ -457,10 +518,22 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
         with open(dzn) as f:
             dzn = f.read()
 
-    enum_types = None
+    var_types = None
     if types:
-        enum_types = []
+        var_types = {}
         for var, var_type in types.items():
+            if isinstance(var_type, str):
+                var_types[var] = _to_var_type(var, var_type)
+            elif isinstance(var_type, dict):
+                var_types[var] = var_type
+            else:
+                err = 'Type of variable {} must be a string or a dict.'
+                raise ValueError(err.format(var))
+
+    enum_types = None
+    if var_types:
+        enum_types = []
+        for var, var_type in var_types.items():
             if 'enum_type' in var_type and var_type['enum_type'] == var:
                 enum_types.append(var)
 
@@ -506,8 +579,8 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None):
     assign = {}
     for var, val in var_list:
         var_type = None
-        if types:
-            var_type = types.get(var, None)
+        if var_types:
+            var_type = var_types.get(var, None)
         assign[var] = parse_value(
             val, var_type=var_type, enums=enums, rebase_arrays=rebase_arrays
         )
