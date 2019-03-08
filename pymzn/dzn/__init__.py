@@ -91,6 +91,52 @@ transform it into a list (list of lists). For instance:
     pymzn.rebase_array({3: {2: 1, 3: 2, 4: 3}, 4: {1: 2, 2: 3}}, recursive=True)
     # [[1, 2, 3], [2, 3]]
 
+Since version 0.18.0, PyMzn supports conversion of MiniZinc enums too:
+
+.. code-block:: python3
+
+    pymzn.dzn2dict('P = {A, B, C}; x = A;')
+    # {'P': {'A', 'B', 'C'}, 'x': 'A'}
+
+Without additional information, PyMzn converts enums values into strings and
+enum types into sets of strings. In order to convert MiniZinc enums into Python
+enums, we need to supply an additional keyword parameter ``types``, which is a
+dictionary of MiniZinc types of the variables. In this case:
+
+.. code-block:: python3
+
+    data = pymzn.dzn2dict('P = {A, B, C}; x = A;', types={'P': 'enum', 'x': 'P'})
+    print(data)
+
+The result will be:
+
+.. code-block:: python3
+
+    {'x': <P.A: 1>}
+
+where ``P.A`` is a value of an IntEnum ``P`` with three values ``P.A``, ``P.B``
+and ``P.C``. By default, PyMzn will not include the enum types into the returned
+dictionary of variable assignments. You can access the enum ``P`` with:
+
+.. code-block:: python3
+
+    P = type(data['x'])
+
+    print(P)
+    # <enum 'P'>
+
+    print(list(P))
+    # [<P.A: 1>, <P.B: 2>, <P.C: 3>]
+
+If you want PyMzn to return the enum types along with the variable assignments,
+you can do so by setting the ``return_enums`` flag to ``True``:
+
+.. code-block:: python3
+
+    data = pymzn.dzn2dict('P = {A, B, C}; x = A;', types={'P': 'enum', 'x': 'P'}, return_enums=True)
+    print(data)
+    # {'x': <P.A: 1>, 'P': <enum 'P'>}
+
 """
 
 from . import marsh
