@@ -137,6 +137,11 @@ you can do so by setting the ``return_enums`` flag to ``True``:
     print(data)
     # {'x': <P.A: 1>, 'P': <enum 'P'>}
 
+When executing the ``pymzn.minizinc`` function, PyMzn will take care of
+retrieving the types of the output variables from the model and will
+automatically convert the enum values into python objects. You can also pass the
+``return_enums=True`` option to ``pymzn.minizinc`` to obtain the same result as
+the above example on all solutions returned.
 """
 
 from . import marsh
