@@ -34,6 +34,7 @@ from tempfile import NamedTemporaryFile
 
 from .. import config, dict2dzn, logger
 
+from .rewrap import rewrap_model
 from .solvers import gecode
 from .process import run_process
 from .output import SolutionParser
@@ -172,35 +173,12 @@ def _process_output_vars(
     return '\n'.join([model, output_stmt])
 
 
-def _rewrap(s):
-    S = {' ', '\t', '\n', '\r', '\f', '\v'}
-    stmts_p = re.compile('(?:^|;)([^;]+)')
-    stmts = []
-    for stmt in stmts_p.findall(s):
-        spaces = 0
-        while spaces < len(stmt) and stmt[spaces] in S:
-            spaces += 1
-        spaces -= stmt[0] == '\n'
-        lines = []
-        for line in stmt.splitlines():
-            start = 0
-            while start < len(line) and start < spaces and line[start] in S:
-                start += 1
-            lines.append(line[start:])
-        stmts.append('\n'.join(lines))
-
-    if len(stmts) > 0 and stmts[-1] != '':
-        stmts.append('')
-
-    return ';\n'.join(stmts)
-
-
 def preprocess_model(model, rewrap=True, **kwargs):
     """Preprocess a MiniZinc model.
 
     This function takes care of preprocessing the model by resolving the
     template using the arguments passed as keyword arguments to this function.
-    Optionally, this function can also "rewrap" the model, deleating spaces at
+    Optionally, this function can also "rewrap" the model, deleting spaces at
     the beginning of the lines while preserving indentation.
 
     Parameters
@@ -208,7 +186,7 @@ def preprocess_model(model, rewrap=True, **kwargs):
     model : str
         The minizinc model (i.e. the content of a ``.mzn`` file).
     rewrap : bool
-        Whether to "rewrap" the model, i.e. to deleate leading spaces, while
+        Whether to "rewrap" the model, i.e. to delete leading spaces, while
         preserving indentation. Default is ``True``.
     **kwargs
         Additional arguments to pass to the template engine.
@@ -223,11 +201,11 @@ def preprocess_model(model, rewrap=True, **kwargs):
     model = _process_template(model, **args)
 
     if rewrap:
-        model = _rewrap(model)
+        model = rewrap_model(model)
     else:
         block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
         model = block_comm_p.sub('', model)
-        line_comm_p = re.compile('%.*\n')
+        line_comm_p = re.compile('%.*')
         model = line_comm_p.sub('', model)
 
     return model
@@ -530,7 +508,7 @@ def minizinc(
     solver=None, timeout=None, two_pass=None, pre_passes=None,
     output_objective=False, non_unique=False, all_solutions=False,
     num_solutions=None, free_search=False, parallel=None, seed=None,
-    rebase_arrays=True, keep_solutions=True,**kwargs
+    rebase_arrays=True, keep_solutions=True, **kwargs
 ):
     """Implements the workflow for solving a CSP problem encoded with MiniZinc.
 
