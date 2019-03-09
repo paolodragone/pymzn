@@ -128,7 +128,7 @@ class SolutionParser:
 
     def __init__(
         self, solver, output_mode='dict', rebase_arrays=True, types=None,
-        keep_solutions=True
+        keep_solutions=True, return_enums=False
     ):
         self.solver = solver
         self.solver_parser = self.solver.parser()
@@ -136,6 +136,7 @@ class SolutionParser:
         self.rebase_arrays = rebase_arrays
         self.types = types
         self.keep_solutions = keep_solutions
+        self.return_enums = return_enums
         self.status = Status.INCOMPLETE
 
     def _collect(self, solns, proc):
@@ -172,6 +173,7 @@ class SolutionParser:
                 if self.output_mode == 'dict':
                     soln = dzn2dict(
                         soln, rebase_arrays=self.rebase_arrays, types=self.types
+                        return_enums=self.return_enums
                     )
                 line = yield soln
             else:

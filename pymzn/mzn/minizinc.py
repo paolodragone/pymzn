@@ -508,7 +508,7 @@ def minizinc(
     solver=None, timeout=None, two_pass=None, pre_passes=None,
     output_objective=False, non_unique=False, all_solutions=False,
     num_solutions=None, free_search=False, parallel=None, seed=None,
-    rebase_arrays=True, keep_solutions=True, **kwargs
+    rebase_arrays=True, keep_solutions=True, return_enums=False, **kwargs
 ):
     """Implements the workflow for solving a CSP problem encoded with MiniZinc.
 
@@ -602,6 +602,9 @@ def minizinc(
         Whether to store the solutions in memory after solving is done. If
         ``keep_solutions`` is ``False``, the returned solution stream can only
         be iterated once and cannot be addressed as a list.
+    return_enums : bool
+        Wheter to return enum types along with the variable assignments in the
+        solutions. Only used if ``output_mode='dict'``. Default is ``False``.
     **kwargs
         Additional arguments to pass to the solver, provided as additional
         keyword arguments to this function. Check the solver documentation for
@@ -651,7 +654,7 @@ def minizinc(
 
     parser = SolutionParser(
         solver, output_mode=output_mode, rebase_arrays=rebase_arrays,
-        types=types, keep_solutions=keep_solutions
+        types=types, keep_solutions=keep_solutions, return_enums=return_enums
     )
     solns = parser.parse(proc)
     return solns
