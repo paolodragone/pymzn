@@ -116,7 +116,7 @@ class Solver:
         seed : int
             The random number generator seed to pass to the solver.
         """
-        args = []
+        args = ['-s', '-v']
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
