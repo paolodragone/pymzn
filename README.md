@@ -58,14 +58,14 @@ PyMzn is also able to:
   passing data to the `pymzn.minizinc` function);
 * Interface with many different
   [solvers](http://paolodragone.com/pymzn/reference/solvers/);
-* Preprocess MiniZinc models (a.k.a. [dynamic
-  modelling](http://paolodragone.com/pymzn/reference/model/)) by embedding code
-  from the [Jinja2](http://jinja.pocoo.org/) templating language;
+* [Preprocess](http://paolodragone.com/pymzn/reference/templates/) MiniZinc models
+  by embedding code from the [Jinja2](http://jinja.pocoo.org/) templating
+  language;
 * Perform [concurrent](http://paolodragone.com/pymzn/reference/aio) MiniZinc
   execution using Python coroutines.
 
 For a follow-up of the previous example, read the
-[Quick Start guide](http://paolodragone.com/pymzn/quick_start.html).
+[PyMzn tutorial](http://paolodragone.com/pymzn/tutorial.html).
 
 For more information on the PyMzn classes and functions refer to the
 [reference manual](http://paolodragone.com/pymzn/reference/).
