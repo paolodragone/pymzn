@@ -38,7 +38,7 @@ class Solutions:
         self._solns = [] if keep else None
         self._n_solns = 0
         self.status = Status.INCOMPLETE
-        self.statistics = None
+        self.log = None
         self.stderr = None
 
     def _fetch(self):
@@ -98,7 +98,7 @@ class Solutions:
                 return self._pp_solns()
         return self.status.name
 
-    def print(self, output_file=sys.stdout, statistics=False):
+    def print(self, output_file=sys.stdout, log=False):
 
         for soln in iter(self):
             print(soln, file=output_file)
@@ -120,8 +120,9 @@ class Solutions:
             if self.stderr:
                 print(self.stderr.strip(), file=sys.stderr)
 
-        elif statistics:
-            print(str(self.statistics), file=output_file)
+        elif log:
+            print(str(self.log), file=output_file)
+
 
 
 class SolutionParser:
@@ -143,8 +144,8 @@ class SolutionParser:
         for soln in self._parse(proc):
             solns._queue.put(soln)
         solns.status = self.status
-        solns.statistics = self.solver_parser.stats
         solns.stderr = proc.stderr_data
+        solns.log = self.solver_parser.log
 
     def parse(self, proc):
         solns = Solutions(Queue(), keep=self.keep_solutions)

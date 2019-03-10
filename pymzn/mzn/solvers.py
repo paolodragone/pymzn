@@ -134,11 +134,11 @@ class Solver:
         _line_comm_p = re.compile('%.*')
 
         def __init__(self):
-            self._stats = []
+            self._log = []
 
         @property
-        def stats(self):
-            return '\n'.join(self._stats)
+        def log(self):
+            return '\n'.join(self._log)
 
         def parse_out(self):
             """Parse the output stream of the solver.
@@ -158,7 +158,7 @@ class Solver:
             line = yield
             while True:
                 if self._line_comm_p.match(line):
-                    self._stats.append(line)
+                    self._log.append(line)
                     line = yield ''
                 else:
                     line = yield line
