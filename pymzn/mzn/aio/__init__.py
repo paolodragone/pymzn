@@ -14,15 +14,15 @@ lazy solution stream that, when addressed or iterated over returns all the
 solutions found so far by the solver. The following is a full example of how to
 use the ``minizinc`` coroutine:
 
-.. literalinclude:: ../../../examples/asyncronous/async.mzn
+.. literalinclude:: ../../../../examples/asyncronous/async.mzn
   :language: minizinc
-  :caption: :download:`async.mzn <../../../examples/asyncronous/async.mzn>`
+  :caption: :download:`async.mzn <../../../../examples/asyncronous/async.mzn>`
   :name: ex-async-mzn
   :linenos:
 
-.. literalinclude:: ../../../examples/asyncronous/async_test.py
+.. literalinclude:: ../../../../examples/asyncronous/async_test.py
   :language: python3
-  :caption: :download:`async.mzn <../../../examples/asyncronous/async_test.py>`
+  :caption: :download:`async.mzn <../../../../examples/asyncronous/async_test.py>`
   :name: ex-async
   :linenos:
 
