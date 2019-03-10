@@ -206,14 +206,15 @@ Solver arguments
 
 Usually, solvers provide arguments that can be used to modify their behavior.
 You can specify arguments to pass to the solver as additional keyword arguments
-in the ``minizinc`` function. For instance, adding the ``parallel`` argument,
-you can specify how many threads should the solver use:
+in the ``minizinc`` function. When using Gecode, for example, the ``fzn_flags``
+option is available, which can take any flag described when executing
+``fzn-gecode --help``. The ``pymzn.minizinc`` can take ``fzn_flags`` as a
+keyword argument, which will then be passed to the solver, e.g.:
 
 .. code-block:: python
 
-    pymzn.minizinc('test.mzn', parallel=4)
+    pymzn.minizinc('test.mzn', fzn_flags=['-restart linear', '-restart-base 1.5'])
 
-Solver arguments are subject to the support of the solver. Some solver may also
-provide additional parameters. More details in the `Solvers
-<reference/solvers/>`__ section.
+More details can be found in the `Solvers <./reference/solvers/index.html>`__
+section.
 
