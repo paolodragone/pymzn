@@ -23,7 +23,7 @@ def main():
     import argparse
 
     def _minizinc(
-        no_declare_enums=False, solver=None, output_file=None, statistics=False,
+        no_declare_enums=False, solver=None, output_file=None, solver_log=False,
         **_args
     ):
         if no_declare_enums:
@@ -53,7 +53,7 @@ def main():
         if 'output_mode' in _args and _args['output_mode'] == 'raw':
             print(solns, file=out)
         else:
-            solns.print(output_file=out, statistics=statistics)
+            solns.print(output_file=out, log=solver_log)
         out.close()
 
     def _config(key=None, value=None, delete=False, **__):
@@ -170,7 +170,7 @@ def main():
         help='path to the output file (default print on standard output)'
     )
     output_options.add_argument(
-        '-s', '--statistics', action='store_true', help='print statistics'
+        '-l', '--solver-log', action='store_true', help='print solver\'s log'
     )
     output_options.add_argument(
         '--output-mode', choices=['dict', 'item', 'dzn', 'json', 'raw'],
