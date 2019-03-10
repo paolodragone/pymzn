@@ -14,7 +14,7 @@ from .mzn import *
 __all__ = ['config'] + log.__all__ + dzn.__all__ + mzn.__all__
 
 
-__version__ = '0.18.0'
+__version__ = '0.18.1'
 
 
 def main():
