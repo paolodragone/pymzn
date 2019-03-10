@@ -33,7 +33,8 @@ release = find_version('..', '..', 'pymzn', '__init__.py')
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.githubpages'
 ]
 
 autosummary_generate = True
