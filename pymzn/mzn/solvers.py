@@ -174,6 +174,18 @@ class Gecode(Solver):
     def __init__(self, solver_id='gecode'):
         super().__init__(solver_id)
 
+    def args(self, fzn_flags=None, **kwargs):
+        args = super().args(**kwargs)
+
+        if fzn_flags:
+            if isinstance(fzn_flags, str):
+                fzn_flags = [fzn_flags]
+            elif not isinstance(fzn_file, list):
+                raise TypeError('Unrecognized type for fzn_flags argument.')
+            args += ['--fzn-flags', ''.join(fzn_flags)]
+
+        return args
+
 
 class Chuffed(Solver):
     """Interface to the Chuffed solver."""
