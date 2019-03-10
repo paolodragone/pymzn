@@ -18,7 +18,7 @@ Table of Contents
    :maxdepth: 2
 
    install
-   quick_start
+   tutorial
    reference/index
 
 Indices and tables
