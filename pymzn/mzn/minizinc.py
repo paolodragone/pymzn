@@ -37,6 +37,9 @@ from .. import config, dict2dzn, logger
 from .rewrap import rewrap_model
 from .solvers import gecode
 from .process import run_process
+
+from . import output
+from .output import *
 from .output import SolutionParser
 
 
@@ -44,7 +47,7 @@ __all__ = [
     'minizinc_version', 'preprocess_model', 'save_model', 'check_model',
     'check_instance', 'minizinc', 'solve', 'mzn2fzn', 'solns2out',
     'MiniZincError'
-]
+] + output.__all__
 
 
 def _run_minizinc_proc(*args, input=None):
@@ -612,13 +615,13 @@ def minizinc(
 
     Returns
     -------
-    list-like or str
-        If ``output_mode`` is not 'raw', returns a list-like object containing
-        the solutions found by the solver. The format of the solution depends on
-        the specified ``output_mode``. If ``keep_solutions=False``, the returned
-        object cannot be addressed as a list and can only be iterated once. If
-        ``output_mode='raw'``, the function returns the whole solution stream as
-        a single string.
+    Solutions or str
+        If ``output_mode`` is not ``'raw'``, returns a list-like object
+        containing the solutions found by the solver. The format of the solution
+        depends on the specified ``output_mode``. If ``keep_solutions=False``,
+        the returned object cannot be addressed as a list and can only be
+        iterated once. If ``output_mode='raw'``, the function returns the whole
+        solution stream as a single string.
     """
 
     mzn_file, dzn_files, data_file, data, keep, _output_mode, types = \
