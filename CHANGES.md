@@ -10,14 +10,15 @@ PyMzn Change Log
   work fine for the most part).
 * Now PyMzn interfaces only to the `minizinc` executable, greatly
   simplifying internal complexity.
-* The behavior of the `minizinc` function is now only that of executing MiniZinc
-  synchronously (i.e. wait for it to finish before parsing the solution stream).
+* The `minizinc` function now only executes MiniZinc synchronously (i.e. wait
+  for it to finish before parsing the solution stream).
 * Asyncronous solving is now handled via Python's `asyncio` package. The new
   `pymzn.aio` module contains the `minizinc` *coroutine*, i.e. an asyncronous
-  version of the `minizinc`. The `pymzn.aio` module requires Python >= 3.6.
+  version of the `pymzn.minizinc` function. The `pymzn.aio` module requires
+  Python >= 3.6.
 * PyMzn can now parse MiniZinc enums into Python Enums and back.
 * Substantial improvement of the preprocessing, solving and solution parsing.
-* The `Solution` class returned by the `minizinc` function has been improved
+* The `Solutions` class returned by the `minizinc` function has been improved
   too.
 * Removed the `MiniZincModel` class for dynamic modelling, just use Jinja
   instead.
