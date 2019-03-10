@@ -87,19 +87,21 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">MiniZinc tools</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.minizinc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.solns2out.html">pymzn.solns2out</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Status.html">pymzn.Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Solutions.html">pymzn.Solutions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio/index.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
@@ -174,7 +176,7 @@
 <h1>pymzn.minizinc<a class="headerlink" href="#pymzn-minizinc" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.minizinc">
-<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>include=None</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em>, <em>keep=False</em>, <em>output_vars=None</em>, <em>output_base=None</em>, <em>output_mode='dict'</em>, <em>solver=None</em>, <em>timeout=None</em>, <em>two_pass=None</em>, <em>pre_passes=None</em>, <em>output_objective=False</em>, <em>non_unique=False</em>, <em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>rebase_arrays=True</em>, <em>keep_solutions=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>include=None</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em>, <em>keep=False</em>, <em>output_vars=None</em>, <em>output_base=None</em>, <em>output_mode='dict'</em>, <em>solver=None</em>, <em>timeout=None</em>, <em>two_pass=None</em>, <em>pre_passes=None</em>, <em>output_objective=False</em>, <em>non_unique=False</em>, <em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>rebase_arrays=True</em>, <em>keep_solutions=True</em>, <em>return_enums=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the workflow for solving a CSP problem encoded with MiniZinc.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -242,21 +244,23 @@ True.</li>
 <li><strong>keep_solutions</strong> (<em>bool</em>) – Whether to store the solutions in memory after solving is done. If
 <code class="docutils literal notranslate"><span class="pre">keep_solutions</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, the returned solution stream can only
 be iterated once and cannot be addressed as a list.</li>
+<li><strong>return_enums</strong> (<em>bool</em>) – Wheter to return enum types along with the variable assignments in the
+solutions. Only used if <code class="docutils literal notranslate"><span class="pre">output_mode='dict'</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
 <li><strong>**kwargs</strong> – Additional arguments to pass to the solver, provided as additional
 keyword arguments to this function. Check the solver documentation for
 the available arguments.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">If <code class="docutils literal notranslate"><span class="pre">output_mode</span></code> is not ‘raw’, returns a list-like object containing
-the solutions found by the solver. The format of the solution depends on
-the specified <code class="docutils literal notranslate"><span class="pre">output_mode</span></code>. If <code class="docutils literal notranslate"><span class="pre">keep_solutions=False</span></code>, the returned
-object cannot be addressed as a list and can only be iterated once. If
-<code class="docutils literal notranslate"><span class="pre">output_mode='raw'</span></code>, the function returns the whole solution stream as
-a single string.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">If <code class="docutils literal notranslate"><span class="pre">output_mode</span></code> is not <code class="docutils literal notranslate"><span class="pre">'raw'</span></code>, returns a list-like object
+containing the solutions found by the solver. The format of the solution
+depends on the specified <code class="docutils literal notranslate"><span class="pre">output_mode</span></code>. If <code class="docutils literal notranslate"><span class="pre">keep_solutions=False</span></code>,
+the returned object cannot be addressed as a list and can only be
+iterated once. If <code class="docutils literal notranslate"><span class="pre">output_mode='raw'</span></code>, the function returns the whole
+solution stream as a single string.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list-like or str</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pymzn.Solutions.html#pymzn.Solutions" title="pymzn.Solutions">Solutions</a> or str</p>
 </td>
 </tr>
 </tbody>

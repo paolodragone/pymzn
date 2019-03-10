@@ -1,0 +1,452 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; PyMzn 0.18.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Manual" href="reference/index.html" />
+    <link rel="prev" title="Install" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PyMzn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.18.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solver-arguments">Solver arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Manual</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyMzn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will cover the basics of how to use PyMzn to solve MiniZinc
+problems inside Python scripts. Bare in mind that this tutorial is not meant to
+be an introduction to MiniZinc, so if you are new to MiniZinc go check out the
+official <a class="reference external" href="https://www.minizinc.org/doc-latest/en/part_2_tutorial.html">MiniZinc tutorial</a> and then come
+back here to learn about how to use MiniZinc in Python.</p>
+<p>Let’s start with a simple coloring problem of Australia (which happens to be the
+same of the MiniZinc tutorial):</p>
+<div class="literal-block-wrapper docutils container" id="ex-aust">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/8ae86ab55911a63d97d3157c5640a048/aust.mzn"><code class="xref download docutils literal notranslate"><span class="pre">aust.mzn</span></code></a></span><a class="headerlink" href="#ex-aust" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">nc</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">3</span><span class="p">;</span><span class="s"></span>
+<span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">wa</span><span class="p">;</span><span class="s">   </span><span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">nt</span><span class="p">;</span><span class="s">  </span><span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">sa</span><span class="p">;</span><span class="s">   </span><span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">q</span><span class="p">;</span><span class="s"></span>
+<span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">nsw</span><span class="p">;</span><span class="s">  </span><span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">v</span><span class="p">;</span><span class="s">   </span><span class="kt">var</span><span class="s"> </span><span class="m">1</span><span class="s"> </span><span class="o">..</span><span class="s"> </span><span class="nv">nc</span><span class="p">:</span><span class="s"> </span><span class="nv">t</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">wa</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">nt</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">wa</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">sa</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">nt</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">sa</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">nt</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">q</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">sa</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">q</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">sa</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">nsw</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">sa</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">v</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">q</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">nsw</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nv">nsw</span><span class="s"> </span><span class="o">!=</span><span class="s"> </span><span class="nv">v</span><span class="p">;</span><span class="s"></span>
+<span class="k">solve</span><span class="s"> </span><span class="k">satisfy</span><span class="p">;</span><span class="s"></span>
+<span class="k">output</span><span class="s"> </span><span class="p">[</span><span class="s"></span>
+<span class="s">    &quot;wa=</span><span class="p">\(</span><span class="nv">wa</span><span class="p">)</span><span class="se">\t</span><span class="s"> nt=</span><span class="p">\(</span><span class="nv">nt</span><span class="p">)</span><span class="se">\t</span><span class="s"> sa=</span><span class="p">\(</span><span class="nv">sa</span><span class="p">)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s"></span>
+<span class="s">    &quot;q=</span><span class="p">\(</span><span class="nv">q</span><span class="p">)</span><span class="se">\t</span><span class="s"> nsw=</span><span class="p">\(</span><span class="nv">nsw</span><span class="p">)</span><span class="se">\t</span><span class="s"> v=</span><span class="p">\(</span><span class="nv">v</span><span class="p">)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s"></span>
+<span class="s">    &quot;t=&quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">t</span><span class="p">),</span><span class="s"> &quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="p">];</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>Using PyMzn we can call MiniZinc to solve the above problem from a Python script
+and get the result as a Python object. Calling PyMzn is just as easy as:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
+<span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which will return a solution like:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;wa&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;sa&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;nsw&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function takes as input the path to the MiniZinc file,
+takes care of launching MiniZinc for you and parses the solution stream to get
+back solutions as Python dictionaries. Internally, PyMzn takes care of how
+solutions should be returned by MiniZinc in order to be able to parse them. By
+default it will ignore the output statement on your MiniZinc model, so you can
+leave it there, just in case. If instead you want to get solutions as strings
+formatted according to the output statement present in your MiniZinc model, you
+can use the option <code class="docutils literal notranslate"><span class="pre">output_mode='item'</span></code> with the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">,</span> <span class="n">output_mode</span><span class="o">=</span><span class="s1">&#39;item&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>which will print:</p>
+<div class="highlight-minizinc notranslate"><div class="highlight"><pre><span></span><span class="nv">wa</span><span class="o">=</span><span class="m">3</span><span class="s">     </span><span class="nv">nt</span><span class="o">=</span><span class="m">2</span><span class="s">    </span><span class="nv">sa</span><span class="o">=</span><span class="m">1</span><span class="s"></span>
+<span class="nv">q</span><span class="o">=</span><span class="m">3</span><span class="s">      </span><span class="nv">nsw</span><span class="o">=</span><span class="m">2</span><span class="s">   </span><span class="nv">v</span><span class="o">=</span><span class="m">3</span><span class="s"></span>
+<span class="nv">t</span><span class="o">=</span><span class="m">1</span><span class="s"></span>
+</pre></div>
+</div>
+<p>There are other options for the <code class="docutils literal notranslate"><span class="pre">output_mode</span></code> flag, namely <code class="docutils literal notranslate"><span class="pre">dzn</span></code>, <code class="docutils literal notranslate"><span class="pre">json</span></code>
+and <code class="docutils literal notranslate"><span class="pre">raw</span></code>. The former two return strings formatted as dzn and json
+respectively, while the latter does not return a list of solutions but rather
+the entire solution stream as a single string.</p>
+<p>As you may have noticed, the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function returns an object of
+type <code class="docutils literal notranslate"><span class="pre">Solutions</span></code> which in most cases may be addressed and iterated as a list:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">solns</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="c1"># Solutions</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">solns</span><span class="p">))</span>
+<span class="c1"># 1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">solns</span><span class="p">)))</span>
+<span class="c1"># list_iterator</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Solutions</span></code> object returned by the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function has also
+few other useful attributes, such as the <code class="docutils literal notranslate"><span class="pre">status</span></code> attribute:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+<span class="c1"># Status.INCOMPLETE</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">status</span></code> attribute is an instance of a <code class="docutils literal notranslate"><span class="pre">pymzn.Status</span></code> enum, which
+represents the status of the solution stream, i.e. wheter it is complete or not,
+whether the problem is unsatisfiable or there has been an error with the solver.
+In this case the status is incomplete because it is a satisfiability problem and
+the solver returned only one of the feasible solution.</p>
+<p>To get all the solutions of the problem, we can use the <code class="docutils literal notranslate"><span class="pre">all_solutions</span></code> flag:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">,</span> <span class="n">all_solutions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">solns</span><span class="p">))</span>
+<span class="c1"># 18</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+<span class="c1"># Status.COMPLETE</span>
+</pre></div>
+</div>
+<p>To be able to get all the solutions for a satisfiability problem, this feature
+needs to be supported by the solver. The default solver used by PyMzn is Gecode,
+which does support this feature.</p>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<p>Let us now move on to another problem, a simple 0-1 knapsack encoded with
+MiniZinc:</p>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/20aa38ef897c1fa30066691cd72f2e25/knapsack01.mzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.mzn</span></code></a></span><a class="headerlink" href="#ex-knapsack" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">n</span><span class="p">;</span><span class="s">                     </span><span class="c">% number of objects</span><span class="s"></span>
+<span class="kt">set</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">OBJ</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">1</span><span class="o">..</span><span class="nv">n</span><span class="p">;</span><span class="s"></span>
+<span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">profit</span><span class="p">;</span><span class="s">  </span><span class="c">% the profit of each object</span><span class="s"></span>
+<span class="kt">array</span><span class="p">[</span><span class="nv">OBJ</span><span class="p">]</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">size</span><span class="p">;</span><span class="s">    </span><span class="c">% the size of each object</span><span class="s"></span>
+<span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">capacity</span><span class="p">;</span><span class="s">              </span><span class="c">% the capacity of the knapsack</span><span class="s"></span>
+
+<span class="kt">var</span><span class="s"> </span><span class="kt">set</span><span class="s"> </span><span class="kt">of</span><span class="s"> </span><span class="nv">OBJ</span><span class="p">:</span><span class="s"> </span><span class="nv">x</span><span class="p">;</span><span class="s"></span>
+<span class="k">constraint</span><span class="s"> </span><span class="nb">sum</span><span class="p">(</span><span class="nv">i</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="p">)(</span><span class="nv">size</span><span class="p">[</span><span class="nv">i</span><span class="p">])</span><span class="s"> </span><span class="o">&lt;=</span><span class="s"> </span><span class="nv">capacity</span><span class="p">;</span><span class="s"></span>
+
+<span class="kt">var</span><span class="s"> </span><span class="kt">int</span><span class="p">:</span><span class="s"> </span><span class="nv">obj</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="nb">sum</span><span class="p">(</span><span class="nv">i</span><span class="s"> </span><span class="k">in</span><span class="s"> </span><span class="nv">x</span><span class="p">)(</span><span class="nv">profit</span><span class="p">[</span><span class="nv">i</span><span class="p">]);</span><span class="s"></span>
+<span class="k">solve</span><span class="s"> </span><span class="k">maximize</span><span class="s"> </span><span class="nv">obj</span><span class="p">;</span><span class="s"></span>
+
+<span class="k">output</span><span class="s"> </span><span class="p">[</span><span class="s"></span>
+<span class="s">    &quot;knapsack = &quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">x</span><span class="p">),</span><span class="s"> &quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s"></span>
+<span class="s">    &quot;objective = &quot;</span><span class="p">,</span><span class="s"> </span><span class="nb">show</span><span class="p">(</span><span class="nv">obj</span><span class="p">)</span><span class="s"></span>
+<span class="p">];</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>As you can see, in the above problem some data is missing, so we need to specify
+it via a data file or via inline data. Here is a data file for the above
+problem:</p>
+<div class="literal-block-wrapper docutils container" id="ex-knapsack-dzn">
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/ef11346e09d4d5e43e37afa051422e34/knapsack01.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-dzn" title="Permalink to this code">¶</a></div>
+<div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">n</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">5</span><span class="p">;</span><span class="s"></span>
+<span class="nv">profit</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[</span><span class="m">10</span><span class="p">,</span><span class="s"> </span><span class="m">3</span><span class="p">,</span><span class="s"> </span><span class="m">9</span><span class="p">,</span><span class="s"> </span><span class="m">4</span><span class="p">,</span><span class="s"> </span><span class="m">8</span><span class="p">];</span><span class="s"></span>
+<span class="nv">size</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="p">[</span><span class="m">14</span><span class="p">,</span><span class="s"> </span><span class="m">4</span><span class="p">,</span><span class="s"> </span><span class="m">10</span><span class="p">,</span><span class="s"> </span><span class="m">6</span><span class="p">,</span><span class="s"> </span><span class="m">9</span><span class="p">];</span><span class="s"></span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>In the above file we are still missing the <code class="docutils literal notranslate"><span class="pre">capacity</span></code> parameter, which we can
+specify as inline data. To solve the above problem with the provided data we
+use:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymzn</span>
+<span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack01.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack01.dzn&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="p">)</span>
+<span class="c1"># [{&#39;x&#39;: {3, 5}}]</span>
+</pre></div>
+</div>
+<p>The second argument we passed to the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function is the data
+file specified above. We also passed the keyword argument <code class="docutils literal notranslate"><span class="pre">data</span></code> as a
+dictionary assigning the value <code class="docutils literal notranslate"><span class="pre">20</span></code> to the variable <code class="docutils literal notranslate"><span class="pre">capacity</span></code>. PyMzn will
+automatically convert the dictionary into an appropriate dzn representation and
+pass it to MiniZinc as inline data. PyMzn does so by using the function
+<code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> which you can use yourself:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">dzn</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">dict2dzn</span><span class="p">({</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dzn</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which will return a list of dzn assignments, one for each variable, in this
+case:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;capacity = 20;&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Conveniently, you can also save the dzn assignments directly on a file:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">dict2dzn</span><span class="p">({</span><span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">fout</span><span class="o">=</span><span class="s1">&#39;capacity.dzn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This file can then be used in subsequent calls to the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code>
+function. We can actually specify as many data files we need as additional
+positional argument to the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function, so the above problem can
+now be solved with:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;knapsack01.mzn&#39;</span><span class="p">,</span> <span class="s1">&#39;knapsack01.dzn&#39;</span><span class="p">,</span> <span class="s1">&#39;capacity.dzn&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="p">)</span>
+<span class="c1"># [{&#39;x&#39;: {3, 5}}]</span>
+</pre></div>
+</div>
+<p>If you want to get back the content of a data file into a Python dictionary,
+PyMzn also offers the inverse function <code class="docutils literal notranslate"><span class="pre">pymzn.dzn2dict</span></code>, which accepts the
+path to a <code class="docutils literal notranslate"><span class="pre">.dzn</span></code> file as input and returns the content of the file converted
+to Python objects:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">dzn2dict</span><span class="p">(</span><span class="s1">&#39;capacity.dzn&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1"># {&#39;capacity&#39;: 20}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pymzn.dzn2dict</span></code> function also accept dzn content directly:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">dzn2dict</span><span class="p">(</span><span class="s1">&#39;capacity = 20;&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1"># {&#39;capacity&#39;: 20}</span>
+</pre></div>
+</div>
+<p>You can read more about converting data to and from dzn format in the <a class="reference external" href="./reference/dzn/index.html">Dzn files</a> section.</p>
+</div>
+<div class="section" id="solver-arguments">
+<h2>Solver arguments<a class="headerlink" href="#solver-arguments" title="Permalink to this headline">¶</a></h2>
+<p>Usually, solvers provide arguments that can be used to modify their behavior.
+You can specify arguments to pass to the solver as additional keyword arguments
+in the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> function. When using Gecode, for example, the <code class="docutils literal notranslate"><span class="pre">fzn_flags</span></code>
+option is available, which can take any flag described when executing
+<code class="docutils literal notranslate"><span class="pre">fzn-gecode</span> <span class="pre">--help</span></code>. The <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> can take <code class="docutils literal notranslate"><span class="pre">fzn_flags</span></code> as a
+keyword argument, which will then be passed to the solver, e.g.:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;test.mzn&#39;</span><span class="p">,</span> <span class="n">fzn_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-restart linear&#39;</span><span class="p">,</span> <span class="s1">&#39;-restart-base 1.5&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>More details can be found in the <a class="reference external" href="./reference/solvers/index.html">Solvers</a>
+section.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="reference/index.html" class="btn btn-neutral float-right" title="Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral float-left" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Paolo Dragone (MIT License)
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

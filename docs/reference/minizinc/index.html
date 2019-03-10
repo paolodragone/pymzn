@@ -87,19 +87,21 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MiniZinc tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.minizinc.html">pymzn.minizinc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.solns2out.html">pymzn.solns2out</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Status.html">pymzn.Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pymzn.Solutions.html">pymzn.Solutions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../dzn/index.html">Dzn files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../aio.html">Asynchronous execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../aio/index.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../exec.html">PyMzn executable</a></li>
 </ul>
@@ -184,6 +186,12 @@
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.solns2out.html#pymzn.solns2out" title="pymzn.solns2out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solns2out</span></code></a>(stream,&nbsp;ozn_file)</td>
 <td>Wraps the <code class="docutils literal notranslate"><span class="pre">solns2out</span></code> utility, executes it on the solution stream, and then returns the output stream.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.Status.html#pymzn.Status" title="pymzn.Status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Status</span></code></a></td>
+<td>Status of the solution stream.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.Solutions.html#pymzn.Solutions" title="pymzn.Solutions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Solutions</span></code></a>(queue,&nbsp;*[,&nbsp;keep])</td>
+<td>Solution stream returned by the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/pymzn.MiniZincError.html#pymzn.MiniZincError" title="pymzn.MiniZincError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MiniZincError</span></code></a>(mzn_file,&nbsp;args[,&nbsp;stderr])</td>
 <td>Generic error raised by the PyMzn functions.</td>

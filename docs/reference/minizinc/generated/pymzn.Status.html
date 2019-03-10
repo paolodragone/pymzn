@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.templates.add_path &mdash; PyMzn 0.18.0 documentation</title>
+  <title>pymzn.Status &mdash; PyMzn 0.18.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Asynchronous execution" href="../../aio/index.html" />
-    <link rel="prev" title="pymzn.templates.add_package" href="pymzn.templates.add_package.html" /> 
+    <link rel="next" title="pymzn.Solutions" href="pymzn.Solutions.html" />
+    <link rel="prev" title="pymzn.solns2out" href="pymzn.solns2out.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,14 +89,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Templating</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pymzn.templates.add_package.html">pymzn.templates.add_package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.templates.add_path</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">MiniZinc tools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pymzn.minizinc.html">pymzn.minizinc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.mzn2fzn.html">pymzn.mzn2fzn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.solns2out.html">pymzn.solns2out</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pymzn.Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.Solutions.html">pymzn.Solutions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pymzn.MiniZincError.html">pymzn.MiniZincError</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../dzn/index.html">Dzn files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../aio/index.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
@@ -149,9 +153,9 @@
         
           <li><a href="../../index.html">Manual</a> &raquo;</li>
         
-          <li><a href="../index.html">Templating</a> &raquo;</li>
+          <li><a href="../index.html">MiniZinc tools</a> &raquo;</li>
         
-      <li>pymzn.templates.add_path</li>
+      <li>pymzn.Status</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -168,12 +172,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pymzn-templates-add-path">
-<h1>pymzn.templates.add_path<a class="headerlink" href="#pymzn-templates-add-path" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="pymzn.templates.add_path">
-<code class="descclassname">pymzn.templates.</code><code class="descname">add_path</code><span class="sig-paren">(</span><em>searchpath</em>, <em>encoding='utf-8'</em>, <em>followlinks=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.templates.add_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the given path to the template search routine</p>
+  <div class="section" id="pymzn-status">
+<h1>pymzn.Status<a class="headerlink" href="#pymzn-status" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pymzn.Status">
+<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Status</code><a class="headerlink" href="#pymzn.Status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status of the solution stream.</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMPLETE</span></code></td>
+<td>The solution stream is complete (all solutions for satisfaction problems, optimal solution for optimization problems)</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">ERROR</span></code></td>
+<td>Generic error in the execution of the solver</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">INCOMPLETE</span></code></td>
+<td>The solution stream is incomplete</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNBOUNDED</span></code></td>
+<td>The problem admits infinite solutions (unbounded domain)</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNKNOWN</span></code></td>
+<td>The solution stream is empty (no solution found in the time limit)</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNSATISFIABLE</span></code></td>
+<td>The problem admits no solution</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNSATorUNBOUNDED</span></code></td>
+<td>Either unsatisfiable or unbounded</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -186,10 +220,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../aio/index.html" class="btn btn-neutral float-right" title="Asynchronous execution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pymzn.Solutions.html" class="btn btn-neutral float-right" title="pymzn.Solutions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pymzn.templates.add_package.html" class="btn btn-neutral float-left" title="pymzn.templates.add_package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pymzn.solns2out.html" class="btn btn-neutral float-left" title="pymzn.solns2out" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

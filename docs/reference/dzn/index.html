@@ -87,7 +87,7 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Install</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../minizinc/index.html">MiniZinc tools</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Dzn files</a><ul>
@@ -100,7 +100,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../aio.html">Asynchronous execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../aio/index.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../exec.html">PyMzn executable</a></li>
 </ul>
@@ -180,7 +180,7 @@
 <tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.dict2dzn.html#pymzn.dict2dzn" title="pymzn.dict2dzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict2dzn</span></code></a>(objs[,&nbsp;declare,&nbsp;assign,&nbsp;…])</td>
 <td>Serializes the objects in input and produces a list of strings encoding them into dzn format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.dzn2dict.html#pymzn.dzn2dict" title="pymzn.dzn2dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dzn2dict</span></code></a>(dzn,&nbsp;*[,&nbsp;rebase_arrays,&nbsp;types])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.dzn2dict.html#pymzn.dzn2dict" title="pymzn.dzn2dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dzn2dict</span></code></a>(dzn,&nbsp;*[,&nbsp;rebase_arrays,&nbsp;types,&nbsp;…])</td>
 <td>Parses a dzn string or file into a dictionary of variable assignments.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.stmt2dzn.html#pymzn.stmt2dzn" title="pymzn.stmt2dzn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stmt2dzn</span></code></a>(name,&nbsp;val[,&nbsp;declare,&nbsp;assign,&nbsp;wrap])</td>
@@ -265,6 +265,47 @@ transform it into a list (list of lists). For instance:</p>
 <span class="c1"># [[1, 2, 3], [2, 3]]</span>
 </pre></div>
 </div>
+<p>Since version 0.18.0, PyMzn supports conversion of MiniZinc enums too:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pymzn</span><span class="o">.</span><span class="n">dzn2dict</span><span class="p">(</span><span class="s1">&#39;P = {A, B, C}; x = A;&#39;</span><span class="p">)</span>
+<span class="c1"># {&#39;P&#39;: {&#39;A&#39;, &#39;B&#39;, &#39;C&#39;}, &#39;x&#39;: &#39;A&#39;}</span>
+</pre></div>
+</div>
+<p>Without additional information, PyMzn converts enums values into strings and
+enum types into sets of strings. In order to convert MiniZinc enums into Python
+enums, we need to supply an additional keyword parameter <code class="docutils literal notranslate"><span class="pre">types</span></code>, which is a
+dictionary of MiniZinc types of the variables. In this case:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">dzn2dict</span><span class="p">(</span><span class="s1">&#39;P = {A, B, C}; x = A;&#39;</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;enum&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The result will be:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">P</span><span class="o">.</span><span class="n">A</span><span class="p">:</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">P.A</span></code> is a value of an IntEnum <code class="docutils literal notranslate"><span class="pre">P</span></code> with three values <code class="docutils literal notranslate"><span class="pre">P.A</span></code>, <code class="docutils literal notranslate"><span class="pre">P.B</span></code>
+and <code class="docutils literal notranslate"><span class="pre">P.C</span></code>. By default, PyMzn will not include the enum types into the returned
+dictionary of variable assignments. You can access the enum <code class="docutils literal notranslate"><span class="pre">P</span></code> with:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+<span class="c1"># &lt;enum &#39;P&#39;&gt;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">P</span><span class="p">))</span>
+<span class="c1"># [&lt;P.A: 1&gt;, &lt;P.B: 2&gt;, &lt;P.C: 3&gt;]</span>
+</pre></div>
+</div>
+<p>If you want PyMzn to return the enum types along with the variable assignments,
+you can do so by setting the <code class="docutils literal notranslate"><span class="pre">return_enums</span></code> flag to <code class="docutils literal notranslate"><span class="pre">True</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">dzn2dict</span><span class="p">(</span><span class="s1">&#39;P = {A, B, C}; x = A;&#39;</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;enum&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">},</span> <span class="n">return_enums</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1"># {&#39;x&#39;: &lt;P.A: 1&gt;, &#39;P&#39;: &lt;enum &#39;P&#39;&gt;}</span>
+</pre></div>
+</div>
+<p>When executing the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function, PyMzn will take care of
+retrieving the types of the output variables from the model and will
+automatically convert the enum values into python objects. You can also pass the
+<code class="docutils literal notranslate"><span class="pre">return_enums=True</span></code> option to <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> to obtain the same result as
+the above example on all solutions returned.</p>
 </div>
 
 

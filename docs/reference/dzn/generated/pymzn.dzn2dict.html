@@ -87,7 +87,7 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../minizinc/index.html">MiniZinc tools</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">Dzn files</a><ul class="current">
@@ -100,7 +100,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../solvers/index.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../templates/index.html">Templating</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../aio.html">Asynchronous execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../aio/index.html">Asynchronous execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../exec.html">PyMzn executable</a></li>
 </ul>
@@ -175,7 +175,7 @@
 <h1>pymzn.dzn2dict<a class="headerlink" href="#pymzn-dzn2dict" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.dzn2dict">
-<code class="descclassname">pymzn.</code><code class="descname">dzn2dict</code><span class="sig-paren">(</span><em>dzn</em>, <em>*</em>, <em>rebase_arrays=True</em>, <em>types=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.dzn2dict" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pymzn.</code><code class="descname">dzn2dict</code><span class="sig-paren">(</span><em>dzn</em>, <em>*</em>, <em>rebase_arrays=True</em>, <em>types=None</em>, <em>return_enums=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.dzn2dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses a dzn string or file into a dictionary of variable assignments.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -185,10 +185,15 @@
 <li><strong>dzn</strong> (<em>str</em>) – A dzn content string or a path to a dzn file.</li>
 <li><strong>rebase_arrays</strong> (<em>bool</em>) – Whether to return arrays as zero-based lists or to return them as
 dictionaries, preserving the original index-sets.</li>
-<li><strong>types</strong> (<em>dict</em>) – Dictionary of variable types, as returned by the <code class="docutils literal notranslate"><span class="pre">minizinc</span>
-<span class="pre">--model-types-only</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which case the type of
+<li><strong>types</strong> (<em>dict</em>) – Dictionary of variable types. Types can either be dictionaries, as
+returned by the <code class="docutils literal notranslate"><span class="pre">minizinc</span> <span class="pre">--model-types-only</span></code>, or strings containing a
+type in dzn format. If the type is a string, it can either be the name
+of an enum type or one of the following: <code class="docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>,
+<code class="docutils literal notranslate"><span class="pre">enum</span></code>, <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">of</span> <span class="pre">&lt;type&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">array[&lt;index_sets&gt;]</span> <span class="pre">of</span> <span class="pre">&lt;type&gt;</span></code>. The
+default value for <code class="docutils literal notranslate"><span class="pre">var_types</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which case the type of
 most dzn assignments will be inferred automatically from the value. Enum
 values can only be parsed if their respective types are available.</li>
+<li><strong>return_enums</strong> (<em>bool</em>) – Whether to return the parsed enum types included in the dzn content.</li>
 </ul>
 </td>
 </tr>
