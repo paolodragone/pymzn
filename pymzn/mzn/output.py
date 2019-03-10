@@ -6,7 +6,7 @@ from .. import dzn2dict
 from queue import Queue
 
 
-__all__ = ['Status']
+__all__ = ['Status', 'Solutions']
 
 
 SOLN_SEP = '----------'
@@ -21,16 +21,58 @@ ERROR = '=====ERROR====='
 class Status(IntEnum):
     """Status of the solution stream."""
 
+    #: The solution stream is complete (all solutions for satisfaction problems,
+    #: optimal solution for optimization problems)
     COMPLETE = 0
+
+    #: The solution stream is incomplete
     INCOMPLETE = 1
+
+    #: The solution stream is empty (no solution found in the time limit)
     UNKNOWN = 2
+
+    #: The problem admits no solution
     UNSATISFIABLE = 3
+
+    #: The problem admits infinite solutions (unbounded domain)
     UNBOUNDED = 4
+
+    #: Either unsatisfiable or unbounded
     UNSATorUNBOUNDED = 5
+
+    #: Generic error in the execution of the solver
     ERROR = 6
 
 
 class Solutions:
+    """Solution stream returned by the ``pymzn.minizinc`` function.
+
+    You should not need to instantiate this class in any other way than by
+    calling the ``pymzn.minizinc`` or the ``pymzn.aio.minizinc`` functions.
+    This class represents lazy list-like objects that collect the solutions
+    provided by the solver and parsed by the PyMzn solution parser. The solution
+    parser provides solutions to this object through a queue that is only
+    accessed when this object is addressed or iterated over. If the queue has
+    limited size (by using the ``max_queue_size`` option of the
+    ``pymzn.aio.minizinc`` function), the execution of the solver will halt
+    untill this object is addressed. Note that, by default, as soon as this
+    object is addressed, the *full* queue is processed and it is cached in
+    memory. To avoid this behavior, use the option ``keep_solutions=True`` in
+    the ``pymzn.minizinc`` or ``pymzn.aio.minizinc`` functions.
+
+    Arguments
+    ---------
+    status : Status
+        The status of the solution stream, i.e. whether it is complete, the
+        problem was unsatisfiable or other errors that might have occurred.
+    log : str
+        The log of the solver on standard output. Usually contains solver
+        statistics and other log messages.
+    stderr : str
+        The log of the MiniZinc executable on standard error. Usually contains
+        log messages about the flattening process, statistics and error
+        messages.
+    """
 
     def __init__(self, queue, *, keep=True):
         self._queue = queue
@@ -99,6 +141,7 @@ class Solutions:
         return self.status.name
 
     def print(self, output_file=sys.stdout, log=False):
+        """Print the solution stream"""
 
         for soln in iter(self):
             print(soln, file=output_file)
@@ -122,7 +165,6 @@ class Solutions:
 
         elif log:
             print(str(self.log), file=output_file)
-
 
 
 class SolutionParser:
