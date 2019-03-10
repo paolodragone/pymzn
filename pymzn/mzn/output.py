@@ -172,8 +172,8 @@ class SolutionParser:
             if soln is not None:
                 if self.output_mode == 'dict':
                     soln = dzn2dict(
-                        soln, rebase_arrays=self.rebase_arrays, types=self.types
-                        return_enums=self.return_enums
+                        soln, rebase_arrays=self.rebase_arrays,
+                        types=self.types, return_enums=self.return_enums
                     )
                 line = yield soln
             else:
