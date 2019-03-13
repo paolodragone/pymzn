@@ -205,11 +205,6 @@ def preprocess_model(model, rewrap=True, **kwargs):
 
     if rewrap:
         model = rewrap_model(model)
-    else:
-        block_comm_p = re.compile('/\*.*\*/', re.DOTALL)
-        model = block_comm_p.sub('', model)
-        line_comm_p = re.compile('%.*')
-        model = line_comm_p.sub('', model)
 
     return model
 
