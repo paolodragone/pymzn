@@ -665,7 +665,7 @@ def _solve_args(
 ):
     args = []
     if timeout:
-        args += ['--time-limit', timeout * 1000] # minizinc takes milliseconds
+        args += ['--time-limit', str(timeout * 1000)] # minizinc takes milliseconds
 
     if two_pass:
         if isinstance(two_pass, bool):
