@@ -35,8 +35,10 @@ performed on the main thread.
 """
 
 from . import minizinc
+from . import output
 
-__all__ = minizinc.__all__
+__all__ = minizinc.__all__ + output.__all__
 
 from .minizinc import *
+from .output import *
 

@@ -1,12 +1,13 @@
 
 import sys
 from enum import IntEnum
-from .. import dzn2dict
-
 from queue import Queue
 
+from .. import dzn2dict
+from .solvers import Solver
 
-__all__ = ['Status', 'Solutions']
+
+__all__ = ['Status', 'Solutions', 'SolutionParser']
 
 
 SOLN_SEP = '----------'
@@ -167,14 +168,66 @@ class Solutions:
             print(str(self.log), file=output_file)
 
 
+class FileReader:
+
+    def __init__(self, path, mode='r'):
+        self.fd = open(path, mode)
+        self.stderr = ''
+
+    def readlines(self):
+        for line in self.fd:
+            yield line
+        self.fd.close()
+
+
 class SolutionParser:
+    """Parser of a solution stream.
+
+    This class is used when calling the `minizinc` function to parse the output
+    of the solver. A `SolutionParser` can also be instantiated and used to parse
+    a solution stream from a file-like object. This can be useful, for instance,
+    when saving a solution stream on a file and parsing it later.
+
+    Arguments
+    ---------
+    solver : Solver
+        The solver used to generate the solution stream.
+    output_mode : {'dict', 'item', 'dzn', 'json', 'raw'}
+        The desired output format. The default is ``'dict'`` which returns a
+        stream of solutions decoded as python dictionaries. The ``'item'``
+        format outputs a stream of strings as returned by the ``solns2out``
+        tool, formatted according to the output statement of the MiniZinc model.
+        The ``'dzn'`` and ``'json'`` formats output a stream of strings
+        formatted in dzn of json respectively. The ``'raw'`` format, instead
+        returns the whole solution stream, without parsing.
+    rebase_arrays : bool
+        Whether to "rebase" parsed arrays (see the `Dzn files
+        <http://paolodragone.com/pymzn/reference/dzn>`__ section). Default is
+        True.
+    types : dict
+        Dictionary of variable types. Types can either be dictionaries, as
+        returned by the ``minizinc --model-types-only``, or strings containing a
+        type in dzn format. If the type is a string, it can either be the name
+        of an enum type or one of the following: ``bool``, ``int``, ``float``,
+        ``enum``, ``set of <type>``, ``array[<index_sets>] of <type>``. The
+        default value for ``var_types`` is ``None``, in which case the type of
+        most dzn assignments will be inferred automatically from the value. Enum
+        values can only be parsed if their respective types are available.
+    keep_solutions : bool
+        Whether to keep the generated solutions in memory once retrieved by the
+        returned `Solutions` object. See the description of the `Solutions`
+        class for more details.
+    return_enums : bool
+        Whether to return the parsed enum types included in the dzn content.
+    """
 
     def __init__(
-        self, solver, output_mode='dict', rebase_arrays=True, types=None,
+        self, solver=None, output_mode='dict', rebase_arrays=True, types=None,
         keep_solutions=True, return_enums=False
     ):
         self.solver = solver
-        self.solver_parser = self.solver.parser()
+        solver_parser = Solver.Parser() if solver is None else solver.parser()
+        self.solver_parser = solver_parser
         self.output_mode = output_mode
         self.rebase_arrays = rebase_arrays
         self.types = types
@@ -182,17 +235,21 @@ class SolutionParser:
         self.return_enums = return_enums
         self.status = Status.INCOMPLETE
 
-    def _collect(self, solns, proc):
+    def parse_file(self, path):
+        proc = FileReader(path)
+        return self.parse(proc)
+
+    def parse(self, proc):
+        solns = Solutions(Queue(), keep=self.keep_solutions)
+        self._collect(proc, solns)
+        return solns
+
+    def _collect(self, proc, solns):
         for soln in self._parse(proc):
             solns._queue.put(soln)
         solns.status = self.status
         solns.stderr = proc.stderr_data
         solns.log = self.solver_parser.log
-
-    def parse(self, proc):
-        solns = Solutions(Queue(), keep=self.keep_solutions)
-        self._collect(solns, proc)
-        return solns
 
     def _parse(self, proc):
         parse_lines = self._parse_lines()
