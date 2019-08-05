@@ -98,7 +98,9 @@ def _var_types(mzn, allow_multiple_assignments=False):
         input = mzn
 
     json_str = _run_minizinc(*args, input=input)
-    return json.loads(json_str)['var_types']['vars']
+    var_types = json.loads(json_str)['var_types']['vars']
+    logger.info('Found var types: {}'.format(var_types))
+    return var_types
 
 
 def _model_interface(mzn, allow_multiple_assignments=False):
@@ -114,7 +116,9 @@ def _model_interface(mzn, allow_multiple_assignments=False):
         input = mzn
 
     json_str = _run_minizinc(*args, input=input)
-    return json.loads(json_str)
+    model_interface = json.loads(json_str)
+    logger.info('Found model interface: {}'.format(model_interface))
+    return model_interface
 
 
 def _dzn_output_statement(output_vars, types):
@@ -155,7 +159,7 @@ def _dzn_output_statement(output_vars, types):
     for enum_type in enum_types:
         enum_list.append(out_var.format(enum_type))
 
-    output = ', '.join(enum_list + out_list)
+    output = ', '.join(out_list + enum_list)
     output_stmt = 'output [{}];'.format(output)
     return output_stmt
 
@@ -169,10 +173,15 @@ def _process_output_vars(
         )
         output_vars = [k for k in model_int['output']]
     output_stmt = _dzn_output_statement(output_vars, types)
-    output_stmt_p = re.compile('output\s*\[(\".+?\"|[^\"]+?)+\](\s*\+\+\s*\[(\".+?\"|[^\"]+?)+\])*\s*(?:;)?', re.DOTALL)
+    output_stmt_p_str = \
+        'output\s*\[(\".+?\"|[^\"]+?)+\](\s*\+\+\s*\[(\".+?\"|[^\"]+?)+\])*\s*(?:;)?'
+    output_stmt_p = re.compile(output_stmt_p_str, re.DOTALL)
     if output_stmt_p.search(model):
+        logger.info(
+            'Substituting model output statement: {}'.format(output_stmt))
         output_stmt = output_stmt.replace('\\', '\\\\')
         return output_stmt_p.sub(output_stmt, model)
+    logger.info('Adding model output statement: {}'.format(output_stmt))
     return '\n'.join([model, output_stmt])
 
 
@@ -245,7 +254,7 @@ def save_model(model, output_file=None, output_dir=None, output_prefix='pymzn'):
     output_file.write(model)
     output_file.close()
 
-    logger.info('Generated file {}'.format(mzn_file))
+    logger.info('Generated file: {}'.format(mzn_file))
     return mzn_file
 
 
@@ -377,6 +386,8 @@ def check_instance(
             mzn if input is None else '\n' + mzn + '\n', args, proc.stderr_data
         )
 
+    logger.info('Instance checking passed.')
+
 
 def check_model(
     mzn, *, include=None, stdlib_dir=None, globals_dir=None
@@ -418,12 +429,21 @@ def check_model(
             mzn if input is None else '\n' + mzn + '\n', args, proc.stderr_data
         )
 
+    logger.info('Model checking passed.')
+
 
 def _minizinc_preliminaries(
     mzn, *dzn_files, args=None, data=None, include=None, stdlib_dir=None,
     globals_dir=None, output_vars=None, keep=False, output_base=None,
     output_mode='dict', declare_enums=True, allow_multiple_assignments=False
 ):
+    logger.info('Starting preliminaries, received arguments: {}'.format({
+        'include': include, 'stdlib_dir': stdlib_dir,
+        'globals_dir': globals_dir, 'output_vars': output_vars, 'keep': keep,
+        'output_base': output_base, 'output_mode': output_mode,
+        'declare_enums': declare_enums,
+        'allow_multiple_assignments': allow_multiple_assignments
+    }))
 
     check_version()
 
@@ -473,6 +493,7 @@ def _minizinc_preliminaries(
                 mzn_dir, mzn_name = os.path.split(mzn_file)
                 output_prefix, _ = os.path.splitext(mzn_name)
             output_dir = mzn_dir
+        logger.info('Keeping files in directory: {}'.format(output_dir))
 
     mzn_file = save_model(
         model, output_dir=output_dir, output_prefix=output_prefix
@@ -495,6 +516,8 @@ def _minizinc_preliminaries(
         _output_mode = 'item'
     else:
         _output_mode = output_mode
+
+    logger.info('Derived output_mode: {}'.format(_output_mode))
 
     return mzn_file, dzn_files, data_file, data, keep, _output_mode, types
 
@@ -648,7 +671,14 @@ def minizinc(
         _cleanup([mzn_file, data_file])
 
     if output_mode == 'raw':
+        logger.info('Returning raw output from the solver.')
         return proc.stdout_data
+
+    logger.info('Creating solution parser with arguments: {}'.format({
+        'output_mode': output_mode, 'rebase_arrays': rebase_arrays,
+        'types': types, 'keep_solutions': keep_solutions,
+        'return_enums': return_enums
+    }))
 
     parser = SolutionParser(
         solver, output_mode=output_mode, rebase_arrays=rebase_arrays,

@@ -120,13 +120,13 @@ class Solver:
         if all_solutions:
             args.append('-a')
         if num_solutions is not None:
-            args += ['-n', num_solutions]
+            args += ['-n', str(num_solutions)]
         if free_search:
             args.append('-f')
         if parallel is not None:
-            args += ['-p', parallel]
+            args += ['-p', str(parallel)]
         if seed is not None:
-            args += ['-r', seed]
+            args += ['-r', str(seed)]
         return args
 
     class Parser:

@@ -3,7 +3,7 @@ import sys
 from enum import IntEnum
 from queue import Queue
 
-from .. import dzn2dict
+from .. import dzn2dict, logger
 from .solvers import Solver
 
 
@@ -240,6 +240,7 @@ class SolutionParser:
         return self.parse(proc)
 
     def parse(self, proc):
+        logger.info('Started parsing solver output.')
         solns = Solutions(Queue(), keep=self.keep_solutions)
         self._collect(proc, solns)
         return solns
@@ -247,7 +248,11 @@ class SolutionParser:
     def _collect(self, proc, solns):
         for soln in self._parse(proc):
             solns._queue.put(soln)
+        logger.info('Solutions parsed: {}'.format(solns._queue.qsize()))
+
         solns.status = self.status
+        logger.info('Final status: {}'.format(solns.status))
+
         solns.stderr = proc.stderr_data
         solns.log = self.solver_parser.log
 
