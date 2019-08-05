@@ -146,7 +146,7 @@ _except_text = (
 def from_string(source, args=None):
     """Renders a template string"""
     if _has_jinja:
-        logger.info('Precompiling model with arguments: {}'.format(args))
+        logger.info('Preprocessing model with arguments: {}'.format(args))
         return _jenv.from_string(source).render(args or {})
     if args:
         raise RuntimeError(_except_text)
