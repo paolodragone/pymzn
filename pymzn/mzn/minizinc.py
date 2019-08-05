@@ -159,7 +159,7 @@ def _dzn_output_statement(output_vars, types):
     for enum_type in enum_types:
         enum_list.append(out_var.format(enum_type))
 
-    output = ', '.join(enum_list + out_list)
+    output = ', '.join(out_list + enum_list)
     output_stmt = 'output [{}];'.format(output)
     return output_stmt
 
