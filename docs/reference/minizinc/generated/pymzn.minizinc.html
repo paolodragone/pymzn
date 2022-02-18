@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.minizinc &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.minizinc &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -176,95 +176,91 @@
 <h1>pymzn.minizinc<a class="headerlink" href="#pymzn-minizinc" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.minizinc">
-<code class="descclassname">pymzn.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>include=None</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em>, <em>keep=False</em>, <em>output_vars=None</em>, <em>output_base=None</em>, <em>output_mode='dict'</em>, <em>solver=None</em>, <em>timeout=None</em>, <em>two_pass=None</em>, <em>pre_passes=None</em>, <em>output_objective=False</em>, <em>non_unique=False</em>, <em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>rebase_arrays=True</em>, <em>keep_solutions=True</em>, <em>return_enums=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pymzn.</code><code class="sig-name descname">minizinc</code><span class="sig-paren">(</span><em class="sig-param">mzn</em>, <em class="sig-param">*dzn_files</em>, <em class="sig-param">args=None</em>, <em class="sig-param">data=None</em>, <em class="sig-param">include=None</em>, <em class="sig-param">stdlib_dir=None</em>, <em class="sig-param">globals_dir=None</em>, <em class="sig-param">declare_enums=True</em>, <em class="sig-param">allow_multiple_assignments=False</em>, <em class="sig-param">keep=False</em>, <em class="sig-param">output_vars=None</em>, <em class="sig-param">output_base=None</em>, <em class="sig-param">output_mode='dict'</em>, <em class="sig-param">solver=None</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">two_pass=None</em>, <em class="sig-param">pre_passes=None</em>, <em class="sig-param">output_objective=False</em>, <em class="sig-param">non_unique=False</em>, <em class="sig-param">all_solutions=False</em>, <em class="sig-param">num_solutions=None</em>, <em class="sig-param">free_search=False</em>, <em class="sig-param">parallel=None</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">rebase_arrays=True</em>, <em class="sig-param">keep_solutions=True</em>, <em class="sig-param">return_enums=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.minizinc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the workflow for solving a CSP problem encoded with MiniZinc.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mzn</strong> (<em>str</em>) – The minizinc model. This can be either the path to the <code class="docutils literal notranslate"><span class="pre">.mzn</span></code> file or
-the content of the model itself.</li>
-<li><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the minizinc execution,
-provided as positional arguments; by default no data file is attached.</li>
-<li><strong>args</strong> (<em>dict</em>) – Arguments for the template engine.</li>
-<li><strong>data</strong> (<em>dict</em>) – Additional data as a dictionary of variables assignments to supply to
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mzn</strong> (<em>str</em>) – The minizinc model. This can be either the path to the <code class="docutils literal notranslate"><span class="pre">.mzn</span></code> file or
+the content of the model itself.</p></li>
+<li><p><strong>*dzn_files</strong> – A list of paths to dzn files to attach to the minizinc execution,
+provided as positional arguments; by default no data file is attached.</p></li>
+<li><p><strong>args</strong> (<em>dict</em>) – Arguments for the template engine.</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – Additional data as a dictionary of variables assignments to supply to
 the minizinc executable. The dictionary is automatically converted to
-dzn format by the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function.</li>
-<li><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included <code class="docutils literal notranslate"><span class="pre">.mzn</span></code> files.</li>
-<li><strong>stdlib_dir</strong> (<em>str</em>) – The path to the MiniZinc standard library. Provide it only if it is
-different from the default one.</li>
-<li><strong>globals_dir</strong> (<em>str</em>) – The path to the MiniZinc globals directory. Provide it only if it is
-different from the default one.</li>
-<li><strong>declare_enums</strong> (<em>bool</em>) – Whether to declare enum types when converting inline data into dzn
+dzn format by the <code class="docutils literal notranslate"><span class="pre">pymzn.dict2dzn</span></code> function.</p></li>
+<li><p><strong>include</strong> (<em>str</em><em> or </em><em>list</em>) – One or more additional paths to search for included <code class="docutils literal notranslate"><span class="pre">.mzn</span></code> files.</p></li>
+<li><p><strong>stdlib_dir</strong> (<em>str</em>) – The path to the MiniZinc standard library. Provide it only if it is
+different from the default one.</p></li>
+<li><p><strong>globals_dir</strong> (<em>str</em>) – The path to the MiniZinc globals directory. Provide it only if it is
+different from the default one.</p></li>
+<li><p><strong>declare_enums</strong> (<em>bool</em>) – Whether to declare enum types when converting inline data into dzn
 format. If the enum types are declared elsewhere this option should be
-False. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</li>
-<li><strong>allow_multiple_assignments</strong> (<em>bool</em>) – Whether to allow multiple assignments of variables. Sometimes is
+False. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>allow_multiple_assignments</strong> (<em>bool</em>) – Whether to allow multiple assignments of variables. Sometimes is
 convenient to simply let the data file override the value already
-assigned in the minizinc file. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
-<li><strong>keep</strong> (<em>bool</em>) – Whether to keep the generated <code class="docutils literal notranslate"><span class="pre">.mzn</span></code>, <code class="docutils literal notranslate"><span class="pre">.dzn</span></code>, <code class="docutils literal notranslate"><span class="pre">.fzn</span></code> and <code class="docutils literal notranslate"><span class="pre">.ozn</span></code>
+assigned in the minizinc file. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>keep</strong> (<em>bool</em>) – Whether to keep the generated <code class="docutils literal notranslate"><span class="pre">.mzn</span></code>, <code class="docutils literal notranslate"><span class="pre">.dzn</span></code>, <code class="docutils literal notranslate"><span class="pre">.fzn</span></code> and <code class="docutils literal notranslate"><span class="pre">.ozn</span></code>
 files or not. If False, the generated files are created as temporary
 files which will be deleted right after the problem is solved. Though
 files generated by PyMzn are not intended to be kept, this property can
 be used for debugging purpose. Note that in case of error the files are
-not deleted even if this parameter is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
-<li><strong>output_vars</strong> (<em>list of str</em>) – A list of output variables. These variables will be the ones included in
-the output dictionary. Only available if <code class="docutils literal notranslate"><span class="pre">ouptut_mode='dict'</span></code>.</li>
-<li><strong>output_base</strong> (<em>str</em>) – Output directory for the files generated by PyMzn. The default
+not deleted even if this parameter is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>output_vars</strong> (<em>list of str</em>) – A list of output variables. These variables will be the ones included in
+the output dictionary. Only available if <code class="docutils literal notranslate"><span class="pre">ouptut_mode='dict'</span></code>.</p></li>
+<li><p><strong>output_base</strong> (<em>str</em>) – Output directory for the files generated by PyMzn. The default
 (<code class="docutils literal notranslate"><span class="pre">None</span></code>) is the temporary directory of your OS (if <code class="docutils literal notranslate"><span class="pre">keep=False</span></code>) or
-the current working directory (if <code class="docutils literal notranslate"><span class="pre">keep=True</span></code>).</li>
-<li><strong>output_mode</strong> (<em>{'dict'</em><em>, </em><em>'item'</em><em>, </em><em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'raw'}</em>) – The desired output format. The default is <code class="docutils literal notranslate"><span class="pre">'dict'</span></code> which returns a
+the current working directory (if <code class="docutils literal notranslate"><span class="pre">keep=True</span></code>).</p></li>
+<li><p><strong>output_mode</strong> (<em>{'dict'</em><em>, </em><em>'item'</em><em>, </em><em>'dzn'</em><em>, </em><em>'json'</em><em>, </em><em>'raw'}</em>) – The desired output format. The default is <code class="docutils literal notranslate"><span class="pre">'dict'</span></code> which returns a
 stream of solutions decoded as python dictionaries. The <code class="docutils literal notranslate"><span class="pre">'item'</span></code>
 format outputs a stream of strings as returned by the <code class="docutils literal notranslate"><span class="pre">solns2out</span></code>
 tool, formatted according to the output statement of the MiniZinc model.
 The <code class="docutils literal notranslate"><span class="pre">'dzn'</span></code> and <code class="docutils literal notranslate"><span class="pre">'json'</span></code> formats output a stream of strings
 formatted in dzn of json respectively. The <code class="docutils literal notranslate"><span class="pre">'raw'</span></code> format, instead
-returns the whole solution stream, without parsing.</li>
-<li><strong>solver</strong> (<a class="reference internal" href="../../solvers/generated/pymzn.Solver.html#pymzn.Solver" title="pymzn.Solver"><em>Solver</em></a>) – The <code class="docutils literal notranslate"><span class="pre">Solver</span></code> instance to use. The default solver is <code class="docutils literal notranslate"><span class="pre">gecode</span></code>.</li>
-<li><strong>timeout</strong> (<em>int</em>) – The timeout in seconds for the flattening + solving process.</li>
-<li><strong>two_pass</strong> (<em>bool</em><em> or </em><em>int</em>) – If <code class="docutils literal notranslate"><span class="pre">two_pass</span></code> is True, then it is equivalent to the <code class="docutils literal notranslate"><span class="pre">--two-pass</span></code>
+returns the whole solution stream, without parsing.</p></li>
+<li><p><strong>solver</strong> (<a class="reference internal" href="../../solvers/generated/pymzn.Solver.html#pymzn.Solver" title="pymzn.Solver"><em>Solver</em></a>) – The <code class="docutils literal notranslate"><span class="pre">Solver</span></code> instance to use. The default solver is <code class="docutils literal notranslate"><span class="pre">gecode</span></code>.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) – The timeout in seconds for the flattening + solving process.</p></li>
+<li><p><strong>two_pass</strong> (<em>bool</em><em> or </em><em>int</em>) – If <code class="docutils literal notranslate"><span class="pre">two_pass</span></code> is True, then it is equivalent to the <code class="docutils literal notranslate"><span class="pre">--two-pass</span></code>
 option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable. If <code class="docutils literal notranslate"><span class="pre">two_pass</span></code> is an integer
 <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>, instead, it is equivalent to the <code class="docutils literal notranslate"><span class="pre">-O&lt;n&gt;</span></code> option for the
-<code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable.</li>
-<li><strong>pre_passes</strong> (<em>int</em>) – Equivalent to the <code class="docutils literal notranslate"><span class="pre">--pre-passes</span></code> option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code>
-executable.</li>
-<li><strong>output_objective</strong> (<em>bool</em>) – Equivalent to the <code class="docutils literal notranslate"><span class="pre">--output-objective</span></code> option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code>
-executable. Adds a field <code class="docutils literal notranslate"><span class="pre">_objective</span></code> to all solutions.</li>
-<li><strong>non_unique</strong> (<em>bool</em>) – Equivalent to the <code class="docutils literal notranslate"><span class="pre">--non-unique</span></code> option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code>
-executable.</li>
-<li><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned. This option might not work
-if the solver does not support it. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
-<li><strong>num_solutions</strong> (<em>int</em>) – The upper bound on the number of solutions to be returned. This option
-might not work if the solver does not support it. Default is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
-<li><strong>free_search</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, instruct the solver to perform free search.</li>
-<li><strong>parallel</strong> (<em>int</em>) – The number of parallel threads the solver can utilize for the solving.</li>
-<li><strong>seed</strong> (<em>int</em>) – The random number generator seed to pass to the solver.</li>
-<li><strong>rebase_arrays</strong> (<em>bool</em>) – Whether to “rebase” parsed arrays (see the <a class="reference external" href="http://paolodragone.com/pymzn/reference/dzn">Dzn files</a> section). Default is
-True.</li>
-<li><strong>keep_solutions</strong> (<em>bool</em>) – Whether to store the solutions in memory after solving is done. If
+<code class="docutils literal notranslate"><span class="pre">minizinc</span></code> executable.</p></li>
+<li><p><strong>pre_passes</strong> (<em>int</em>) – Equivalent to the <code class="docutils literal notranslate"><span class="pre">--pre-passes</span></code> option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code>
+executable.</p></li>
+<li><p><strong>output_objective</strong> (<em>bool</em>) – Equivalent to the <code class="docutils literal notranslate"><span class="pre">--output-objective</span></code> option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code>
+executable. Adds a field <code class="docutils literal notranslate"><span class="pre">_objective</span></code> to all solutions.</p></li>
+<li><p><strong>non_unique</strong> (<em>bool</em>) – Equivalent to the <code class="docutils literal notranslate"><span class="pre">--non-unique</span></code> option for the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code>
+executable.</p></li>
+<li><p><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned. This option might not work
+if the solver does not support it. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>num_solutions</strong> (<em>int</em>) – The upper bound on the number of solutions to be returned. This option
+might not work if the solver does not support it. Default is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>free_search</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, instruct the solver to perform free search.</p></li>
+<li><p><strong>parallel</strong> (<em>int</em>) – The number of parallel threads the solver can utilize for the solving.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – The random number generator seed to pass to the solver.</p></li>
+<li><p><strong>rebase_arrays</strong> (<em>bool</em>) – Whether to “rebase” parsed arrays (see the <a class="reference external" href="http://paolodragone.com/pymzn/reference/dzn">Dzn files</a> section). Default is
+True.</p></li>
+<li><p><strong>keep_solutions</strong> (<em>bool</em>) – Whether to store the solutions in memory after solving is done. If
 <code class="docutils literal notranslate"><span class="pre">keep_solutions</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, the returned solution stream can only
-be iterated once and cannot be addressed as a list.</li>
-<li><strong>return_enums</strong> (<em>bool</em>) – Wheter to return enum types along with the variable assignments in the
-solutions. Only used if <code class="docutils literal notranslate"><span class="pre">output_mode='dict'</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
-<li><strong>**kwargs</strong> – Additional arguments to pass to the solver, provided as additional
+be iterated once and cannot be addressed as a list.</p></li>
+<li><p><strong>return_enums</strong> (<em>bool</em>) – Wheter to return enum types along with the variable assignments in the
+solutions. Only used if <code class="docutils literal notranslate"><span class="pre">output_mode='dict'</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments to pass to the solver, provided as additional
 keyword arguments to this function. Check the solver documentation for
-the available arguments.</li>
+the available arguments.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">If <code class="docutils literal notranslate"><span class="pre">output_mode</span></code> is not <code class="docutils literal notranslate"><span class="pre">'raw'</span></code>, returns a list-like object
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If <code class="docutils literal notranslate"><span class="pre">output_mode</span></code> is not <code class="docutils literal notranslate"><span class="pre">'raw'</span></code>, returns a list-like object
 containing the solutions found by the solver. The format of the solution
 depends on the specified <code class="docutils literal notranslate"><span class="pre">output_mode</span></code>. If <code class="docutils literal notranslate"><span class="pre">keep_solutions=False</span></code>,
 the returned object cannot be addressed as a list and can only be
 iterated once. If <code class="docutils literal notranslate"><span class="pre">output_mode='raw'</span></code>, the function returns the whole
 solution stream as a single string.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pymzn.Solutions.html#pymzn.Solutions" title="pymzn.Solutions">Solutions</a> or str</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="pymzn.Solutions.html#pymzn.Solutions" title="pymzn.Solutions">Solutions</a> or str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

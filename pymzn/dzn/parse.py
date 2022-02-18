@@ -67,8 +67,9 @@ _var_p = re.compile('^\s*(?P<var>[\w]+)\s*=\s*(?P<val>.+)$', re.DOTALL)
 # statement pattern
 _stmt_p = re.compile('\s*([^;]+?);')
 
-# comment pattern
+# comment patterns
 _comm_p = re.compile('%.+?\n')
+_comm_mult_p = re.compile('/\*[\w\s]*(?s:.*)\*/')
 
 # set type pattern
 _set_type_p = re.compile('set\s+of\s+(?P<type>\w+)')
@@ -541,6 +542,7 @@ def dzn2dict(dzn, *, rebase_arrays=True, types=None, return_enums=False):
 
     var_list = []
     dzn = _comm_p.sub('\n', dzn)
+    dzn = _comm_mult_p.sub('\n',dzn)
     stmts = _stmt_p.findall(dzn)
     for stmt in stmts:
         var_m = _var_p.match(stmt)

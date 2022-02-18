@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.dict2dzn &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.dict2dzn &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -175,39 +175,35 @@
 <h1>pymzn.dict2dzn<a class="headerlink" href="#pymzn-dict2dzn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.dict2dzn">
-<code class="descclassname">pymzn.</code><code class="descname">dict2dzn</code><span class="sig-paren">(</span><em>objs</em>, <em>declare=False</em>, <em>assign=True</em>, <em>declare_enums=True</em>, <em>wrap=True</em>, <em>fout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.dict2dzn" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pymzn.</code><code class="sig-name descname">dict2dzn</code><span class="sig-paren">(</span><em class="sig-param">objs</em>, <em class="sig-param">declare=False</em>, <em class="sig-param">assign=True</em>, <em class="sig-param">declare_enums=True</em>, <em class="sig-param">wrap=True</em>, <em class="sig-param">fout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.dict2dzn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serializes the objects in input and produces a list of strings encoding
 them into dzn format. Optionally, the produced dzn is written on a file.</p>
 <p>Supported types of objects include: <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">set</span></code>,
 <code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">dict</span></code>. List and dict are serialized into dzn
 (multi-dimensional) arrays. The key-set of a dict is used as index-set of
 dzn arrays. The index-set of a list is implicitly set to <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">..</span> <span class="pre">len(list)</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>objs</strong> (<em>dict</em>) – A dictionary containing the objects to serialize, the keys are the names
-of the variables.</li>
-<li><strong>declare</strong> (<em>bool</em>) – Whether to include the declaration of the variable in the statements or
-just the assignment. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
-<li><strong>assign</strong> (<em>bool</em>) – Whether to include assignment of the value in the statements or just the
-declaration.</li>
-<li><strong>declare_enums</strong> (<em>bool</em>) – Whether to declare the enums found as types of the objects to serialize.
-Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</li>
-<li><strong>wrap</strong> (<em>bool</em>) – Whether to wrap the serialized values.</li>
-<li><strong>fout</strong> (<em>str</em>) – Path to the output file, if None no output file is written.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objs</strong> (<em>dict</em>) – A dictionary containing the objects to serialize, the keys are the names
+of the variables.</p></li>
+<li><p><strong>declare</strong> (<em>bool</em>) – Whether to include the declaration of the variable in the statements or
+just the assignment. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>assign</strong> (<em>bool</em>) – Whether to include assignment of the value in the statements or just the
+declaration.</p></li>
+<li><p><strong>declare_enums</strong> (<em>bool</em>) – Whether to declare the enums found as types of the objects to serialize.
+Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>wrap</strong> (<em>bool</em>) – Whether to wrap the serialized values.</p></li>
+<li><p><strong>fout</strong> (<em>str</em>) – Path to the output file, if None no output file is written.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of strings containing the dzn-encoded objects.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of strings containing the dzn-encoded objects.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

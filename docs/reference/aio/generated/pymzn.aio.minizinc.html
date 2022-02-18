@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.aio.minizinc &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.aio.minizinc &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -171,13 +171,11 @@
 <h1>pymzn.aio.minizinc<a class="headerlink" href="#pymzn-aio-minizinc" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.aio.minizinc">
-<code class="descclassname">pymzn.aio.</code><code class="descname">minizinc</code><span class="sig-paren">(</span><em>mzn</em>, <em>*dzn_files</em>, <em>args=None</em>, <em>data=None</em>, <em>include=None</em>, <em>stdlib_dir=None</em>, <em>globals_dir=None</em>, <em>declare_enums=True</em>, <em>allow_multiple_assignments=False</em>, <em>keep=False</em>, <em>output_vars=None</em>, <em>output_base=None</em>, <em>output_mode='dict'</em>, <em>solver=None</em>, <em>timeout=None</em>, <em>two_pass=None</em>, <em>pre_passes=None</em>, <em>output_objective=False</em>, <em>non_unique=False</em>, <em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>rebase_arrays=True</em>, <em>keep_solutions=True</em>, <em>return_enums=False</em>, <em>max_queue_size=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.aio.minizinc" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-prename descclassname">pymzn.aio.</code><code class="sig-name descname">minizinc</code><span class="sig-paren">(</span><em class="sig-param">mzn</em>, <em class="sig-param">*dzn_files</em>, <em class="sig-param">args=None</em>, <em class="sig-param">data=None</em>, <em class="sig-param">include=None</em>, <em class="sig-param">stdlib_dir=None</em>, <em class="sig-param">globals_dir=None</em>, <em class="sig-param">declare_enums=True</em>, <em class="sig-param">allow_multiple_assignments=False</em>, <em class="sig-param">keep=False</em>, <em class="sig-param">output_vars=None</em>, <em class="sig-param">output_base=None</em>, <em class="sig-param">output_mode='dict'</em>, <em class="sig-param">solver=None</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">two_pass=None</em>, <em class="sig-param">pre_passes=None</em>, <em class="sig-param">output_objective=False</em>, <em class="sig-param">non_unique=False</em>, <em class="sig-param">all_solutions=False</em>, <em class="sig-param">num_solutions=None</em>, <em class="sig-param">free_search=False</em>, <em class="sig-param">parallel=None</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">rebase_arrays=True</em>, <em class="sig-param">keep_solutions=True</em>, <em class="sig-param">return_enums=False</em>, <em class="sig-param">max_queue_size=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.aio.minizinc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coroutine version of the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_queue_size</strong> (<em>int</em>) – Maximum number of solutions in the queue between the solution parser and
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>max_queue_size</strong> (<em>int</em>) – Maximum number of solutions in the queue between the solution parser and
 the returned solution stream. When the queue is full, the solver
 execution will halt untill an item of the queue is consumed. This option
 is useful for memory management in cases where the solution stream gets
@@ -185,10 +183,9 @@ very large and the caller cannot consume solutions as fast as they are
 produced. Use with care, if the full solution stream is not consumed
 before the execution of the Python program ends it may result in the
 solver becoming a zombie process. Default is <code class="docutils literal notranslate"><span class="pre">0</span></code>, meaning an infinite
-queue.</td>
-</tr>
-</tbody>
-</table>
+queue.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Asynchronous execution &mdash; PyMzn 0.18.1 documentation</title>
+  <title>Asynchronous execution &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -167,14 +167,14 @@
             
   <div class="section" id="asynchronous-execution">
 <h1>Asynchronous execution<a class="headerlink" href="#asynchronous-execution" title="Permalink to this headline">¶</a></h1>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.aio.minizinc.html#pymzn.aio.minizinc" title="pymzn.aio.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a>(mzn,&nbsp;*dzn_files[,&nbsp;args,&nbsp;data,&nbsp;…])</td>
-<td>Coroutine version of the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pymzn.aio.minizinc.html#pymzn.aio.minizinc" title="pymzn.aio.minizinc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minizinc</span></code></a>(mzn, *dzn_files[, args, data, …])</p></td>
+<td><p>Coroutine version of the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function.</p></td>
 </tr>
 </tbody>
 </table>
@@ -192,7 +192,7 @@ lazy solution stream that, when addressed or iterated over returns all the
 solutions found so far by the solver. The following is a full example of how to
 use the <code class="docutils literal notranslate"><span class="pre">minizinc</span></code> coroutine:</p>
 <div class="literal-block-wrapper docutils container" id="ex-async-mzn">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/fd8fafa82b253649490a82cd19510e47/async.mzn"><code class="xref download docutils literal notranslate"><span class="pre">async.mzn</span></code></a></span><a class="headerlink" href="#ex-async-mzn" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/c23e5a0a9f838eef744bf72021f09552/async.mzn"><code class="xref download docutils literal notranslate"><span class="pre">async.mzn</span></code></a></span><a class="headerlink" href="#ex-async-mzn" title="Permalink to this code">¶</a></div>
 <div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Use a large domain to simulate a long solving process</span><span class="s"></span>
@@ -202,7 +202,7 @@ use the <code class="docutils literal notranslate"><span class="pre">minizinc</s
 </td></tr></table></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="ex-async">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/7274b86b658cdf3ca83e550b5305764e/async_test.py"><code class="xref download docutils literal notranslate"><span class="pre">async.mzn</span></code></a></span><a class="headerlink" href="#ex-async" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/2eda3a4cd39edf25bb12282935fcb93e/async_test.py"><code class="xref download docutils literal notranslate"><span class="pre">async.mzn</span></code></a></span><a class="headerlink" href="#ex-async" title="Permalink to this code">¶</a></div>
 <div class="highlight-python3 notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3

@@ -37,6 +37,7 @@ setup(
     author_email = 'dragone.paolo@gmail.com',
     description = 'A Python wrapper for the MiniZinc tool pipeline.',
     long_description = read('README.md'),
+    long_description_content_type = 'text/markdown',
     packages = find_packages(exclude=['*tests*']),
     test_suite = "pymzn.tests",
     install_requires = [

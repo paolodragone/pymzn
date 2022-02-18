@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorial &mdash; PyMzn 0.18.1 documentation</title>
+  <title>Tutorial &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -165,7 +165,7 @@ back here to learn about how to use MiniZinc in Python.</p>
 <p>Let’s start with a simple coloring problem of Australia (which happens to be the
 same of the MiniZinc tutorial):</p>
 <div class="literal-block-wrapper docutils container" id="ex-aust">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/8ae86ab55911a63d97d3157c5640a048/aust.mzn"><code class="xref download docutils literal notranslate"><span class="pre">aust.mzn</span></code></a></span><a class="headerlink" href="#ex-aust" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/4c93c2001885c8b710ea717ed49ba4f7/aust.mzn"><code class="xref download docutils literal notranslate"><span class="pre">aust.mzn</span></code></a></span><a class="headerlink" href="#ex-aust" title="Permalink to this code">¶</a></div>
 <div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -239,7 +239,16 @@ respectively, while the latter does not return a list of solutions but rather
 the entire solution stream as a single string.</p>
 <p>As you may have noticed, the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function returns an object of
 type <code class="docutils literal notranslate"><span class="pre">Solutions</span></code> which in most cases may be addressed and iterated as a list:</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">)</span>
+<div class="highlight-python3 notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">solns</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="c1"># Solutions</span>
@@ -250,7 +259,7 @@ type <code class="docutils literal notranslate"><span class="pre">Solutions</spa
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">solns</span><span class="p">)))</span>
 <span class="c1"># list_iterator</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>The <code class="docutils literal notranslate"><span class="pre">Solutions</span></code> object returned by the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function has also
 few other useful attributes, such as the <code class="docutils literal notranslate"><span class="pre">status</span></code> attribute:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">)</span>
@@ -265,7 +274,13 @@ whether the problem is unsatisfiable or there has been an error with the solver.
 In this case the status is incomplete because it is a satisfiability problem and
 the solver returned only one of the feasible solution.</p>
 <p>To get all the solutions of the problem, we can use the <code class="docutils literal notranslate"><span class="pre">all_solutions</span></code> flag:</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">,</span> <span class="n">all_solutions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python3 notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">solns</span> <span class="o">=</span> <span class="n">pymzn</span><span class="o">.</span><span class="n">minizinc</span><span class="p">(</span><span class="s1">&#39;aust.mzn&#39;</span><span class="p">,</span> <span class="n">all_solutions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">solns</span><span class="p">))</span>
 <span class="c1"># 18</span>
@@ -273,7 +288,7 @@ the solver returned only one of the feasible solution.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">solns</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
 <span class="c1"># Status.COMPLETE</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>To be able to get all the solutions for a satisfiability problem, this feature
 needs to be supported by the solver. The default solver used by PyMzn is Gecode,
 which does support this feature.</p>
@@ -282,7 +297,7 @@ which does support this feature.</p>
 <p>Let us now move on to another problem, a simple 0-1 knapsack encoded with
 MiniZinc:</p>
 <div class="literal-block-wrapper docutils container" id="ex-knapsack">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/20aa38ef897c1fa30066691cd72f2e25/knapsack01.mzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.mzn</span></code></a></span><a class="headerlink" href="#ex-knapsack" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/6a35e4a01d00b27a0bba9129623d65c3/knapsack01.mzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.mzn</span></code></a></span><a class="headerlink" href="#ex-knapsack" title="Permalink to this code">¶</a></div>
 <div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -321,7 +336,7 @@ MiniZinc:</p>
 it via a data file or via inline data. Here is a data file for the above
 problem:</p>
 <div class="literal-block-wrapper docutils container" id="ex-knapsack-dzn">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/ef11346e09d4d5e43e37afa051422e34/knapsack01.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-dzn" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="_downloads/b2db48b364223274b0cb31fda4b04ca8/knapsack01.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack01.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-dzn" title="Permalink to this code">¶</a></div>
 <div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">n</span><span class="s"> </span><span class="o">=</span><span class="s"> </span><span class="m">5</span><span class="p">;</span><span class="s"></span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.dzn2dict &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.dzn2dict &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -175,37 +175,33 @@
 <h1>pymzn.dzn2dict<a class="headerlink" href="#pymzn-dzn2dict" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pymzn.dzn2dict">
-<code class="descclassname">pymzn.</code><code class="descname">dzn2dict</code><span class="sig-paren">(</span><em>dzn</em>, <em>*</em>, <em>rebase_arrays=True</em>, <em>types=None</em>, <em>return_enums=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.dzn2dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pymzn.</code><code class="sig-name descname">dzn2dict</code><span class="sig-paren">(</span><em class="sig-param">dzn</em>, <em class="sig-param">*</em>, <em class="sig-param">rebase_arrays=True</em>, <em class="sig-param">types=None</em>, <em class="sig-param">return_enums=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.dzn2dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses a dzn string or file into a dictionary of variable assignments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dzn</strong> (<em>str</em>) – A dzn content string or a path to a dzn file.</li>
-<li><strong>rebase_arrays</strong> (<em>bool</em>) – Whether to return arrays as zero-based lists or to return them as
-dictionaries, preserving the original index-sets.</li>
-<li><strong>types</strong> (<em>dict</em>) – Dictionary of variable types. Types can either be dictionaries, as
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dzn</strong> (<em>str</em>) – A dzn content string or a path to a dzn file.</p></li>
+<li><p><strong>rebase_arrays</strong> (<em>bool</em>) – Whether to return arrays as zero-based lists or to return them as
+dictionaries, preserving the original index-sets.</p></li>
+<li><p><strong>types</strong> (<em>dict</em>) – Dictionary of variable types. Types can either be dictionaries, as
 returned by the <code class="docutils literal notranslate"><span class="pre">minizinc</span> <span class="pre">--model-types-only</span></code>, or strings containing a
 type in dzn format. If the type is a string, it can either be the name
 of an enum type or one of the following: <code class="docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>,
 <code class="docutils literal notranslate"><span class="pre">enum</span></code>, <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">of</span> <span class="pre">&lt;type&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">array[&lt;index_sets&gt;]</span> <span class="pre">of</span> <span class="pre">&lt;type&gt;</span></code>. The
 default value for <code class="docutils literal notranslate"><span class="pre">var_types</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which case the type of
 most dzn assignments will be inferred automatically from the value. Enum
-values can only be parsed if their respective types are available.</li>
-<li><strong>return_enums</strong> (<em>bool</em>) – Whether to return the parsed enum types included in the dzn content.</li>
+values can only be parsed if their respective types are available.</p></li>
+<li><p><strong>return_enums</strong> (<em>bool</em>) – Whether to return the parsed enum types included in the dzn content.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary containing the variable assignments parsed from the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary containing the variable assignments parsed from the
 input file or string.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

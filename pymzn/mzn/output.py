@@ -1,4 +1,5 @@
 
+import re
 import sys
 from enum import IntEnum
 from queue import Queue
@@ -251,6 +252,10 @@ class SolutionParser:
         logger.info('Solutions parsed: {}'.format(solns._queue.qsize()))
 
         solns.status = self.status
+        if solns.status is Status.INCOMPLETE and solns._queue.qsize() == 0:
+            if re.search('MiniZinc: evaluation error:', proc.stderr_data):
+                logger.info('Evaluation error detected.')
+                solns.status = Status.ERROR
         logger.info('Final status: {}'.format(solns.status))
 
         solns.stderr = proc.stderr_data

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; PyMzn 0.18.1 documentation</title>
+  <title>Configuration &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -167,12 +167,12 @@
             
   <div class="section" id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
+<tbody>
 </tbody>
 </table>
 <span class="target" id="module-pymzn.config"></span><p>PyMzn can be configured with custom executable paths and other variables.
@@ -184,16 +184,16 @@ Configuration is done via the <code class="docutils literal notranslate"><span c
 <p>The configurable properties used by PyMzn are the following:</p>
 <blockquote>
 <div><ul class="simple">
-<li><strong>minizinc</strong>: Path to the minizinc executable;</li>
-<li><strong>solver</strong>: Solver instance to use when calling pymzn.minizinc;</li>
-<li><strong>solver_args</strong>: Arguments to pass to the solver when calling pymzn.minizinc;</li>
-<li><strong>args</strong>: Additional arguments to pass to the template engine;</li>
-<li><strong>include</strong>: List of search paths to include in all minizinc calls;</li>
-<li><strong>keep</strong>: Overrides the keep flag of all minizinc calls;</li>
-<li><strong>dzn_width</strong>: The horizontal character limit for dzn files;
+<li><p><strong>minizinc</strong>: Path to the minizinc executable;</p></li>
+<li><p><strong>solver</strong>: Solver instance to use when calling pymzn.minizinc;</p></li>
+<li><p><strong>solver_args</strong>: Arguments to pass to the solver when calling pymzn.minizinc;</p></li>
+<li><p><strong>args</strong>: Additional arguments to pass to the template engine;</p></li>
+<li><p><strong>include</strong>: List of search paths to include in all minizinc calls;</p></li>
+<li><p><strong>keep</strong>: Overrides the keep flag of all minizinc calls;</p></li>
+<li><p><strong>dzn_width</strong>: The horizontal character limit for dzn files;
 This property is used to wrap long dzn statements when writing dzn files.
 This property is also used in the minizinc function as a limit to decide
-whether to write the inline data into a file.</li>
+whether to write the inline data into a file.</p></li>
 </ul>
 </div></blockquote>
 <p>One can also set custom properties to be used for custom solvers.</p>

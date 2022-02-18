@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.Opturion.args &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.Opturion.args &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -194,26 +194,22 @@
 <h1>pymzn.Opturion.args<a class="headerlink" href="#pymzn-opturion-args" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="pymzn.Opturion.args">
-<code class="descclassname">Opturion.</code><code class="descname">args</code><span class="sig-paren">(</span><em>all_solutions=False</em>, <em>num_solutions=None</em>, <em>free_search=False</em>, <em>parallel=None</em>, <em>seed=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Opturion.args" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Opturion.</code><code class="sig-name descname">args</code><span class="sig-paren">(</span><em class="sig-param">all_solutions=False</em>, <em class="sig-param">num_solutions=None</em>, <em class="sig-param">free_search=False</em>, <em class="sig-param">parallel=None</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Opturion.args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of command line arguments for the specified options.</p>
 <p>If the solver parser is able to parse statistics, this function should
 always add options to display statistics.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned (default is False).</li>
-<li><strong>num_solutions</strong> (<em>int</em>) – The maximum number of solutions to be returned (only used in
-satisfation problems).</li>
-<li><strong>free_search</strong> (<em>bool</em>) – Whether the solver should be instructed to perform a free search.</li>
-<li><strong>parallel</strong> (<em>int</em>) – The number of parallel threads the solver should use.</li>
-<li><strong>seed</strong> (<em>int</em>) – The random number generator seed to pass to the solver.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_solutions</strong> (<em>bool</em>) – Whether all the solutions must be returned (default is False).</p></li>
+<li><p><strong>num_solutions</strong> (<em>int</em>) – The maximum number of solutions to be returned (only used in
+satisfation problems).</p></li>
+<li><p><strong>free_search</strong> (<em>bool</em>) – Whether the solver should be instructed to perform a free search.</p></li>
+<li><p><strong>parallel</strong> (<em>int</em>) – The number of parallel threads the solver should use.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – The random number generator seed to pass to the solver.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

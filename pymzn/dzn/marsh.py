@@ -136,6 +136,8 @@ def _dzn_val(val):
         return 'true' if val else 'false'
     if isinstance(val, Enum):
         return val.name
+    if isinstance(val, set) and len(val) == 0:
+        return '{}'
     return str(val)
 
 

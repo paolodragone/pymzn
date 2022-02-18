@@ -2,6 +2,13 @@
 PyMzn Change Log
 ================
 
+0.18.2
+------
+
+* Support parsing of saved solution streams.
+* Bugfixes.
+
+
 0.18.1
 ------
 

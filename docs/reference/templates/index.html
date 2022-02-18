@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Templating &mdash; PyMzn 0.18.1 documentation</title>
+  <title>Templating &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -168,17 +168,17 @@
             
   <div class="section" id="templating">
 <h1>Templating<a class="headerlink" href="#templating" title="Permalink to this headline">¶</a></h1>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pymzn.templates.add_package.html#pymzn.templates.add_package" title="pymzn.templates.add_package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_package</span></code></a>(package_name[,&nbsp;package_path,&nbsp;…])</td>
-<td>Adds the given package to the template search routine</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pymzn.templates.add_package.html#pymzn.templates.add_package" title="pymzn.templates.add_package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_package</span></code></a>(package_name[, package_path, …])</p></td>
+<td><p>Adds the given package to the template search routine</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pymzn.templates.add_path.html#pymzn.templates.add_path" title="pymzn.templates.add_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_path</span></code></a>(searchpath[,&nbsp;encoding,&nbsp;followlinks])</td>
-<td>Adds the given path to the template search routine</td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pymzn.templates.add_path.html#pymzn.templates.add_path" title="pymzn.templates.add_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_path</span></code></a>(searchpath[, encoding, followlinks])</p></td>
+<td><p>Adds the given path to the template search routine</p></td>
 </tr>
 </tbody>
 </table>
@@ -187,7 +187,7 @@ code from the <a class="reference external" href="http://jinja.pocoo.org/">Jinja
 MiniZinc model to make a PyMzn template file (usually distinguished with the
 <code class="docutils literal notranslate"><span class="pre">.pmzn</span></code> extension). An example:</p>
 <div class="literal-block-wrapper docutils container" id="ex-knapsack-comp">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/7df95a7d6b7bf4813ba0af9dcccf77c9/knapsack.pmzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack.pmzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/01d4f87b527eeecbcb76d5c2bcd8148f/knapsack.pmzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack.pmzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp" title="Permalink to this code">¶</a></div>
 <div class="highlight-pymzn notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -237,7 +237,7 @@ MiniZinc model to make a PyMzn template file (usually distinguished with the
 </td></tr></table></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="ex-knapsack-comp-dzn">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/50ea5b09ca0786ad1de7b2a42e0edf87/knapsack.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp-dzn" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/950c86cecc71a77b2a5af6c51e202723/knapsack.dzn"><code class="xref download docutils literal notranslate"><span class="pre">knapsack.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp-dzn" title="Permalink to this code">¶</a></div>
 <div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -262,7 +262,7 @@ case, the model can be solved as usual by running:</p>
 <p>If we want to use the compatibility constraint, we define a compatibility
 matrix e.g. in a dzn file:</p>
 <div class="literal-block-wrapper docutils container" id="ex-knapsack-comp-dzn-comp">
-<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/312ca0d0d05226e8d550f3842830024a/compatibility.dzn"><code class="xref download docutils literal notranslate"><span class="pre">compatibility.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp-dzn-comp" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text"><a class="reference download internal" download="" href="../../_downloads/2f69d69f555b88a203186e2fd2cc6b35/compatibility.dzn"><code class="xref download docutils literal notranslate"><span class="pre">compatibility.dzn</span></code></a></span><a class="headerlink" href="#ex-knapsack-comp-dzn-comp" title="Permalink to this code">¶</a></div>
 <div class="highlight-minizinc notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
@@ -292,11 +292,11 @@ function, along with the dzn file with the compatibility matrix:</p>
 Jinja2 is also possible in PyMzn, including variables, control structures,
 template inheritance, and filters. PyMzn implements few custom filters as well:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">int(value,</span> <span class="pre">factor=100)</span></code> : discretizes the given input or array,
+<li><p><code class="docutils literal notranslate"><span class="pre">int(value,</span> <span class="pre">factor=100)</span></code> : discretizes the given input or array,
 pre-multiplying by the given factor. Usage:
-<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">float_value_or_array</span> <span class="pre">|</span> <span class="pre">int}}</span></code> or <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">float_value_or_array</span> <span class="pre">|</span> <span class="pre">int(factor=1000)</span> <span class="pre">}}</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">dzn(value)</span></code> : transform the input into its equivalent dzn string. Usage:
-<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">dzn_argument</span> <span class="pre">|</span> <span class="pre">dzn</span> <span class="pre">}}</span></code></li>
+<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">float_value_or_array</span> <span class="pre">|</span> <span class="pre">int}}</span></code> or <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">float_value_or_array</span> <span class="pre">|</span> <span class="pre">int(factor=1000)</span> <span class="pre">}}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dzn(value)</span></code> : transform the input into its equivalent dzn string. Usage:
+<code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">dzn_argument</span> <span class="pre">|</span> <span class="pre">dzn</span> <span class="pre">}}</span></code></p></li>
 </ul>
 <p>To provide a custom search path to the template engine you can use the
 function <code class="docutils literal notranslate"><span class="pre">add_path</span></code>:</p>

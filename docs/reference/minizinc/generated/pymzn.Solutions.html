@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.Solutions &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.Solutions &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -179,7 +179,7 @@
 <h1>pymzn.Solutions<a class="headerlink" href="#pymzn-solutions" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pymzn.Solutions">
-<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Solutions</code><span class="sig-paren">(</span><em>queue</em>, <em>*</em>, <em>keep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Solutions" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pymzn.</code><code class="sig-name descname">Solutions</code><span class="sig-paren">(</span><em class="sig-param">queue</em>, <em class="sig-param">*</em>, <em class="sig-param">keep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Solutions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solution stream returned by the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> function.</p>
 <p>You should not need to instantiate this class in any other way than by
 calling the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> or the <code class="docutils literal notranslate"><span class="pre">pymzn.aio.minizinc</span></code> functions.
@@ -193,32 +193,28 @@ untill this object is addressed. Note that, by default, as soon as this
 object is addressed, the <em>full</em> queue is processed and it is cached in
 memory. To avoid this behavior, use the option <code class="docutils literal notranslate"><span class="pre">keep_solutions=True</span></code> in
 the <code class="docutils literal notranslate"><span class="pre">pymzn.minizinc</span></code> or <code class="docutils literal notranslate"><span class="pre">pymzn.aio.minizinc</span></code> functions.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>status</strong> (<a class="reference internal" href="pymzn.Status.html#pymzn.Status" title="pymzn.Status"><em>Status</em></a>) – The status of the solution stream, i.e. whether it is complete, the
-problem was unsatisfiable or other errors that might have occurred.</li>
-<li><strong>log</strong> (<em>str</em>) – The log of the solver on standard output. Usually contains solver
-statistics and other log messages.</li>
-<li><strong>stderr</strong> (<em>str</em>) – The log of the MiniZinc executable on standard error. Usually contains
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<a class="reference internal" href="pymzn.Status.html#pymzn.Status" title="pymzn.Status"><em>Status</em></a>) – The status of the solution stream, i.e. whether it is complete, the
+problem was unsatisfiable or other errors that might have occurred.</p></li>
+<li><p><strong>log</strong> (<em>str</em>) – The log of the solver on standard output. Usually contains solver
+statistics and other log messages.</p></li>
+<li><p><strong>stderr</strong> (<em>str</em>) – The log of the MiniZinc executable on standard error. Usually contains
 log messages about the flattening process, statistics and error
-messages.</li>
+messages.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.Solutions.print.html#pymzn.Solutions.print" title="pymzn.Solutions.print"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print</span></code></a>([output_file,&nbsp;log])</td>
-<td>Print the solution stream</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="pymzn.Solutions.print.html#pymzn.Solutions.print" title="pymzn.Solutions.print"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print</span></code></a>([output_file, log])</p></td>
+<td><p>Print the solution stream</p></td>
 </tr>
 </tbody>
 </table>

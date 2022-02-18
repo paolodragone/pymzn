@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pymzn.Solver &mdash; PyMzn 0.18.1 documentation</title>
+  <title>pymzn.Solver &mdash; PyMzn 0.18.3 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18.1
+                0.18.3
               </div>
             
           
@@ -192,28 +192,25 @@
 <h1>pymzn.Solver<a class="headerlink" href="#pymzn-solver" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pymzn.Solver">
-<em class="property">class </em><code class="descclassname">pymzn.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>solver_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Solver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pymzn.</code><code class="sig-name descname">Solver</code><span class="sig-paren">(</span><em class="sig-param">solver_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pymzn.Solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract solver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>solver_id</strong> (<em>str</em>) – The identifier to use when launching the minizinc command.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>solver_id</strong> (<em>str</em>) – The identifier to use when launching the minizinc command.</p>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="pymzn.Solver.args.html#pymzn.Solver.args" title="pymzn.Solver.args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args</span></code></a>([all_solutions,&nbsp;num_solutions,&nbsp;…])</td>
-<td>Returns a list of command line arguments for the specified options.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="pymzn.Solver.args.html#pymzn.Solver.args" title="pymzn.Solver.args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args</span></code></a>([all_solutions, num_solutions, …])</p></td>
+<td><p>Returns a list of command line arguments for the specified options.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="pymzn.Solver.parser.html#pymzn.Solver.parser" title="pymzn.Solver.parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser</span></code></a>()</td>
-<td>This function should return a new instance of the solver parser.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="pymzn.Solver.parser.html#pymzn.Solver.parser" title="pymzn.Solver.parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser</span></code></a>()</p></td>
+<td><p>This function should return a new instance of the solver parser.</p></td>
 </tr>
 </tbody>
 </table>
